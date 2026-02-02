@@ -32,7 +32,13 @@ export function SimulationPhase() {
       const ships = await loadAllShips();
       setAllShips(ships);
 
-      if (currentLevel && placedShips.length > 0) {
+      console.log('[Simulation] Init:', {
+        currentLevel: !!currentLevel,
+        placedShipsCount: placedShips.length,
+        placedShips
+      });
+
+      if (currentLevel) {
         const eng = new SimulationEngine(
           placedShips,
           ships,
@@ -43,12 +49,14 @@ export function SimulationPhase() {
         );
         setEngine(eng);
         setSimState(eng.getState());
+        console.log('[Simulation] Engine created:', eng.getState());
       }
 
       setIsLoading(false);
     }
     init();
-  }, [currentLevel, placedShips, degradation]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Ships map for lookups
   const shipsMap = useMemo(

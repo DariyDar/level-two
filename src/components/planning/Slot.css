@@ -43,6 +43,11 @@
   z-index: 10;
 }
 
+.slot--drop-spans-2,
+.slot--drop-spans-3 {
+  position: absolute;
+}
+
 .slot--drop-spans-2 {
   width: 168px;
 }
