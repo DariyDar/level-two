@@ -1,0 +1,51 @@
+.ship-inventory {
+  background: #2d3748;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ship-inventory__tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.ship-inventory__tab {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #1a202c;
+  color: #a0aec0;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ship-inventory__tab:hover {
+  background: #4a5568;
+  color: #e2e8f0;
+}
+
+.ship-inventory__tab--active {
+  background: #4299e1;
+  color: white;
+}
+
+.ship-inventory__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 100px;
+}
+
+.ship-inventory__empty {
+  width: 100%;
+  padding: 24px;
+  text-align: center;
+  color: #718096;
+  font-size: 14px;
+}

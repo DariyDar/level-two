@@ -1,4 +1,5 @@
 import { useGameStore } from './store/gameStore';
+import { PlanningPhase } from './components/planning';
 import './App.css';
 
 function App() {
@@ -9,39 +10,23 @@ function App() {
       <header className="app-header">
         <h1>🚢 Port Management</h1>
         <div className="status-bar">
-          <span>Phase: {phase}</span>
-          <span>Day: {currentDay}</span>
-          {currentLevel && <span>Level: {currentLevel.name}</span>}
+          <span>Day {currentDay}</span>
+          {currentLevel && <span>{currentLevel.name}</span>}
         </div>
       </header>
 
       <main className="app-main">
-        {phase === 'Planning' && <PlanningPlaceholder />}
+        {phase === 'Planning' && <PlanningPhase />}
         {phase === 'Simulation' && <SimulationPlaceholder />}
         {phase === 'Results' && <ResultsPlaceholder />}
       </main>
 
       <footer className="app-footer">
         <div className="degradation-status">
-          <span>🫀 Liver: {degradation.liver}</span>
-          <span>🫁 Pancreas: {degradation.pancreas}</span>
+          <span>🫀 Liver: {degradation.liver}%</span>
+          <span>🫁 Pancreas: {degradation.pancreas}%</span>
         </div>
       </footer>
-    </div>
-  );
-}
-
-// Placeholder components - will be replaced with real implementations
-function PlanningPlaceholder() {
-  const { setPhase } = useGameStore();
-
-  return (
-    <div className="phase-placeholder">
-      <h2>📋 Planning Phase</h2>
-      <p>Drag food ships to timeline slots</p>
-      <button onClick={() => setPhase('Simulation')}>
-        Start Simulation →
-      </button>
     </div>
   );
 }

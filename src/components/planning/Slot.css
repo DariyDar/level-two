@@ -1,0 +1,60 @@
+.slot {
+  width: 80px;
+  height: 80px;
+  border: 2px dashed #4a5568;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a202c;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.slot__number {
+  color: #4a5568;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.slot--occupied {
+  border-style: solid;
+  border-color: #4299e1;
+  background: #2d3748;
+}
+
+.slot--pre-occupied {
+  border-color: #ed8936;
+  background: #2d3748;
+}
+
+.slot--pre-occupied::after {
+  content: '🔒';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 10px;
+}
+
+.slot--drop-valid {
+  border-color: #48bb78;
+  background: rgba(72, 187, 120, 0.2);
+  transform: scale(1.05);
+}
+
+.slot--drop-invalid {
+  border-color: #fc8181;
+  background: rgba(252, 129, 129, 0.2);
+}
+
+.slot--highlighted {
+  border-color: #48bb78;
+  box-shadow: 0 0 0 2px rgba(72, 187, 120, 0.3);
+}
+
+.slot--part-of-ship {
+  border-style: solid;
+  border-color: #4299e1;
+  background: #2d3748;
+  opacity: 0.7;
+}
