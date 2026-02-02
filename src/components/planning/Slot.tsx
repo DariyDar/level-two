@@ -1,5 +1,6 @@
 import { useDroppable } from '@dnd-kit/core';
 import type { Ship, PlacedShip } from '../../core/types';
+import { SHIP_SIZE_TO_SLOTS } from '../../core/types';
 import { ShipCard } from './ShipCard';
 import './Slot.css';
 
@@ -33,6 +34,7 @@ export function Slot({
   });
 
   const showShip = placedShip && ship && !isPartOfShip;
+  const shipSlots = ship ? SHIP_SIZE_TO_SLOTS[ship.size] : 1;
 
   return (
     <div
@@ -40,6 +42,7 @@ export function Slot({
       className={[
         'slot',
         isOccupied && 'slot--occupied',
+        isOccupied && shipSlots > 1 && `slot--spans-${shipSlots}`,
         isPreOccupied && 'slot--pre-occupied',
         isValidTarget && 'slot--valid-target',
         isOver && canDrop && 'slot--drop-valid',

@@ -99,6 +99,7 @@ export function ShipInventory({
             <ShipCard
               key={`${ship.id}-${index}`}
               ship={ship}
+              instanceId={`inventory-${ship.id}-${index}`}
               showDetails={true}
             />
           ))

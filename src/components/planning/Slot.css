@@ -60,8 +60,17 @@
 }
 
 .slot--part-of-ship {
-  border-style: solid;
-  border-color: #4299e1;
-  background: #2d3748;
-  opacity: 0.7;
+  border: none;
+  background: transparent;
+}
+
+/* Multi-slot ships - span across slots */
+.slot--spans-2 {
+  width: 168px; /* 80px * 2 + 8px gap */
+  z-index: 1;
+}
+
+.slot--spans-3 {
+  width: 256px; /* 80px * 3 + 8px * 2 gaps */
+  z-index: 1;
 }
