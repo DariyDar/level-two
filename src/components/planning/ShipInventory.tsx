@@ -12,6 +12,11 @@ interface ShipInventoryProps {
   placedShips: PlacedShip[];
 }
 
+interface InventoryItem {
+  ship: Ship;
+  index: number; // For unique key when showing individual items
+}
+
 export function ShipInventory({
   allShips,
   availableFoods,
@@ -29,29 +34,38 @@ export function ShipInventory({
     return counts;
   }, [placedShips]);
 
-  // Get available ships for current tab
-  const availableShips = useMemo(() => {
+  // Get available ships for current tab - each item shown separately (no stacking)
+  const inventoryItems = useMemo(() => {
+    const items: InventoryItem[] = [];
+
     if (activeTab === 'Food') {
-      return availableFoods
-        .map((af) => {
-          const ship = allShips.find((s) => s.id === af.id);
-          if (!ship) return null;
-          const placed = placedCounts.get(af.id) || 0;
-          const remaining = af.count - placed;
-          return { ship, remaining, maxCount: af.count };
-        })
-        .filter((item): item is NonNullable<typeof item> => item !== null && item.remaining > 0);
+      for (const af of availableFoods) {
+        const ship = allShips.find((s) => s.id === af.id);
+        if (!ship) continue;
+
+        const placed = placedCounts.get(af.id) || 0;
+        const remaining = af.count - placed;
+
+        // Add each remaining item separately
+        for (let i = 0; i < remaining; i++) {
+          items.push({ ship, index: i });
+        }
+      }
     } else {
-      return availableInterventions
-        .map((id) => {
-          const ship = allShips.find((s) => s.id === id);
-          if (!ship) return null;
-          const placed = placedCounts.get(id) || 0;
-          // Interventions have unlimited uses (for now)
-          return { ship, remaining: 99 - placed, maxCount: 99 };
-        })
-        .filter((item): item is NonNullable<typeof item> => item !== null && item.remaining > 0);
+      for (const id of availableInterventions) {
+        const ship = allShips.find((s) => s.id === id);
+        if (!ship) continue;
+
+        const placed = placedCounts.get(id) || 0;
+        const remaining = Math.max(0, 5 - placed); // Limit interventions to 5
+
+        for (let i = 0; i < remaining; i++) {
+          items.push({ ship, index: i });
+        }
+      }
     }
+
+    return items;
   }, [activeTab, allShips, availableFoods, availableInterventions, placedCounts]);
 
   const hasInterventions = availableInterventions.length > 0;
@@ -76,17 +90,16 @@ export function ShipInventory({
       )}
 
       <div className="ship-inventory__grid">
-        {availableShips.length === 0 ? (
+        {inventoryItems.length === 0 ? (
           <div className="ship-inventory__empty">
             {activeTab === 'Food' ? 'All food placed!' : 'No interventions available'}
           </div>
         ) : (
-          availableShips.map(({ ship, remaining, maxCount }) => (
+          inventoryItems.map(({ ship, index }) => (
             <ShipCard
-              key={ship.id}
+              key={`${ship.id}-${index}`}
               ship={ship}
               showDetails={true}
-              remainingCount={maxCount < 99 ? remaining : undefined}
             />
           ))
         )}

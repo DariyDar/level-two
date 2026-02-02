@@ -259,15 +259,9 @@ export class SimulationEngine {
     // If already unloading, skip
     if (this.state.unloadingShip) return;
 
-    // Find next ship that should start this tick
-    // Ships start when their slot's hour begins
-    // Slot 1-3 = hour 0-2, slot 4-6 = hour 3-5, etc.
-    const currentHour = this.state.currentTick;
-
-    const nextShip = this.state.remainingShips.find((s) => {
-      const slotHour = s.slotNumber - 1; // slot 1 = hour 0
-      return slotHour <= currentHour;
-    });
+    // Find next ship in queue (they're already sorted by slot number)
+    // Ships unload sequentially - when one finishes, next one starts
+    const nextShip = this.state.remainingShips[0];
 
     if (nextShip) {
       const ship = this.ships.get(nextShip.shipId);

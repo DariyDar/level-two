@@ -23,19 +23,19 @@
   cursor: grabbing;
 }
 
-/* Size variants */
+/* Size variants - used in slots */
 .ship-card--size-s {
   width: 70px;
   height: 70px;
 }
 
 .ship-card--size-m {
-  width: 154px; /* 70*2 + 8 gap + 6 border */
+  width: 154px;
   height: 70px;
 }
 
 .ship-card--size-l {
-  width: 238px; /* 70*3 + 16 gap + 12 border */
+  width: 238px;
   height: 70px;
 }
 
@@ -60,14 +60,14 @@
 }
 
 .ship-card--dragging {
-  opacity: 0.5;
-  transform: scale(0.95);
+  opacity: 0.3;
 }
 
 .ship-card--overlay {
   cursor: grabbing;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  transition: none;
+  transform: none !important;
 }
 
 /* Children */
@@ -112,15 +112,48 @@
   text-align: center;
 }
 
-/* Inventory display (larger, with details) */
+/* Inventory display - show actual sizes */
 .ship-inventory .ship-card {
-  width: auto;
-  min-width: 80px;
-  height: auto;
-  min-height: 80px;
-  padding: 12px;
+  height: 70px;
+  padding: 8px 12px;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.ship-inventory .ship-card--size-s {
+  width: 80px;
+  flex-direction: column;
+}
+
+.ship-inventory .ship-card--size-m {
+  width: 140px;
+}
+
+.ship-inventory .ship-card--size-l {
+  width: 200px;
 }
 
 .ship-inventory .ship-card__emoji {
-  font-size: 28px;
+  font-size: 24px;
+}
+
+.ship-inventory .ship-card__details {
+  margin-top: 0;
+  align-items: flex-start;
+}
+
+.ship-inventory .ship-card--size-s .ship-card__details {
+  align-items: center;
+}
+
+/* Size indicator badge */
+.ship-card__size-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
 }
