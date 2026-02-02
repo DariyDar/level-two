@@ -1,0 +1,86 @@
+.container-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.container-view__header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.container-view__emoji {
+  font-size: 16px;
+}
+
+.container-view__label {
+  color: #a0aec0;
+  font-weight: 500;
+}
+
+.container-view__degradation {
+  color: #fc8181;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.container-view__bar {
+  position: relative;
+  width: 40px;
+  height: 100px;
+  background: #1a202c;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 2px solid #4a5568;
+}
+
+.container-view__fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transition: height 0.3s ease, background-color 0.3s ease;
+  border-radius: 0 0 4px 4px;
+}
+
+.container-view__marker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 1;
+}
+
+.container-view__marker--low {
+  background: #ecc94b;
+}
+
+.container-view__marker--target {
+  background: #48bb78;
+}
+
+.container-view__marker--high {
+  background: #ed8936;
+}
+
+.container-view__marker--critical {
+  background: #e53e3e;
+}
+
+.container-view__value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.container-view__rate {
+  font-size: 10px;
+  font-weight: 500;
+  color: #a0aec0;
+}

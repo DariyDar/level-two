@@ -1,5 +1,6 @@
 import { useGameStore } from './store/gameStore';
 import { PlanningPhase } from './components/planning';
+import { SimulationPhase } from './components/simulation';
 import './App.css';
 
 function App() {
@@ -17,7 +18,7 @@ function App() {
 
       <main className="app-main">
         {phase === 'Planning' && <PlanningPhase />}
-        {phase === 'Simulation' && <SimulationPlaceholder />}
+        {phase === 'Simulation' && <SimulationPhase />}
         {phase === 'Results' && <ResultsPlaceholder />}
       </main>
 
@@ -27,20 +28,6 @@ function App() {
           <span>🫁 Pancreas: {degradation.pancreas}%</span>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function SimulationPlaceholder() {
-  const { setPhase } = useGameStore();
-
-  return (
-    <div className="phase-placeholder">
-      <h2>⚡ Simulation Phase</h2>
-      <p>Watch the day unfold...</p>
-      <button onClick={() => setPhase('Results')}>
-        End Simulation →
-      </button>
     </div>
   );
 }

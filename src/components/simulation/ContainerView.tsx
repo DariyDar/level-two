@@ -1,0 +1,103 @@
+import './ContainerView.css';
+
+interface ContainerViewProps {
+  label: string;
+  emoji: string;
+  value: number;
+  capacity: number;
+  thresholds?: {
+    low?: number;
+    target?: number;
+    high?: number;
+    critical?: number;
+  };
+  showRate?: number;
+  rateDirection?: 'in' | 'out';
+  degradation?: number;
+}
+
+export function ContainerView({
+  label,
+  emoji,
+  value,
+  capacity,
+  thresholds,
+  showRate,
+  rateDirection,
+  degradation,
+}: ContainerViewProps) {
+  const fillPercent = Math.min(100, (value / capacity) * 100);
+
+  // Determine fill color based on thresholds
+  let fillColor = '#4299e1'; // Default blue
+
+  if (thresholds) {
+    if (thresholds.critical && value >= thresholds.critical) {
+      fillColor = '#e53e3e'; // Red
+    } else if (thresholds.high && value >= thresholds.high) {
+      fillColor = '#ed8936'; // Orange
+    } else if (thresholds.target && value >= thresholds.target) {
+      fillColor = '#48bb78'; // Green
+    } else if (thresholds.low && value < thresholds.low) {
+      fillColor = '#ecc94b'; // Yellow
+    }
+  }
+
+  return (
+    <div className="container-view">
+      <div className="container-view__header">
+        <span className="container-view__emoji">{emoji}</span>
+        <span className="container-view__label">{label}</span>
+        {degradation !== undefined && degradation > 0 && (
+          <span className="container-view__degradation">-{degradation}%</span>
+        )}
+      </div>
+
+      <div className="container-view__bar">
+        {/* Threshold markers */}
+        {thresholds?.low && (
+          <div
+            className="container-view__marker container-view__marker--low"
+            style={{ bottom: `${(thresholds.low / capacity) * 100}%` }}
+          />
+        )}
+        {thresholds?.target && (
+          <div
+            className="container-view__marker container-view__marker--target"
+            style={{ bottom: `${(thresholds.target / capacity) * 100}%` }}
+          />
+        )}
+        {thresholds?.high && (
+          <div
+            className="container-view__marker container-view__marker--high"
+            style={{ bottom: `${(thresholds.high / capacity) * 100}%` }}
+          />
+        )}
+        {thresholds?.critical && (
+          <div
+            className="container-view__marker container-view__marker--critical"
+            style={{ bottom: `${(thresholds.critical / capacity) * 100}%` }}
+          />
+        )}
+
+        {/* Fill */}
+        <div
+          className="container-view__fill"
+          style={{
+            height: `${fillPercent}%`,
+            backgroundColor: fillColor,
+          }}
+        />
+      </div>
+
+      <div className="container-view__value">
+        {Math.round(value)}
+        {showRate !== undefined && showRate > 0 && (
+          <span className="container-view__rate">
+            {rateDirection === 'out' ? '↓' : '↑'}{showRate}/h
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,56 @@
+.ship-progress {
+  background: #2d3748;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.ship-progress--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+}
+
+.ship-progress__label {
+  color: #718096;
+  font-size: 14px;
+}
+
+.ship-progress__ship {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.ship-progress__emoji {
+  font-size: 24px;
+}
+
+.ship-progress__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.ship-progress__bar {
+  height: 8px;
+  background: #1a202c;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.ship-progress__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4299e1 0%, #48bb78 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.ship-progress__info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #a0aec0;
+}

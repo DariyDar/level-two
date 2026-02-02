@@ -1,0 +1,116 @@
+.simulation-phase {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.simulation-phase--loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #a0aec0;
+  font-size: 16px;
+}
+
+/* Header */
+.simulation-phase__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #2d3748;
+  border-radius: 12px;
+}
+
+.simulation-phase__time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 70px;
+}
+
+.simulation-phase__hour {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.simulation-phase__segment {
+  font-size: 11px;
+  color: #a0aec0;
+  text-transform: uppercase;
+}
+
+.simulation-phase__progress {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.simulation-phase__progress-bar {
+  height: 8px;
+  background: #1a202c;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.simulation-phase__progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4299e1 0%, #48bb78 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.simulation-phase__progress-text {
+  font-size: 11px;
+  color: #a0aec0;
+  text-align: right;
+}
+
+.simulation-phase__controls {
+  display: flex;
+  gap: 4px;
+}
+
+.simulation-phase__control {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: #1a202c;
+  color: #a0aec0;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.simulation-phase__control:hover {
+  background: #4a5568;
+  color: #e2e8f0;
+}
+
+.simulation-phase__control--active {
+  background: #4299e1;
+  color: white;
+}
+
+/* Boosts */
+.simulation-phase__boosts {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+  .simulation-phase {
+    max-width: 500px;
+  }
+}
