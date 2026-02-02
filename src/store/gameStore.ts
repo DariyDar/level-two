@@ -33,14 +33,13 @@ interface GameState {
   clearPlan: () => void;
   setResults: (results: DayResults) => void;
   startNextDay: () => void;
-  retryLevel: () => void;
+  retryDay: () => void;
   updateValidation: (validation: PlanValidation) => void;
 }
 
 const initialDegradation: SimpleDegradation = {
   liver: 0,
   pancreas: 0,
-  kidney: 0,
 };
 
 const initialValidation: PlanValidation = {
@@ -88,10 +87,17 @@ export const useGameStore = create<GameState>()(
 
       removeShip: (instanceId) =>
         set((state) => ({
-          placedShips: state.placedShips.filter((s) => s.instanceId !== instanceId),
+          // Can't remove pre-occupied ships
+          placedShips: state.placedShips.filter(
+            (s) => s.instanceId !== instanceId && !s.isPreOccupied
+          ),
         })),
 
-      clearPlan: () => set({ placedShips: [] }),
+      clearPlan: () =>
+        set((state) => ({
+          // Keep pre-occupied ships when clearing
+          placedShips: state.placedShips.filter((s) => s.isPreOccupied),
+        })),
 
       setResults: (results) =>
         set((state) => ({
@@ -99,7 +105,6 @@ export const useGameStore = create<GameState>()(
           degradation: {
             liver: state.degradation.liver + results.degradation.liver,
             pancreas: state.degradation.pancreas + results.degradation.pancreas,
-            kidney: state.degradation.kidney + results.degradation.kidney,
           },
         })),
 
@@ -111,13 +116,12 @@ export const useGameStore = create<GameState>()(
           results: null,
         })),
 
-      retryLevel: () =>
+      // Retry returns to Planning of the same day (not reset level)
+      retryDay: () =>
         set((state) => ({
-          currentDay: 1,
           phase: 'Planning',
-          placedShips: [],
+          placedShips: state.placedShips.filter((s) => s.isPreOccupied),
           results: null,
-          degradation: state.currentLevel?.initialDegradation ?? initialDegradation,
         })),
 
       updateValidation: (validation) => set({ planValidation: validation }),

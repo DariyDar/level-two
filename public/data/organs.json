@@ -2,7 +2,8 @@
   "containers": {
     "liver": {
       "capacity": 100,
-      "initialLevel": 20
+      "initialLevel": 0,
+      "transferRates": [0, 30, 50]
     },
     "bg": {
       "capacity": 400,
@@ -14,9 +15,8 @@
         "critical": 300
       }
     },
-    "kidney": {
-      "capacity": 60,
-      "initialLevel": 0
+    "muscles": {
+      "drainRates": [0, 20, 30, 50, 70, 90]
     },
     "metforminEffect": {
       "capacity": 120,
@@ -29,6 +29,18 @@
       "decayRate": 50
     }
   },
+  "boosts": {
+    "liverBoost": {
+      "cooldownHours": 1,
+      "durationHours": 1,
+      "rateTier": 2
+    },
+    "pancreasBoost": {
+      "cooldownHours": 3,
+      "durationHours": 1,
+      "tierBonus": 1
+    }
+  },
   "degradation": {
     "bgHighThreshold": 200,
     "bgCriticalThreshold": 300,
@@ -36,9 +48,11 @@
     "criticalMultiplier": 0.3,
     "maxDailyPoints": 30,
     "distribution": {
-      "liver": 0.4,
-      "pancreas": 0.4,
-      "kidney": 0.2
+      "liver": 0.5,
+      "pancreas": 0.5
     }
+  },
+  "graph": {
+    "pointsPerHour": 1
   }
 }

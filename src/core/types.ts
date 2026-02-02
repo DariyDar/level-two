@@ -15,11 +15,10 @@ export type GamePhase = 'Planning' | 'Simulation' | 'Results';
 export type ContainerId =
   | 'liver'
   | 'bg'
-  | 'kidney'
   | 'metforminEffect'
   | 'exerciseEffect';
 
-export type OrganId = 'liver' | 'pancreas' | 'muscles' | 'kidney';
+export type OrganId = 'liver' | 'pancreas' | 'muscles';
 
 // === Constants ===
 
@@ -66,6 +65,7 @@ export interface PlacedShip {
   segment: DaySegment;
   row: 0 | 1;
   startSlot: number;
+  isPreOccupied?: boolean; // Can't be moved or removed
 }
 
 // === Container Models ===
@@ -91,18 +91,29 @@ export interface BGThresholds {
 export interface SimpleDegradation {
   liver: number;
   pancreas: number;
-  kidney: number;
 }
 
 // === Level Config ===
+
+export interface AvailableFood {
+  id: string;
+  count: number;
+}
+
+export interface PreOccupiedSlot {
+  slot: number;  // 1-18 (sequential slot number)
+  shipId: string;
+}
 
 export interface LevelConfig {
   id: string;
   name: string;
   description?: string;
   days: number;
-  availableFoods: string[];
+  initialBG?: number; // Starting BG level (default 100)
+  availableFoods: AvailableFood[];
   availableInterventions: string[];
+  preOccupiedSlots?: PreOccupiedSlot[];
   carbRequirements: {
     min: number;
     max: number;
@@ -160,6 +171,20 @@ export interface PlanValidation {
   warnings: string[];
 }
 
+// === Boost Config ===
+
+export interface BoostConfig {
+  cooldownHours: number;
+  durationHours: number;
+  rateTier?: number;    // For Liver Boost
+  tierBonus?: number;   // For Pancreas Boost
+}
+
+export interface BoostsConfig {
+  liverBoost: BoostConfig;
+  pancreasBoost: BoostConfig;
+}
+
 // === Type Guards ===
 
 export function isGlucoseShip(ship: Ship): boolean {
@@ -180,4 +205,35 @@ export function isValidSlotIndex(index: number): index is 0 | 1 | 2 {
 
 export function isValidRow(row: number): row is 0 | 1 {
   return row === 0 || row === 1;
+}
+
+// === Utility Functions ===
+
+/**
+ * Convert sequential slot number (1-18) to SlotPosition
+ */
+export function slotNumberToPosition(slotNum: number): SlotPosition {
+  if (slotNum < 1 || slotNum > 18) {
+    throw new Error(`Invalid slot number: ${slotNum}. Must be 1-18.`);
+  }
+
+  const zeroIndexed = slotNum - 1;
+  const segmentIndex = Math.floor(zeroIndexed / 6);
+  const withinSegment = zeroIndexed % 6;
+  const row = Math.floor(withinSegment / 3) as 0 | 1;
+  const index = (withinSegment % 3) as 0 | 1 | 2;
+
+  return {
+    segment: DAY_SEGMENTS[segmentIndex],
+    row,
+    index,
+  };
+}
+
+/**
+ * Convert SlotPosition to sequential slot number (1-18)
+ */
+export function positionToSlotNumber(pos: SlotPosition): number {
+  const segmentIndex = DAY_SEGMENTS.indexOf(pos.segment);
+  return segmentIndex * 6 + pos.row * 3 + pos.index + 1;
 }

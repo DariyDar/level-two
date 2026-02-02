@@ -41,6 +41,8 @@ public/
 }
 ```
 
+> **Примечание:** Параметр `description` не обязателен для кораблей.
+
 ### Поля
 
 | Поле | Тип | Обязательное | Описание |
@@ -273,6 +275,27 @@ public/
 | `initialDegradation` | object | ❌ | Начальная деградация органов |
 | `interventionCharges` | object | ✅ | Заряды boost кнопок |
 | `winCondition.minRank` | 1-5 | ✅ | Минимальный ранг для прохождения дня |
+| `initialBG` | number | ❌ | Стартовый уровень глюкозы (по умолчанию 100) |
+| `preOccupiedSlots` | array | ❌ | Заранее занятые слоты (нельзя убрать/заменить) |
+
+### Формат preOccupiedSlots
+
+```json
+"preOccupiedSlots": [
+  { "slot": 1, "shipId": "oatmeal" },
+  { "slot": 4, "shipId": "sandwich" }
+]
+```
+
+### Формат availableFoods (с количеством)
+
+```json
+"availableFoods": [
+  { "id": "apple", "count": 3 },
+  { "id": "sandwich", "count": 2 },
+  { "id": "oatmeal", "count": 1 }
+]
+```
 
 ### Примеры уровней
 

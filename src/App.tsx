@@ -25,7 +25,6 @@ function App() {
         <div className="degradation-status">
           <span>🫀 Liver: {degradation.liver}</span>
           <span>🫁 Pancreas: {degradation.pancreas}</span>
-          <span>🫘 Kidney: {degradation.kidney}</span>
         </div>
       </footer>
     </div>
@@ -62,17 +61,17 @@ function SimulationPlaceholder() {
 }
 
 function ResultsPlaceholder() {
-  const { setPhase, startNextDay } = useGameStore();
+  const { startNextDay, retryDay } = useGameStore();
 
   return (
     <div className="phase-placeholder">
       <h2>📊 Results Phase</h2>
       <p>View your performance</p>
       <div className="button-group">
-        <button onClick={() => { startNextDay(); setPhase('Planning'); }}>
+        <button onClick={startNextDay}>
           Continue →
         </button>
-        <button onClick={() => setPhase('Planning')}>
+        <button onClick={retryDay}>
           Retry
         </button>
       </div>

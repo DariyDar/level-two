@@ -3,8 +3,14 @@
   "name": "First Steps",
   "description": "Learn the basics of meal planning.",
   "days": 1,
-  "availableFoods": ["apple", "sandwich", "oatmeal"],
+  "initialBG": 100,
+  "availableFoods": [
+    { "id": "apple", "count": 3 },
+    { "id": "sandwich", "count": 2 },
+    { "id": "oatmeal", "count": 1 }
+  ],
   "availableInterventions": [],
+  "preOccupiedSlots": [],
   "carbRequirements": {
     "min": 60,
     "max": 120
