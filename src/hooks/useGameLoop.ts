@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import type { SimulationEngine, SimulationState } from '../core/simulation';
 
 interface UseGameLoopOptions {
@@ -17,17 +17,26 @@ export function useGameLoop({
   onComplete,
 }: UseGameLoopOptions) {
   const intervalRef = useRef<number | null>(null);
+  const onTickRef = useRef(onTick);
+  const onCompleteRef = useRef(onComplete);
 
-  const clearLoop = useCallback(() => {
+  // Keep refs updated
+  onTickRef.current = onTick;
+  onCompleteRef.current = onComplete;
+
+  useEffect(() => {
+    // Clear any existing loop
     if (intervalRef.current !== null) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-  }, []);
 
-  useEffect(() => {
-    // Clear any existing loop
-    clearLoop();
+    console.log('[GameLoop] Effect:', {
+      hasEngine: !!engine,
+      isPaused,
+      isComplete: engine?.isComplete(),
+      speed
+    });
 
     // Don't start if no engine, paused, or complete
     if (!engine || isPaused || engine.isComplete()) {
@@ -38,24 +47,45 @@ export function useGameLoop({
     // 1x = 1000ms, 2x = 500ms, 4x = 250ms
     const tickDuration = 1000 / speed;
 
+    console.log('[GameLoop] Starting interval, tickDuration:', tickDuration);
+
     intervalRef.current = window.setInterval(() => {
       if (engine.isComplete()) {
-        clearLoop();
-        onComplete();
+        if (intervalRef.current !== null) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+        onCompleteRef.current();
         return;
       }
 
       const newState = engine.tick();
-      onTick(newState);
+      console.log('[GameLoop] Tick:', newState.currentTick, 'BG:', newState.containers.bg);
+      onTickRef.current(newState);
 
       if (engine.isComplete()) {
-        clearLoop();
-        onComplete();
+        if (intervalRef.current !== null) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+        onCompleteRef.current();
       }
     }, tickDuration);
 
-    return clearLoop;
-  }, [engine, speed, isPaused, onTick, onComplete, clearLoop]);
+    return () => {
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [engine, speed, isPaused]);
 
-  return { clearLoop };
+  return {
+    clearLoop: () => {
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }
+  };
 }
