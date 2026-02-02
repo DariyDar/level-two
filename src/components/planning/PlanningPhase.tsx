@@ -222,6 +222,7 @@ export function PlanningPhase() {
             ships={allShips}
             validDropSlots={validDropSlots}
             highlightedSlots={new Set()}
+            activeShip={activeShip}
           />
 
           <ShipInventory
@@ -233,7 +234,7 @@ export function PlanningPhase() {
         </div>
       </div>
 
-      <DragOverlay>
+      <DragOverlay dropAnimation={null}>
         {activeShip && <ShipCardOverlay ship={activeShip} />}
       </DragOverlay>
     </DndContext>
