@@ -107,7 +107,7 @@ let interventionsCache: Ship[] | null = null;
 export async function loadFoods(): Promise<Ship[]> {
   if (foodsCache) return foodsCache;
 
-  const response = await fetch('/data/foods.json');
+  const response = await fetch('/data/foods.json', { cache: 'no-store' });
   const data = await response.json();
   const ships = data.foods.map(transformFood);
   foodsCache = ships;
@@ -117,7 +117,7 @@ export async function loadFoods(): Promise<Ship[]> {
 export async function loadInterventions(): Promise<Ship[]> {
   if (interventionsCache) return interventionsCache;
 
-  const response = await fetch('/data/interventions.json');
+  const response = await fetch('/data/interventions.json', { cache: 'no-store' });
   const data = await response.json();
   const ships = data.interventions.map(transformIntervention);
   interventionsCache = ships;
@@ -125,7 +125,7 @@ export async function loadInterventions(): Promise<Ship[]> {
 }
 
 export async function loadLevel(levelId: string): Promise<LevelConfig> {
-  const response = await fetch(`/data/levels/${levelId}.json`);
+  const response = await fetch(`/data/levels/${levelId}.json`, { cache: 'no-store' });
   const data = await response.json();
   return transformLevel(data);
 }

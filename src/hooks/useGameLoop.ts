@@ -31,13 +31,6 @@ export function useGameLoop({
       intervalRef.current = null;
     }
 
-    console.log('[GameLoop] Effect:', {
-      hasEngine: !!engine,
-      isPaused,
-      isComplete: engine?.isComplete(),
-      speed
-    });
-
     // Don't start if no engine, paused, or complete
     if (!engine || isPaused || engine.isComplete()) {
       return;
@@ -46,8 +39,6 @@ export function useGameLoop({
     // Calculate tick duration based on speed
     // 1x = 1000ms, 2x = 500ms, 4x = 250ms
     const tickDuration = 1000 / speed;
-
-    console.log('[GameLoop] Starting interval, tickDuration:', tickDuration);
 
     intervalRef.current = window.setInterval(() => {
       if (engine.isComplete()) {
@@ -60,7 +51,6 @@ export function useGameLoop({
       }
 
       const newState = engine.tick();
-      console.log('[GameLoop] Tick:', newState.currentTick, 'BG:', newState.containers.bg);
       onTickRef.current(newState);
 
       if (engine.isComplete()) {

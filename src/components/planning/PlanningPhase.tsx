@@ -43,11 +43,9 @@ export function PlanningPhase() {
         const ships = await loadAllShips();
         setAllShips(ships);
 
-        // Load level if not already loaded
-        if (!currentLevel) {
-          const level = await loadLevel('level-01');
-          setLevel(level);
-        }
+        // Always load level to get fresh config
+        const level = await loadLevel('level-01');
+        setLevel(level);
 
         setIsLoading(false);
       } catch (error) {
@@ -56,7 +54,8 @@ export function PlanningPhase() {
       }
     }
     loadConfigs();
-  }, [currentLevel, setLevel]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Validate plan whenever placed ships change
   useEffect(() => {

@@ -25,6 +25,22 @@
       "description": "Quick energy, fast absorption."
     },
     {
+      "id": "banana",
+      "name": "Banana",
+      "emoji": "🍌",
+      "size": "S",
+      "glucose": 18,
+      "description": "Natural energy, potassium rich."
+    },
+    {
+      "id": "cookie",
+      "name": "Cookie",
+      "emoji": "🍪",
+      "size": "S",
+      "glucose": 22,
+      "description": "Sweet treat, quick sugar."
+    },
+    {
       "id": "sandwich",
       "name": "Sandwich",
       "emoji": "🥪",
@@ -49,6 +65,22 @@
       "description": "Staple food, reliable energy."
     },
     {
+      "id": "pizza",
+      "name": "Pizza Slice",
+      "emoji": "🍕",
+      "size": "M",
+      "glucose": 38,
+      "description": "Tasty but carb-heavy."
+    },
+    {
+      "id": "burger",
+      "name": "Burger",
+      "emoji": "🍔",
+      "size": "M",
+      "glucose": 42,
+      "description": "Filling meal, mixed nutrients."
+    },
+    {
       "id": "oatmeal",
       "name": "Oatmeal",
       "emoji": "🥣",
@@ -71,6 +103,14 @@
       "size": "L",
       "glucose": 25,
       "description": "Low carbs, fills slots, very gentle."
+    },
+    {
+      "id": "chicken",
+      "name": "Chicken Meal",
+      "emoji": "🍗",
+      "size": "L",
+      "glucose": 30,
+      "description": "Protein-rich, slow energy release."
     }
   ]
 }

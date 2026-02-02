@@ -6,8 +6,11 @@
   "initialBG": 100,
   "availableFoods": [
     { "id": "apple", "count": 3 },
+    { "id": "banana", "count": 2 },
     { "id": "sandwich", "count": 2 },
-    { "id": "oatmeal", "count": 1 }
+    { "id": "pizza", "count": 1 },
+    { "id": "oatmeal", "count": 1 },
+    { "id": "chicken", "count": 1 }
   ],
   "availableInterventions": [],
   "preOccupiedSlots": [],

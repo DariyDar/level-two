@@ -1,0 +1,52 @@
+.flow-particles {
+  position: absolute;
+  pointer-events: none;
+  z-index: 10;
+  overflow: visible;
+}
+
+.flow-particles__particle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+/* Ship → Liver: from top-right area down to liver container */
+.flow-particles--ship-liver {
+  top: 20px;
+  right: 80px;
+  width: 60px;
+  height: 80px;
+}
+
+.flow-particles__particle--ship-liver {
+  background: radial-gradient(circle, #fbbf24 0%, #f59e0b 60%, transparent 100%);
+  box-shadow: 0 0 10px #fbbf24, 0 0 20px rgba(251, 191, 36, 0.8);
+}
+
+/* Liver → BG: from liver (top-right) down to BG (center) */
+.flow-particles--liver-bg {
+  top: 60px;
+  right: calc(50% - 40px);
+  width: 80px;
+  height: 100px;
+}
+
+.flow-particles__particle--liver-bg {
+  background: radial-gradient(circle, #48bb78 0%, #38a169 60%, transparent 100%);
+  box-shadow: 0 0 10px #48bb78, 0 0 20px rgba(72, 187, 120, 0.8);
+}
+
+/* BG → Muscles: from BG (center) up-left to muscles */
+.flow-particles--bg-muscles {
+  top: 60px;
+  left: calc(50% - 40px);
+  width: 80px;
+  height: 100px;
+}
+
+.flow-particles__particle--bg-muscles {
+  background: radial-gradient(circle, #60a5fa 0%, #3b82f6 60%, transparent 100%);
+  box-shadow: 0 0 10px #60a5fa, 0 0 20px rgba(96, 165, 250, 0.8);
+}
