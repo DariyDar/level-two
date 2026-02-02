@@ -71,8 +71,16 @@ export function SimulationPhase() {
 
   // Game loop callbacks
   const handleTick = useCallback((state: SimulationState) => {
-    // Create a shallow copy to trigger React re-render
-    setSimState({ ...state });
+    // Deep copy to trigger React re-render
+    setSimState({
+      ...state,
+      containers: { ...state.containers },
+      unloadingShip: state.unloadingShip ? { ...state.unloadingShip } : null,
+      remainingShips: [...state.remainingShips],
+      bgHistory: [...state.bgHistory],
+      liverBoost: { ...state.liverBoost },
+      pancreasBoost: { ...state.pancreasBoost },
+    });
   }, []);
 
   const handleComplete = useCallback(() => {
