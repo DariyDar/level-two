@@ -1,0 +1,73 @@
+.bg-graph {
+  position: relative;
+  background: #1a202c;
+  border-radius: 12px;
+  padding: 20px 30px 30px 40px;
+  height: 200px;
+}
+
+.bg-graph svg {
+  width: 100%;
+  height: 100%;
+}
+
+.bg-graph__threshold {
+  stroke-width: 0.5;
+  stroke-dasharray: 2, 2;
+}
+
+.bg-graph__threshold--low {
+  stroke: #ecc94b;
+}
+
+.bg-graph__threshold--target {
+  stroke: #48bb78;
+}
+
+.bg-graph__threshold--high {
+  stroke: #ed8936;
+}
+
+.bg-graph__threshold--critical {
+  stroke: #e53e3e;
+}
+
+.bg-graph__line {
+  stroke: #4299e1;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.bg-graph__point {
+  fill: #4299e1;
+}
+
+.bg-graph__labels {
+  position: absolute;
+  left: 0;
+  top: 20px;
+  bottom: 30px;
+  width: 35px;
+  display: flex;
+  flex-direction: column;
+}
+
+.bg-graph__labels span {
+  position: absolute;
+  right: 5px;
+  font-size: 10px;
+  color: #718096;
+  transform: translateY(-50%);
+}
+
+.bg-graph__x-labels {
+  position: absolute;
+  left: 40px;
+  right: 30px;
+  bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #718096;
+}

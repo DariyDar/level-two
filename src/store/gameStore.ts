@@ -19,6 +19,9 @@ interface GameState {
   placedShips: PlacedShip[];
   planValidation: PlanValidation;
 
+  // Simulation
+  bgHistory: number[];
+
   // Results
   results: DayResults | null;
 
@@ -31,6 +34,7 @@ interface GameState {
   placeShip: (ship: PlacedShip) => void;
   removeShip: (instanceId: string) => void;
   clearPlan: () => void;
+  setBgHistory: (history: number[]) => void;
   setResults: (results: DayResults) => void;
   startNextDay: () => void;
   retryDay: () => void;
@@ -60,6 +64,7 @@ export const useGameStore = create<GameState>()(
       currentDay: 1,
       placedShips: [],
       planValidation: initialValidation,
+      bgHistory: [],
       results: null,
       degradation: initialDegradation,
 
@@ -99,6 +104,8 @@ export const useGameStore = create<GameState>()(
           placedShips: state.placedShips.filter((s) => s.isPreOccupied),
         })),
 
+      setBgHistory: (history) => set({ bgHistory: history }),
+
       setResults: (results) =>
         set((state) => ({
           results,
@@ -113,6 +120,7 @@ export const useGameStore = create<GameState>()(
           currentDay: state.currentDay + 1,
           phase: 'Planning',
           placedShips: [],
+          bgHistory: [],
           results: null,
         })),
 
@@ -121,6 +129,7 @@ export const useGameStore = create<GameState>()(
         set((state) => ({
           phase: 'Planning',
           placedShips: state.placedShips.filter((s) => s.isPreOccupied),
+          bgHistory: [],
           results: null,
         })),
 

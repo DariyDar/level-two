@@ -1,10 +1,11 @@
 import { useGameStore } from './store/gameStore';
 import { PlanningPhase } from './components/planning';
 import { SimulationPhase } from './components/simulation';
+import { ResultsPhase } from './components/results';
 import './App.css';
 
 function App() {
-  const { phase, currentLevel, currentDay, degradation } = useGameStore();
+  const { phase, currentLevel, currentDay, degradation, bgHistory } = useGameStore();
 
   return (
     <div className="app">
@@ -19,7 +20,7 @@ function App() {
       <main className="app-main">
         {phase === 'Planning' && <PlanningPhase />}
         {phase === 'Simulation' && <SimulationPhase />}
-        {phase === 'Results' && <ResultsPlaceholder />}
+        {phase === 'Results' && <ResultsPhase bgHistory={bgHistory} />}
       </main>
 
       <footer className="app-footer">
@@ -28,25 +29,6 @@ function App() {
           <span>🫁 Pancreas: {degradation.pancreas}%</span>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function ResultsPlaceholder() {
-  const { startNextDay, retryDay } = useGameStore();
-
-  return (
-    <div className="phase-placeholder">
-      <h2>📊 Results Phase</h2>
-      <p>View your performance</p>
-      <div className="button-group">
-        <button onClick={startNextDay}>
-          Continue →
-        </button>
-        <button onClick={retryDay}>
-          Retry
-        </button>
-      </div>
     </div>
   );
 }

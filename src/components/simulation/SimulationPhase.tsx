@@ -16,6 +16,7 @@ export function SimulationPhase() {
     currentLevel,
     degradation,
     setPhase,
+    setBgHistory,
   } = useGameStore();
 
   const [allShips, setAllShips] = useState<Ship[]>([]);
@@ -61,8 +62,12 @@ export function SimulationPhase() {
   }, []);
 
   const handleComplete = useCallback(() => {
+    // Save BG history before transitioning
+    if (engine) {
+      setBgHistory(engine.getState().bgHistory);
+    }
     setPhase('Results');
-  }, [setPhase]);
+  }, [setPhase, setBgHistory, engine]);
 
   // Use game loop hook
   useGameLoop({
