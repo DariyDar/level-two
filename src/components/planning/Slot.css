@@ -43,18 +43,7 @@
   z-index: 10;
 }
 
-.slot--drop-spans-2,
-.slot--drop-spans-3 {
-  position: absolute;
-}
-
-.slot--drop-spans-2 {
-  width: 168px;
-}
-
-.slot--drop-spans-3 {
-  width: 256px;
-}
+/* Drop preview spans - no width change, handled by overlay */
 
 .slot--drop-invalid {
   border-color: #fc8181;
@@ -71,17 +60,25 @@
   background: transparent;
 }
 
-/* Multi-slot ships - span across slots using absolute positioning */
+/* Multi-slot ships - ShipCard inside spans across */
 .slot--spans-2,
 .slot--spans-3 {
-  position: absolute;
+  overflow: visible;
   z-index: 5;
 }
 
-.slot--spans-2 {
+.slot--spans-2 .ship-card--placed,
+.slot--spans-3 .ship-card--placed {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+}
+
+.slot--spans-2 .ship-card--placed {
   width: 168px; /* 80px * 2 + 8px gap */
 }
 
-.slot--spans-3 {
+.slot--spans-3 .ship-card--placed {
   width: 256px; /* 80px * 3 + 8px * 2 gaps */
 }

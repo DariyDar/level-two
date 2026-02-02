@@ -35,7 +35,7 @@ export function SimulationPhase() {
       console.log('[Simulation] Init:', {
         currentLevel: !!currentLevel,
         placedShipsCount: placedShips.length,
-        placedShips
+        placedShips: JSON.parse(JSON.stringify(placedShips))
       });
 
       if (currentLevel) {
@@ -48,8 +48,13 @@ export function SimulationPhase() {
           }
         );
         setEngine(eng);
-        setSimState(eng.getState());
-        console.log('[Simulation] Engine created:', eng.getState());
+        const state = eng.getState();
+        setSimState(state);
+        console.log('[Simulation] Engine created:', {
+          remainingShips: state.remainingShips,
+          unloadingShip: state.unloadingShip,
+          currentTick: state.currentTick
+        });
       }
 
       setIsLoading(false);
