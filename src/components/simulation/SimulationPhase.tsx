@@ -71,7 +71,8 @@ export function SimulationPhase() {
 
   // Game loop callbacks
   const handleTick = useCallback((state: SimulationState) => {
-    setSimState(state);
+    // Create a shallow copy to trigger React re-render
+    setSimState({ ...state });
   }, []);
 
   const handleComplete = useCallback(() => {
