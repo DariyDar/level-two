@@ -65,6 +65,8 @@
 .slot--spans-3 {
   overflow: visible;
   z-index: 5;
+  border: none;
+  background: transparent;
 }
 
 .slot--spans-2 .ship-card--placed,
