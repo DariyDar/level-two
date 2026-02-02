@@ -1,0 +1,19 @@
+{
+  "id": "level-01",
+  "name": "First Steps",
+  "description": "Learn the basics of meal planning.",
+  "days": 1,
+  "availableFoods": ["apple", "sandwich", "oatmeal"],
+  "availableInterventions": [],
+  "carbRequirements": {
+    "min": 60,
+    "max": 120
+  },
+  "interventionCharges": {
+    "liverBoost": 3,
+    "pancreasBoost": 2
+  },
+  "winCondition": {
+    "minRank": 2
+  }
+}

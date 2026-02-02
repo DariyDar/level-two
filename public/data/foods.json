@@ -1,0 +1,76 @@
+{
+  "foods": [
+    {
+      "id": "candy",
+      "name": "Candy",
+      "emoji": "🍬",
+      "size": "S",
+      "glucose": 25,
+      "description": "Fast sugar spike. Use carefully."
+    },
+    {
+      "id": "apple",
+      "name": "Apple",
+      "emoji": "🍎",
+      "size": "S",
+      "glucose": 15,
+      "description": "Light snack with moderate sugar."
+    },
+    {
+      "id": "juice",
+      "name": "Orange Juice",
+      "emoji": "🧃",
+      "size": "S",
+      "glucose": 20,
+      "description": "Quick energy, fast absorption."
+    },
+    {
+      "id": "sandwich",
+      "name": "Sandwich",
+      "emoji": "🥪",
+      "size": "M",
+      "glucose": 35,
+      "description": "Balanced meal, steady release."
+    },
+    {
+      "id": "pasta",
+      "name": "Pasta",
+      "emoji": "🍝",
+      "size": "M",
+      "glucose": 45,
+      "description": "High carbs, moderate absorption."
+    },
+    {
+      "id": "rice",
+      "name": "Rice Bowl",
+      "emoji": "🍚",
+      "size": "M",
+      "glucose": 40,
+      "description": "Staple food, reliable energy."
+    },
+    {
+      "id": "oatmeal",
+      "name": "Oatmeal",
+      "emoji": "🥣",
+      "size": "L",
+      "glucose": 40,
+      "description": "Slow release, gentle on system."
+    },
+    {
+      "id": "beans",
+      "name": "Bean Stew",
+      "emoji": "🫘",
+      "size": "L",
+      "glucose": 35,
+      "description": "Very slow absorption, high fiber."
+    },
+    {
+      "id": "salad",
+      "name": "Big Salad",
+      "emoji": "🥗",
+      "size": "L",
+      "glucose": 25,
+      "description": "Low carbs, fills slots, very gentle."
+    }
+  ]
+}

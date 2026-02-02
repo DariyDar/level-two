@@ -1,0 +1,44 @@
+{
+  "containers": {
+    "liver": {
+      "capacity": 100,
+      "initialLevel": 20
+    },
+    "bg": {
+      "capacity": 400,
+      "initialLevel": 100,
+      "thresholds": {
+        "low": 70,
+        "target": 100,
+        "high": 200,
+        "critical": 300
+      }
+    },
+    "kidney": {
+      "capacity": 60,
+      "initialLevel": 0
+    },
+    "metforminEffect": {
+      "capacity": 120,
+      "initialLevel": 0,
+      "decayRate": 7
+    },
+    "exerciseEffect": {
+      "capacity": 100,
+      "initialLevel": 0,
+      "decayRate": 50
+    }
+  },
+  "degradation": {
+    "bgHighThreshold": 200,
+    "bgCriticalThreshold": 300,
+    "baseMultiplier": 0.1,
+    "criticalMultiplier": 0.3,
+    "maxDailyPoints": 30,
+    "distribution": {
+      "liver": 0.4,
+      "pancreas": 0.4,
+      "kidney": 0.2
+    }
+  }
+}

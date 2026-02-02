@@ -1,0 +1,118 @@
+/* Mobile First Styles */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #eee;
+}
+
+.app-header {
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.app-header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.status-bar {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #aaa;
+}
+
+.app-main {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-footer {
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.degradation-status {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 0.875rem;
+}
+
+/* Phase Placeholders */
+
+.phase-placeholder {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+  max-width: 400px;
+  width: 100%;
+}
+
+.phase-placeholder h2 {
+  margin: 0 0 1rem 0;
+}
+
+.phase-placeholder p {
+  margin: 0 0 1.5rem 0;
+  color: #aaa;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: #4a90d9;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #3a7bc8;
+}
+
+button:active {
+  background: #2a6ab8;
+}
+
+/* Desktop styles */
+@media (min-width: 768px) {
+  .app-header h1 {
+    font-size: 2rem;
+  }
+
+  .status-bar {
+    font-size: 1rem;
+    gap: 2rem;
+  }
+
+  .app-main {
+    padding: 2rem;
+  }
+
+  .phase-placeholder {
+    padding: 3rem;
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "interventions": [
+    {
+      "id": "metformin",
+      "name": "Metformin",
+      "emoji": "💊",
+      "size": "S",
+      "load": 100,
+      "targetContainer": "metforminEffect",
+      "description": "Reduces liver glucose output. Long-lasting effect."
+    },
+    {
+      "id": "light_exercise",
+      "name": "Light Exercise",
+      "emoji": "🚶",
+      "size": "S",
+      "load": 60,
+      "targetContainer": "exerciseEffect",
+      "description": "Moderate boost to glucose utilization."
+    },
+    {
+      "id": "exercise",
+      "name": "Exercise",
+      "emoji": "🏃",
+      "size": "M",
+      "load": 100,
+      "targetContainer": "exerciseEffect",
+      "description": "Strong boost to muscle glucose uptake."
+    }
+  ]
+}
