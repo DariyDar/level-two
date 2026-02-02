@@ -11,7 +11,7 @@ interface SlotProps {
   isOccupied: boolean;
   isPreOccupied: boolean;
   canDrop: boolean;
-  isValidTarget: boolean; // This slot is part of a valid drop zone (for multi-slot ships)
+  activeShipSize: number;
   isHighlighted: boolean;
   isPartOfShip: boolean; // This slot is occupied by a multi-slot ship but not the start
 }
@@ -23,7 +23,7 @@ export function Slot({
   isOccupied,
   isPreOccupied,
   canDrop,
-  isValidTarget,
+  activeShipSize,
   isHighlighted,
   isPartOfShip,
 }: SlotProps) {
@@ -44,8 +44,8 @@ export function Slot({
         isOccupied && 'slot--occupied',
         isOccupied && shipSlots > 1 && `slot--spans-${shipSlots}`,
         isPreOccupied && 'slot--pre-occupied',
-        isValidTarget && 'slot--valid-target',
         isOver && canDrop && 'slot--drop-valid',
+        isOver && canDrop && activeShipSize > 1 && `slot--drop-spans-${activeShipSize}`,
         isOver && !canDrop && 'slot--drop-invalid',
         isHighlighted && 'slot--highlighted',
         isPartOfShip && 'slot--part-of-ship',

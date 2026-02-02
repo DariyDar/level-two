@@ -24,6 +24,7 @@
   display: flex;
   gap: 8px;
   margin-bottom: 8px;
+  position: relative;
 }
 
 .slot-grid__row:last-child {

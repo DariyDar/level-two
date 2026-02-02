@@ -25,15 +25,8 @@ export function SlotGrid({
   highlightedSlots,
   activeShip,
 }: SlotGridProps) {
-  // Calculate all slots that would be highlighted based on valid drop slots and ship size
   const activeShipSize = activeShip ? SHIP_SIZE_TO_SLOTS[activeShip.size] : 1;
-  const allHighlightedSlots = new Set<number>();
 
-  for (const startSlot of validDropSlots) {
-    for (let i = 0; i < activeShipSize; i++) {
-      allHighlightedSlots.add(startSlot + i);
-    }
-  }
   // Build a map of slot number -> placed ship info
   const slotToShip = new Map<number, { placedShip: PlacedShip; isStart: boolean }>();
 
@@ -78,7 +71,7 @@ export function SlotGrid({
             isOccupied={!!shipInfo?.isStart}
             isPreOccupied={!!shipInfo?.placedShip.isPreOccupied}
             canDrop={validDropSlots.has(slotNumber)}
-            isValidTarget={allHighlightedSlots.has(slotNumber)}
+            activeShipSize={activeShipSize}
             isHighlighted={highlightedSlots.has(slotNumber)}
             isPartOfShip={!!shipInfo && !shipInfo.isStart}
           />

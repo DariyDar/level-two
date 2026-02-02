@@ -36,17 +36,19 @@
   font-size: 10px;
 }
 
-.slot--valid-target {
-  border-color: #48bb78;
-  border-style: dashed;
-  background: rgba(72, 187, 120, 0.15);
-}
-
 .slot--drop-valid {
   border-color: #48bb78;
   border-style: dashed;
   background: rgba(72, 187, 120, 0.3);
-  transform: scale(1.02);
+  z-index: 10;
+}
+
+.slot--drop-spans-2 {
+  width: 168px;
+}
+
+.slot--drop-spans-3 {
+  width: 256px;
 }
 
 .slot--drop-invalid {
@@ -64,13 +66,17 @@
   background: transparent;
 }
 
-/* Multi-slot ships - span across slots */
+/* Multi-slot ships - span across slots using absolute positioning */
+.slot--spans-2,
+.slot--spans-3 {
+  position: absolute;
+  z-index: 5;
+}
+
 .slot--spans-2 {
   width: 168px; /* 80px * 2 + 8px gap */
-  z-index: 1;
 }
 
 .slot--spans-3 {
   width: 256px; /* 80px * 3 + 8px * 2 gaps */
-  z-index: 1;
 }

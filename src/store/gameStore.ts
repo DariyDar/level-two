@@ -94,7 +94,7 @@ export const useGameStore = create<GameState>()(
         set((state) => ({
           // Can't remove pre-occupied ships
           placedShips: state.placedShips.filter(
-            (s) => s.instanceId !== instanceId && !s.isPreOccupied
+            (s) => s.instanceId !== instanceId || s.isPreOccupied
           ),
         })),
 
