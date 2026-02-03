@@ -12,12 +12,22 @@ export type DaySegment = 'Morning' | 'Day' | 'Evening';
 
 export type GamePhase = 'Planning' | 'Simulation' | 'Results';
 
+// Naming Convention Mapping (Excel v0.6 ↔ Code):
+// Containers (store substances):
+//   'bg' (code) = BGContainer (Excel) - blood glucose
+//   'liver' (code) = LiverContainer (Excel) - liver glucose buffer
+//   'metforminEffect' (code) = Metformin Effect Container (Excel)
+//   'exerciseEffect' (code) = Exercise Effect Container (Excel)
 export type ContainerId =
   | 'liver'
   | 'bg'
   | 'metforminEffect'
   | 'exerciseEffect';
 
+// Organs (process/utilize substances):
+//   'liver' (code) = Liver (Excel) - organ with container
+//   'pancreas' (code) = Pancreas (Excel) - controls insulin response
+//   'muscles' (code) = Muscle (Excel) - glucose utilization
 export type OrganId = 'liver' | 'pancreas' | 'muscles';
 
 // === Constants ===

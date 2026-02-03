@@ -100,18 +100,20 @@ export interface SimulationConfig {
   initialLiver: number;
 }
 
+// Default configuration values - Updated to match Excel v0.6 "System Parameters" sheet
+// Naming convention: bg = BGContainer, liver = LiverContainer (see types.ts for full mapping)
 const DEFAULT_CONFIG: SimulationConfig = {
-  liverCapacity: 100,
-  bgCapacity: 400,
+  liverCapacity: 100, // LiverContainer capacity (Excel: 100 mg/dL)
+  bgCapacity: 400, // BGContainer capacity (Excel: 400 mg/dL)
   bgLow: 70,
   bgTarget: 100,
   bgHigh: 200,
   bgCritical: 300,
-  liverTransferRates: [0, 30, 50],
-  muscleDrainRates: [0, 20, 30, 50, 70, 90],
-  metforminDecayRate: 7,
-  exerciseDecayRate: 50,
-  liverBoostCooldown: 1,
+  liverTransferRates: [0, 50, 75], // Excel v0.6: Tier 0=0, Tier 1=50, Tier 2=75 mg/dL/hour
+  muscleDrainRates: [0, 30, 35, 40, 45, 50], // Excel v0.6: Linear 30→50 progression
+  metforminDecayRate: 7, // TODO: Excel v0.6 specifies 10/hour (to be updated in v0.4.0)
+  exerciseDecayRate: 100, // Excel v0.6: 100/hour (1 hour to full decay)
+  liverBoostCooldown: 3, // Excel v0.6: 3 hours
   liverBoostDuration: 1,
   liverBoostTier: 2,
   pancreasBoostCooldown: 3,

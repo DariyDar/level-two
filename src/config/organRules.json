@@ -78,7 +78,7 @@
       }
     ],
     "modifiers": [],
-    "rates": [0, 30, 50],
+    "rates": [0, 50, 75],
     "minTier": 0,
     "maxTier": 2
   },
@@ -87,29 +87,14 @@
     "description": "Muscle glucose utilization rules - controls how fast muscles consume glucose from bloodstream",
     "rules": [
       {
-        "id": "bg_critical",
-        "description": "Maximum drain at critical BG levels",
+        "id": "bg_high",
+        "description": "High BG Reaction - Activate muscle drain",
         "priority": 1,
         "condition": {
           "type": "container",
           "container": "bg",
-          "operator": ">",
-          "value": 300
-        },
-        "action": {
-          "type": "setTier",
-          "tier": 4
-        }
-      },
-      {
-        "id": "bg_high",
-        "description": "High drain at elevated BG",
-        "priority": 2,
-        "condition": {
-          "type": "container",
-          "container": "bg",
-          "operator": ">",
-          "value": 200
+          "operator": ">=",
+          "value": 150
         },
         "action": {
           "type": "setTier",
@@ -117,24 +102,24 @@
         }
       },
       {
-        "id": "bg_normal_high",
-        "description": "Moderate drain at normal-high BG",
-        "priority": 3,
+        "id": "bg_low_stop",
+        "description": "Low BG Reaction - Disable muscle drain",
+        "priority": 2,
         "condition": {
           "type": "container",
           "container": "bg",
-          "operator": ">",
-          "value": 100
+          "operator": "<=",
+          "value": 70
         },
         "action": {
           "type": "setTier",
-          "tier": 2
+          "tier": 0
         }
       },
       {
-        "id": "bg_low_stop",
-        "description": "Stop drain when BG is low or normal",
-        "priority": 4,
+        "id": "default_normal",
+        "description": "Default - Tier 0 (no drain)",
+        "priority": 3,
         "condition": {
           "type": "default"
         },
@@ -190,7 +175,7 @@
         }
       }
     ],
-    "rates": [0, 20, 30, 50, 70, 90],
+    "rates": [0, 30, 35, 40, 45, 50],
     "minTier": 0,
     "maxTier": 5
   }
