@@ -1,108 +1,146 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import './GlucoseParticleSystem.css';
 
-// Container types for particle flow
-type Container = 'ship' | 'liver' | 'bg' | 'muscles' | 'kidneys';
+// Flow types for particle streams
+type FlowType = 'ship-liver' | 'liver-bg' | 'bg-muscles' | 'bg-kidneys';
 
 interface Particle {
   id: number;
-  from: Container;
-  to: Container;
+  flow: FlowType;
   progress: number; // 0-1, where 1 = reached destination
-  isAbsorbing: boolean; // true when playing absorption animation
+  isAbsorbing: boolean;
   x: number;
   y: number;
-  // Starting position (needed for ship particles that spawn at dissolve edge)
+  // Starting position
   startX: number;
   startY: number;
-  // Drift parameters for organic movement
-  driftPhase: number;
-  driftAmplitude: number;
-  driftFrequency: number;
+  // Target position
+  targetX: number;
+  targetY: number;
+  // Smoke-like drift (small, focused)
+  driftOffset: number; // perpendicular offset
+  driftSpeed: number;
 }
 
 interface GlucoseParticleSystemProps {
-  // Flow rates (glucose per hour)
-  shipUnloading: number; // Ship → Liver
-  liverToBgRate: number; // Liver → BG
-  bgToMusclesRate: number; // BG → Muscles
-  bgToKidneysRate: number; // BG → Kidneys
-  // Speed multiplier
+  shipUnloading: number;
+  liverToBgRate: number;
+  bgToMusclesRate: number;
+  bgToKidneysRate: number;
   speed: number;
   isPaused: boolean;
-  // Dissolve progress for ship (0-1) - particles spawn from dissolve edge
   dissolveProgress: number;
 }
 
-// Visual multiplier for more particles (aesthetic)
-const VISUAL_MULTIPLIER = 3;
+const VISUAL_MULTIPLIER = 2;
 
-// Container positions (relative to .simulation-phase__main, percentages)
-// Based on screenshot measurements:
-// - BodyDiagram takes ~60% of height (with Liver at bottom ~55%)
-// - ShipQueue starts at ~62% with first row at ~65%
-// - Gap between them ~2%
-const POSITIONS: Record<Container, { x: number; y: number }> = {
-  // Ship position is dynamic - see getShipSpawnPosition()
-  ship: { x: 50, y: 65 },      // First row in ShipQueue
-  liver: { x: 50, y: 52 },     // Liver container (bottom of BodyDiagram)
-  bg: { x: 50, y: 22 },        // Blood Glucose bar (top center of BodyDiagram)
-  muscles: { x: 28, y: 22 },   // Muscles (left of BG)
-  kidneys: { x: 72, y: 22 },   // Kidneys (right of BG)
+// Entry/exit points for each container (percentages relative to .simulation-phase__main)
+// Based on visual layout from screenshots
+const POINTS = {
+  // Ship dissolve edge - dynamic X based on dissolveProgress
+  shipDissolve: { y: 63 },
+
+  // Liver - bottom entry, top exit
+  liverBottom: { x: 50, y: 56 },  // Entry point (bottom of liver)
+  liverTop: { x: 50, y: 46 },     // Exit point (top of liver)
+
+  // BG - bottom entry, side exits
+  bgBottom: { x: 50, y: 35 },     // Entry from liver
+  bgLeft: { x: 40, y: 28 },       // Exit to muscles
+  bgRight: { x: 60, y: 28 },      // Exit to kidneys
+
+  // Muscles - right side entry
+  musclesEntry: { x: 32, y: 28 },
+
+  // Kidneys - left side entry
+  kidneysEntry: { x: 68, y: 28 },
 };
 
-// Ship spawn area bounds (ShipQueue first row)
-const SHIP_SPAWN = {
-  xMin: 12,   // Left edge of ship grid
-  xMax: 88,   // Right edge of ship grid
-  y: 65,      // Y position (first row in ShipQueue)
-};
-
-// Get spawn position for ship particles based on dissolve progress
-function getShipSpawnPosition(dissolveProgress: number): { x: number; y: number } {
-  // Dissolve goes left-to-right, so particles spawn at the dissolve edge
-  const dissolveX = SHIP_SPAWN.xMin + (SHIP_SPAWN.xMax - SHIP_SPAWN.xMin) * dissolveProgress;
-  return {
-    x: dissolveX + (Math.random() - 0.5) * 10,
-    y: SHIP_SPAWN.y + (Math.random() - 0.5) * 4,
-  };
+// Get spawn position based on flow type
+function getSpawnPosition(flow: FlowType, dissolveProgress: number): { x: number; y: number } {
+  switch (flow) {
+    case 'ship-liver': {
+      // Spawn at dissolve edge (moves left to right)
+      const shipXMin = 15;
+      const shipXMax = 85;
+      const dissolveX = shipXMin + (shipXMax - shipXMin) * dissolveProgress;
+      return {
+        x: dissolveX + (Math.random() - 0.5) * 6, // Small horizontal spread
+        y: POINTS.shipDissolve.y + (Math.random() - 0.5) * 2,
+      };
+    }
+    case 'liver-bg': {
+      // Spawn from top of liver
+      return {
+        x: POINTS.liverTop.x + (Math.random() - 0.5) * 4,
+        y: POINTS.liverTop.y + (Math.random() - 0.5) * 2,
+      };
+    }
+    case 'bg-muscles': {
+      // Spawn from left side of BG
+      return {
+        x: POINTS.bgLeft.x + (Math.random() - 0.5) * 3,
+        y: POINTS.bgLeft.y + (Math.random() - 0.5) * 2,
+      };
+    }
+    case 'bg-kidneys': {
+      // Spawn from right side of BG
+      return {
+        x: POINTS.bgRight.x + (Math.random() - 0.5) * 3,
+        y: POINTS.bgRight.y + (Math.random() - 0.5) * 2,
+      };
+    }
+  }
 }
 
-// Get position along path from start to destination
-function getPathPosition(
-  startX: number,
-  startY: number,
-  to: Container,
-  progress: number
-): { x: number; y: number } {
-  const toPos = POSITIONS[to];
-
-  const x = startX + (toPos.x - startX) * progress;
-  const y = startY + (toPos.y - startY) * progress;
-
-  return { x, y };
+// Get target position based on flow type
+function getTargetPosition(flow: FlowType): { x: number; y: number } {
+  switch (flow) {
+    case 'ship-liver':
+      return {
+        x: POINTS.liverBottom.x + (Math.random() - 0.5) * 4,
+        y: POINTS.liverBottom.y,
+      };
+    case 'liver-bg':
+      return {
+        x: POINTS.bgBottom.x + (Math.random() - 0.5) * 4,
+        y: POINTS.bgBottom.y,
+      };
+    case 'bg-muscles':
+      return {
+        x: POINTS.musclesEntry.x,
+        y: POINTS.musclesEntry.y + (Math.random() - 0.5) * 3,
+      };
+    case 'bg-kidneys':
+      return {
+        x: POINTS.kidneysEntry.x,
+        y: POINTS.kidneysEntry.y + (Math.random() - 0.5) * 3,
+      };
+  }
 }
 
-// Apply organic drift to position
-function applyDrift(
-  baseX: number,
-  baseY: number,
-  progress: number,
-  driftPhase: number,
-  driftAmplitude: number,
-  driftFrequency: number,
-  time: number
-): { x: number; y: number } {
-  // Combine progress-based sine wave with time-based movement
-  const waveOffset = Math.sin(progress * Math.PI * driftFrequency + driftPhase + time * 0.001) * driftAmplitude;
+// Calculate position along path with smoke-like drift
+function getParticlePosition(p: Particle, time: number): { x: number; y: number } {
+  // Linear interpolation along path
+  const baseX = p.startX + (p.targetX - p.startX) * p.progress;
+  const baseY = p.startY + (p.targetY - p.startY) * p.progress;
 
-  // Perpendicular drift (mostly sideways)
-  const perpX = waveOffset;
-  const perpY = Math.sin(progress * Math.PI * 2 + driftPhase * 1.5 + time * 0.0005) * driftAmplitude * 0.3;
+  // Calculate perpendicular direction for drift
+  const dx = p.targetX - p.startX;
+  const dy = p.targetY - p.startY;
+  const len = Math.sqrt(dx * dx + dy * dy) || 1;
+  const perpX = -dy / len;
+  const perpY = dx / len;
+
+  // Smoke-like drift: small sine wave perpendicular to path
+  // Amplitude decreases as particle approaches target (more focused at end)
+  const driftAmplitude = 1.5 * (1 - p.progress * 0.5);
+  const driftWave = Math.sin(p.progress * Math.PI * 2 + p.driftOffset + time * p.driftSpeed * 0.001);
+  const drift = driftWave * driftAmplitude;
 
   return {
-    x: baseX + perpX,
-    y: baseY + perpY,
+    x: baseX + perpX * drift,
+    y: baseY + perpY * drift,
   };
 }
 
@@ -121,13 +159,15 @@ export function GlucoseParticleSystem({
   const lastTimeRef = useRef<number>(0);
   const globalTimeRef = useRef<number>(0);
 
-  // Accumulator refs for spawning (since rates can be fractional per frame)
-  const shipToLiverAccum = useRef(0);
-  const liverToBgAccum = useRef(0);
-  const bgToMusclesAccum = useRef(0);
-  const bgToKidneysAccum = useRef(0);
+  // Accumulators for fractional spawning
+  const accumulators = useRef({
+    shipLiver: 0,
+    liverBg: 0,
+    bgMuscles: 0,
+    bgKidneys: 0,
+  });
 
-  // Store rates in refs to avoid useEffect restarts
+  // Store rates in refs
   const ratesRef = useRef({
     shipUnloading,
     liverToBgRate,
@@ -137,7 +177,6 @@ export function GlucoseParticleSystem({
     dissolveProgress,
   });
 
-  // Update refs when props change (without restarting animation)
   useEffect(() => {
     ratesRef.current = {
       shipUnloading,
@@ -149,29 +188,23 @@ export function GlucoseParticleSystem({
     };
   }, [shipUnloading, liverToBgRate, bgToMusclesRate, bgToKidneysRate, speed, dissolveProgress]);
 
-  const spawnParticle = useCallback((from: Container, to: Container, currentDissolve: number): Particle => {
-    // For ship particles, spawn from dissolve edge
-    const pos = from === 'ship'
-      ? getShipSpawnPosition(currentDissolve)
-      : {
-          x: POSITIONS[from].x + (Math.random() - 0.5) * 8,
-          y: POSITIONS[from].y + (Math.random() - 0.5) * 4,
-        };
+  const spawnParticle = useCallback((flow: FlowType, currentDissolve: number): Particle => {
+    const start = getSpawnPosition(flow, currentDissolve);
+    const target = getTargetPosition(flow);
 
     return {
       id: nextIdRef.current++,
-      from,
-      to,
+      flow,
       progress: 0,
       isAbsorbing: false,
-      x: pos.x,
-      y: pos.y,
-      startX: pos.x,
-      startY: pos.y,
-      // Random drift parameters for organic movement
-      driftPhase: Math.random() * Math.PI * 2,
-      driftAmplitude: 2 + Math.random() * 4, // 2-6% drift
-      driftFrequency: 1 + Math.random() * 2, // 1-3 waves per path
+      x: start.x,
+      y: start.y,
+      startX: start.x,
+      startY: start.y,
+      targetX: target.x,
+      targetY: target.y,
+      driftOffset: Math.random() * Math.PI * 2,
+      driftSpeed: 0.5 + Math.random() * 1, // Slow drift
     };
   }, []);
 
@@ -189,65 +222,57 @@ export function GlucoseParticleSystem({
         lastTimeRef.current = timestamp;
       }
 
-      const deltaTime = Math.min(timestamp - lastTimeRef.current, 100); // Cap delta
+      const deltaTime = Math.min(timestamp - lastTimeRef.current, 100);
       lastTimeRef.current = timestamp;
       globalTimeRef.current = timestamp;
 
       const deltaSeconds = deltaTime / 1000;
-
-      // Read current rates from ref (updated without restarting animation)
       const rates = ratesRef.current;
 
-      // Particles complete path in ~4s at 1x speed
-      const progressPerSecond = 0.25 * rates.speed;
+      // Faster travel: complete path in ~2s at 1x speed
+      const progressPerSecond = 0.5 * rates.speed;
 
       setParticles(prev => {
         let updated = [...prev];
+        const acc = accumulators.current;
 
-        // === SPAWN NEW PARTICLES (4 independent flows) ===
-
-        // Flow 1: Ship → Liver (spawn from dissolve edge)
+        // Spawn particles for each flow
         if (rates.shipUnloading > 0) {
-          shipToLiverAccum.current += rates.shipUnloading * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
-          while (shipToLiverAccum.current >= 1) {
-            updated.push(spawnParticle('ship', 'liver', rates.dissolveProgress));
-            shipToLiverAccum.current -= 1;
+          acc.shipLiver += rates.shipUnloading * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
+          while (acc.shipLiver >= 1) {
+            updated.push(spawnParticle('ship-liver', rates.dissolveProgress));
+            acc.shipLiver -= 1;
           }
         }
 
-        // Flow 2: Liver → BG
         if (rates.liverToBgRate > 0) {
-          liverToBgAccum.current += rates.liverToBgRate * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
-          while (liverToBgAccum.current >= 1) {
-            updated.push(spawnParticle('liver', 'bg', 0));
-            liverToBgAccum.current -= 1;
+          acc.liverBg += rates.liverToBgRate * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
+          while (acc.liverBg >= 1) {
+            updated.push(spawnParticle('liver-bg', 0));
+            acc.liverBg -= 1;
           }
         }
 
-        // Flow 3: BG → Muscles
         if (rates.bgToMusclesRate > 0) {
-          bgToMusclesAccum.current += rates.bgToMusclesRate * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
-          while (bgToMusclesAccum.current >= 1) {
-            updated.push(spawnParticle('bg', 'muscles', 0));
-            bgToMusclesAccum.current -= 1;
+          acc.bgMuscles += rates.bgToMusclesRate * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
+          while (acc.bgMuscles >= 1) {
+            updated.push(spawnParticle('bg-muscles', 0));
+            acc.bgMuscles -= 1;
           }
         }
 
-        // Flow 4: BG → Kidneys
         if (rates.bgToKidneysRate > 0) {
-          bgToKidneysAccum.current += rates.bgToKidneysRate * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
-          while (bgToKidneysAccum.current >= 1) {
-            updated.push(spawnParticle('bg', 'kidneys', 0));
-            bgToKidneysAccum.current -= 1;
+          acc.bgKidneys += rates.bgToKidneysRate * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
+          while (acc.bgKidneys >= 1) {
+            updated.push(spawnParticle('bg-kidneys', 0));
+            acc.bgKidneys -= 1;
           }
         }
 
-        // === UPDATE PARTICLES ===
+        // Update particles
         updated = updated.map(p => {
-          // If absorbing, let CSS animation handle it, then remove
           if (p.isAbsorbing) {
-            // Absorption animation lasts 0.3s
-            const newProgress = p.progress + deltaSeconds / 0.3;
+            const newProgress = p.progress + deltaSeconds / 0.25;
             if (newProgress >= 1) {
               return { ...p, progress: 2 }; // Mark for removal
             }
@@ -256,44 +281,32 @@ export function GlucoseParticleSystem({
 
           const newProgress = p.progress + progressPerSecond * deltaSeconds;
 
-          // Reached destination - start absorption
           if (newProgress >= 1) {
-            const destPos = POSITIONS[p.to];
             return {
               ...p,
               progress: 0,
               isAbsorbing: true,
-              x: destPos.x,
-              y: destPos.y,
+              x: p.targetX,
+              y: p.targetY,
             };
           }
 
-          // Update position with organic drift
-          const basePos = getPathPosition(p.startX, p.startY, p.to, newProgress);
-          const driftedPos = applyDrift(
-            basePos.x,
-            basePos.y,
-            newProgress,
-            p.driftPhase,
-            p.driftAmplitude,
-            p.driftFrequency,
-            globalTimeRef.current
-          );
+          const pos = getParticlePosition({ ...p, progress: newProgress }, globalTimeRef.current);
 
           return {
             ...p,
             progress: newProgress,
-            x: driftedPos.x,
-            y: driftedPos.y,
+            x: pos.x,
+            y: pos.y,
           };
         });
 
-        // Remove finished particles (absorption complete)
+        // Remove finished particles
         updated = updated.filter(p => !(p.isAbsorbing && p.progress >= 1));
 
-        // Limit total particles
-        if (updated.length > 500) {
-          updated = updated.slice(-500);
+        // Limit particles
+        if (updated.length > 400) {
+          updated = updated.slice(-400);
         }
 
         return updated;
@@ -302,7 +315,6 @@ export function GlucoseParticleSystem({
       animationRef.current = requestAnimationFrame(animate);
     };
 
-    // Only reset time when starting/resuming animation
     lastTimeRef.current = 0;
     animationRef.current = requestAnimationFrame(animate);
 
@@ -311,14 +323,16 @@ export function GlucoseParticleSystem({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isPaused, spawnParticle]); // Only restart on pause/resume
+  }, [isPaused, spawnParticle]);
 
   return (
     <div className="glucose-particles">
       {particles.map(p => (
         <div
           key={p.id}
-          className={`glucose-particles__particle ${p.isAbsorbing ? 'glucose-particles__particle--absorbing' : ''}`}
+          className={`glucose-particles__particle glucose-particles__particle--${p.flow} ${
+            p.isAbsorbing ? 'glucose-particles__particle--absorbing' : ''
+          }`}
           style={{
             left: `${p.x}%`,
             top: `${p.y}%`,

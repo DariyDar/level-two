@@ -11,43 +11,59 @@
 
 .glucose-particles__particle {
   position: absolute;
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   background: white;
+  border-radius: 50%;
   box-shadow:
-    0 0 2px white,
-    0 0 4px rgba(255, 255, 255, 0.7);
-  /* 4-pointed star */
-  clip-path: polygon(
-    50% 0%,
-    60% 40%,
-    100% 50%,
-    60% 60%,
-    50% 100%,
-    40% 60%,
-    0% 50%,
-    40% 40%
-  );
+    0 0 3px white,
+    0 0 6px rgba(255, 255, 255, 0.5);
   transform: translate(-50%, -50%);
-  opacity: 0.9;
+  opacity: 0.85;
 }
 
-/* Absorption effect when particle reaches container */
+/* Different glow colors for different flows */
+.glucose-particles__particle--ship-liver {
+  background: #ffd700; /* Gold - food/glucose */
+  box-shadow:
+    0 0 3px #ffd700,
+    0 0 6px rgba(255, 215, 0, 0.6);
+}
+
+.glucose-particles__particle--liver-bg {
+  background: #48bb78; /* Green - from liver */
+  box-shadow:
+    0 0 3px #48bb78,
+    0 0 6px rgba(72, 187, 120, 0.6);
+}
+
+.glucose-particles__particle--bg-muscles {
+  background: #4299e1; /* Blue - to muscles */
+  box-shadow:
+    0 0 3px #4299e1,
+    0 0 6px rgba(66, 153, 225, 0.6);
+}
+
+.glucose-particles__particle--bg-kidneys {
+  background: #ed64a6; /* Pink - to kidneys */
+  box-shadow:
+    0 0 3px #ed64a6,
+    0 0 6px rgba(237, 100, 166, 0.6);
+}
+
+/* Absorption effect */
 .glucose-particles__particle--absorbing {
-  animation: particle-absorb 0.3s ease-out forwards;
+  animation: particle-absorb 0.25s ease-out forwards;
 }
 
 @keyframes particle-absorb {
   0% {
     transform: translate(-50%, -50%) scale(1);
-    opacity: 0.9;
+    opacity: 0.85;
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.5);
+    transform: translate(-50%, -50%) scale(1.3);
     opacity: 1;
-    box-shadow:
-      0 0 4px white,
-      0 0 8px rgba(255, 255, 255, 0.9);
   }
   100% {
     transform: translate(-50%, -50%) scale(0);
