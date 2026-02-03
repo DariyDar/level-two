@@ -1,36 +1,39 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import './GlucoseParticleSystem.css';
 
-// Particle locations (visual containers)
-type VisualLocation = 'ship' | 'liver' | 'bg' | 'muscles' | 'kidneys';
-type ParticleLocation = VisualLocation | 'done';
+// Container types for particle flow
+type Container = 'ship' | 'liver' | 'bg' | 'muscles' | 'kidneys';
 
 interface Particle {
   id: number;
-  location: ParticleLocation;
-  destination?: 'muscles' | 'kidneys'; // For BG particles
-  progress: number; // 0-1 progress within current path
+  from: Container;
+  to: Container;
+  progress: number; // 0-1, where 1 = reached destination
+  isAbsorbing: boolean; // true when playing absorption animation
   x: number;
   y: number;
   // Drift parameters for organic movement
-  driftPhase: number; // Random phase for sine wave
-  driftAmplitude: number; // How much to drift sideways
-  driftFrequency: number; // How fast to oscillate
+  driftPhase: number;
+  driftAmplitude: number;
+  driftFrequency: number;
 }
 
 interface GlucoseParticleSystemProps {
   // Flow rates (glucose per hour)
-  shipUnloading: number; // Glucose being unloaded from ship
-  liverToBgRate: number;
-  bgToMusclesRate: number;
-  bgToKidneysRate: number;
+  shipUnloading: number; // Ship → Liver
+  liverToBgRate: number; // Liver → BG
+  bgToMusclesRate: number; // BG → Muscles
+  bgToKidneysRate: number; // BG → Kidneys
   // Speed multiplier
   speed: number;
   isPaused: boolean;
 }
 
+// Visual multiplier for more particles (aesthetic)
+const VISUAL_MULTIPLIER = 3;
+
 // Container positions (relative to parent, percentages)
-const POSITIONS: Record<VisualLocation, { x: number; y: number }> = {
+const POSITIONS: Record<Container, { x: number; y: number }> = {
   ship: { x: 50, y: 95 },      // Bottom center (port)
   liver: { x: 50, y: 70 },     // Above port
   bg: { x: 50, y: 40 },        // Center-upper
@@ -38,12 +41,11 @@ const POSITIONS: Record<VisualLocation, { x: number; y: number }> = {
   kidneys: { x: 75, y: 35 },   // Right of BG
 };
 
-// Get base position along path (without drift)
-function getBasePosition(from: VisualLocation, to: VisualLocation, progress: number): { x: number; y: number } {
+// Get position along path between two containers
+function getPathPosition(from: Container, to: Container, progress: number): { x: number; y: number } {
   const fromPos = POSITIONS[from];
   const toPos = POSITIONS[to];
 
-  // Simple linear interpolation for base path
   const x = fromPos.x + (toPos.x - fromPos.x) * progress;
   const y = fromPos.y + (toPos.y - fromPos.y) * progress;
 
@@ -88,18 +90,19 @@ export function GlucoseParticleSystem({
   const globalTimeRef = useRef<number>(0);
 
   // Accumulator refs for spawning (since rates can be fractional per frame)
-  const shipSpawnAccum = useRef(0);
-  const liverSpawnAccum = useRef(0);
-  const muscleSpawnAccum = useRef(0);
-  const kidneySpawnAccum = useRef(0);
+  const shipToLiverAccum = useRef(0);
+  const liverToBgAccum = useRef(0);
+  const bgToMusclesAccum = useRef(0);
+  const bgToKidneysAccum = useRef(0);
 
-  const spawnParticle = useCallback((location: VisualLocation, destination?: 'muscles' | 'kidneys'): Particle => {
-    const pos = POSITIONS[location];
+  const spawnParticle = useCallback((from: Container, to: Container): Particle => {
+    const pos = POSITIONS[from];
     return {
       id: nextIdRef.current++,
-      location,
-      destination,
+      from,
+      to,
       progress: 0,
+      isAbsorbing: false,
       x: pos.x + (Math.random() - 0.5) * 8,
       y: pos.y + (Math.random() - 0.5) * 4,
       // Random drift parameters for organic movement
@@ -128,82 +131,78 @@ export function GlucoseParticleSystem({
       globalTimeRef.current = timestamp;
 
       const deltaSeconds = deltaTime / 1000;
-      // Much slower: particles complete path in ~4s at 1x speed
+      // Particles complete path in ~4s at 1x speed
       const progressPerSecond = 0.25 * speed;
 
       setParticles(prev => {
         let updated = [...prev];
 
-        // Spawn new particles from ship
+        // === SPAWN NEW PARTICLES (4 independent flows) ===
+
+        // Flow 1: Ship → Liver
         if (shipUnloading > 0) {
-          shipSpawnAccum.current += shipUnloading * deltaSeconds * speed * 0.3;
-          while (shipSpawnAccum.current >= 1) {
-            updated.push(spawnParticle('ship'));
-            shipSpawnAccum.current -= 1;
+          shipToLiverAccum.current += shipUnloading * deltaSeconds * speed * VISUAL_MULTIPLIER;
+          while (shipToLiverAccum.current >= 1) {
+            updated.push(spawnParticle('ship', 'liver'));
+            shipToLiverAccum.current -= 1;
           }
         }
 
-        // Spawn particles from liver to BG
+        // Flow 2: Liver → BG
         if (liverToBgRate > 0) {
-          liverSpawnAccum.current += liverToBgRate * deltaSeconds * speed * 0.2;
-          while (liverSpawnAccum.current >= 1) {
-            updated.push(spawnParticle('liver'));
-            liverSpawnAccum.current -= 1;
+          liverToBgAccum.current += liverToBgRate * deltaSeconds * speed * VISUAL_MULTIPLIER;
+          while (liverToBgAccum.current >= 1) {
+            updated.push(spawnParticle('liver', 'bg'));
+            liverToBgAccum.current -= 1;
           }
         }
 
-        // Spawn particles from BG to muscles
+        // Flow 3: BG → Muscles
         if (bgToMusclesRate > 0) {
-          muscleSpawnAccum.current += bgToMusclesRate * deltaSeconds * speed * 0.2;
-          while (muscleSpawnAccum.current >= 1) {
+          bgToMusclesAccum.current += bgToMusclesRate * deltaSeconds * speed * VISUAL_MULTIPLIER;
+          while (bgToMusclesAccum.current >= 1) {
             updated.push(spawnParticle('bg', 'muscles'));
-            muscleSpawnAccum.current -= 1;
+            bgToMusclesAccum.current -= 1;
           }
         }
 
-        // Spawn particles from BG to kidneys
+        // Flow 4: BG → Kidneys
         if (bgToKidneysRate > 0) {
-          kidneySpawnAccum.current += bgToKidneysRate * deltaSeconds * speed * 0.2;
-          while (kidneySpawnAccum.current >= 1) {
+          bgToKidneysAccum.current += bgToKidneysRate * deltaSeconds * speed * VISUAL_MULTIPLIER;
+          while (bgToKidneysAccum.current >= 1) {
             updated.push(spawnParticle('bg', 'kidneys'));
-            kidneySpawnAccum.current -= 1;
+            bgToKidneysAccum.current -= 1;
           }
         }
 
-        // Update particle positions
+        // === UPDATE PARTICLES ===
         updated = updated.map(p => {
-          if (p.location === 'done') return p;
+          // If absorbing, let CSS animation handle it, then remove
+          if (p.isAbsorbing) {
+            // Absorption animation lasts 0.3s
+            const newProgress = p.progress + deltaSeconds / 0.3;
+            if (newProgress >= 1) {
+              return { ...p, progress: 2 }; // Mark for removal
+            }
+            return { ...p, progress: newProgress };
+          }
 
           const newProgress = p.progress + progressPerSecond * deltaSeconds;
 
+          // Reached destination - start absorption
           if (newProgress >= 1) {
-            // Move to next location
-            if (p.location === 'ship') {
-              return { ...p, location: 'liver' as ParticleLocation, progress: 0 };
-            } else if (p.location === 'liver') {
-              return { ...p, location: 'bg' as ParticleLocation, progress: 0 };
-            } else if (p.location === 'bg') {
-              if (p.destination === 'muscles') {
-                return { ...p, location: 'muscles' as ParticleLocation, progress: 0 };
-              } else if (p.destination === 'kidneys') {
-                return { ...p, location: 'kidneys' as ParticleLocation, progress: 0 };
-              }
-              // Particle stays in BG (no destination yet)
-              return { ...p, progress: 0 };
-            } else if (p.location === 'muscles' || p.location === 'kidneys') {
-              return { ...p, location: 'done' as ParticleLocation, progress: 1 };
-            }
+            const destPos = POSITIONS[p.to];
+            return {
+              ...p,
+              progress: 0,
+              isAbsorbing: true,
+              x: destPos.x,
+              y: destPos.y,
+            };
           }
 
-          // Calculate new position with organic drift
-          let nextLoc: VisualLocation = p.location as VisualLocation;
-          if (p.location === 'ship') nextLoc = 'liver';
-          else if (p.location === 'liver') nextLoc = 'bg';
-          else if (p.location === 'bg' && p.destination) {
-            nextLoc = p.destination;
-          }
-
-          const basePos = getBasePosition(p.location as VisualLocation, nextLoc, newProgress);
+          // Update position with organic drift
+          const basePos = getPathPosition(p.from, p.to, newProgress);
           const driftedPos = applyDrift(
             basePos.x,
             basePos.y,
@@ -222,8 +221,8 @@ export function GlucoseParticleSystem({
           };
         });
 
-        // Remove finished particles
-        updated = updated.filter(p => p.location !== 'done');
+        // Remove finished particles (absorption complete)
+        updated = updated.filter(p => !(p.isAbsorbing && p.progress >= 1));
 
         // Limit total particles
         if (updated.length > 500) {
@@ -251,11 +250,10 @@ export function GlucoseParticleSystem({
       {particles.map(p => (
         <div
           key={p.id}
-          className="glucose-particles__particle"
+          className={`glucose-particles__particle ${p.isAbsorbing ? 'glucose-particles__particle--absorbing' : ''}`}
           style={{
             left: `${p.x}%`,
             top: `${p.y}%`,
-            opacity: p.location === 'done' ? 0 : 0.9,
           }}
         />
       ))}
