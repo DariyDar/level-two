@@ -8,8 +8,12 @@ import { useInterpolatedValues } from '../../hooks/useInterpolatedValue';
 import { loadAllShips } from '../../config/loader';
 import { BodyDiagram } from './BodyDiagram';
 import { BoostButton } from './BoostButton';
-import { ShipProgress } from './ShipProgress';
+import { ShipQueue } from './ShipQueue';
 import './SimulationPhase.css';
+
+// Available simulation speeds
+type SimSpeed = 0.25 | 0.5 | 0.75 | 1 | 2 | 4;
+const SPEEDS: SimSpeed[] = [0.25, 0.5, 0.75, 1, 2, 4];
 
 export function SimulationPhase() {
   const {
@@ -23,7 +27,7 @@ export function SimulationPhase() {
   const [allShips, setAllShips] = useState<Ship[]>([]);
   const [engine, setEngine] = useState<SimulationEngine | null>(null);
   const [simState, setSimState] = useState<SimulationState | null>(null);
-  const [speed, setSpeed] = useState<1 | 2 | 4>(1);
+  const [speed, setSpeed] = useState<SimSpeed>(0.25); // Default to slowest
   const [isPaused, setIsPaused] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -155,7 +159,7 @@ export function SimulationPhase() {
           >
             {isPaused ? '▶' : '⏸'}
           </button>
-          {([1, 2, 4] as const).map((s) => (
+          {SPEEDS.map((s) => (
             <button
               key={s}
               className={`simulation-phase__control ${speed === s && !isPaused ? 'simulation-phase__control--active' : ''}`}
@@ -171,13 +175,15 @@ export function SimulationPhase() {
       </div>
 
       {/* Body Diagram */}
-      <BodyDiagram state={simState} degradation={degradation} interpolated={interpolated} />
+      <BodyDiagram state={simState} degradation={degradation} interpolated={interpolated} speed={speed} />
 
-      {/* Ship Progress */}
-      <ShipProgress
+      {/* Ship Queue */}
+      <ShipQueue
+        placedShips={placedShips}
         unloadingShip={simState.unloadingShip}
         remainingShips={simState.remainingShips}
         ships={shipsMap}
+        currentTick={simState.currentTick}
       />
 
       {/* Boost Buttons */}

@@ -15,9 +15,10 @@ interface BodyDiagramProps {
   state: SimulationState;
   degradation: SimpleDegradation;
   interpolated?: InterpolatedValues;
+  speed?: number;
 }
 
-export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramProps) {
+export function BodyDiagram({ state, degradation, interpolated, speed = 1 }: BodyDiagramProps) {
   const { currentLiverRate, currentMuscleRate, unloadingShip } = state;
 
   // Use interpolated values if provided, otherwise use state values
@@ -85,16 +86,19 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
         flowType="ship-liver"
         rate={shipUnloadRate}
         isActive={shipUnloadRate > 0}
+        speed={speed}
       />
       <FlowParticles
         flowType="liver-bg"
         rate={displayLiverRate}
         isActive={displayLiverRate > 0}
+        speed={speed}
       />
       <FlowParticles
         flowType="bg-muscles"
         rate={displayMuscleRate}
         isActive={displayMuscleRate > 0}
+        speed={speed}
       />
     </div>
   );

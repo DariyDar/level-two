@@ -3,7 +3,7 @@ import type { SimulationEngine, SimulationState } from '../core/simulation';
 
 interface UseGameLoopOptions {
   engine: SimulationEngine | null;
-  speed: 1 | 2 | 4;
+  speed: number; // 0.25, 0.5, 0.75, 1, 2, 4
   isPaused: boolean;
   onTick: (state: SimulationState) => void;
   onComplete: () => void;

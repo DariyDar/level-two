@@ -1,0 +1,160 @@
+.ship-queue {
+  background: #2d3748;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+
+/* Port indicator */
+.ship-queue__port {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #4299e1;
+}
+
+.ship-queue__port-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #4299e1;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ship-queue__port-indicator {
+  flex: 1;
+  height: 4px;
+  background: linear-gradient(90deg, #4299e1 0%, transparent 100%);
+  border-radius: 2px;
+}
+
+/* Segments container */
+.ship-queue__segments {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Segment */
+.ship-queue__segment {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ship-queue__segment-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Row */
+.ship-queue__row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  min-height: 36px;
+}
+
+.ship-queue__row--at-port {
+  /* Highlight row at port */
+}
+
+/* Slot */
+.ship-queue__slot {
+  height: 36px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ship-queue__slot--empty {
+  background: #1a202c;
+  border: 1px dashed #4a5568;
+}
+
+/* Ship in queue */
+.ship-queue__ship {
+  height: 36px;
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.ship-queue__ship--size-S {
+  /* Single slot */
+}
+
+.ship-queue__ship--size-M {
+  /* Spans 2 slots via grid-column */
+}
+
+.ship-queue__ship--size-L {
+  /* Spans 3 slots via grid-column */
+}
+
+.ship-queue__ship--unloading {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  animation: unloading-pulse 1s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(72, 187, 120, 0.5);
+}
+
+@keyframes unloading-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.9;
+  }
+}
+
+.ship-queue__ship--completed {
+  background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+  opacity: 0.5;
+}
+
+.ship-queue__ship-emoji {
+  font-size: 18px;
+}
+
+/* Unloading progress */
+.ship-queue__unloading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #4a5568;
+}
+
+.ship-queue__unloading-bar {
+  flex: 1;
+  height: 6px;
+  background: #1a202c;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.ship-queue__unloading-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #48bb78 0%, #68d391 100%);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.ship-queue__unloading-text {
+  font-size: 11px;
+  color: #a0aec0;
+  white-space: nowrap;
+}
