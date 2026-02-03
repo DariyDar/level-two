@@ -17,7 +17,6 @@ You are a port manager responsible for planning the arrival of food "ships" thro
 - React 19 + TypeScript
 - Vite
 - Zustand (state management)
-- Framer Motion (animations)
 - @dnd-kit (drag and drop)
 
 ## Development
