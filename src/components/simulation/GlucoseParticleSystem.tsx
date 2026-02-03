@@ -8,18 +8,13 @@ interface Particle {
   id: number;
   flow: FlowType;
   progress: number; // 0-1, where 1 = reached destination
-  isAbsorbing: boolean;
   x: number;
   y: number;
-  // Starting position
   startX: number;
   startY: number;
-  // Target position
   targetX: number;
   targetY: number;
-  // Smoke-like drift (small, focused)
-  driftOffset: number; // perpendicular offset
-  driftSpeed: number;
+  driftOffset: number;
 }
 
 interface GlucoseParticleSystemProps {
@@ -32,117 +27,100 @@ interface GlucoseParticleSystemProps {
   dissolveProgress: number;
 }
 
-const VISUAL_MULTIPLIER = 2;
+// More particles for continuous stream
+const VISUAL_MULTIPLIER = 4;
 
-// Entry/exit points for each container (percentages relative to .simulation-phase__main)
-// Measured from screenshot v0.2.2:
-// - simulation-phase__main contains BodyDiagram (~58%) + gap + ShipQueue (~40%)
-// - BodyDiagram: padding 20px, middle-row at top, bottom-row (Liver) below
-// - ShipQueue: starts at ~60% of main height
+// Container positions (percentages relative to .simulation-phase__main)
+// Based on screenshot v0.2.3 - adjusted to hit actual container boundaries
 const POINTS = {
-  // Ship dissolve edge - first row in ShipQueue area
-  shipDissolve: { y: 72 },  // Ships are at ~72% from top of main
+  // Ship dissolve edge
+  shipY: 73,
 
-  // Liver - center container in bottom row of BodyDiagram
-  liverBottom: { x: 50, y: 55 },  // Bottom of liver bar
-  liverTop: { x: 50, y: 42 },     // Top of liver bar
+  // Liver bar boundaries
+  liverTop: { x: 50, y: 38 },
+  liverBottom: { x: 50, y: 52 },
 
-  // BG - center container in middle row (larger bar)
-  bgBottom: { x: 50, y: 32 },     // Bottom of BG bar
-  bgLeft: { x: 43, y: 18 },       // Left edge of BG (for muscles exit)
-  bgRight: { x: 57, y: 18 },      // Right edge of BG (for kidneys exit)
+  // BG bar boundaries (inside the bar, not at the number below)
+  bgTop: { x: 50, y: 8 },
+  bgBottom: { x: 50, y: 28 },
 
-  // Muscles - left container, center of the bar
-  musclesCenter: { x: 27, y: 22 },
+  // Muscles bar (left side)
+  musclesRight: { x: 32, y: 18 },
 
-  // Kidneys - right container, center of the bar
-  kidneysCenter: { x: 73, y: 22 },
+  // Kidneys bar (right side)
+  kidneysLeft: { x: 68, y: 18 },
 };
 
-// Get spawn position based on flow type
 function getSpawnPosition(flow: FlowType, dissolveProgress: number): { x: number; y: number } {
   switch (flow) {
     case 'ship-liver': {
-      // Spawn at dissolve edge (moves left to right with ship unloading)
-      const shipXMin = 18;
-      const shipXMax = 82;
+      const shipXMin = 20;
+      const shipXMax = 80;
       const dissolveX = shipXMin + (shipXMax - shipXMin) * dissolveProgress;
       return {
-        x: dissolveX + (Math.random() - 0.5) * 4,
-        y: POINTS.shipDissolve.y + (Math.random() - 0.5) * 2,
+        x: dissolveX + (Math.random() - 0.5) * 3,
+        y: POINTS.shipY + (Math.random() - 0.5) * 2,
       };
     }
-    case 'liver-bg': {
-      // Spawn from top of liver bar
+    case 'liver-bg':
       return {
-        x: POINTS.liverTop.x + (Math.random() - 0.5) * 6,
+        x: POINTS.liverTop.x + (Math.random() - 0.5) * 4,
         y: POINTS.liverTop.y,
       };
-    }
-    case 'bg-muscles': {
-      // Spawn from left side of BG
+    case 'bg-muscles':
+      // Exit from left side of BG bar
       return {
-        x: POINTS.bgLeft.x,
-        y: POINTS.bgLeft.y + (Math.random() - 0.5) * 4,
+        x: 44 + (Math.random() - 0.5) * 2,
+        y: POINTS.bgBottom.y - 8 + (Math.random() - 0.5) * 4,
       };
-    }
-    case 'bg-kidneys': {
-      // Spawn from right side of BG
+    case 'bg-kidneys':
+      // Exit from right side of BG bar
       return {
-        x: POINTS.bgRight.x,
-        y: POINTS.bgRight.y + (Math.random() - 0.5) * 4,
+        x: 56 + (Math.random() - 0.5) * 2,
+        y: POINTS.bgBottom.y - 8 + (Math.random() - 0.5) * 4,
       };
-    }
   }
 }
 
-// Get target position based on flow type
 function getTargetPosition(flow: FlowType): { x: number; y: number } {
   switch (flow) {
     case 'ship-liver':
-      // Enter liver from bottom
       return {
-        x: POINTS.liverBottom.x + (Math.random() - 0.5) * 6,
+        x: POINTS.liverBottom.x + (Math.random() - 0.5) * 4,
         y: POINTS.liverBottom.y,
       };
     case 'liver-bg':
-      // Enter BG from bottom
       return {
-        x: POINTS.bgBottom.x + (Math.random() - 0.5) * 6,
+        x: POINTS.bgBottom.x + (Math.random() - 0.5) * 4,
         y: POINTS.bgBottom.y,
       };
     case 'bg-muscles':
-      // Enter Muscles from center
       return {
-        x: POINTS.musclesCenter.x,
-        y: POINTS.musclesCenter.y + (Math.random() - 0.5) * 4,
+        x: POINTS.musclesRight.x,
+        y: POINTS.musclesRight.y + (Math.random() - 0.5) * 6,
       };
     case 'bg-kidneys':
-      // Enter Kidneys from center
       return {
-        x: POINTS.kidneysCenter.x,
-        y: POINTS.kidneysCenter.y + (Math.random() - 0.5) * 4,
+        x: POINTS.kidneysLeft.x,
+        y: POINTS.kidneysLeft.y + (Math.random() - 0.5) * 6,
       };
   }
 }
 
-// Calculate position along path with smoke-like drift
 function getParticlePosition(p: Particle, time: number): { x: number; y: number } {
-  // Linear interpolation along path
   const baseX = p.startX + (p.targetX - p.startX) * p.progress;
   const baseY = p.startY + (p.targetY - p.startY) * p.progress;
 
-  // Calculate perpendicular direction for drift
+  // Small drift perpendicular to path
   const dx = p.targetX - p.startX;
   const dy = p.targetY - p.startY;
   const len = Math.sqrt(dx * dx + dy * dy) || 1;
   const perpX = -dy / len;
   const perpY = dx / len;
 
-  // Smoke-like drift: small sine wave perpendicular to path
-  // Amplitude decreases as particle approaches target (more focused at end)
-  const driftAmplitude = 1.5 * (1 - p.progress * 0.5);
-  const driftWave = Math.sin(p.progress * Math.PI * 2 + p.driftOffset + time * p.driftSpeed * 0.001);
+  // Gentle sine wave, smaller amplitude
+  const driftAmplitude = 0.8 * (1 - p.progress * 0.5);
+  const driftWave = Math.sin(p.progress * Math.PI * 1.5 + p.driftOffset + time * 0.0005);
   const drift = driftWave * driftAmplitude;
 
   return {
@@ -166,15 +144,14 @@ export function GlucoseParticleSystem({
   const lastTimeRef = useRef<number>(0);
   const globalTimeRef = useRef<number>(0);
 
-  // Accumulators for fractional spawning
-  const accumulators = useRef({
+  // Time-based spawning for continuous stream
+  const lastSpawnTimeRef = useRef({
     shipLiver: 0,
     liverBg: 0,
     bgMuscles: 0,
     bgKidneys: 0,
   });
 
-  // Store rates in refs
   const ratesRef = useRef({
     shipUnloading,
     liverToBgRate,
@@ -203,7 +180,6 @@ export function GlucoseParticleSystem({
       id: nextIdRef.current++,
       flow,
       progress: 0,
-      isAbsorbing: false,
       x: start.x,
       y: start.y,
       startX: start.x,
@@ -211,7 +187,6 @@ export function GlucoseParticleSystem({
       targetX: target.x,
       targetY: target.y,
       driftOffset: Math.random() * Math.PI * 2,
-      driftSpeed: 0.5 + Math.random() * 1, // Slow drift
     };
   }, []);
 
@@ -227,6 +202,13 @@ export function GlucoseParticleSystem({
     const animate = (timestamp: number) => {
       if (lastTimeRef.current === 0) {
         lastTimeRef.current = timestamp;
+        // Reset spawn times when starting
+        lastSpawnTimeRef.current = {
+          shipLiver: timestamp,
+          liverBg: timestamp,
+          bgMuscles: timestamp,
+          bgKidneys: timestamp,
+        };
       }
 
       const deltaTime = Math.min(timestamp - lastTimeRef.current, 100);
@@ -236,66 +218,63 @@ export function GlucoseParticleSystem({
       const deltaSeconds = deltaTime / 1000;
       const rates = ratesRef.current;
 
-      // Faster travel: complete path in ~2s at 1x speed
-      const progressPerSecond = 0.5 * rates.speed;
+      // Travel time: ~1.5s at 1x speed
+      const progressPerSecond = 0.67 * rates.speed;
 
       setParticles(prev => {
         let updated = [...prev];
-        const acc = accumulators.current;
+        const spawnTimes = lastSpawnTimeRef.current;
 
-        // Spawn particles for each flow
+        // Spawn based on time intervals (not accumulators) for continuous stream
+        // Calculate spawn interval: higher rate = shorter interval
+        const getSpawnInterval = (rate: number) => {
+          if (rate <= 0) return Infinity;
+          return 1000 / (rate * rates.speed * VISUAL_MULTIPLIER);
+        };
+
+        // Ship → Liver
         if (rates.shipUnloading > 0) {
-          acc.shipLiver += rates.shipUnloading * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
-          while (acc.shipLiver >= 1) {
+          const interval = getSpawnInterval(rates.shipUnloading);
+          while (timestamp - spawnTimes.shipLiver >= interval) {
             updated.push(spawnParticle('ship-liver', rates.dissolveProgress));
-            acc.shipLiver -= 1;
+            spawnTimes.shipLiver += interval;
           }
         }
 
+        // Liver → BG
         if (rates.liverToBgRate > 0) {
-          acc.liverBg += rates.liverToBgRate * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
-          while (acc.liverBg >= 1) {
+          const interval = getSpawnInterval(rates.liverToBgRate);
+          while (timestamp - spawnTimes.liverBg >= interval) {
             updated.push(spawnParticle('liver-bg', 0));
-            acc.liverBg -= 1;
+            spawnTimes.liverBg += interval;
           }
         }
 
+        // BG → Muscles
         if (rates.bgToMusclesRate > 0) {
-          acc.bgMuscles += rates.bgToMusclesRate * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
-          while (acc.bgMuscles >= 1) {
+          const interval = getSpawnInterval(rates.bgToMusclesRate);
+          while (timestamp - spawnTimes.bgMuscles >= interval) {
             updated.push(spawnParticle('bg-muscles', 0));
-            acc.bgMuscles -= 1;
+            spawnTimes.bgMuscles += interval;
           }
         }
 
+        // BG → Kidneys
         if (rates.bgToKidneysRate > 0) {
-          acc.bgKidneys += rates.bgToKidneysRate * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
-          while (acc.bgKidneys >= 1) {
+          const interval = getSpawnInterval(rates.bgToKidneysRate);
+          while (timestamp - spawnTimes.bgKidneys >= interval) {
             updated.push(spawnParticle('bg-kidneys', 0));
-            acc.bgKidneys -= 1;
+            spawnTimes.bgKidneys += interval;
           }
         }
 
         // Update particles
         updated = updated.map(p => {
-          if (p.isAbsorbing) {
-            const newProgress = p.progress + deltaSeconds / 0.25;
-            if (newProgress >= 1) {
-              return { ...p, progress: 2 }; // Mark for removal
-            }
-            return { ...p, progress: newProgress };
-          }
-
           const newProgress = p.progress + progressPerSecond * deltaSeconds;
 
+          // Remove when reached destination (no absorption animation)
           if (newProgress >= 1) {
-            return {
-              ...p,
-              progress: 0,
-              isAbsorbing: true,
-              x: p.targetX,
-              y: p.targetY,
-            };
+            return { ...p, progress: 2 }; // Mark for removal
           }
 
           const pos = getParticlePosition({ ...p, progress: newProgress }, globalTimeRef.current);
@@ -309,11 +288,11 @@ export function GlucoseParticleSystem({
         });
 
         // Remove finished particles
-        updated = updated.filter(p => !(p.isAbsorbing && p.progress >= 1));
+        updated = updated.filter(p => p.progress < 1.5);
 
         // Limit particles
-        if (updated.length > 400) {
-          updated = updated.slice(-400);
+        if (updated.length > 500) {
+          updated = updated.slice(-500);
         }
 
         return updated;
@@ -337,9 +316,7 @@ export function GlucoseParticleSystem({
       {particles.map(p => (
         <div
           key={p.id}
-          className={`glucose-particles__particle ${
-            p.isAbsorbing ? 'glucose-particles__particle--absorbing' : ''
-          }`}
+          className="glucose-particles__particle"
           style={{
             left: `${p.x}%`,
             top: `${p.y}%`,
