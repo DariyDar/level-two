@@ -75,43 +75,6 @@ export function ShipQueue({
     return result;
   }, [placedShips, unloadingShip, remainingShips, ships]);
 
-  // Find which row contains the currently unloading ship
-  const unloadingRowIndex = useMemo(() => {
-    if (!unloadingShip) return -1;
-
-    for (let segIdx = 0; segIdx < segments.length; segIdx++) {
-      for (let rowIdx = 0; rowIdx < 2; rowIdx++) {
-        const hasUnloading = segments[segIdx].rows[rowIdx].ships.some(s => s.isUnloading);
-        if (hasUnloading) {
-          return segIdx * 2 + rowIdx;
-        }
-      }
-    }
-    return -1;
-  }, [segments, unloadingShip]);
-
-  // Calculate dissolve progress for smooth row movement
-  const currentDissolveProgress = unloadingShip
-    ? (unloadingShip.totalTicks - unloadingShip.remainingTicks) / unloadingShip.totalTicks
-    : 0;
-
-  // Calculate vertical offset for rows - rows move UP toward port
-  const ROW_HEIGHT = 44; // Height of row including gap
-
-  const getRowOffset = (segmentIndex: number, rowIndex: number): number => {
-    const globalRowIndex = segmentIndex * 2 + rowIndex;
-
-    // Count how many rows have been completed (fully dissolved)
-    const completedRows = unloadingRowIndex >= 0 ? unloadingRowIndex : 0;
-
-    // Calculate offset: completed rows + current dissolve progress
-    const totalOffset = completedRows + (unloadingRowIndex >= 0 ? currentDissolveProgress : 0);
-
-    // Rows move up (negative Y) as ships complete
-    const rowOffset = (globalRowIndex - totalOffset) * ROW_HEIGHT;
-
-    return Math.max(0, rowOffset);
-  };
 
   return (
     <div className="ship-queue">
@@ -121,7 +84,7 @@ export function ShipQueue({
       </div>
 
       <div className="ship-queue__segments">
-        {segments.map((segmentData, segmentIndex) => (
+        {segments.map((segmentData) => (
           <div
             key={segmentData.segment}
             className="ship-queue__segment"
@@ -129,17 +92,10 @@ export function ShipQueue({
             <span className="ship-queue__segment-label">{segmentData.segment}</span>
 
             {segmentData.rows.map((row, rowIndex) => {
-              const offset = getRowOffset(segmentIndex, rowIndex);
-              const isAtPort = offset === 0;
-
               return (
                 <div
                   key={rowIndex}
-                  className={`ship-queue__row ${isAtPort ? 'ship-queue__row--at-port' : ''}`}
-                  style={{
-                    transform: `translateY(-${offset}px)`,
-                    transition: 'transform 0.3s ease-out',
-                  }}
+                  className="ship-queue__row"
                 >
                   {/* Render 3 slots per row */}
                   {[0, 1, 2].map(slotIndex => {
