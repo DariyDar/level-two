@@ -31,6 +31,20 @@ v0.2.5  →  v0.3.0  (new feature)
 - Communicate in Russian
 - Code and comments in English
 
+## Documentation
+
+**Keep documentation up to date** — After making significant changes, update:
+
+1. **CLAUDE.md** — Update "Current State" and "Known Issues" sections
+2. **docs/** — Update relevant design docs if architecture changes
+3. **Code comments** — Add/update comments for complex logic
+
+What counts as "significant":
+- New features or components
+- Changed architecture or data flow
+- Fixed or discovered issues
+- Changed file structure
+
 ## Project Context
 
 This is "Port Management" — a metabolic simulation game teaching blood glucose management through a port/ship metaphor.
