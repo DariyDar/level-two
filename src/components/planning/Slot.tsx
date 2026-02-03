@@ -10,11 +10,11 @@ interface SlotProps {
   ship?: Ship;
   isOccupied: boolean;
   isPreOccupied: boolean;
-  canDrop: boolean;
   groupStartSlot?: number; // The start slot of the valid drop group this slot belongs to
   isHighlighted: boolean;
   isPartOfShip: boolean; // This slot is occupied by a multi-slot ship but not the start
-  isHoveredGroup?: boolean; // This slot is part of the currently hovered drop group
+  isHoveredValid?: boolean; // This slot is part of a valid hovered drop group (green)
+  isHoveredInvalid?: boolean; // This slot is part of an invalid hovered drop group (red)
 }
 
 export function Slot({
@@ -23,11 +23,11 @@ export function Slot({
   ship,
   isOccupied,
   isPreOccupied,
-  canDrop,
   groupStartSlot,
   isHighlighted,
   isPartOfShip,
-  isHoveredGroup = false,
+  isHoveredValid = false,
+  isHoveredInvalid = false,
 }: SlotProps) {
   const { setNodeRef } = useDroppable({
     id: `slot-${slotNumber}`,
@@ -39,9 +39,6 @@ export function Slot({
   const showShip = placedShip && ship && !isPartOfShip;
   const shipSlots = ship ? SHIP_SIZE_TO_SLOTS[ship.size] : 1;
 
-  // Show drop-valid highlight when this slot is part of the hovered group
-  const showDropHighlight = isHoveredGroup && canDrop;
-
   return (
     <div
       ref={setNodeRef}
@@ -50,7 +47,8 @@ export function Slot({
         isOccupied && 'slot--occupied',
         isOccupied && shipSlots > 1 && `slot--spans-${shipSlots}`,
         isPreOccupied && 'slot--pre-occupied',
-        showDropHighlight && 'slot--drop-valid',
+        isHoveredValid && 'slot--drop-valid',
+        isHoveredInvalid && 'slot--drop-invalid',
         isHighlighted && 'slot--highlighted',
         isPartOfShip && 'slot--part-of-ship',
       ]

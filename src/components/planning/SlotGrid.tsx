@@ -63,18 +63,41 @@ export function SlotGrid({
     }
   }
 
-  // Calculate which group is being hovered (if any)
-  // When hovering any slot in a valid group, highlight all slots in that group
-  let hoveredGroupStart: number | null = null;
-  if (hoveredSlot !== null && hoveredSlot !== undefined) {
-    hoveredGroupStart = slotToGroupStart.get(hoveredSlot) ?? null;
-  }
-
-  // Build set of slots that should show hover highlight
+  // Calculate which slots would be occupied if we drop at the hovered slot
+  // This works for ANY hovered slot, not just valid ones
   const hoveredGroupSlots = new Set<number>();
-  if (hoveredGroupStart !== null) {
-    for (let i = 0; i < activeShipSize; i++) {
-      hoveredGroupSlots.add(hoveredGroupStart + i);
+  let isHoveredGroupValid = false;
+
+  if (hoveredSlot !== null && hoveredSlot !== undefined && activeShipSize > 0) {
+    // Calculate the leftmost slot where the ship would start
+    // For multi-slot ships, we want to show where it would actually land
+    // If hovering slot 9 with L ship (3 slots), it would occupy 7,8,9 if started at 7
+    // But we need to find a valid start position or show invalid
+
+    // First, check if there's a valid group that includes this slot
+    const validGroupStart = slotToGroupStart.get(hoveredSlot);
+
+    if (validGroupStart !== undefined) {
+      // This slot is part of a valid drop zone - highlight the valid group
+      for (let i = 0; i < activeShipSize; i++) {
+        hoveredGroupSlots.add(validGroupStart + i);
+      }
+      isHoveredGroupValid = true;
+    } else {
+      // Not a valid drop - show where ship WOULD go (red highlight)
+      // Ship would start at hoveredSlot and extend right
+      const rowStart = Math.floor((hoveredSlot - 1) / 3) * 3 + 1; // First slot in this row
+      const rowEnd = rowStart + 2; // Last slot in this row
+
+      // Calculate which slots the ship would occupy starting from hoveredSlot
+      for (let i = 0; i < activeShipSize; i++) {
+        const targetSlot = hoveredSlot + i;
+        // Only include slots that are in the same row
+        if (targetSlot <= rowEnd) {
+          hoveredGroupSlots.add(targetSlot);
+        }
+      }
+      isHoveredGroupValid = false;
     }
   }
 
@@ -91,12 +114,10 @@ export function SlotGrid({
           ? ships.find((s) => s.id === shipInfo.placedShip.shipId)
           : undefined;
 
-        // For multi-slot ships, check if this slot is part of a valid drop group
-        const isInValidGroup = expandedValidSlots.has(slotNumber);
         const groupStartSlot = slotToGroupStart.get(slotNumber);
 
         // Check if this slot is part of the currently hovered group
-        const isHoveredGroup = hoveredGroupSlots.has(slotNumber);
+        const isInHoveredGroup = hoveredGroupSlots.has(slotNumber);
 
         slots.push(
           <Slot
@@ -106,11 +127,11 @@ export function SlotGrid({
             ship={shipInfo?.isStart ? ship : undefined}
             isOccupied={!!shipInfo?.isStart}
             isPreOccupied={!!shipInfo?.placedShip.isPreOccupied}
-            canDrop={isInValidGroup}
             groupStartSlot={groupStartSlot}
             isHighlighted={highlightedSlots.has(slotNumber)}
             isPartOfShip={!!shipInfo && !shipInfo.isStart}
-            isHoveredGroup={isHoveredGroup}
+            isHoveredValid={isInHoveredGroup && isHoveredGroupValid}
+            isHoveredInvalid={isInHoveredGroup && !isHoveredGroupValid}
           />
         );
       }
