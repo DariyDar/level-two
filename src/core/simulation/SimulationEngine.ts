@@ -5,6 +5,9 @@ import type {
   SimpleDegradation,
 } from '../types';
 import { SHIP_SIZE_TO_HOURS, positionToSlotNumber } from '../types';
+import { RuleEngine } from '../rules/RuleEngine';
+import type { RulesConfig, RuleEvaluationContext } from '../rules/types';
+import organRulesConfig from '../../config/organRules.json';
 
 // === Simulation State Types ===
 
@@ -125,6 +128,7 @@ export class SimulationEngine {
   private config: SimulationConfig;
   private ships: Map<string, Ship>;
   private degradation: SimpleDegradation;
+  private rulesConfig: RulesConfig;
 
   constructor(
     placedShips: PlacedShip[],
@@ -135,6 +139,7 @@ export class SimulationEngine {
     this.config = { ...DEFAULT_CONFIG, ...config };
     this.ships = new Map(allShips.map((s) => [s.id, s]));
     this.degradation = initialDegradation;
+    this.rulesConfig = organRulesConfig as RulesConfig;
 
     // Convert placed ships to queue, sorted by slot number
     const queue: QueuedShip[] = placedShips
@@ -255,6 +260,46 @@ export class SimulationEngine {
 
   // === Private methods ===
 
+  /**
+   * Build evaluation context for rule engine
+   */
+  private buildRuleContext(): RuleEvaluationContext {
+    return {
+      containers: {
+        liver: this.state.containers.liver,
+        bg: this.state.containers.bg,
+        metforminEffect: this.state.containers.metforminEffect,
+        exerciseEffect: this.state.containers.exerciseEffect,
+      },
+      capacities: {
+        liver: this.config.liverCapacity,
+        bg: this.config.bgCapacity,
+      },
+      boosts: {
+        liverBoost: {
+          isActive: this.state.liverBoost.isActive,
+          charges: this.state.liverBoost.charges,
+          cooldownTicks: this.state.liverBoost.cooldownTicks,
+        },
+        pancreasBoost: {
+          isActive: this.state.pancreasBoost.isActive,
+          charges: this.state.pancreasBoost.charges,
+          cooldownTicks: this.state.pancreasBoost.cooldownTicks,
+        },
+      },
+      degradation: {
+        liver: this.degradation.liver,
+        pancreas: this.degradation.pancreas,
+      },
+      thresholds: {
+        bgLow: this.config.bgLow,
+        bgTarget: this.config.bgTarget,
+        bgHigh: this.config.bgHigh,
+        bgCritical: this.config.bgCritical,
+      },
+    };
+  }
+
   private checkShipQueue(): void {
     // If already unloading, skip
     if (this.state.unloadingShip) return;
@@ -327,38 +372,14 @@ export class SimulationEngine {
   }
 
   private processLiverTransfer(): void {
-    const { liver, bg } = this.state.containers;
-    const { bgTarget, bgHigh, liverCapacity, liverTransferRates } = this.config;
+    const context = this.buildRuleContext();
+    const result = RuleEngine.evaluateOrganRules(this.rulesConfig.liver, context);
 
-    // Determine transfer tier
-    let tier = 0;
-
-    // Liver boost active = force tier 2
-    if (this.state.liverBoost.isActive) {
-      tier = this.config.liverBoostTier;
-    }
-    // Liver overflow = tier 2 (emergency dump)
-    else if (liver >= liverCapacity * 0.9) {
-      tier = 2;
-    }
-    // BG low = tier 1 (release glucose)
-    else if (bg <= bgTarget) {
-      tier = 1;
-    }
-    // BG high = tier 0 (stop release)
-    else if (bg >= bgHigh) {
-      tier = 0;
-    }
-    // Normal = tier 1
-    else {
-      tier = 1;
-    }
-
-    const rate = liverTransferRates[tier] || 0;
-    this.state.currentLiverRate = rate;
+    this.state.currentLiverRate = result.finalRate;
 
     // Transfer from liver to BG
-    const transfer = Math.min(rate, liver);
+    const liver = this.state.containers.liver;
+    const transfer = Math.min(result.finalRate, liver);
     this.state.containers.liver -= transfer;
     this.state.containers.bg += transfer;
 
@@ -370,42 +391,13 @@ export class SimulationEngine {
   }
 
   private processMuscleDrain(): void {
-    const { bg } = this.state.containers;
-    const { bgTarget, bgHigh, bgCritical, muscleDrainRates } = this.config;
+    const context = this.buildRuleContext();
+    const result = RuleEngine.evaluateOrganRules(this.rulesConfig.muscles, context);
 
-    // Determine base tier based on BG level (Pancreas response)
-    let tier = 0;
-
-    if (bg <= bgTarget) {
-      tier = 0; // Low BG = no drain
-    } else if (bg <= bgHigh) {
-      tier = 2; // Normal high = moderate drain
-    } else if (bg <= bgCritical) {
-      tier = 3; // High = increased drain
-    } else {
-      tier = 4; // Critical = maximum drain
-    }
-
-    // Apply degradation penalty (reduce max tier)
-    const degradationPenalty = Math.floor(this.degradation.pancreas / 25);
-    const maxTier = Math.max(0, muscleDrainRates.length - 1 - degradationPenalty);
-    tier = Math.min(tier, maxTier);
-
-    // Apply exercise bonus
-    if (this.state.containers.exerciseEffect > 50) {
-      tier = Math.min(tier + 1, maxTier);
-    }
-
-    // Apply pancreas boost
-    if (this.state.pancreasBoost.isActive) {
-      tier = Math.min(tier + this.config.pancreasBoostTierBonus, maxTier);
-    }
-
-    const rate = muscleDrainRates[tier] || 0;
-    this.state.currentMuscleRate = rate;
+    this.state.currentMuscleRate = result.finalRate;
 
     // Drain from BG
-    this.state.containers.bg = Math.max(0, this.state.containers.bg - rate);
+    this.state.containers.bg = Math.max(0, this.state.containers.bg - result.finalRate);
   }
 
   private updateBoostCooldowns(): void {

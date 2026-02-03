@@ -1,0 +1,197 @@
+{
+  "version": "1.0.0",
+  "liver": {
+    "organ": "liver",
+    "description": "Liver glucose transfer rules - controls glucose release from liver buffer to bloodstream",
+    "rules": [
+      {
+        "id": "liver_boost_active",
+        "description": "Liver boost forces maximum transfer rate",
+        "priority": 1,
+        "condition": {
+          "type": "boost",
+          "boost": "liverBoost",
+          "state": "active"
+        },
+        "action": {
+          "type": "setTier",
+          "tier": 2
+        }
+      },
+      {
+        "id": "liver_overflow",
+        "description": "Emergency dump when liver is nearly full",
+        "priority": 2,
+        "condition": {
+          "type": "container",
+          "container": "liver",
+          "operator": ">=",
+          "value": 0.9,
+          "relative": "capacity"
+        },
+        "action": {
+          "type": "setTier",
+          "tier": 2
+        }
+      },
+      {
+        "id": "bg_high_stop",
+        "description": "Stop release when blood glucose is high",
+        "priority": 3,
+        "condition": {
+          "type": "container",
+          "container": "bg",
+          "operator": ">=",
+          "value": 200
+        },
+        "action": {
+          "type": "setTier",
+          "tier": 0
+        }
+      },
+      {
+        "id": "bg_low_release",
+        "description": "Release glucose when blood glucose is low",
+        "priority": 4,
+        "condition": {
+          "type": "container",
+          "container": "bg",
+          "operator": "<=",
+          "value": 100
+        },
+        "action": {
+          "type": "setTier",
+          "tier": 1
+        }
+      },
+      {
+        "id": "default_normal",
+        "description": "Default: normal release rate",
+        "priority": 5,
+        "condition": {
+          "type": "default"
+        },
+        "action": {
+          "type": "setTier",
+          "tier": 1
+        }
+      }
+    ],
+    "modifiers": [],
+    "rates": [0, 30, 50],
+    "minTier": 0,
+    "maxTier": 2
+  },
+  "muscles": {
+    "organ": "muscles",
+    "description": "Muscle glucose utilization rules - controls how fast muscles consume glucose from bloodstream",
+    "rules": [
+      {
+        "id": "bg_critical",
+        "description": "Maximum drain at critical BG levels",
+        "priority": 1,
+        "condition": {
+          "type": "container",
+          "container": "bg",
+          "operator": ">",
+          "value": 300
+        },
+        "action": {
+          "type": "setTier",
+          "tier": 4
+        }
+      },
+      {
+        "id": "bg_high",
+        "description": "High drain at elevated BG",
+        "priority": 2,
+        "condition": {
+          "type": "container",
+          "container": "bg",
+          "operator": ">",
+          "value": 200
+        },
+        "action": {
+          "type": "setTier",
+          "tier": 3
+        }
+      },
+      {
+        "id": "bg_normal_high",
+        "description": "Moderate drain at normal-high BG",
+        "priority": 3,
+        "condition": {
+          "type": "container",
+          "container": "bg",
+          "operator": ">",
+          "value": 100
+        },
+        "action": {
+          "type": "setTier",
+          "tier": 2
+        }
+      },
+      {
+        "id": "bg_low_stop",
+        "description": "Stop drain when BG is low or normal",
+        "priority": 4,
+        "condition": {
+          "type": "default"
+        },
+        "action": {
+          "type": "setTier",
+          "tier": 0
+        }
+      }
+    ],
+    "modifiers": [
+      {
+        "id": "degradation_penalty",
+        "description": "Pancreas degradation reduces maximum drain tier",
+        "type": "degradation",
+        "condition": {
+          "type": "degradation",
+          "organ": "pancreas",
+          "operator": ">",
+          "value": 0
+        },
+        "effect": {
+          "type": "subtractTier",
+          "amount": 1
+        }
+      },
+      {
+        "id": "exercise_bonus",
+        "description": "Exercise increases drain tier",
+        "type": "effect",
+        "condition": {
+          "type": "effect",
+          "container": "exerciseEffect",
+          "operator": ">",
+          "value": 50
+        },
+        "effect": {
+          "type": "addTier",
+          "amount": 1
+        }
+      },
+      {
+        "id": "pancreas_boost",
+        "description": "Pancreas boost increases drain tier",
+        "type": "boost",
+        "condition": {
+          "type": "boost",
+          "boost": "pancreasBoost",
+          "state": "active"
+        },
+        "effect": {
+          "type": "addTier",
+          "amount": 1
+        }
+      }
+    ],
+    "rates": [0, 20, 30, 50, 70, 90],
+    "minTier": 0,
+    "maxTier": 5
+  }
+}

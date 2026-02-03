@@ -62,12 +62,16 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - `src/components/planning/` — planning phase UI
 - `data/` — JSON configs for ships and levels
 
-### Current State (v0.2.4)
+### Current State (v0.3.0)
 - Planning phase: drag-and-drop ships to time slots ✅
 - Simulation phase: glucose flow visualization with particles ✅
 - Results phase: basic BG history graph ✅
 - Particle system: streams from ships → liver → BG → muscles/kidneys
+- **NEW:** Configuration-driven rules system ✅
+  - Organ behavior defined in JSON config files
+  - Rule Engine evaluates conditions and actions
+  - Easy balancing without code changes
 
 ### Known Issues
 - Particle positions may need fine-tuning
-- Kidneys only activate when BG > 180
+- Kidneys not implemented (deferred to future iteration)
