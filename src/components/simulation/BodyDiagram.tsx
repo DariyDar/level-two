@@ -1,7 +1,6 @@
 import type { SimulationState } from '../../core/simulation';
 import type { SimpleDegradation } from '../../core/types';
 import { ContainerView } from './ContainerView';
-import { GlucoseParticleSystem } from './GlucoseParticleSystem';
 import './BodyDiagram.css';
 
 interface InterpolatedValues {
@@ -15,12 +14,10 @@ interface BodyDiagramProps {
   state: SimulationState;
   degradation: SimpleDegradation;
   interpolated?: InterpolatedValues;
-  speed?: number;
-  isPaused?: boolean;
 }
 
-export function BodyDiagram({ state, degradation, interpolated, speed = 1, isPaused = false }: BodyDiagramProps) {
-  const { currentLiverRate, currentMuscleRate, unloadingShip, containers } = state;
+export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramProps) {
+  const { currentLiverRate, currentMuscleRate, containers } = state;
 
   // Use interpolated values if provided, otherwise use state values
   const liverValue = interpolated?.liver ?? containers.liver;
@@ -28,24 +25,11 @@ export function BodyDiagram({ state, degradation, interpolated, speed = 1, isPau
   const displayLiverRate = interpolated?.liverRate ?? currentLiverRate;
   const displayMuscleRate = interpolated?.muscleRate ?? currentMuscleRate;
 
-  // Calculate ship unload rate for particles
-  const shipUnloadRate = unloadingShip ? unloadingShip.loadPerTick : 0;
-
   // Kidney excretion rate (when BG > 180, kidneys start working)
   const kidneyRate = bgValue > 180 ? Math.min((bgValue - 180) * 0.1, 20) : 0;
 
   return (
     <div className="body-diagram">
-      {/* Glucose Particle System */}
-      <GlucoseParticleSystem
-        shipUnloading={shipUnloadRate}
-        liverToBgRate={displayLiverRate}
-        bgToMusclesRate={displayMuscleRate}
-        bgToKidneysRate={kidneyRate}
-        speed={speed}
-        isPaused={isPaused}
-      />
-
       {/* Middle row: Muscles - BG - Kidneys */}
       <div className="body-diagram__middle-row">
         <ContainerView

@@ -101,6 +101,14 @@
   color: white;
 }
 
+/* Main simulation area - contains particles */
+.simulation-phase__main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 /* Boosts */
 .simulation-phase__boosts {
   display: flex;

@@ -15,6 +15,7 @@ interface ShipQueueProps {
   unloadingShip: UnloadingShip | null;
   remainingShips: QueuedShip[];
   ships: Map<string, Ship>;
+  dissolveProgress: number; // Interpolated 0-1 for smooth animation
 }
 
 // Group ships by segment and row for display
@@ -32,6 +33,7 @@ export function ShipQueue({
   unloadingShip,
   remainingShips,
   ships,
+  dissolveProgress,
 }: ShipQueueProps) {
   // Build the queue structure matching planning phase
   const segments = useMemo(() => {
@@ -104,10 +106,8 @@ export function ShipQueue({
 
                     if (shipData) {
                       const slots = SHIP_SIZE_TO_SLOTS[shipData.ship.size];
-                      // Calculate dissolve progress (0 to 1) for CSS mask effect
-                      const dissolveProgress = shipData.isUnloading && unloadingShip
-                        ? (unloadingShip.totalTicks - unloadingShip.remainingTicks) / unloadingShip.totalTicks
-                        : 0;
+                      // Use interpolated dissolve progress for smooth animation
+                      const shipDissolve = shipData.isUnloading ? dissolveProgress : 0;
                       return (
                         <div
                           key={slotIndex}
@@ -116,7 +116,7 @@ export function ShipQueue({
                           } ${shipData.isCompleted ? 'ship-queue__ship--completed' : ''}`}
                           style={{
                             gridColumn: `span ${slots}`,
-                            '--dissolve-progress': dissolveProgress,
+                            '--dissolve-progress': shipDissolve,
                           } as React.CSSProperties}
                         >
                           <span className="ship-queue__ship-emoji">{shipData.ship.emoji}</span>

@@ -5,6 +5,7 @@ interface InterpolatedValues {
   bg: number;
   muscleRate: number;
   liverRate: number;
+  dissolveProgress: number;
 }
 
 interface UseInterpolationOptions {
@@ -12,6 +13,7 @@ interface UseInterpolationOptions {
   targetBG: number;
   targetMuscleRate: number;
   targetLiverRate: number;
+  targetDissolveProgress: number;
   duration: number; // ms to interpolate over
   isPaused: boolean;
 }
@@ -21,6 +23,7 @@ export function useInterpolatedValues({
   targetBG,
   targetMuscleRate,
   targetLiverRate,
+  targetDissolveProgress,
   duration,
   isPaused,
 }: UseInterpolationOptions): InterpolatedValues {
@@ -29,6 +32,7 @@ export function useInterpolatedValues({
     bg: targetBG,
     muscleRate: targetMuscleRate,
     liverRate: targetLiverRate,
+    dissolveProgress: targetDissolveProgress,
   });
 
   const animationRef = useRef<number | null>(null);
@@ -62,6 +66,7 @@ export function useInterpolatedValues({
         bg: start.bg + (targetBG - start.bg) * eased,
         muscleRate: start.muscleRate + (targetMuscleRate - start.muscleRate) * eased,
         liverRate: start.liverRate + (targetLiverRate - start.liverRate) * eased,
+        dissolveProgress: start.dissolveProgress + (targetDissolveProgress - start.dissolveProgress) * eased,
       });
 
       if (progress < 1) {
@@ -76,7 +81,7 @@ export function useInterpolatedValues({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [targetLiver, targetBG, targetMuscleRate, targetLiverRate, duration, isPaused]);
+  }, [targetLiver, targetBG, targetMuscleRate, targetLiverRate, targetDissolveProgress, duration, isPaused]);
 
   return values;
 }

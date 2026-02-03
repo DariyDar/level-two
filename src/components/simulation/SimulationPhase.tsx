@@ -9,6 +9,7 @@ import { loadAllShips } from '../../config/loader';
 import { BodyDiagram } from './BodyDiagram';
 import { BoostButton } from './BoostButton';
 import { ShipQueue } from './ShipQueue';
+import { GlucoseParticleSystem } from './GlucoseParticleSystem';
 import './SimulationPhase.css';
 
 // Available simulation speeds
@@ -93,6 +94,11 @@ export function SimulationPhase() {
     onComplete: handleComplete,
   });
 
+  // Calculate dissolve progress for current unloading ship
+  const targetDissolveProgress = simState?.unloadingShip
+    ? (simState.unloadingShip.totalTicks - simState.unloadingShip.remainingTicks) / simState.unloadingShip.totalTicks
+    : 0;
+
   // Interpolated values for smooth animation
   const tickDuration = 1000 / speed;
   const interpolated = useInterpolatedValues({
@@ -100,6 +106,7 @@ export function SimulationPhase() {
     targetBG: simState?.containers.bg ?? 100,
     targetMuscleRate: simState?.currentMuscleRate ?? 0,
     targetLiverRate: simState?.currentLiverRate ?? 0,
+    targetDissolveProgress,
     duration: tickDuration * 0.9, // Finish slightly before next tick
     isPaused,
   });
@@ -174,16 +181,30 @@ export function SimulationPhase() {
         </div>
       </div>
 
-      {/* Body Diagram */}
-      <BodyDiagram state={simState} degradation={degradation} interpolated={interpolated} speed={speed} isPaused={isPaused} />
+      {/* Main simulation area with particles */}
+      <div className="simulation-phase__main">
+        {/* Particle System - spans both BodyDiagram and ShipQueue */}
+        <GlucoseParticleSystem
+          shipUnloading={simState.unloadingShip?.loadPerTick ?? 0}
+          liverToBgRate={interpolated.liverRate}
+          bgToMusclesRate={interpolated.muscleRate}
+          bgToKidneysRate={interpolated.bg > 180 ? Math.min((interpolated.bg - 180) * 0.1, 20) : 0}
+          speed={speed}
+          isPaused={isPaused}
+        />
 
-      {/* Ship Queue */}
-      <ShipQueue
-        placedShips={placedShips}
-        unloadingShip={simState.unloadingShip}
-        remainingShips={simState.remainingShips}
-        ships={shipsMap}
-      />
+        {/* Body Diagram */}
+        <BodyDiagram state={simState} degradation={degradation} interpolated={interpolated} />
+
+        {/* Ship Queue */}
+        <ShipQueue
+          placedShips={placedShips}
+          unloadingShip={simState.unloadingShip}
+          remainingShips={simState.remainingShips}
+          ships={shipsMap}
+          dissolveProgress={interpolated.dissolveProgress}
+        />
+      </div>
 
       {/* Boost Buttons */}
       <div className="simulation-phase__boosts">
