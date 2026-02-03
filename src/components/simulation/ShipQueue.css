@@ -105,19 +105,22 @@
 
 .ship-queue__ship--unloading {
   background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-  animation: unloading-pulse 1s ease-in-out infinite;
   box-shadow: 0 0 12px rgba(72, 187, 120, 0.5);
-}
-
-@keyframes unloading-pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.02);
-    opacity: 0.9;
-  }
+  /* Dissolve effect using mask - progress controlled via CSS variable */
+  -webkit-mask-image: linear-gradient(
+    135deg,
+    transparent 0%,
+    transparent calc(var(--dissolve-progress, 0) * 100% - 5%),
+    black calc(var(--dissolve-progress, 0) * 100% + 5%),
+    black 100%
+  );
+  mask-image: linear-gradient(
+    135deg,
+    transparent 0%,
+    transparent calc(var(--dissolve-progress, 0) * 100% - 5%),
+    black calc(var(--dissolve-progress, 0) * 100% + 5%),
+    black 100%
+  );
 }
 
 .ship-queue__ship--completed {
@@ -130,55 +133,3 @@
   z-index: 2;
 }
 
-/* Progress bar inside ship */
-.ship-queue__ship {
-  position: relative;
-  overflow: hidden;
-}
-
-.ship-queue__ship-progress {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-}
-
-.ship-queue__ship-progress-fill {
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  transition: width 0.3s ease;
-  /* Fill from right to left as cargo is unloaded */
-  margin-left: auto;
-}
-
-/* Unloading progress */
-.ship-queue__unloading {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #4a5568;
-}
-
-.ship-queue__unloading-bar {
-  flex: 1;
-  height: 6px;
-  background: #1a202c;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.ship-queue__unloading-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #48bb78 0%, #68d391 100%);
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-.ship-queue__unloading-text {
-  font-size: 11px;
-  color: #a0aec0;
-  white-space: nowrap;
-}

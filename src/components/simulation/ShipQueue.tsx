@@ -15,7 +15,6 @@ interface ShipQueueProps {
   unloadingShip: UnloadingShip | null;
   remainingShips: QueuedShip[];
   ships: Map<string, Ship>;
-  currentTick: number;
 }
 
 // Group ships by segment and row for display
@@ -33,7 +32,6 @@ export function ShipQueue({
   unloadingShip,
   remainingShips,
   ships,
-  currentTick,
 }: ShipQueueProps) {
   // Build the queue structure matching planning phase
   const segments = useMemo(() => {
@@ -77,12 +75,42 @@ export function ShipQueue({
     return result;
   }, [placedShips, unloadingShip, remainingShips, ships]);
 
-  // Calculate which row is currently active (approaching port)
-  // Each row takes some ticks to process
+  // Find which row contains the currently unloading ship
+  const unloadingRowIndex = useMemo(() => {
+    if (!unloadingShip) return -1;
+
+    for (let segIdx = 0; segIdx < segments.length; segIdx++) {
+      for (let rowIdx = 0; rowIdx < 2; rowIdx++) {
+        const hasUnloading = segments[segIdx].rows[rowIdx].ships.some(s => s.isUnloading);
+        if (hasUnloading) {
+          return segIdx * 2 + rowIdx;
+        }
+      }
+    }
+    return -1;
+  }, [segments, unloadingShip]);
+
+  // Calculate dissolve progress for smooth row movement
+  const currentDissolveProgress = unloadingShip
+    ? (unloadingShip.totalTicks - unloadingShip.remainingTicks) / unloadingShip.totalTicks
+    : 0;
+
+  // Calculate vertical offset for rows - rows move UP toward port
+  const ROW_HEIGHT = 44; // Height of row including gap
+
   const getRowOffset = (segmentIndex: number, rowIndex: number): number => {
-    const totalRowsBefore = segmentIndex * 2 + rowIndex;
-    // Offset based on progression - rows move toward port over time
-    return Math.max(0, (totalRowsBefore * 50) - (currentTick * 15));
+    const globalRowIndex = segmentIndex * 2 + rowIndex;
+
+    // Count how many rows have been completed (fully dissolved)
+    const completedRows = unloadingRowIndex >= 0 ? unloadingRowIndex : 0;
+
+    // Calculate offset: completed rows + current dissolve progress
+    const totalOffset = completedRows + (unloadingRowIndex >= 0 ? currentDissolveProgress : 0);
+
+    // Rows move up (negative Y) as ships complete
+    const rowOffset = (globalRowIndex - totalOffset) * ROW_HEIGHT;
+
+    return Math.max(0, rowOffset);
   };
 
   return (
@@ -109,8 +137,8 @@ export function ShipQueue({
                   key={rowIndex}
                   className={`ship-queue__row ${isAtPort ? 'ship-queue__row--at-port' : ''}`}
                   style={{
-                    transform: `translateX(${offset}px)`,
-                    transition: 'transform 0.5s ease-out',
+                    transform: `translateY(-${offset}px)`,
+                    transition: 'transform 0.3s ease-out',
                   }}
                 >
                   {/* Render 3 slots per row */}
@@ -120,8 +148,9 @@ export function ShipQueue({
 
                     if (shipData) {
                       const slots = SHIP_SIZE_TO_SLOTS[shipData.ship.size];
-                      const unloadProgress = shipData.isUnloading && unloadingShip
-                        ? ((unloadingShip.totalTicks - unloadingShip.remainingTicks) / unloadingShip.totalTicks) * 100
+                      // Calculate dissolve progress (0 to 1) for CSS mask effect
+                      const dissolveProgress = shipData.isUnloading && unloadingShip
+                        ? (unloadingShip.totalTicks - unloadingShip.remainingTicks) / unloadingShip.totalTicks
                         : 0;
                       return (
                         <div
@@ -129,17 +158,12 @@ export function ShipQueue({
                           className={`ship-queue__ship ship-queue__ship--size-${shipData.ship.size} ${
                             shipData.isUnloading ? 'ship-queue__ship--unloading' : ''
                           } ${shipData.isCompleted ? 'ship-queue__ship--completed' : ''}`}
-                          style={{ gridColumn: `span ${slots}` }}
+                          style={{
+                            gridColumn: `span ${slots}`,
+                            '--dissolve-progress': dissolveProgress,
+                          } as React.CSSProperties}
                         >
                           <span className="ship-queue__ship-emoji">{shipData.ship.emoji}</span>
-                          {shipData.isUnloading && (
-                            <div className="ship-queue__ship-progress">
-                              <div
-                                className="ship-queue__ship-progress-fill"
-                                style={{ width: `${100 - unloadProgress}%` }}
-                              />
-                            </div>
-                          )}
                         </div>
                       );
                     }
@@ -167,22 +191,6 @@ export function ShipQueue({
         ))}
       </div>
 
-      {/* Unloading progress */}
-      {unloadingShip && (
-        <div className="ship-queue__unloading">
-          <div className="ship-queue__unloading-bar">
-            <div
-              className="ship-queue__unloading-fill"
-              style={{
-                width: `${((unloadingShip.totalTicks - unloadingShip.remainingTicks) / unloadingShip.totalTicks) * 100}%`
-              }}
-            />
-          </div>
-          <span className="ship-queue__unloading-text">
-            {unloadingShip.remainingTicks}h remaining
-          </span>
-        </div>
-      )}
     </div>
   );
 }

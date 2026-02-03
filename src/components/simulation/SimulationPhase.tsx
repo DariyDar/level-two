@@ -183,7 +183,6 @@ export function SimulationPhase() {
         unloadingShip={simState.unloadingShip}
         remainingShips={simState.remainingShips}
         ships={shipsMap}
-        currentTick={simState.currentTick}
       />
 
       {/* Boost Buttons */}

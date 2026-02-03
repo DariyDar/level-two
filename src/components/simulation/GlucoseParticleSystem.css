@@ -5,7 +5,8 @@
   right: 0;
   bottom: 0;
   pointer-events: none;
-  overflow: hidden;
+  overflow: visible;
+  z-index: 10;
 }
 
 .glucose-particles__particle {
