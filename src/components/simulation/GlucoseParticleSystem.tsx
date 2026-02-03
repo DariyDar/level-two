@@ -27,24 +27,44 @@ interface GlucoseParticleSystemProps {
   // Speed multiplier
   speed: number;
   isPaused: boolean;
+  // Dissolve progress for ship (0-1) - particles spawn from dissolve edge
+  dissolveProgress: number;
 }
 
 // Visual multiplier for more particles (aesthetic)
 const VISUAL_MULTIPLIER = 3;
 
 // Container positions (relative to .simulation-phase__main, percentages)
-// Based on actual layout measurements:
-// - BodyDiagram: ~280px height (with min-height)
+// Based on actual layout:
+// - BodyDiagram: ~280px min-height with padding
 // - ShipQueue: ~300px height
 // Total: ~580px + 16px gap = ~600px
-// BodyDiagram takes roughly 47%, ShipQueue 50%, gap 3%
+// BodyDiagram is ~47%, ShipQueue is ~50%, gap ~3%
 const POSITIONS: Record<Container, { x: number; y: number }> = {
-  ship: { x: 50, y: 75 },      // Middle of ShipQueue (first row of ships)
-  liver: { x: 50, y: 38 },     // Liver in BodyDiagram (lower part)
-  bg: { x: 50, y: 15 },        // Blood Glucose bar (upper part)
-  muscles: { x: 22, y: 15 },   // Muscles (left)
-  kidneys: { x: 78, y: 15 },   // Kidneys (right)
+  // Ship position is dynamic - see getShipSpawnPosition()
+  ship: { x: 50, y: 58 },      // Base position, adjusted by dissolve
+  liver: { x: 50, y: 40 },     // Liver in BodyDiagram (bottom area)
+  bg: { x: 50, y: 12 },        // Blood Glucose bar (top center)
+  muscles: { x: 20, y: 12 },   // Muscles (left)
+  kidneys: { x: 80, y: 12 },   // Kidneys (right)
 };
+
+// Ship spawn area bounds (ShipQueue grid area)
+const SHIP_SPAWN = {
+  xMin: 15,   // Left edge of ship area
+  xMax: 85,   // Right edge of ship area
+  y: 58,      // Y position (top of first row in ShipQueue)
+};
+
+// Get spawn position for ship particles based on dissolve progress
+function getShipSpawnPosition(dissolveProgress: number): { x: number; y: number } {
+  // Dissolve goes left-to-right, so particles spawn at the dissolve edge
+  const dissolveX = SHIP_SPAWN.xMin + (SHIP_SPAWN.xMax - SHIP_SPAWN.xMin) * dissolveProgress;
+  return {
+    x: dissolveX + (Math.random() - 0.5) * 10,
+    y: SHIP_SPAWN.y + (Math.random() - 0.5) * 4,
+  };
+}
 
 // Get position along path between two containers
 function getPathPosition(from: Container, to: Container, progress: number): { x: number; y: number } {
@@ -87,6 +107,7 @@ export function GlucoseParticleSystem({
   bgToKidneysRate,
   speed,
   isPaused,
+  dissolveProgress,
 }: GlucoseParticleSystemProps) {
   const [particles, setParticles] = useState<Particle[]>([]);
   const nextIdRef = useRef(0);
@@ -107,6 +128,7 @@ export function GlucoseParticleSystem({
     bgToMusclesRate,
     bgToKidneysRate,
     speed,
+    dissolveProgress,
   });
 
   // Update refs when props change (without restarting animation)
@@ -117,19 +139,27 @@ export function GlucoseParticleSystem({
       bgToMusclesRate,
       bgToKidneysRate,
       speed,
+      dissolveProgress,
     };
-  }, [shipUnloading, liverToBgRate, bgToMusclesRate, bgToKidneysRate, speed]);
+  }, [shipUnloading, liverToBgRate, bgToMusclesRate, bgToKidneysRate, speed, dissolveProgress]);
 
-  const spawnParticle = useCallback((from: Container, to: Container): Particle => {
-    const pos = POSITIONS[from];
+  const spawnParticle = useCallback((from: Container, to: Container, currentDissolve: number): Particle => {
+    // For ship particles, spawn from dissolve edge
+    const pos = from === 'ship'
+      ? getShipSpawnPosition(currentDissolve)
+      : {
+          x: POSITIONS[from].x + (Math.random() - 0.5) * 8,
+          y: POSITIONS[from].y + (Math.random() - 0.5) * 4,
+        };
+
     return {
       id: nextIdRef.current++,
       from,
       to,
       progress: 0,
       isAbsorbing: false,
-      x: pos.x + (Math.random() - 0.5) * 8,
-      y: pos.y + (Math.random() - 0.5) * 4,
+      x: pos.x,
+      y: pos.y,
       // Random drift parameters for organic movement
       driftPhase: Math.random() * Math.PI * 2,
       driftAmplitude: 2 + Math.random() * 4, // 2-6% drift
@@ -168,11 +198,11 @@ export function GlucoseParticleSystem({
 
         // === SPAWN NEW PARTICLES (4 independent flows) ===
 
-        // Flow 1: Ship → Liver
+        // Flow 1: Ship → Liver (spawn from dissolve edge)
         if (rates.shipUnloading > 0) {
           shipToLiverAccum.current += rates.shipUnloading * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
           while (shipToLiverAccum.current >= 1) {
-            updated.push(spawnParticle('ship', 'liver'));
+            updated.push(spawnParticle('ship', 'liver', rates.dissolveProgress));
             shipToLiverAccum.current -= 1;
           }
         }
@@ -181,7 +211,7 @@ export function GlucoseParticleSystem({
         if (rates.liverToBgRate > 0) {
           liverToBgAccum.current += rates.liverToBgRate * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
           while (liverToBgAccum.current >= 1) {
-            updated.push(spawnParticle('liver', 'bg'));
+            updated.push(spawnParticle('liver', 'bg', 0));
             liverToBgAccum.current -= 1;
           }
         }
@@ -190,7 +220,7 @@ export function GlucoseParticleSystem({
         if (rates.bgToMusclesRate > 0) {
           bgToMusclesAccum.current += rates.bgToMusclesRate * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
           while (bgToMusclesAccum.current >= 1) {
-            updated.push(spawnParticle('bg', 'muscles'));
+            updated.push(spawnParticle('bg', 'muscles', 0));
             bgToMusclesAccum.current -= 1;
           }
         }
@@ -199,7 +229,7 @@ export function GlucoseParticleSystem({
         if (rates.bgToKidneysRate > 0) {
           bgToKidneysAccum.current += rates.bgToKidneysRate * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
           while (bgToKidneysAccum.current >= 1) {
-            updated.push(spawnParticle('bg', 'kidneys'));
+            updated.push(spawnParticle('bg', 'kidneys', 0));
             bgToKidneysAccum.current -= 1;
           }
         }

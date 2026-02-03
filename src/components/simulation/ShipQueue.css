@@ -6,33 +6,11 @@
   flex-direction: column;
   gap: 12px;
   overflow: hidden;
+  /* Fixed height for smooth scrolling effect */
+  max-height: 200px;
 }
 
-/* Port indicator */
-.ship-queue__port {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #4299e1;
-}
-
-.ship-queue__port-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: #4299e1;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.ship-queue__port-indicator {
-  flex: 1;
-  height: 4px;
-  background: linear-gradient(90deg, #4299e1 0%, transparent 100%);
-  border-radius: 2px;
-}
-
-/* Segments container */
+/* Segments container - smooth scrolling */
 .ship-queue__segments {
   display: flex;
   flex-direction: column;

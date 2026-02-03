@@ -191,6 +191,7 @@ export function SimulationPhase() {
           bgToKidneysRate={interpolated.bg > 180 ? Math.min((interpolated.bg - 180) * 0.1, 20) : 0}
           speed={speed}
           isPaused={isPaused}
+          dissolveProgress={interpolated.dissolveProgress}
         />
 
         {/* Body Diagram */}

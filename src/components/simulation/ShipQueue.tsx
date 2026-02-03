@@ -28,6 +28,9 @@ interface SegmentData {
   rows: [RowData, RowData];
 }
 
+// Row height in pixels (matches CSS min-height: 36px + gap: 4px)
+const ROW_HEIGHT = 40;
+
 export function ShipQueue({
   placedShips,
   unloadingShip,
@@ -36,12 +39,16 @@ export function ShipQueue({
   dissolveProgress,
 }: ShipQueueProps) {
   // Build the queue structure matching planning phase
-  const segments = useMemo(() => {
+  const { segments, unloadingRowIndex, completedRowsCount } = useMemo(() => {
     const result: SegmentData[] = [];
 
     // Set of remaining ship instance IDs for quick lookup
     const remainingSet = new Set(remainingShips.map(s => s.instanceId));
     const unloadingId = unloadingShip?.instanceId;
+
+    let currentRowIndex = 0;
+    let unloadingRowIdx = -1;
+    let completedRows = 0;
 
     for (const segment of DAY_SEGMENTS) {
       const segmentShips = placedShips.filter(p => p.segment === segment);
@@ -71,21 +78,48 @@ export function ShipQueue({
       rows[0].ships.sort((a, b) => a.placed.startSlot - b.placed.startSlot);
       rows[1].ships.sort((a, b) => a.placed.startSlot - b.placed.startSlot);
 
+      // Track which row contains unloading ship and count completed rows
+      for (let i = 0; i < 2; i++) {
+        const hasUnloading = rows[i].ships.some(s => s.isUnloading);
+        const allCompleted = rows[i].ships.length > 0 && rows[i].ships.every(s => s.isCompleted);
+
+        if (hasUnloading) {
+          unloadingRowIdx = currentRowIndex;
+        }
+        if (allCompleted) {
+          completedRows++;
+        }
+        currentRowIndex++;
+      }
+
       result.push({ segment, rows });
     }
 
-    return result;
+    return {
+      segments: result,
+      unloadingRowIndex: unloadingRowIdx,
+      completedRowsCount: completedRows,
+    };
   }, [placedShips, unloadingShip, remainingShips, ships]);
+
+  // Calculate smooth scroll offset:
+  // - Completed rows are fully scrolled out
+  // - Current unloading row scrolls based on dissolve progress
+  const scrollOffset = useMemo(() => {
+    const completedOffset = completedRowsCount * ROW_HEIGHT;
+    const currentRowOffset = unloadingRowIndex >= 0 ? dissolveProgress * ROW_HEIGHT : 0;
+    return completedOffset + currentRowOffset;
+  }, [completedRowsCount, unloadingRowIndex, dissolveProgress]);
 
 
   return (
     <div className="ship-queue">
-      <div className="ship-queue__port">
-        <span className="ship-queue__port-label">PORT</span>
-        <div className="ship-queue__port-indicator" />
-      </div>
-
-      <div className="ship-queue__segments">
+      <div
+        className="ship-queue__segments"
+        style={{
+          transform: `translateY(-${scrollOffset}px)`,
+        }}
+      >
         {segments.map((segmentData) => (
           <div
             key={segmentData.segment}
