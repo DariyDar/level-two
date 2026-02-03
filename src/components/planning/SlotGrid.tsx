@@ -49,6 +49,18 @@ export function SlotGrid({
     }
   }
 
+  // Build expanded valid slots - for multi-slot ships, all slots in valid groups should highlight
+  // Map each slot to its group's start slot for drop handling
+  const expandedValidSlots = new Set<number>();
+  const slotToGroupStart = new Map<number, number>();
+
+  for (const startSlot of validDropSlots) {
+    for (let i = 0; i < activeShipSize; i++) {
+      expandedValidSlots.add(startSlot + i);
+      slotToGroupStart.set(startSlot + i, startSlot);
+    }
+  }
+
   const renderSegment = (segment: DaySegment, segmentIndex: number) => {
     const rows = [];
 
@@ -62,6 +74,10 @@ export function SlotGrid({
           ? ships.find((s) => s.id === shipInfo.placedShip.shipId)
           : undefined;
 
+        // For multi-slot ships, check if this slot is part of a valid drop group
+        const isInValidGroup = expandedValidSlots.has(slotNumber);
+        const groupStartSlot = slotToGroupStart.get(slotNumber);
+
         slots.push(
           <Slot
             key={slotNumber}
@@ -70,7 +86,8 @@ export function SlotGrid({
             ship={shipInfo?.isStart ? ship : undefined}
             isOccupied={!!shipInfo?.isStart}
             isPreOccupied={!!shipInfo?.placedShip.isPreOccupied}
-            canDrop={validDropSlots.has(slotNumber)}
+            canDrop={isInValidGroup}
+            groupStartSlot={groupStartSlot}
             activeShipSize={activeShipSize}
             isHighlighted={highlightedSlots.has(slotNumber)}
             isPartOfShip={!!shipInfo && !shipInfo.isStart}

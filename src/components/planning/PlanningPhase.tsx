@@ -161,8 +161,11 @@ export function PlanningPhase() {
       const slotMatch = String(over.id).match(/^slot-(\d+)$/);
       if (!slotMatch) return;
 
-      const slotNumber = parseInt(slotMatch[1], 10);
-      if (!validDropSlots.has(slotNumber)) return;
+      // Use groupStartSlot if available (for multi-slot ships dropped on non-start slots)
+      const groupStartSlot = over.data.current?.groupStartSlot as number | undefined;
+      const targetSlot = groupStartSlot ?? parseInt(slotMatch[1], 10);
+
+      if (!validDropSlots.has(targetSlot)) return;
 
       const ship = active.data.current?.ship as Ship;
       const wasPlaced = active.data.current?.isPlaced;
@@ -174,7 +177,7 @@ export function PlanningPhase() {
       }
 
       // Convert slot number to position
-      const pos = slotNumberToPosition(slotNumber);
+      const pos = slotNumberToPosition(targetSlot);
 
       // Create new placement
       const newPlacement: PlacedShip = {

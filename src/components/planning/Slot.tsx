@@ -11,6 +11,7 @@ interface SlotProps {
   isOccupied: boolean;
   isPreOccupied: boolean;
   canDrop: boolean;
+  groupStartSlot?: number; // The start slot of the valid drop group this slot belongs to
   activeShipSize: number;
   isHighlighted: boolean;
   isPartOfShip: boolean; // This slot is occupied by a multi-slot ship but not the start
@@ -23,6 +24,7 @@ export function Slot({
   isOccupied,
   isPreOccupied,
   canDrop,
+  groupStartSlot,
   activeShipSize,
   isHighlighted,
   isPartOfShip,
@@ -30,7 +32,8 @@ export function Slot({
   const { isOver, setNodeRef } = useDroppable({
     id: `slot-${slotNumber}`,
     disabled: isOccupied || isPartOfShip,
-    data: { slotNumber },
+    // Pass the group start slot so drop handler knows where to actually place the ship
+    data: { slotNumber, groupStartSlot: groupStartSlot ?? slotNumber },
   });
 
   const showShip = placedShip && ship && !isPartOfShip;
