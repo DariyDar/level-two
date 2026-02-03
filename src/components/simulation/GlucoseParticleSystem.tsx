@@ -12,6 +12,9 @@ interface Particle {
   isAbsorbing: boolean; // true when playing absorption animation
   x: number;
   y: number;
+  // Starting position (needed for ship particles that spawn at dissolve edge)
+  startX: number;
+  startY: number;
   // Drift parameters for organic movement
   driftPhase: number;
   driftAmplitude: number;
@@ -35,25 +38,24 @@ interface GlucoseParticleSystemProps {
 const VISUAL_MULTIPLIER = 3;
 
 // Container positions (relative to .simulation-phase__main, percentages)
-// Based on actual layout:
-// - BodyDiagram: ~280px min-height with padding
-// - ShipQueue: ~300px height
-// Total: ~580px + 16px gap = ~600px
-// BodyDiagram is ~47%, ShipQueue is ~50%, gap ~3%
+// Based on screenshot measurements:
+// - BodyDiagram takes ~60% of height (with Liver at bottom ~55%)
+// - ShipQueue starts at ~62% with first row at ~65%
+// - Gap between them ~2%
 const POSITIONS: Record<Container, { x: number; y: number }> = {
   // Ship position is dynamic - see getShipSpawnPosition()
-  ship: { x: 50, y: 58 },      // Base position, adjusted by dissolve
-  liver: { x: 50, y: 40 },     // Liver in BodyDiagram (bottom area)
-  bg: { x: 50, y: 12 },        // Blood Glucose bar (top center)
-  muscles: { x: 20, y: 12 },   // Muscles (left)
-  kidneys: { x: 80, y: 12 },   // Kidneys (right)
+  ship: { x: 50, y: 65 },      // First row in ShipQueue
+  liver: { x: 50, y: 52 },     // Liver container (bottom of BodyDiagram)
+  bg: { x: 50, y: 22 },        // Blood Glucose bar (top center of BodyDiagram)
+  muscles: { x: 28, y: 22 },   // Muscles (left of BG)
+  kidneys: { x: 72, y: 22 },   // Kidneys (right of BG)
 };
 
-// Ship spawn area bounds (ShipQueue grid area)
+// Ship spawn area bounds (ShipQueue first row)
 const SHIP_SPAWN = {
-  xMin: 15,   // Left edge of ship area
-  xMax: 85,   // Right edge of ship area
-  y: 58,      // Y position (top of first row in ShipQueue)
+  xMin: 12,   // Left edge of ship grid
+  xMax: 88,   // Right edge of ship grid
+  y: 65,      // Y position (first row in ShipQueue)
 };
 
 // Get spawn position for ship particles based on dissolve progress
@@ -66,13 +68,17 @@ function getShipSpawnPosition(dissolveProgress: number): { x: number; y: number 
   };
 }
 
-// Get position along path between two containers
-function getPathPosition(from: Container, to: Container, progress: number): { x: number; y: number } {
-  const fromPos = POSITIONS[from];
+// Get position along path from start to destination
+function getPathPosition(
+  startX: number,
+  startY: number,
+  to: Container,
+  progress: number
+): { x: number; y: number } {
   const toPos = POSITIONS[to];
 
-  const x = fromPos.x + (toPos.x - fromPos.x) * progress;
-  const y = fromPos.y + (toPos.y - fromPos.y) * progress;
+  const x = startX + (toPos.x - startX) * progress;
+  const y = startY + (toPos.y - startY) * progress;
 
   return { x, y };
 }
@@ -160,6 +166,8 @@ export function GlucoseParticleSystem({
       isAbsorbing: false,
       x: pos.x,
       y: pos.y,
+      startX: pos.x,
+      startY: pos.y,
       // Random drift parameters for organic movement
       driftPhase: Math.random() * Math.PI * 2,
       driftAmplitude: 2 + Math.random() * 4, // 2-6% drift
@@ -261,7 +269,7 @@ export function GlucoseParticleSystem({
           }
 
           // Update position with organic drift
-          const basePos = getPathPosition(p.from, p.to, newProgress);
+          const basePos = getPathPosition(p.startX, p.startY, p.to, newProgress);
           const driftedPos = applyDrift(
             basePos.x,
             basePos.y,
