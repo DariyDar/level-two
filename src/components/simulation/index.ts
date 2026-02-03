@@ -5,3 +5,4 @@ export { BoostButton } from './BoostButton';
 export { ShipProgress } from './ShipProgress';
 export { ShipQueue } from './ShipQueue';
 export { FlowParticles } from './FlowParticles';
+export { GlucoseParticleSystem } from './GlucoseParticleSystem';

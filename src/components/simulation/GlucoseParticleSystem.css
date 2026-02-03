@@ -1,0 +1,32 @@
+.glucose-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.glucose-particles__particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: white;
+  box-shadow:
+    0 0 2px white,
+    0 0 4px rgba(255, 255, 255, 0.7);
+  /* 4-pointed star */
+  clip-path: polygon(
+    50% 0%,
+    60% 40%,
+    100% 50%,
+    60% 60%,
+    50% 100%,
+    40% 60%,
+    0% 50%,
+    40% 40%
+  );
+  transform: translate(-50%, -50%);
+  transition: opacity 0.2s ease;
+}

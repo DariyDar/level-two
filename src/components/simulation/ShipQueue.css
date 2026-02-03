@@ -127,6 +127,30 @@
 
 .ship-queue__ship-emoji {
   font-size: 18px;
+  z-index: 2;
+}
+
+/* Progress bar inside ship */
+.ship-queue__ship {
+  position: relative;
+  overflow: hidden;
+}
+
+.ship-queue__ship-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+.ship-queue__ship-progress-fill {
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  transition: width 0.3s ease;
+  /* Fill from right to left as cargo is unloaded */
+  margin-left: auto;
 }
 
 /* Unloading progress */

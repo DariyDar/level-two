@@ -120,6 +120,9 @@ export function ShipQueue({
 
                     if (shipData) {
                       const slots = SHIP_SIZE_TO_SLOTS[shipData.ship.size];
+                      const unloadProgress = shipData.isUnloading && unloadingShip
+                        ? ((unloadingShip.totalTicks - unloadingShip.remainingTicks) / unloadingShip.totalTicks) * 100
+                        : 0;
                       return (
                         <div
                           key={slotIndex}
@@ -129,6 +132,14 @@ export function ShipQueue({
                           style={{ gridColumn: `span ${slots}` }}
                         >
                           <span className="ship-queue__ship-emoji">{shipData.ship.emoji}</span>
+                          {shipData.isUnloading && (
+                            <div className="ship-queue__ship-progress">
+                              <div
+                                className="ship-queue__ship-progress-fill"
+                                style={{ width: `${100 - unloadProgress}%` }}
+                              />
+                            </div>
+                          )}
                         </div>
                       );
                     }

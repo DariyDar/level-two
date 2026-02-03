@@ -84,3 +84,25 @@
   font-weight: 500;
   color: #a0aec0;
 }
+
+/* Compact mode */
+.container-view--compact {
+  gap: 2px;
+}
+
+.container-view--compact .container-view__header {
+  font-size: 10px;
+}
+
+.container-view--compact .container-view__emoji {
+  font-size: 12px;
+}
+
+.container-view--compact .container-view__bar {
+  width: 24px;
+  height: 50px;
+}
+
+.container-view--compact .container-view__value {
+  font-size: 10px;
+}

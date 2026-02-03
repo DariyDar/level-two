@@ -1,7 +1,7 @@
 import type { SimulationState } from '../../core/simulation';
 import type { SimpleDegradation } from '../../core/types';
 import { ContainerView } from './ContainerView';
-import { FlowParticles } from './FlowParticles';
+import { GlucoseParticleSystem } from './GlucoseParticleSystem';
 import './BodyDiagram.css';
 
 interface InterpolatedValues {
@@ -16,33 +16,72 @@ interface BodyDiagramProps {
   degradation: SimpleDegradation;
   interpolated?: InterpolatedValues;
   speed?: number;
+  isPaused?: boolean;
 }
 
-export function BodyDiagram({ state, degradation, interpolated, speed = 1 }: BodyDiagramProps) {
-  const { currentLiverRate, currentMuscleRate, unloadingShip } = state;
+export function BodyDiagram({ state, degradation, interpolated, speed = 1, isPaused = false }: BodyDiagramProps) {
+  const { currentLiverRate, currentMuscleRate, unloadingShip, containers } = state;
 
   // Use interpolated values if provided, otherwise use state values
-  const liverValue = interpolated?.liver ?? state.containers.liver;
-  const bgValue = interpolated?.bg ?? state.containers.bg;
+  const liverValue = interpolated?.liver ?? containers.liver;
+  const bgValue = interpolated?.bg ?? containers.bg;
   const displayLiverRate = interpolated?.liverRate ?? currentLiverRate;
   const displayMuscleRate = interpolated?.muscleRate ?? currentMuscleRate;
 
   // Calculate ship unload rate for particles
   const shipUnloadRate = unloadingShip ? unloadingShip.loadPerTick : 0;
 
+  // Kidney excretion rate (when BG > 180, kidneys start working)
+  const kidneyRate = bgValue > 180 ? Math.min((bgValue - 180) * 0.1, 20) : 0;
+
   return (
     <div className="body-diagram">
-      {/* Top row: Muscles and Liver */}
-      <div className="body-diagram__row">
+      {/* Glucose Particle System */}
+      <GlucoseParticleSystem
+        shipUnloading={shipUnloadRate}
+        liverToBgRate={displayLiverRate}
+        bgToMusclesRate={displayMuscleRate}
+        bgToKidneysRate={kidneyRate}
+        speed={speed}
+        isPaused={isPaused}
+      />
+
+      {/* Middle row: Muscles - BG - Kidneys */}
+      <div className="body-diagram__middle-row">
         <ContainerView
           label="Muscles"
           emoji="💪"
           value={displayMuscleRate}
           capacity={100}
           showRate={Math.round(displayMuscleRate)}
-          rateDirection="out"
+          rateDirection="in"
         />
 
+        <ContainerView
+          label="Blood Glucose"
+          emoji="🩸"
+          value={bgValue}
+          capacity={400}
+          thresholds={{
+            low: 70,
+            target: 100,
+            high: 180,
+            critical: 300,
+          }}
+        />
+
+        <ContainerView
+          label="Kidneys"
+          emoji="🫘"
+          value={kidneyRate}
+          capacity={50}
+          showRate={kidneyRate > 0 ? Math.round(kidneyRate) : undefined}
+          rateDirection="in"
+        />
+      </div>
+
+      {/* Bottom row: Liver */}
+      <div className="body-diagram__bottom-row">
         <ContainerView
           label="Liver"
           emoji="🫀"
@@ -54,52 +93,17 @@ export function BodyDiagram({ state, degradation, interpolated, speed = 1 }: Bod
         />
       </div>
 
-      {/* Center: BG (Blood Glucose) */}
-      <div className="body-diagram__center">
-        <ContainerView
-          label="Blood Glucose"
-          emoji="🩸"
-          value={bgValue}
-          capacity={400}
-          thresholds={{
-            low: 70,
-            target: 100,
-            high: 200,
-            critical: 300,
-          }}
-        />
-      </div>
-
-      {/* Bottom row: Pancreas */}
-      <div className="body-diagram__row body-diagram__row--bottom">
+      {/* Pancreas - small indicator */}
+      <div className="body-diagram__pancreas">
         <ContainerView
           label="Pancreas"
           emoji="🫁"
           value={displayMuscleRate > 0 ? 100 : 0}
           capacity={100}
           degradation={degradation.pancreas}
+          compact
         />
       </div>
-
-      {/* Flow particles */}
-      <FlowParticles
-        flowType="ship-liver"
-        rate={shipUnloadRate}
-        isActive={shipUnloadRate > 0}
-        speed={speed}
-      />
-      <FlowParticles
-        flowType="liver-bg"
-        rate={displayLiverRate}
-        isActive={displayLiverRate > 0}
-        speed={speed}
-      />
-      <FlowParticles
-        flowType="bg-muscles"
-        rate={displayMuscleRate}
-        isActive={displayMuscleRate > 0}
-        speed={speed}
-      />
     </div>
   );
 }

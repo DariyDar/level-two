@@ -14,6 +14,7 @@ interface ContainerViewProps {
   showRate?: number;
   rateDirection?: 'in' | 'out';
   degradation?: number;
+  compact?: boolean;
 }
 
 export function ContainerView({
@@ -25,6 +26,7 @@ export function ContainerView({
   showRate,
   rateDirection,
   degradation,
+  compact = false,
 }: ContainerViewProps) {
   const fillPercent = Math.min(100, (value / capacity) * 100);
 
@@ -44,7 +46,7 @@ export function ContainerView({
   }
 
   return (
-    <div className="container-view">
+    <div className={`container-view ${compact ? 'container-view--compact' : ''}`}>
       <div className="container-view__header">
         <span className="container-view__emoji">{emoji}</span>
         <span className="container-view__label">{label}</span>

@@ -175,7 +175,7 @@ export function SimulationPhase() {
       </div>
 
       {/* Body Diagram */}
-      <BodyDiagram state={simState} degradation={degradation} interpolated={interpolated} speed={speed} />
+      <BodyDiagram state={simState} degradation={degradation} interpolated={interpolated} speed={speed} isPaused={isPaused} />
 
       {/* Ship Queue */}
       <ShipQueue
