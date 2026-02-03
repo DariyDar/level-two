@@ -39,8 +39,10 @@ export function Slot({
   const showShip = placedShip && ship && !isPartOfShip;
   const shipSlots = ship ? SHIP_SIZE_TO_SLOTS[ship.size] : 1;
 
-  // Show drop preview overlay when hovering over valid slot with multi-slot ship
-  const showDropPreview = isOver && canDrop && activeShipSize > 1;
+  // Show drop preview overlay when hovering over the START slot of a valid group
+  // Only show preview if this slot IS the group start (not a middle/end slot of the group)
+  const isGroupStartSlot = groupStartSlot === slotNumber;
+  const showDropPreview = isOver && canDrop && activeShipSize > 1 && isGroupStartSlot;
 
   return (
     <div
