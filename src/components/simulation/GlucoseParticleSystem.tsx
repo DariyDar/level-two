@@ -12,6 +12,10 @@ interface Particle {
   progress: number; // 0-1 progress within current path
   x: number;
   y: number;
+  // Drift parameters for organic movement
+  driftPhase: number; // Random phase for sine wave
+  driftAmplitude: number; // How much to drift sideways
+  driftFrequency: number; // How fast to oscillate
 }
 
 interface GlucoseParticleSystemProps {
@@ -28,27 +32,45 @@ interface GlucoseParticleSystemProps {
 // Container positions (relative to parent, percentages)
 const POSITIONS: Record<VisualLocation, { x: number; y: number }> = {
   ship: { x: 50, y: 95 },      // Bottom center (port)
-  liver: { x: 50, y: 75 },     // Above port
-  bg: { x: 50, y: 50 },        // Center
-  muscles: { x: 20, y: 50 },   // Left of BG
-  kidneys: { x: 80, y: 50 },   // Right of BG
+  liver: { x: 50, y: 70 },     // Above port
+  bg: { x: 50, y: 40 },        // Center-upper
+  muscles: { x: 25, y: 35 },   // Left of BG
+  kidneys: { x: 75, y: 35 },   // Right of BG
 };
 
-// Interpolate position along path
-function getPosition(from: VisualLocation, to: VisualLocation, progress: number): { x: number; y: number } {
+// Get base position along path (without drift)
+function getBasePosition(from: VisualLocation, to: VisualLocation, progress: number): { x: number; y: number } {
   const fromPos = POSITIONS[from];
   const toPos = POSITIONS[to];
 
-  // Add some curve/randomness to path
-  const midX = (fromPos.x + toPos.x) / 2 + (Math.random() - 0.5) * 5;
-  const midY = (fromPos.y + toPos.y) / 2;
-
-  // Quadratic bezier
-  const t = progress;
-  const x = (1 - t) * (1 - t) * fromPos.x + 2 * (1 - t) * t * midX + t * t * toPos.x;
-  const y = (1 - t) * (1 - t) * fromPos.y + 2 * (1 - t) * t * midY + t * t * toPos.y;
+  // Simple linear interpolation for base path
+  const x = fromPos.x + (toPos.x - fromPos.x) * progress;
+  const y = fromPos.y + (toPos.y - fromPos.y) * progress;
 
   return { x, y };
+}
+
+// Apply organic drift to position
+function applyDrift(
+  baseX: number,
+  baseY: number,
+  progress: number,
+  driftPhase: number,
+  driftAmplitude: number,
+  driftFrequency: number,
+  time: number
+): { x: number; y: number } {
+  // Combine progress-based sine wave with time-based movement
+  const waveOffset = Math.sin(progress * Math.PI * driftFrequency + driftPhase + time * 0.001) * driftAmplitude;
+
+  // Perpendicular drift (mostly sideways)
+  const perpX = waveOffset;
+  const perpY = Math.sin(progress * Math.PI * 2 + driftPhase * 1.5 + time * 0.0005) * driftAmplitude * 0.3;
+
+  return {
+    x: baseX + perpX,
+    y: baseY + perpY,
+  };
 }
 
 export function GlucoseParticleSystem({
@@ -63,6 +85,7 @@ export function GlucoseParticleSystem({
   const nextIdRef = useRef(0);
   const animationRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
+  const globalTimeRef = useRef<number>(0);
 
   // Accumulator refs for spawning (since rates can be fractional per frame)
   const shipSpawnAccum = useRef(0);
@@ -77,8 +100,12 @@ export function GlucoseParticleSystem({
       location,
       destination,
       progress: 0,
-      x: pos.x + (Math.random() - 0.5) * 4,
+      x: pos.x + (Math.random() - 0.5) * 8,
       y: pos.y + (Math.random() - 0.5) * 4,
+      // Random drift parameters for organic movement
+      driftPhase: Math.random() * Math.PI * 2,
+      driftAmplitude: 2 + Math.random() * 4, // 2-6% drift
+      driftFrequency: 1 + Math.random() * 2, // 1-3 waves per path
     };
   }, []);
 
@@ -98,16 +125,18 @@ export function GlucoseParticleSystem({
 
       const deltaTime = Math.min(timestamp - lastTimeRef.current, 100); // Cap delta
       lastTimeRef.current = timestamp;
+      globalTimeRef.current = timestamp;
 
       const deltaSeconds = deltaTime / 1000;
-      const progressPerSecond = 1.5 * speed; // Particles complete path in ~0.67s at 1x
+      // Much slower: particles complete path in ~4s at 1x speed
+      const progressPerSecond = 0.25 * speed;
 
       setParticles(prev => {
         let updated = [...prev];
 
-        // Spawn new particles from ship (1 particle per gram)
+        // Spawn new particles from ship
         if (shipUnloading > 0) {
-          shipSpawnAccum.current += shipUnloading * deltaSeconds * speed * 0.5;
+          shipSpawnAccum.current += shipUnloading * deltaSeconds * speed * 0.3;
           while (shipSpawnAccum.current >= 1) {
             updated.push(spawnParticle('ship'));
             shipSpawnAccum.current -= 1;
@@ -116,7 +145,7 @@ export function GlucoseParticleSystem({
 
         // Spawn particles from liver to BG
         if (liverToBgRate > 0) {
-          liverSpawnAccum.current += liverToBgRate * deltaSeconds * speed * 0.3;
+          liverSpawnAccum.current += liverToBgRate * deltaSeconds * speed * 0.2;
           while (liverSpawnAccum.current >= 1) {
             updated.push(spawnParticle('liver'));
             liverSpawnAccum.current -= 1;
@@ -125,7 +154,7 @@ export function GlucoseParticleSystem({
 
         // Spawn particles from BG to muscles
         if (bgToMusclesRate > 0) {
-          muscleSpawnAccum.current += bgToMusclesRate * deltaSeconds * speed * 0.3;
+          muscleSpawnAccum.current += bgToMusclesRate * deltaSeconds * speed * 0.2;
           while (muscleSpawnAccum.current >= 1) {
             updated.push(spawnParticle('bg', 'muscles'));
             muscleSpawnAccum.current -= 1;
@@ -134,7 +163,7 @@ export function GlucoseParticleSystem({
 
         // Spawn particles from BG to kidneys
         if (bgToKidneysRate > 0) {
-          kidneySpawnAccum.current += bgToKidneysRate * deltaSeconds * speed * 0.3;
+          kidneySpawnAccum.current += bgToKidneysRate * deltaSeconds * speed * 0.2;
           while (kidneySpawnAccum.current >= 1) {
             updated.push(spawnParticle('bg', 'kidneys'));
             kidneySpawnAccum.current -= 1;
@@ -166,7 +195,7 @@ export function GlucoseParticleSystem({
             }
           }
 
-          // Calculate new position
+          // Calculate new position with organic drift
           let nextLoc: VisualLocation = p.location as VisualLocation;
           if (p.location === 'ship') nextLoc = 'liver';
           else if (p.location === 'liver') nextLoc = 'bg';
@@ -174,13 +203,22 @@ export function GlucoseParticleSystem({
             nextLoc = p.destination;
           }
 
-          const pos = getPosition(p.location as VisualLocation, nextLoc, newProgress);
+          const basePos = getBasePosition(p.location as VisualLocation, nextLoc, newProgress);
+          const driftedPos = applyDrift(
+            basePos.x,
+            basePos.y,
+            newProgress,
+            p.driftPhase,
+            p.driftAmplitude,
+            p.driftFrequency,
+            globalTimeRef.current
+          );
 
           return {
             ...p,
             progress: newProgress,
-            x: pos.x,
-            y: pos.y,
+            x: driftedPos.x,
+            y: driftedPos.y,
           };
         });
 

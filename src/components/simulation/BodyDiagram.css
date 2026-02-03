@@ -45,16 +45,16 @@
   z-index: 5;
 }
 
-/* Pancreas indicator - small, positioned */
+/* Pancreas indicator - positioned under Muscles (bottom left) */
 .body-diagram__pancreas {
   position: absolute;
   bottom: 12px;
-  right: 12px;
+  left: 12px;
   z-index: 5;
   opacity: 0.8;
 }
 
 .body-diagram__pancreas .container-view {
   transform: scale(0.7);
-  transform-origin: bottom right;
+  transform-origin: bottom left;
 }
