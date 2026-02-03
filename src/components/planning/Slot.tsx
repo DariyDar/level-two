@@ -39,6 +39,9 @@ export function Slot({
   const showShip = placedShip && ship && !isPartOfShip;
   const shipSlots = ship ? SHIP_SIZE_TO_SLOTS[ship.size] : 1;
 
+  // Show drop preview overlay when hovering over valid slot with multi-slot ship
+  const showDropPreview = isOver && canDrop && activeShipSize > 1;
+
   return (
     <div
       ref={setNodeRef}
@@ -48,7 +51,6 @@ export function Slot({
         isOccupied && shipSlots > 1 && `slot--spans-${shipSlots}`,
         isPreOccupied && 'slot--pre-occupied',
         isOver && canDrop && 'slot--drop-valid',
-        isOver && canDrop && activeShipSize > 1 && `slot--drop-spans-${activeShipSize}`,
         isOver && !canDrop && 'slot--drop-invalid',
         isHighlighted && 'slot--highlighted',
         isPartOfShip && 'slot--part-of-ship',
@@ -66,6 +68,10 @@ export function Slot({
         />
       ) : (
         <span className="slot__number">{slotNumber}</span>
+      )}
+      {/* Multi-slot drop preview overlay */}
+      {showDropPreview && (
+        <div className={`slot__drop-preview slot__drop-preview--size-${activeShipSize}`} />
       )}
     </div>
   );
