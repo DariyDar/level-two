@@ -100,6 +100,26 @@ export function GlucoseParticleSystem({
   const bgToMusclesAccum = useRef(0);
   const bgToKidneysAccum = useRef(0);
 
+  // Store rates in refs to avoid useEffect restarts
+  const ratesRef = useRef({
+    shipUnloading,
+    liverToBgRate,
+    bgToMusclesRate,
+    bgToKidneysRate,
+    speed,
+  });
+
+  // Update refs when props change (without restarting animation)
+  useEffect(() => {
+    ratesRef.current = {
+      shipUnloading,
+      liverToBgRate,
+      bgToMusclesRate,
+      bgToKidneysRate,
+      speed,
+    };
+  }, [shipUnloading, liverToBgRate, bgToMusclesRate, bgToKidneysRate, speed]);
+
   const spawnParticle = useCallback((from: Container, to: Container): Particle => {
     const pos = POSITIONS[from];
     return {
@@ -136,8 +156,12 @@ export function GlucoseParticleSystem({
       globalTimeRef.current = timestamp;
 
       const deltaSeconds = deltaTime / 1000;
+
+      // Read current rates from ref (updated without restarting animation)
+      const rates = ratesRef.current;
+
       // Particles complete path in ~4s at 1x speed
-      const progressPerSecond = 0.25 * speed;
+      const progressPerSecond = 0.25 * rates.speed;
 
       setParticles(prev => {
         let updated = [...prev];
@@ -145,8 +169,8 @@ export function GlucoseParticleSystem({
         // === SPAWN NEW PARTICLES (4 independent flows) ===
 
         // Flow 1: Ship → Liver
-        if (shipUnloading > 0) {
-          shipToLiverAccum.current += shipUnloading * deltaSeconds * speed * VISUAL_MULTIPLIER;
+        if (rates.shipUnloading > 0) {
+          shipToLiverAccum.current += rates.shipUnloading * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
           while (shipToLiverAccum.current >= 1) {
             updated.push(spawnParticle('ship', 'liver'));
             shipToLiverAccum.current -= 1;
@@ -154,8 +178,8 @@ export function GlucoseParticleSystem({
         }
 
         // Flow 2: Liver → BG
-        if (liverToBgRate > 0) {
-          liverToBgAccum.current += liverToBgRate * deltaSeconds * speed * VISUAL_MULTIPLIER;
+        if (rates.liverToBgRate > 0) {
+          liverToBgAccum.current += rates.liverToBgRate * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
           while (liverToBgAccum.current >= 1) {
             updated.push(spawnParticle('liver', 'bg'));
             liverToBgAccum.current -= 1;
@@ -163,8 +187,8 @@ export function GlucoseParticleSystem({
         }
 
         // Flow 3: BG → Muscles
-        if (bgToMusclesRate > 0) {
-          bgToMusclesAccum.current += bgToMusclesRate * deltaSeconds * speed * VISUAL_MULTIPLIER;
+        if (rates.bgToMusclesRate > 0) {
+          bgToMusclesAccum.current += rates.bgToMusclesRate * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
           while (bgToMusclesAccum.current >= 1) {
             updated.push(spawnParticle('bg', 'muscles'));
             bgToMusclesAccum.current -= 1;
@@ -172,8 +196,8 @@ export function GlucoseParticleSystem({
         }
 
         // Flow 4: BG → Kidneys
-        if (bgToKidneysRate > 0) {
-          bgToKidneysAccum.current += bgToKidneysRate * deltaSeconds * speed * VISUAL_MULTIPLIER;
+        if (rates.bgToKidneysRate > 0) {
+          bgToKidneysAccum.current += rates.bgToKidneysRate * deltaSeconds * rates.speed * VISUAL_MULTIPLIER;
           while (bgToKidneysAccum.current >= 1) {
             updated.push(spawnParticle('bg', 'kidneys'));
             bgToKidneysAccum.current -= 1;
@@ -240,6 +264,7 @@ export function GlucoseParticleSystem({
       animationRef.current = requestAnimationFrame(animate);
     };
 
+    // Only reset time when starting/resuming animation
     lastTimeRef.current = 0;
     animationRef.current = requestAnimationFrame(animate);
 
@@ -248,7 +273,7 @@ export function GlucoseParticleSystem({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [shipUnloading, liverToBgRate, bgToMusclesRate, bgToKidneysRate, speed, isPaused, spawnParticle]);
+  }, [isPaused, spawnParticle]); // Only restart on pause/resume
 
   return (
     <div className="glucose-particles">
