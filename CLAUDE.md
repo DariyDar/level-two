@@ -8,6 +8,12 @@
 git add ... && git commit ... && git push
 ```
 
+## Version Number
+
+**Always increment version after changes** — Update `src/version.ts` after every change and tell user which version to test.
+
+Format: `v0.X.Y` where X is feature number, Y is fix number within feature.
+
 ## Language
 
 - Communicate in Russian

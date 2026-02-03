@@ -37,7 +37,16 @@ export function useInterpolatedValues({
 
   const animationRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
-  const startValuesRef = useRef<InterpolatedValues>(values);
+  const startValuesRef = useRef<Omit<InterpolatedValues, 'dissolveProgress'>>({
+    liver: targetLiver,
+    bg: targetBG,
+    muscleRate: targetMuscleRate,
+    liverRate: targetLiverRate,
+  });
+
+  // Track dissolve separately - it needs to grow linearly
+  const dissolveStartRef = useRef<number>(targetDissolveProgress);
+  const prevTargetDissolveRef = useRef<number>(targetDissolveProgress);
 
   useEffect(() => {
     if (isPaused) {
@@ -48,25 +57,42 @@ export function useInterpolatedValues({
       return;
     }
 
+    // Detect if dissolve target reset (new ship started)
+    const dissolveReset = targetDissolveProgress < prevTargetDissolveRef.current - 0.1;
+    prevTargetDissolveRef.current = targetDissolveProgress;
+
     // Start interpolation
     startTimeRef.current = performance.now();
-    startValuesRef.current = { ...values };
+    startValuesRef.current = {
+      liver: values.liver,
+      bg: values.bg,
+      muscleRate: values.muscleRate,
+      liverRate: values.liverRate,
+    };
+
+    // For dissolve: if reset, start from 0; otherwise continue from current
+    dissolveStartRef.current = dissolveReset ? 0 : values.dissolveProgress;
 
     const animate = (now: number) => {
       const elapsed = now - startTimeRef.current;
       const progress = Math.min(1, elapsed / duration);
 
-      // Ease out cubic
+      // Ease out cubic for regular values
       const eased = 1 - Math.pow(1 - progress, 3);
 
+      // Linear for dissolve (sand-timer effect)
+      const linearProgress = progress;
+
       const start = startValuesRef.current;
+      const dissolveStart = dissolveStartRef.current;
 
       setValues({
         liver: start.liver + (targetLiver - start.liver) * eased,
         bg: start.bg + (targetBG - start.bg) * eased,
         muscleRate: start.muscleRate + (targetMuscleRate - start.muscleRate) * eased,
         liverRate: start.liverRate + (targetLiverRate - start.liverRate) * eased,
-        dissolveProgress: start.dissolveProgress + (targetDissolveProgress - start.dissolveProgress) * eased,
+        // Dissolve: linear interpolation from start to target
+        dissolveProgress: dissolveStart + (targetDissolveProgress - dissolveStart) * linearProgress,
       });
 
       if (progress < 1) {

@@ -2,6 +2,7 @@ import { useGameStore } from './store/gameStore';
 import { PlanningPhase } from './components/planning';
 import { SimulationPhase } from './components/simulation';
 import { ResultsPhase } from './components/results';
+import { VERSION } from './version';
 import './App.css';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
           <span>🫀 Liver: {degradation.liver}%</span>
           <span>🫁 Pancreas: {degradation.pancreas}%</span>
         </div>
+        <div className="version-badge">{VERSION}</div>
       </footer>
     </div>
   );
