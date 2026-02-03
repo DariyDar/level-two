@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
+import type { DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import {
   DndContext,
   DragOverlay,
@@ -34,6 +34,7 @@ export function PlanningPhase() {
   const [allShips, setAllShips] = useState<Ship[]>([]);
   const [activeShip, setActiveShip] = useState<Ship | null>(null);
   const [validDropSlots, setValidDropSlots] = useState<Set<number>>(new Set());
+  const [hoveredSlot, setHoveredSlot] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load configs on mount
@@ -126,12 +127,31 @@ export function PlanningPhase() {
     [placedShips, allShips]
   );
 
+  const handleDragMove = useCallback(
+    (event: DragMoveEvent) => {
+      const { over } = event;
+      if (!over) {
+        setHoveredSlot(null);
+        return;
+      }
+
+      const slotMatch = String(over.id).match(/^slot-(\d+)$/);
+      if (slotMatch) {
+        setHoveredSlot(parseInt(slotMatch[1], 10));
+      } else {
+        setHoveredSlot(null);
+      }
+    },
+    []
+  );
+
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
 
       setActiveShip(null);
       setValidDropSlots(new Set());
+      setHoveredSlot(null);
 
       if (!over) {
         // Dropped outside - if was placed, remove it (return to inventory)
@@ -209,6 +229,7 @@ export function PlanningPhase() {
     <DndContext
       sensors={sensors}
       onDragStart={handleDragStart}
+      onDragMove={handleDragMove}
       onDragEnd={handleDragEnd}
     >
       <div className="planning-phase">
@@ -225,6 +246,7 @@ export function PlanningPhase() {
             validDropSlots={validDropSlots}
             highlightedSlots={new Set()}
             activeShip={activeShip}
+            hoveredSlot={hoveredSlot}
           />
 
           <ShipInventory

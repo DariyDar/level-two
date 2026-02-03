@@ -85,23 +85,3 @@
   width: 256px; /* 80px * 3 + 8px * 2 gaps */
 }
 
-/* Drop preview overlay for multi-slot ships */
-.slot__drop-preview {
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  height: calc(100% + 4px);
-  border: 2px dashed #48bb78;
-  border-radius: 8px;
-  background: rgba(72, 187, 120, 0.25);
-  pointer-events: none;
-  z-index: 20;
-}
-
-.slot__drop-preview--size-2 {
-  width: calc(200% + 8px + 4px); /* 2 slots + gap + border */
-}
-
-.slot__drop-preview--size-3 {
-  width: calc(300% + 16px + 4px); /* 3 slots + 2 gaps + border */
-}

@@ -16,6 +16,7 @@ interface SlotGridProps {
   validDropSlots: Set<number>;
   highlightedSlots: Set<number>;
   activeShip?: Ship | null;
+  hoveredSlot?: number | null;
 }
 
 export function SlotGrid({
@@ -24,6 +25,7 @@ export function SlotGrid({
   validDropSlots,
   highlightedSlots,
   activeShip,
+  hoveredSlot,
 }: SlotGridProps) {
   const activeShipSize = activeShip ? SHIP_SIZE_TO_SLOTS[activeShip.size] : 1;
 
@@ -61,6 +63,21 @@ export function SlotGrid({
     }
   }
 
+  // Calculate which group is being hovered (if any)
+  // When hovering any slot in a valid group, highlight all slots in that group
+  let hoveredGroupStart: number | null = null;
+  if (hoveredSlot !== null && hoveredSlot !== undefined) {
+    hoveredGroupStart = slotToGroupStart.get(hoveredSlot) ?? null;
+  }
+
+  // Build set of slots that should show hover highlight
+  const hoveredGroupSlots = new Set<number>();
+  if (hoveredGroupStart !== null) {
+    for (let i = 0; i < activeShipSize; i++) {
+      hoveredGroupSlots.add(hoveredGroupStart + i);
+    }
+  }
+
   const renderSegment = (segment: DaySegment, segmentIndex: number) => {
     const rows = [];
 
@@ -78,6 +95,9 @@ export function SlotGrid({
         const isInValidGroup = expandedValidSlots.has(slotNumber);
         const groupStartSlot = slotToGroupStart.get(slotNumber);
 
+        // Check if this slot is part of the currently hovered group
+        const isHoveredGroup = hoveredGroupSlots.has(slotNumber);
+
         slots.push(
           <Slot
             key={slotNumber}
@@ -88,9 +108,9 @@ export function SlotGrid({
             isPreOccupied={!!shipInfo?.placedShip.isPreOccupied}
             canDrop={isInValidGroup}
             groupStartSlot={groupStartSlot}
-            activeShipSize={activeShipSize}
             isHighlighted={highlightedSlots.has(slotNumber)}
             isPartOfShip={!!shipInfo && !shipInfo.isStart}
+            isHoveredGroup={isHoveredGroup}
           />
         );
       }
