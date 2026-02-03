@@ -35,59 +35,62 @@ interface GlucoseParticleSystemProps {
 const VISUAL_MULTIPLIER = 2;
 
 // Entry/exit points for each container (percentages relative to .simulation-phase__main)
-// Based on visual layout from screenshots
+// Measured from screenshot v0.2.2:
+// - simulation-phase__main contains BodyDiagram (~58%) + gap + ShipQueue (~40%)
+// - BodyDiagram: padding 20px, middle-row at top, bottom-row (Liver) below
+// - ShipQueue: starts at ~60% of main height
 const POINTS = {
-  // Ship dissolve edge - dynamic X based on dissolveProgress
-  shipDissolve: { y: 63 },
+  // Ship dissolve edge - first row in ShipQueue area
+  shipDissolve: { y: 72 },  // Ships are at ~72% from top of main
 
-  // Liver - bottom entry, top exit
-  liverBottom: { x: 50, y: 56 },  // Entry point (bottom of liver)
-  liverTop: { x: 50, y: 46 },     // Exit point (top of liver)
+  // Liver - center container in bottom row of BodyDiagram
+  liverBottom: { x: 50, y: 55 },  // Bottom of liver bar
+  liverTop: { x: 50, y: 42 },     // Top of liver bar
 
-  // BG - bottom entry, side exits
-  bgBottom: { x: 50, y: 35 },     // Entry from liver
-  bgLeft: { x: 40, y: 28 },       // Exit to muscles
-  bgRight: { x: 60, y: 28 },      // Exit to kidneys
+  // BG - center container in middle row (larger bar)
+  bgBottom: { x: 50, y: 32 },     // Bottom of BG bar
+  bgLeft: { x: 43, y: 18 },       // Left edge of BG (for muscles exit)
+  bgRight: { x: 57, y: 18 },      // Right edge of BG (for kidneys exit)
 
-  // Muscles - right side entry
-  musclesEntry: { x: 32, y: 28 },
+  // Muscles - left container, center of the bar
+  musclesCenter: { x: 27, y: 22 },
 
-  // Kidneys - left side entry
-  kidneysEntry: { x: 68, y: 28 },
+  // Kidneys - right container, center of the bar
+  kidneysCenter: { x: 73, y: 22 },
 };
 
 // Get spawn position based on flow type
 function getSpawnPosition(flow: FlowType, dissolveProgress: number): { x: number; y: number } {
   switch (flow) {
     case 'ship-liver': {
-      // Spawn at dissolve edge (moves left to right)
-      const shipXMin = 15;
-      const shipXMax = 85;
+      // Spawn at dissolve edge (moves left to right with ship unloading)
+      const shipXMin = 18;
+      const shipXMax = 82;
       const dissolveX = shipXMin + (shipXMax - shipXMin) * dissolveProgress;
       return {
-        x: dissolveX + (Math.random() - 0.5) * 6, // Small horizontal spread
+        x: dissolveX + (Math.random() - 0.5) * 4,
         y: POINTS.shipDissolve.y + (Math.random() - 0.5) * 2,
       };
     }
     case 'liver-bg': {
-      // Spawn from top of liver
+      // Spawn from top of liver bar
       return {
-        x: POINTS.liverTop.x + (Math.random() - 0.5) * 4,
-        y: POINTS.liverTop.y + (Math.random() - 0.5) * 2,
+        x: POINTS.liverTop.x + (Math.random() - 0.5) * 6,
+        y: POINTS.liverTop.y,
       };
     }
     case 'bg-muscles': {
       // Spawn from left side of BG
       return {
-        x: POINTS.bgLeft.x + (Math.random() - 0.5) * 3,
-        y: POINTS.bgLeft.y + (Math.random() - 0.5) * 2,
+        x: POINTS.bgLeft.x,
+        y: POINTS.bgLeft.y + (Math.random() - 0.5) * 4,
       };
     }
     case 'bg-kidneys': {
       // Spawn from right side of BG
       return {
-        x: POINTS.bgRight.x + (Math.random() - 0.5) * 3,
-        y: POINTS.bgRight.y + (Math.random() - 0.5) * 2,
+        x: POINTS.bgRight.x,
+        y: POINTS.bgRight.y + (Math.random() - 0.5) * 4,
       };
     }
   }
@@ -97,24 +100,28 @@ function getSpawnPosition(flow: FlowType, dissolveProgress: number): { x: number
 function getTargetPosition(flow: FlowType): { x: number; y: number } {
   switch (flow) {
     case 'ship-liver':
+      // Enter liver from bottom
       return {
-        x: POINTS.liverBottom.x + (Math.random() - 0.5) * 4,
+        x: POINTS.liverBottom.x + (Math.random() - 0.5) * 6,
         y: POINTS.liverBottom.y,
       };
     case 'liver-bg':
+      // Enter BG from bottom
       return {
-        x: POINTS.bgBottom.x + (Math.random() - 0.5) * 4,
+        x: POINTS.bgBottom.x + (Math.random() - 0.5) * 6,
         y: POINTS.bgBottom.y,
       };
     case 'bg-muscles':
+      // Enter Muscles from center
       return {
-        x: POINTS.musclesEntry.x,
-        y: POINTS.musclesEntry.y + (Math.random() - 0.5) * 3,
+        x: POINTS.musclesCenter.x,
+        y: POINTS.musclesCenter.y + (Math.random() - 0.5) * 4,
       };
     case 'bg-kidneys':
+      // Enter Kidneys from center
       return {
-        x: POINTS.kidneysEntry.x,
-        y: POINTS.kidneysEntry.y + (Math.random() - 0.5) * 3,
+        x: POINTS.kidneysCenter.x,
+        y: POINTS.kidneysCenter.y + (Math.random() - 0.5) * 4,
       };
   }
 }
@@ -330,7 +337,7 @@ export function GlucoseParticleSystem({
       {particles.map(p => (
         <div
           key={p.id}
-          className={`glucose-particles__particle glucose-particles__particle--${p.flow} ${
+          className={`glucose-particles__particle ${
             p.isAbsorbing ? 'glucose-particles__particle--absorbing' : ''
           }`}
           style={{

@@ -22,35 +22,6 @@
   opacity: 0.85;
 }
 
-/* Different glow colors for different flows */
-.glucose-particles__particle--ship-liver {
-  background: #ffd700; /* Gold - food/glucose */
-  box-shadow:
-    0 0 3px #ffd700,
-    0 0 6px rgba(255, 215, 0, 0.6);
-}
-
-.glucose-particles__particle--liver-bg {
-  background: #48bb78; /* Green - from liver */
-  box-shadow:
-    0 0 3px #48bb78,
-    0 0 6px rgba(72, 187, 120, 0.6);
-}
-
-.glucose-particles__particle--bg-muscles {
-  background: #4299e1; /* Blue - to muscles */
-  box-shadow:
-    0 0 3px #4299e1,
-    0 0 6px rgba(66, 153, 225, 0.6);
-}
-
-.glucose-particles__particle--bg-kidneys {
-  background: #ed64a6; /* Pink - to kidneys */
-  box-shadow:
-    0 0 3px #ed64a6,
-    0 0 6px rgba(237, 100, 166, 0.6);
-}
-
 /* Absorption effect */
 .glucose-particles__particle--absorbing {
   animation: particle-absorb 0.25s ease-out forwards;
