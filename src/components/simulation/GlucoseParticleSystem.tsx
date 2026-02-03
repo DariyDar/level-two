@@ -33,12 +33,16 @@ interface GlucoseParticleSystemProps {
 const VISUAL_MULTIPLIER = 3;
 
 // Container positions (relative to parent, percentages)
+// Based on actual BodyDiagram layout:
+// - Middle row (top): Muscles - BG - Kidneys
+// - Bottom row: Liver
+// - Ship comes from bottom (port area)
 const POSITIONS: Record<Container, { x: number; y: number }> = {
-  ship: { x: 50, y: 95 },      // Bottom center (port)
-  liver: { x: 50, y: 70 },     // Above port
-  bg: { x: 50, y: 40 },        // Center-upper
-  muscles: { x: 25, y: 35 },   // Left of BG
-  kidneys: { x: 75, y: 35 },   // Right of BG
+  ship: { x: 50, y: 98 },      // Bottom - where ships unload
+  liver: { x: 50, y: 75 },     // Bottom row - Liver container
+  bg: { x: 50, y: 30 },        // Middle row center - Blood Glucose
+  muscles: { x: 25, y: 25 },   // Middle row left - Muscles
+  kidneys: { x: 75, y: 25 },   // Middle row right - Kidneys
 };
 
 // Get position along path between two containers
