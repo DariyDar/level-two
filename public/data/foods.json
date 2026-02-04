@@ -26,7 +26,7 @@
       "size": "S",
       "glucose": 300,
       "carbs": 30,
-      "mood": true,
+      "mood": 1,
       "description": "Sweet treat, instant happiness."
     },
     {
@@ -45,7 +45,7 @@
       "size": "M",
       "glucose": 350,
       "carbs": 35,
-      "mood": true,
+      "mood": 1,
       "description": "Sweet treat, comforting."
     },
     {
@@ -65,7 +65,7 @@
       "size": "M",
       "glucose": 500,
       "carbs": 50,
-      "mood": true,
+      "mood": 1,
       "description": "Decadent dessert, mood booster."
     },
     {

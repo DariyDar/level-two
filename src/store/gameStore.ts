@@ -7,6 +7,8 @@ import type {
   LevelConfig,
   DayResults,
   PlanValidation,
+  MoodLevel,
+  MoodEffect,
 } from '../core/types';
 
 interface GameState {
@@ -28,6 +30,11 @@ interface GameState {
   // Persistent (between days/levels)
   degradation: SimpleDegradation;
 
+  // Mood system
+  currentMood: MoodLevel; // Current mood level (1-5)
+  negativeEventPlanned: boolean; // Whether negative event is planned for this day
+  negativeEventsToday: number; // Count of negative events today (max 1 per day)
+
   // Actions
   setPhase: (phase: GamePhase) => void;
   setLevel: (level: LevelConfig) => void;
@@ -39,6 +46,9 @@ interface GameState {
   startNextDay: () => void;
   retryDay: () => void;
   updateValidation: (validation: PlanValidation) => void;
+  updateMood: (delta: MoodEffect) => void;
+  checkNegativeEvent: () => void;
+  resetDayCounters: () => void;
 }
 
 const initialDegradation: SimpleDegradation = {
@@ -67,6 +77,9 @@ export const useGameStore = create<GameState>()(
       bgHistory: [],
       results: null,
       degradation: initialDegradation,
+      currentMood: 3, // Start at middle mood level
+      negativeEventPlanned: false,
+      negativeEventsToday: 0,
 
       // Actions
       setPhase: (phase) => set({ phase }),
@@ -122,6 +135,8 @@ export const useGameStore = create<GameState>()(
           placedShips: [],
           bgHistory: [],
           results: null,
+          negativeEventPlanned: false,
+          negativeEventsToday: 0,
         })),
 
       // Retry returns to Planning of the same day (not reset level)
@@ -131,15 +146,65 @@ export const useGameStore = create<GameState>()(
           placedShips: state.placedShips.filter((s) => s.isPreOccupied),
           bgHistory: [],
           results: null,
+          negativeEventPlanned: false,
+          negativeEventsToday: 0,
         })),
 
       updateValidation: (validation) => set({ planValidation: validation }),
+
+      // Mood system actions
+      updateMood: (delta) =>
+        set((state) => ({
+          currentMood: Math.max(1, Math.min(5, state.currentMood + delta)) as MoodLevel,
+        })),
+
+      checkNegativeEvent: () =>
+        set((state) => {
+          const maxNegEventsPerDay = 1;
+
+          // If already at max negative events, skip check
+          if (state.negativeEventsToday >= maxNegEventsPerDay) {
+            console.log('[Mood] Max negative events reached, skipping check');
+            return {};
+          }
+
+          // Calculate probability based on mood
+          const probabilities: Record<MoodLevel, number> = {
+            1: 1.0,   // 100%
+            2: 0.75,  // 75%
+            3: 0.5,   // 50%
+            4: 0.25,  // 25%
+            5: 0.0,   // 0%
+          };
+
+          const probability = probabilities[state.currentMood];
+          const roll = Math.random();
+          const eventOccurs = roll < probability;
+
+          console.log(`[Mood] Pre-simulation check: Mood=${state.currentMood}, P=${probability * 100}%, Roll=${roll.toFixed(3)}, Event=${eventOccurs}`);
+
+          if (eventOccurs) {
+            return {
+              negativeEventPlanned: true,
+              negativeEventsToday: state.negativeEventsToday + 1,
+            };
+          }
+
+          return { negativeEventPlanned: false };
+        }),
+
+      resetDayCounters: () =>
+        set({
+          negativeEventPlanned: false,
+          negativeEventsToday: 0,
+        }),
     }),
     {
       name: 'port-management-save',
       partialize: (state) => ({
         degradation: state.degradation,
         currentDay: state.currentDay,
+        currentMood: state.currentMood,
       }),
     }
   )

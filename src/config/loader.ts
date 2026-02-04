@@ -10,7 +10,7 @@ interface RawFoodConfig {
   glucose: number;
   carbs: number; // Carbohydrates in grams (for UI display)
   description?: string;
-  mood?: boolean;
+  mood?: 1 | -1; // Mood effect: +1 (positive) or -1 (negative)
   fiber?: boolean;
 }
 

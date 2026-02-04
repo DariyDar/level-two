@@ -1,14 +1,17 @@
-import type { PlanValidation } from '../../core/types';
+import type { PlanValidation, MoodLevel } from '../../core/types';
+import { MoodIndicator } from './MoodIndicator';
 import './PlanningHeader.css';
 
 interface PlanningHeaderProps {
   currentBG: number;
+  currentMood: MoodLevel;
   validation: PlanValidation;
   onSimulate: () => void;
 }
 
 export function PlanningHeader({
   currentBG,
+  currentMood,
   validation,
   onSimulate,
 }: PlanningHeaderProps) {
@@ -32,6 +35,8 @@ export function PlanningHeader({
         <span className="planning-header__label">BG</span>
         <span className="planning-header__value">{currentBG}</span>
       </div>
+
+      <MoodIndicator mood={currentMood} />
 
       <div className="planning-header__carbs">
         <div className="planning-header__carbs-label">

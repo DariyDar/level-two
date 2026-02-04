@@ -29,6 +29,9 @@ export function PlanningPhase() {
     setPhase,
     currentLevel,
     setLevel,
+    currentMood,
+    updateMood,
+    checkNegativeEvent,
   } = useGameStore();
 
   const [allShips, setAllShips] = useState<Ship[]>([]);
@@ -160,6 +163,11 @@ export function PlanningPhase() {
         const isPreOccupied = placedShips.find(s => s.instanceId === instanceId)?.isPreOccupied;
 
         if (wasPlaced && instanceId && !isPreOccupied) {
+          // Revert mood effect when removing ship
+          const ship = active.data.current?.ship as Ship;
+          if (ship.mood) {
+            updateMood(-ship.mood as 1 | -1); // Reverse the effect
+          }
           removeShip(instanceId);
         }
         return;
@@ -172,6 +180,11 @@ export function PlanningPhase() {
         const isPreOccupied = placedShips.find(s => s.instanceId === instanceId)?.isPreOccupied;
 
         if (wasPlaced && instanceId && !isPreOccupied) {
+          // Revert mood effect when removing ship
+          const ship = active.data.current?.ship as Ship;
+          if (ship.mood) {
+            updateMood(-ship.mood as 1 | -1); // Reverse the effect
+          }
           removeShip(instanceId);
         }
         return;
@@ -191,8 +204,11 @@ export function PlanningPhase() {
       const wasPlaced = active.data.current?.isPlaced;
       const oldInstanceId = active.data.current?.instanceId;
 
-      // Remove old placement if moving
+      // Remove old placement if moving (mood reverts then reapplies - net zero change)
       if (wasPlaced && oldInstanceId) {
+        if (ship.mood) {
+          updateMood(-ship.mood as 1 | -1); // Reverse old effect
+        }
         removeShip(oldInstanceId);
       }
 
@@ -209,13 +225,20 @@ export function PlanningPhase() {
       };
 
       placeShip(newPlacement);
+
+      // Apply mood effect when placing ship
+      if (ship.mood) {
+        updateMood(ship.mood);
+      }
     },
-    [validDropSlots, placedShips, placeShip, removeShip]
+    [validDropSlots, placedShips, placeShip, removeShip, updateMood]
   );
 
   const handleSimulate = useCallback(() => {
+    // Check for negative event before starting simulation
+    checkNegativeEvent();
     setPhase('Simulation');
-  }, [setPhase]);
+  }, [setPhase, checkNegativeEvent]);
 
   if (isLoading || !currentLevel) {
     return (
@@ -235,6 +258,7 @@ export function PlanningPhase() {
       <div className="planning-phase">
         <PlanningHeader
           currentBG={currentLevel.initialBG ?? 100}
+          currentMood={currentMood}
           validation={planValidation}
           onSimulate={handleSimulate}
         />

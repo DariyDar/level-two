@@ -12,6 +12,10 @@ export type DaySegment = 'Morning' | 'Day' | 'Evening';
 
 export type GamePhase = 'Planning' | 'Simulation' | 'Results';
 
+export type MoodLevel = 1 | 2 | 3 | 4 | 5;
+
+export type MoodEffect = 1 | -1; // +1 for positive, -1 for negative
+
 // Naming Convention Mapping (Excel v0.6 ↔ Code):
 // Containers (store substances):
 //   'bg' (code) = BGContainer (Excel) - blood glucose
@@ -68,7 +72,7 @@ export interface Ship {
   loadType: LoadType;
   targetContainer: ContainerId;
   description?: string;
-  mood?: boolean; // Mood boost effect (displays smile icon)
+  mood?: MoodEffect; // Mood effect: +1 (positive 😊) or -1 (negative 😔)
   fiber?: boolean; // Fiber content (displays leaf icon)
 }
 

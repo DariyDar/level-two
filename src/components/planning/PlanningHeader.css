@@ -31,7 +31,8 @@
 }
 
 .planning-header__carbs {
-  flex: 1;
+  flex: 0 1 auto;
+  max-width: 250px;
   display: flex;
   flex-direction: column;
   gap: 4px;
