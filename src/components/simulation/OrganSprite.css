@@ -5,13 +5,15 @@
   gap: 4px;
 }
 
-/* Substrate - rounded square background */
+/* Substrate - rounded square background with icon and label */
 .organ-sprite__substrate {
   border-radius: 12px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 8px;
+  gap: 4px;
   transition: background-color 0.3s ease;
 }
 
@@ -28,54 +30,39 @@
 /* Icon image */
 .organ-sprite__icon {
   width: 100%;
-  height: 100%;
+  height: auto;
   object-fit: contain;
+}
+
+/* Label - now inside substrate, below icon */
+.organ-sprite__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #e2e8f0;
+  text-align: center;
+  margin-top: 2px;
 }
 
 /* Size variants */
 .organ-sprite--small .organ-sprite__substrate {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  min-height: 65px;
 }
 
 .organ-sprite--normal .organ-sprite__substrate {
   width: 60px;
-  height: 60px;
+  min-height: 75px;
 }
 
 .organ-sprite--large .organ-sprite__substrate {
   width: 80px;
-  height: 80px;
-}
-
-/* Label */
-.organ-sprite__label {
-  font-size: 12px;
-  font-weight: 500;
-  color: #e2e8f0;
-  text-align: center;
+  min-height: 95px;
 }
 
 .organ-sprite--small .organ-sprite__label {
-  font-size: 10px;
+  font-size: 9px;
 }
 
 .organ-sprite--large .organ-sprite__label {
-  font-size: 14px;
-}
-
-/* Value */
-.organ-sprite__value {
-  font-size: 16px;
-  font-weight: 700;
-  color: #ffffff;
-  text-align: center;
-}
-
-.organ-sprite--small .organ-sprite__value {
-  font-size: 14px;
-}
-
-.organ-sprite--large .organ-sprite__value {
-  font-size: 18px;
+  font-size: 13px;
 }

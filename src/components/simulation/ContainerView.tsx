@@ -19,6 +19,9 @@ interface ContainerViewProps {
     maxTier: number;   // Maximum tier for this organ
   };
   compact?: boolean;
+  hideHeader?: boolean;        // Hide emoji/label header
+  floatingValue?: boolean;     // Show value as floating indicator (for BG)
+  compactSize?: boolean;       // Use compact dimensions (narrower/shorter)
 }
 
 export function ContainerView({
@@ -31,6 +34,9 @@ export function ContainerView({
   rateDirection,
   degradation,
   compact = false,
+  hideHeader = false,
+  floatingValue = false,
+  compactSize = false,
 }: ContainerViewProps) {
   const fillPercent = Math.min(100, (value / capacity) * 100);
 
@@ -50,11 +56,13 @@ export function ContainerView({
   }
 
   return (
-    <div className={`container-view ${compact ? 'container-view--compact' : ''}`}>
-      <div className="container-view__header">
-        <span className="container-view__emoji">{emoji}</span>
-        <span className="container-view__label">{label}</span>
-      </div>
+    <div className={`container-view ${compact ? 'container-view--compact' : ''} ${compactSize ? 'container-view--compact-size' : ''}`}>
+      {!hideHeader && (
+        <div className="container-view__header">
+          <span className="container-view__emoji">{emoji}</span>
+          <span className="container-view__label">{label}</span>
+        </div>
+      )}
 
       <div className="container-view__bar">
         {/* Threshold markers */}
@@ -90,17 +98,27 @@ export function ContainerView({
             height: `${fillPercent}%`,
             backgroundColor: fillColor,
           }}
-        />
+        >
+          {/* Floating value indicator for BG */}
+          {floatingValue && (
+            <div className="container-view__floating-value">
+              {Math.round(value)}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="container-view__value">
-        {Math.round(value)}
-        {showRate !== undefined && showRate > 0 && (
-          <span className="container-view__rate">
-            {rateDirection === 'out' ? '↓' : '↑'}{showRate}/h
-          </span>
-        )}
-      </div>
+      {/* Regular value display (for non-floating) */}
+      {!floatingValue && (
+        <div className="container-view__value">
+          {Math.round(value)}
+          {showRate !== undefined && showRate > 0 && (
+            <span className="container-view__rate">
+              {rateDirection === 'out' ? '↓' : '↑'}{showRate}/h
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Degradation circles */}
       {degradation && degradation.maxTier > 0 && (

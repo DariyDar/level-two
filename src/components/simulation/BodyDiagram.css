@@ -31,9 +31,9 @@
   z-index: 10;
 }
 
-/* BG container - larger */
+/* BG container - larger and wider */
 .body-diagram__bg .container-view .container-view__bar {
-  width: 60px;
+  width: 80px;
   height: 140px;
 }
 
@@ -85,4 +85,21 @@
   align-items: center;
   justify-content: flex-start;
   padding-left: 8px;
+}
+
+/* External value indicators */
+.body-diagram__value-left {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+
+.body-diagram__value-right {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-left: 8px;
+  white-space: nowrap;
 }

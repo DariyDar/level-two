@@ -1,0 +1,31 @@
+.tier-circles {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+.tier-circles--top {
+  margin-bottom: 4px;
+}
+
+.tier-circles--bottom {
+  margin-top: 4px;
+}
+
+.tier-circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.tier-circle--filled {
+  background-color: #f97316; /* orange-500 */
+  box-shadow: 0 0 4px rgba(249, 115, 22, 0.5);
+}
+
+.tier-circle--empty {
+  background-color: #374151; /* gray-700 */
+  box-shadow: 0 0 2px rgba(55, 65, 81, 0.3);
+}

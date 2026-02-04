@@ -2,6 +2,7 @@ import type { SimulationState } from '../../core/simulation';
 import type { DegradationState } from '../../core/types';
 import { ContainerView } from './ContainerView';
 import { OrganSprite } from './OrganSprite';
+import { getMuscleTierFromRate } from './utils';
 import './BodyDiagram.css';
 
 interface InterpolatedValues {
@@ -29,15 +30,27 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
   // Kidney excretion rate (when BG > 180, kidneys start working)
   const kidneyRate = bgValue > 180 ? Math.min((bgValue - 180) * 0.1, 20) : 0;
 
+  // Calculate muscle tier from rate
+  const muscleTier = getMuscleTierFromRate(displayMuscleRate);
+
   return (
     <div className="body-diagram">
       {/* Muscles - B1-C2 (columns 1-2, rows 2-3) */}
       <div className="body-diagram__muscles">
+        {/* Numeric value left of icon */}
+        <div className="body-diagram__value-left">
+          {Math.round(displayMuscleRate)}/h
+        </div>
+
+        {/* Muscle icon with tier circles */}
         <OrganSprite
-          label="Muscles"
+          label="Muscle"
           iconPath="/assets/organs/muscle_icon.png"
-          value={displayMuscleRate}
           isActive={displayMuscleRate > 0}
+          tierIndicator={{
+            tier: muscleTier,
+            maxTier: 5
+          }}
           size="normal"
         />
       </div>
@@ -55,6 +68,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
             high: 180,
             critical: 300,
           }}
+          floatingValue={true}
         />
       </div>
 
@@ -65,29 +79,36 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           emoji="🫘"
           value={kidneyRate}
           capacity={50}
-          showRate={kidneyRate > 0 ? Math.round(kidneyRate) : undefined}
-          rateDirection="in"
+          hideHeader={true}
+          compactSize={true}
         />
       </div>
 
       {/* Kidneys icon - B6-C6 (column 6, rows 2-3) */}
       <div className="body-diagram__kidneys-icon">
+        {/* Numeric value right of container */}
+        <div className="body-diagram__value-right">
+          {Math.round(kidneyRate)}
+        </div>
+
         <OrganSprite
-          label=""
+          label="Kidney"
           iconPath="/assets/organs/kidney_icon.png"
-          value={kidneyRate}
           isActive={kidneyRate > 0}
           size="normal"
-          showValue={false}
         />
       </div>
 
       {/* Pancreas - E1-E2 (columns 1-2, row 5) */}
       <div className="body-diagram__pancreas">
+        {/* Numeric value left of icon */}
+        <div className="body-diagram__value-left">
+          {degradation.pancreas.tier}
+        </div>
+
         <OrganSprite
           label="Pancreas"
           iconPath="/assets/organs/pancreas_icon.png"
-          value={degradation.pancreas.tier}
           isActive={displayMuscleRate > 0}
           degradation={{
             tier: degradation.pancreas.tier,
@@ -104,8 +125,8 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           emoji="🫀"
           value={liverValue}
           capacity={100}
-          showRate={Math.round(displayLiverRate)}
-          rateDirection="out"
+          hideHeader={true}
+          compactSize={true}
           degradation={{
             tier: degradation.liver.tier,
             maxTier: 5
@@ -116,13 +137,20 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
       {/* Liver icon - E4-F5 (columns 4-5, rows 5-6) */}
       <div className="body-diagram__liver-icon">
         <OrganSprite
-          label=""
+          label="Liver"
           iconPath="/assets/organs/liver_icon.png"
-          value={displayLiverRate}
           isActive={displayLiverRate > 0}
+          degradation={{
+            tier: degradation.liver.tier,
+            maxTier: 5
+          }}
           size="normal"
-          showValue={false}
         />
+
+        {/* Numeric value right of icon */}
+        <div className="body-diagram__value-right">
+          {Math.round(displayLiverRate)}/h
+        </div>
       </div>
     </div>
   );

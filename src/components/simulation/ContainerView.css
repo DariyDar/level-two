@@ -106,3 +106,26 @@
 .container-view--compact .container-view__value {
   font-size: 10px;
 }
+
+/* Compact size mode - narrower/shorter containers (liver/kidneys) */
+.container-view--compact-size .container-view__bar {
+  width: 60px;
+  height: 90px;
+}
+
+/* Floating value indicator for BG */
+.container-view__floating-value {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2d3748;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  white-space: nowrap;
+}
