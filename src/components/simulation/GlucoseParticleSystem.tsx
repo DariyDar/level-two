@@ -15,6 +15,10 @@ interface Particle {
   targetX: number;
   targetY: number;
   driftOffset: number;
+  // New fields for glucose tracking
+  glucoseAmount: number; // 1-5 glucose per particle (sugar cube representation)
+  speedModifier: number; // 0.7 for fiber, 1.0 for normal
+  hasFiber: boolean; // Whether this particle is from a fiber food
 }
 
 interface GlucoseParticleSystemProps {
@@ -27,8 +31,11 @@ interface GlucoseParticleSystemProps {
   dissolveProgress: number;
 }
 
-// More particles for continuous stream
-const VISUAL_MULTIPLIER = 4;
+// Glucose per particle (sugar cube representation: 5g carbs = 1 cube)
+const GLUCOSE_PER_PARTICLE = 5;
+
+// Visual multiplier for continuous stream (reduced for performance)
+const VISUAL_MULTIPLIER = 1;
 
 // Container positions (percentages relative to .simulation-phase__main)
 // Based on screenshot v0.2.3 - adjusted to hit actual container boundaries
@@ -172,7 +179,12 @@ export function GlucoseParticleSystem({
     };
   }, [shipUnloading, liverToBgRate, bgToMusclesRate, bgToKidneysRate, speed, dissolveProgress]);
 
-  const spawnParticle = useCallback((flow: FlowType, currentDissolve: number): Particle => {
+  const spawnParticle = useCallback((
+    flow: FlowType,
+    currentDissolve: number,
+    hasFiber: boolean = false,
+    glucoseAmount: number = GLUCOSE_PER_PARTICLE
+  ): Particle => {
     const start = getSpawnPosition(flow, currentDissolve);
     const target = getTargetPosition(flow);
 
@@ -187,6 +199,9 @@ export function GlucoseParticleSystem({
       targetX: target.x,
       targetY: target.y,
       driftOffset: Math.random() * Math.PI * 2,
+      glucoseAmount,
+      speedModifier: hasFiber ? 0.7 : 1.0,
+      hasFiber,
     };
   }, []);
 
@@ -270,7 +285,8 @@ export function GlucoseParticleSystem({
 
         // Update particles
         updated = updated.map(p => {
-          const newProgress = p.progress + progressPerSecond * deltaSeconds;
+          // Apply speed modifier (fiber slows particles by 30%)
+          const newProgress = p.progress + progressPerSecond * deltaSeconds * p.speedModifier;
 
           // Remove when reached destination (no absorption animation)
           if (newProgress >= 1) {
@@ -316,12 +332,19 @@ export function GlucoseParticleSystem({
       {particles.map(p => (
         <div
           key={p.id}
-          className="glucose-particles__particle"
+          className={`glucose-particles__particle ${p.hasFiber ? 'glucose-particles__particle--fiber' : ''}`}
           style={{
             left: `${p.x}%`,
             top: `${p.y}%`,
           }}
-        />
+        >
+          {/* Sugar cube icon */}
+          <span className="glucose-particles__cube">🧊</span>
+          {/* Show number for partial cubes */}
+          {p.glucoseAmount < GLUCOSE_PER_PARTICLE && (
+            <span className="glucose-particles__amount">{p.glucoseAmount}</span>
+          )}
+        </div>
       ))}
     </div>
   );
