@@ -68,6 +68,8 @@ export interface Ship {
   loadType: LoadType;
   targetContainer: ContainerId;
   description?: string;
+  mood?: boolean; // Mood boost effect (displays smile icon)
+  fiber?: boolean; // Fiber content (displays leaf icon)
 }
 
 export interface PlacedShip {

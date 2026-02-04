@@ -58,6 +58,16 @@ export function ShipCard({
     >
       <span className="ship-card__emoji">{ship.emoji}</span>
 
+      {/* Mood icon - top right */}
+      {ship.mood && (
+        <span className="ship-card__badge ship-card__badge--mood">😊</span>
+      )}
+
+      {/* Fiber icon - bottom right */}
+      {ship.fiber && (
+        <span className="ship-card__badge ship-card__badge--fiber">🌿</span>
+      )}
+
       {showDetails && (
         <div className="ship-card__details">
           <span className="ship-card__name">{ship.name}</span>
@@ -88,6 +98,17 @@ export function ShipCardOverlay({ ship }: { ship: Ship }) {
       ].join(' ')}
     >
       <span className="ship-card__emoji">{ship.emoji}</span>
+
+      {/* Mood icon - top right */}
+      {ship.mood && (
+        <span className="ship-card__badge ship-card__badge--mood">😊</span>
+      )}
+
+      {/* Fiber icon - bottom right */}
+      {ship.fiber && (
+        <span className="ship-card__badge ship-card__badge--fiber">🌿</span>
+      )}
+
       <div className="ship-card__details">
         <span className="ship-card__name">{ship.name}</span>
         <span className="ship-card__info">

@@ -1,33 +1,6 @@
 {
   "foods": [
     {
-      "id": "candy",
-      "name": "Candy",
-      "emoji": "🍬",
-      "size": "S",
-      "glucose": 250,
-      "carbs": 25,
-      "description": "Fast sugar spike. Use carefully."
-    },
-    {
-      "id": "apple",
-      "name": "Apple",
-      "emoji": "🍎",
-      "size": "S",
-      "glucose": 150,
-      "carbs": 15,
-      "description": "Light snack with moderate sugar."
-    },
-    {
-      "id": "juice",
-      "name": "Orange Juice",
-      "emoji": "🧃",
-      "size": "S",
-      "glucose": 200,
-      "carbs": 20,
-      "description": "Quick energy, fast absorption."
-    },
-    {
       "id": "banana",
       "name": "Banana",
       "emoji": "🍌",
@@ -37,85 +10,72 @@
       "description": "Natural energy, potassium rich."
     },
     {
+      "id": "apple",
+      "name": "Apple",
+      "emoji": "🍎",
+      "size": "S",
+      "glucose": 250,
+      "carbs": 25,
+      "fiber": true,
+      "description": "Light snack with fiber."
+    },
+    {
+      "id": "icecream",
+      "name": "Ice Cream",
+      "emoji": "🍦",
+      "size": "S",
+      "glucose": 300,
+      "carbs": 30,
+      "mood": true,
+      "description": "Sweet treat, instant happiness."
+    },
+    {
+      "id": "popcorn",
+      "name": "Popcorn",
+      "emoji": "🍿",
+      "size": "S",
+      "glucose": 150,
+      "carbs": 15,
+      "description": "Light snack, quick energy."
+    },
+    {
       "id": "cookie",
       "name": "Cookie",
       "emoji": "🍪",
-      "size": "S",
-      "glucose": 220,
-      "carbs": 22,
-      "description": "Sweet treat, quick sugar."
+      "size": "M",
+      "glucose": 350,
+      "carbs": 35,
+      "mood": true,
+      "description": "Sweet treat, comforting."
+    },
+    {
+      "id": "caesarsalad",
+      "name": "Caesar Salad",
+      "emoji": "🥗",
+      "size": "M",
+      "glucose": 200,
+      "carbs": 20,
+      "fiber": true,
+      "description": "Fresh and healthy, high fiber."
+    },
+    {
+      "id": "chocolatemuffin",
+      "name": "Chocolate Muffin",
+      "emoji": "🧁",
+      "size": "M",
+      "glucose": 500,
+      "carbs": 50,
+      "mood": true,
+      "description": "Decadent dessert, mood booster."
     },
     {
       "id": "sandwich",
       "name": "Sandwich",
       "emoji": "🥪",
       "size": "M",
-      "glucose": 350,
-      "carbs": 35,
+      "glucose": 400,
+      "carbs": 40,
       "description": "Balanced meal, steady release."
-    },
-    {
-      "id": "pasta",
-      "name": "Pasta",
-      "emoji": "🍝",
-      "size": "M",
-      "glucose": 450,
-      "carbs": 45,
-      "description": "High carbs, moderate absorption."
-    },
-    {
-      "id": "rice",
-      "name": "Rice Bowl",
-      "emoji": "🍚",
-      "size": "M",
-      "glucose": 400,
-      "carbs": 40,
-      "description": "Staple food, reliable energy."
-    },
-    {
-      "id": "pizza",
-      "name": "Pizza Slice",
-      "emoji": "🍕",
-      "size": "M",
-      "glucose": 380,
-      "carbs": 38,
-      "description": "Tasty but carb-heavy."
-    },
-    {
-      "id": "burger",
-      "name": "Burger",
-      "emoji": "🍔",
-      "size": "M",
-      "glucose": 420,
-      "carbs": 42,
-      "description": "Filling meal, mixed nutrients."
-    },
-    {
-      "id": "oatmeal",
-      "name": "Oatmeal",
-      "emoji": "🥣",
-      "size": "L",
-      "glucose": 400,
-      "carbs": 40,
-      "description": "Slow release, gentle on system."
-    },
-    {
-      "id": "beans",
-      "name": "Bean Stew",
-      "emoji": "🫘",
-      "size": "L",
-      "glucose": 350,
-      "carbs": 35,
-      "description": "Very slow absorption, high fiber."
-    },
-    {
-      "id": "salad",
-      "name": "Big Salad",
-      "emoji": "🥗",
-      "size": "L",
-      "glucose": 250,
-      "carbs": 25,
-      "description": "Low carbs, fills slots, very gentle."
     },
     {
       "id": "chicken",
@@ -125,6 +85,42 @@
       "glucose": 300,
       "carbs": 30,
       "description": "Protein-rich, slow energy release."
+    },
+    {
+      "id": "rice",
+      "name": "Bowl of Rice",
+      "emoji": "🍚",
+      "size": "L",
+      "glucose": 500,
+      "carbs": 50,
+      "description": "Staple food, reliable energy."
+    },
+    {
+      "id": "burger",
+      "name": "Hamburger",
+      "emoji": "🍔",
+      "size": "L",
+      "glucose": 450,
+      "carbs": 45,
+      "description": "Filling meal, mixed nutrients."
+    },
+    {
+      "id": "oatmeal",
+      "name": "Oatmeal",
+      "emoji": "🥣",
+      "size": "L",
+      "glucose": 350,
+      "carbs": 35,
+      "description": "Slow release, gentle on system."
+    },
+    {
+      "id": "pizza",
+      "name": "Pepperoni Pizza Slice",
+      "emoji": "🍕",
+      "size": "L",
+      "glucose": 370,
+      "carbs": 37,
+      "description": "Tasty but carb-heavy."
     }
   ]
 }

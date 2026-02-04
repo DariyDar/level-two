@@ -158,3 +158,22 @@
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.3);
 }
+
+/* Mood and Fiber badges */
+.ship-card__badge {
+  position: absolute;
+  font-size: 16px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  z-index: 1;
+}
+
+.ship-card__badge--mood {
+  top: 2px;
+  right: 2px;
+}
+
+.ship-card__badge--fiber {
+  bottom: 2px;
+  right: 2px;
+}
