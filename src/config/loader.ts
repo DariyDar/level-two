@@ -10,6 +10,8 @@ interface RawFoodConfig {
   glucose: number;
   carbs: number; // Carbohydrates in grams (for UI display)
   description?: string;
+  mood?: boolean;
+  fiber?: boolean;
 }
 
 interface RawInterventionConfig {
@@ -61,6 +63,8 @@ function transformFood(raw: RawFoodConfig): Ship {
     loadType: 'Glucose' as LoadType,
     targetContainer: 'liver',
     description: raw.description,
+    mood: raw.mood,
+    fiber: raw.fiber,
   };
 }
 
