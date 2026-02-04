@@ -31,6 +31,24 @@ v0.2.5  →  v0.3.0  (new feature)
 - Communicate in Russian
 - Code and comments in English
 
+## Build Verification
+
+**CRITICAL: Always run `npm run build` before committing** — Vercel will reject deployments with TypeScript errors.
+
+Common TypeScript issues to avoid:
+- Unused imports → Remove them or prefix with `_`
+- Unused function parameters → Prefix with `_` (e.g., `_context`)
+- Missing fields in types → Update type definitions when adding new fields
+- Optional fields → Use `??` for defaults (e.g., `config.minTier ?? 0`)
+- Private method access → Make methods `public` or `static` if needed externally
+
+```bash
+# Before committing:
+npm run build
+
+# If build fails, fix errors, then commit
+```
+
 ## Documentation
 
 **Keep documentation up to date** — After making significant changes, update:
@@ -62,7 +80,7 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - `src/components/planning/` — planning phase UI
 - `data/` — JSON configs for ships and levels
 
-### Current State (v0.6.0)
+### Current State (v0.6.1)
 - Planning phase: drag-and-drop ships to time slots ✅
 - Simulation phase: glucose flow visualization with particles ✅
 - Results phase: basic BG history graph ✅
