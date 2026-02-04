@@ -1,6 +1,7 @@
 import type { SimulationState } from '../../core/simulation';
 import type { DegradationState } from '../../core/types';
 import { ContainerView } from './ContainerView';
+import { OrganSprite } from './OrganSprite';
 import './BodyDiagram.css';
 
 interface InterpolatedValues {
@@ -30,17 +31,18 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
 
   return (
     <div className="body-diagram">
-      {/* Middle row: Muscles - BG - Kidneys */}
-      <div className="body-diagram__middle-row">
-        <ContainerView
+      {/* Top row: Muscles - BG - Kidneys */}
+      <div className="body-diagram__top-row">
+        {/* Muscles - sprite only */}
+        <OrganSprite
           label="Muscles"
-          emoji="💪"
+          iconPath="/assets/organs/muscle_icon.png"
           value={displayMuscleRate}
-          capacity={100}
-          showRate={Math.round(displayMuscleRate)}
-          rateDirection="in"
+          isActive={displayMuscleRate > 0}
+          size="normal"
         />
 
+        {/* Blood Glucose - container */}
         <ContainerView
           label="Blood Glucose"
           emoji="🩸"
@@ -54,45 +56,63 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           }}
         />
 
-        <ContainerView
-          label="Kidneys"
-          emoji="🫘"
-          value={kidneyRate}
-          capacity={50}
-          showRate={kidneyRate > 0 ? Math.round(kidneyRate) : undefined}
-          rateDirection="in"
-        />
+        {/* Kidneys - container + sprite */}
+        <div className="body-diagram__organ-group">
+          <ContainerView
+            label="Kidneys"
+            emoji="🫘"
+            value={kidneyRate}
+            capacity={50}
+            showRate={kidneyRate > 0 ? Math.round(kidneyRate) : undefined}
+            rateDirection="in"
+          />
+          <OrganSprite
+            label=""
+            iconPath="/assets/organs/kidney_icon.png"
+            value={kidneyRate}
+            isActive={kidneyRate > 0}
+            size="small"
+          />
+        </div>
       </div>
 
-      {/* Bottom row: Liver */}
+      {/* Bottom row: Pancreas - Liver */}
       <div className="body-diagram__bottom-row">
-        <ContainerView
-          label="Liver"
-          emoji="🫀"
-          value={liverValue}
-          capacity={100}
-          showRate={Math.round(displayLiverRate)}
-          rateDirection="out"
-          degradation={{
-            tier: degradation.liver.tier,
-            maxTier: 5
-          }}
-        />
-      </div>
-
-      {/* Pancreas - small indicator */}
-      <div className="body-diagram__pancreas">
-        <ContainerView
+        {/* Pancreas - sprite only */}
+        <OrganSprite
           label="Pancreas"
-          emoji="🫁"
-          value={displayMuscleRate > 0 ? 100 : 0}
-          capacity={100}
+          iconPath="/assets/organs/pancreas_icon.png"
+          value={degradation.pancreas.tier}
+          isActive={displayMuscleRate > 0}
           degradation={{
             tier: degradation.pancreas.tier,
             maxTier: 4
           }}
-          compact
+          size="normal"
         />
+
+        {/* Liver - container + sprite */}
+        <div className="body-diagram__organ-group">
+          <ContainerView
+            label="Liver"
+            emoji="🫀"
+            value={liverValue}
+            capacity={100}
+            showRate={Math.round(displayLiverRate)}
+            rateDirection="out"
+            degradation={{
+              tier: degradation.liver.tier,
+              maxTier: 5
+            }}
+          />
+          <OrganSprite
+            label=""
+            iconPath="/assets/organs/liver_icon.png"
+            value={displayLiverRate}
+            isActive={displayLiverRate > 0}
+            size="small"
+          />
+        </div>
       </div>
     </div>
   );

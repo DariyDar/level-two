@@ -1,0 +1,81 @@
+.organ-sprite {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Substrate - rounded square background */
+.organ-sprite__substrate {
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  transition: background-color 0.3s ease;
+}
+
+/* Inactive state - darker substrate */
+.organ-sprite__substrate--inactive {
+  background-color: #2d3748; /* Dark gray */
+}
+
+/* Active state - lighter substrate */
+.organ-sprite__substrate--active {
+  background-color: #4a5568; /* Light gray */
+}
+
+/* Icon image */
+.organ-sprite__icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Size variants */
+.organ-sprite--small .organ-sprite__substrate {
+  width: 40px;
+  height: 40px;
+}
+
+.organ-sprite--normal .organ-sprite__substrate {
+  width: 60px;
+  height: 60px;
+}
+
+.organ-sprite--large .organ-sprite__substrate {
+  width: 80px;
+  height: 80px;
+}
+
+/* Label */
+.organ-sprite__label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #e2e8f0;
+  text-align: center;
+}
+
+.organ-sprite--small .organ-sprite__label {
+  font-size: 10px;
+}
+
+.organ-sprite--large .organ-sprite__label {
+  font-size: 14px;
+}
+
+/* Value */
+.organ-sprite__value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+}
+
+.organ-sprite--small .organ-sprite__value {
+  font-size: 14px;
+}
+
+.organ-sprite--large .organ-sprite__value {
+  font-size: 18px;
+}
