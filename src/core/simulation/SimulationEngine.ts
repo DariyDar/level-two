@@ -183,7 +183,6 @@ export class SimulationEngine {
   private state: SimulationState;
   private config: SimulationConfig;
   private ships: Map<string, Ship>;
-  private degradation: SimpleDegradation;
   private rulesConfig: RulesConfig;
 
   constructor(
@@ -194,7 +193,6 @@ export class SimulationEngine {
   ) {
     this.config = { ...DEFAULT_CONFIG, ...config };
     this.ships = new Map(allShips.map((s) => [s.id, s]));
-    this.degradation = initialDegradation;
     this.rulesConfig = organRulesConfig as RulesConfig;
 
     // Convert placed ships to queue, sorted by slot number
@@ -510,11 +508,10 @@ export class SimulationEngine {
     let tier = this.state.currentMuscleTier;
 
     // Apply muscle modifiers (degradation, exercise, boost)
-    for (const modifier of muscleConfig.modifiers) {
-      const conditionMet = RuleEngine.evaluateCondition(modifier.condition, context, {
-        liverBoost: this.state.liverBoost,
-        pancreasBoost: this.state.pancreasBoost,
-      });
+    const modifiers = muscleConfig.modifiers ?? [];
+    for (const modifier of modifiers) {
+      if (!modifier.condition) continue;
+      const conditionMet = RuleEngine.evaluateCondition(modifier.condition, context);
 
       if (conditionMet) {
         if (modifier.effect.type === 'addTier') {
@@ -526,12 +523,14 @@ export class SimulationEngine {
     }
 
     // Clamp tier to valid range, accounting for pancreas degradation
+    const minTier = muscleConfig.minTier ?? 0;
+    const maxTier = muscleConfig.maxTier ?? (muscleConfig.rates.length - 1);
     const effectiveMaxTier = Math.max(
-      muscleConfig.minTier,
-      muscleConfig.maxTier - this.state.degradation.pancreas.tierEffects.maxTierReduction
+      minTier,
+      maxTier - this.state.degradation.pancreas.tierEffects.maxTierReduction
     );
-    tier = Math.max(muscleConfig.minTier, Math.min(tier, effectiveMaxTier));
-    const drainRate = muscleConfig.rates[tier];
+    tier = Math.max(minTier, Math.min(tier, effectiveMaxTier));
+    const drainRate = muscleConfig.rates[tier] ?? 0;
 
     this.state.currentMuscleRate = drainRate;
 

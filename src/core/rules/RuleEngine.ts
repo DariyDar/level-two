@@ -4,10 +4,8 @@
 // ============================================
 
 import type {
-  Rule,
   RuleCondition,
   RuleAction,
-  TierModifier,
   OrganRuleSet,
   RuleEvaluationContext,
   RuleEvaluationResult,
@@ -80,9 +78,9 @@ export class RuleEngine {
   }
 
   /**
-   * Evaluate a condition
+   * Evaluate a condition (public for external use)
    */
-  private static evaluateCondition(
+  static evaluateCondition(
     condition: RuleCondition,
     context: RuleEvaluationContext
   ): boolean {
@@ -159,7 +157,8 @@ export class RuleEngine {
     condition: Extract<RuleCondition, { type: 'degradation' }>,
     context: RuleEvaluationContext
   ): boolean {
-    const level = context.degradation[condition.organ];
+    const organ = condition.organ as 'liver' | 'pancreas';
+    const level = context.degradation[organ];
     return this.compare(level, condition.operator, condition.value);
   }
 
@@ -191,7 +190,7 @@ export class RuleEngine {
   private static executeAction(
     action: RuleAction,
     currentTier: number,
-    context: RuleEvaluationContext
+    _context: RuleEvaluationContext
   ): number {
     switch (action.type) {
       case 'setTier':

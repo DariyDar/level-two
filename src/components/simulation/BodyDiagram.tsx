@@ -16,7 +16,7 @@ interface BodyDiagramProps {
   interpolated?: InterpolatedValues;
 }
 
-export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramProps) {
+export function BodyDiagram({ state, interpolated }: BodyDiagramProps) {
   const { currentLiverRate, currentMuscleRate, containers, degradationBuffer } = state;
 
   // Use interpolated values if provided, otherwise use state values

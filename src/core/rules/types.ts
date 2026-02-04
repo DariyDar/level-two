@@ -185,6 +185,7 @@ export interface OrganRuleSet {
 export interface RulesConfig {
   version: string;
   liver: OrganRuleSet;
+  pancreas: OrganRuleSet;
   muscles: OrganRuleSet;
 }
 
