@@ -5,7 +5,8 @@
       "name": "Candy",
       "emoji": "🍬",
       "size": "S",
-      "glucose": 25,
+      "glucose": 250,
+      "carbs": 25,
       "description": "Fast sugar spike. Use carefully."
     },
     {
@@ -13,7 +14,8 @@
       "name": "Apple",
       "emoji": "🍎",
       "size": "S",
-      "glucose": 15,
+      "glucose": 150,
+      "carbs": 15,
       "description": "Light snack with moderate sugar."
     },
     {
@@ -21,7 +23,8 @@
       "name": "Orange Juice",
       "emoji": "🧃",
       "size": "S",
-      "glucose": 20,
+      "glucose": 200,
+      "carbs": 20,
       "description": "Quick energy, fast absorption."
     },
     {
@@ -29,7 +32,8 @@
       "name": "Banana",
       "emoji": "🍌",
       "size": "S",
-      "glucose": 18,
+      "glucose": 180,
+      "carbs": 18,
       "description": "Natural energy, potassium rich."
     },
     {
@@ -37,7 +41,8 @@
       "name": "Cookie",
       "emoji": "🍪",
       "size": "S",
-      "glucose": 22,
+      "glucose": 220,
+      "carbs": 22,
       "description": "Sweet treat, quick sugar."
     },
     {
@@ -45,7 +50,8 @@
       "name": "Sandwich",
       "emoji": "🥪",
       "size": "M",
-      "glucose": 35,
+      "glucose": 350,
+      "carbs": 35,
       "description": "Balanced meal, steady release."
     },
     {
@@ -53,7 +59,8 @@
       "name": "Pasta",
       "emoji": "🍝",
       "size": "M",
-      "glucose": 45,
+      "glucose": 450,
+      "carbs": 45,
       "description": "High carbs, moderate absorption."
     },
     {
@@ -61,7 +68,8 @@
       "name": "Rice Bowl",
       "emoji": "🍚",
       "size": "M",
-      "glucose": 40,
+      "glucose": 400,
+      "carbs": 40,
       "description": "Staple food, reliable energy."
     },
     {
@@ -69,7 +77,8 @@
       "name": "Pizza Slice",
       "emoji": "🍕",
       "size": "M",
-      "glucose": 38,
+      "glucose": 380,
+      "carbs": 38,
       "description": "Tasty but carb-heavy."
     },
     {
@@ -77,7 +86,8 @@
       "name": "Burger",
       "emoji": "🍔",
       "size": "M",
-      "glucose": 42,
+      "glucose": 420,
+      "carbs": 42,
       "description": "Filling meal, mixed nutrients."
     },
     {
@@ -85,7 +95,8 @@
       "name": "Oatmeal",
       "emoji": "🥣",
       "size": "L",
-      "glucose": 40,
+      "glucose": 400,
+      "carbs": 40,
       "description": "Slow release, gentle on system."
     },
     {
@@ -93,7 +104,8 @@
       "name": "Bean Stew",
       "emoji": "🫘",
       "size": "L",
-      "glucose": 35,
+      "glucose": 350,
+      "carbs": 35,
       "description": "Very slow absorption, high fiber."
     },
     {
@@ -101,7 +113,8 @@
       "name": "Big Salad",
       "emoji": "🥗",
       "size": "L",
-      "glucose": 25,
+      "glucose": 250,
+      "carbs": 25,
       "description": "Low carbs, fills slots, very gentle."
     },
     {
@@ -109,7 +122,8 @@
       "name": "Chicken Meal",
       "emoji": "🍗",
       "size": "L",
-      "glucose": 30,
+      "glucose": 300,
+      "carbs": 30,
       "description": "Protein-rich, slow energy release."
     }
   ]

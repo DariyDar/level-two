@@ -64,6 +64,7 @@ export interface Ship {
   emoji: string;
   size: ShipSize;
   load: number;
+  carbs?: number; // Carbohydrates in grams (for display on food ships)
   loadType: LoadType;
   targetContainer: ContainerId;
   description?: string;

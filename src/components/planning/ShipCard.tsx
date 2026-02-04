@@ -62,7 +62,7 @@ export function ShipCard({
         <div className="ship-card__details">
           <span className="ship-card__name">{ship.name}</span>
           <span className="ship-card__info">
-            {ship.load}g • {slotsRequired}h
+            {ship.carbs ?? ship.load}g • {slotsRequired}h
           </span>
         </div>
       )}
@@ -91,7 +91,7 @@ export function ShipCardOverlay({ ship }: { ship: Ship }) {
       <div className="ship-card__details">
         <span className="ship-card__name">{ship.name}</span>
         <span className="ship-card__info">
-          {ship.load}g • {slotsRequired}h
+          {ship.carbs ?? ship.load}g • {slotsRequired}h
         </span>
       </div>
     </div>

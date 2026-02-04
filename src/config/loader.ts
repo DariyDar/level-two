@@ -8,6 +8,7 @@ interface RawFoodConfig {
   emoji?: string;
   size: ShipSize;
   glucose: number;
+  carbs: number; // Carbohydrates in grams (for UI display)
   description?: string;
 }
 
@@ -56,6 +57,7 @@ function transformFood(raw: RawFoodConfig): Ship {
     emoji: raw.emoji || '🍽️',
     size: raw.size,
     load: raw.glucose,
+    carbs: raw.carbs,
     loadType: 'Glucose' as LoadType,
     targetContainer: 'liver',
     description: raw.description,
