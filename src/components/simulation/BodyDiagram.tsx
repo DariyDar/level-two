@@ -31,7 +31,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
 
   return (
     <div className="body-diagram">
-      {/* Muscles - A1-A4 (left column, rows 1-2) */}
+      {/* Muscles - B1-C2 (columns 1-2, rows 2-3) */}
       <div className="body-diagram__muscles">
         <OrganSprite
           label="Muscles"
@@ -42,7 +42,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
         />
       </div>
 
-      {/* Blood Glucose - A2-A5-A8 (center column, all rows) */}
+      {/* Blood Glucose - B3-C4 (columns 3-4, rows 2-3) */}
       <div className="body-diagram__bg">
         <ContainerView
           label="Blood Glucose"
@@ -58,8 +58,8 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
         />
       </div>
 
-      {/* Kidneys - A3-A6 (right column, rows 1-2) */}
-      <div className="body-diagram__kidneys">
+      {/* Kidneys container - B5-C5 (column 5, rows 2-3) */}
+      <div className="body-diagram__kidneys-container">
         <ContainerView
           label="Kidneys"
           emoji="🫘"
@@ -68,6 +68,10 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           showRate={kidneyRate > 0 ? Math.round(kidneyRate) : undefined}
           rateDirection="in"
         />
+      </div>
+
+      {/* Kidneys icon - B6-C6 (column 6, rows 2-3) */}
+      <div className="body-diagram__kidneys-icon">
         <OrganSprite
           label=""
           iconPath="/assets/organs/kidney_icon.png"
@@ -78,7 +82,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
         />
       </div>
 
-      {/* Pancreas - A4-A7 (left column, rows 2-3) */}
+      {/* Pancreas - E1-E2 (columns 1-2, row 5) */}
       <div className="body-diagram__pancreas">
         <OrganSprite
           label="Pancreas"
@@ -93,8 +97,8 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
         />
       </div>
 
-      {/* Liver - A8 (center column, row 3) */}
-      <div className="body-diagram__liver">
+      {/* Liver container - E3-F4 (columns 3-4, rows 5-6) */}
+      <div className="body-diagram__liver-container">
         <ContainerView
           label="Liver"
           emoji="🫀"
@@ -107,6 +111,10 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
             maxTier: 5
           }}
         />
+      </div>
+
+      {/* Liver icon - E4-F5 (columns 4-5, rows 5-6) */}
+      <div className="body-diagram__liver-icon">
         <OrganSprite
           label=""
           iconPath="/assets/organs/liver_icon.png"
