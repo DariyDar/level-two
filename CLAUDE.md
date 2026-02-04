@@ -80,7 +80,7 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - `src/components/planning/` — planning phase UI
 - `data/` — JSON configs for ships and levels
 
-### Current State (v0.6.2)
+### Current State (v0.7.0)
 - Planning phase: drag-and-drop ships to time slots ✅
 - Simulation phase: glucose flow visualization with particles ✅
 - Results phase: basic BG history graph ✅
@@ -104,14 +104,22 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
     - Pancreas: max muscle tier reduction
   - Configuration-driven tier thresholds and effects (`degradationConfig.json`)
   - Real-time tier calculation and effect application
-- **NEW:** Visual Degradation Indicators ✅
+- Visual Degradation Indicators ✅
   - Color-coded circles for organ health (green = healthy, pink = degraded)
   - Liver: 5 circles (max 5 degraded)
   - Pancreas: 4 circles (max 4 degraded)
   - Real-time visual feedback during simulation
+- **NEW:** Organ Sprite UI System ✅
+  - OrganSprite component with icon on substrate (rounded square)
+  - Two substrate states: active (light) and inactive (dark)
+  - Muscles & Pancreas: sprite-only display (no progress bars)
+  - Liver & Kidneys: container + sprite combo
+  - Updated layout: Top row (Muscles-BG-Kidneys), Bottom row (Pancreas-Liver)
+  - Organ icons: kidney_icon.png, liver_icon.png, muscle_icon.png, pancreas_icon.png
 
 ### Known Issues
-- Effect Containers: No threshold-based activation (planned for v0.7.0)
-- Kidneys: Not implemented (deferred to future iteration)
+- Effect Containers: No threshold-based activation (planned for future)
+- Kidneys: Not fully implemented (basic excretion only)
 - Muscle Rate Tiers: Need update to [0,20,30,50,70,90] from spec
 - Metformin degradation blocking: Not implemented
+- Pipe connections: Visual connections between organs not yet implemented
