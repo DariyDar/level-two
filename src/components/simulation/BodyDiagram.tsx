@@ -99,7 +99,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
         />
       </div>
 
-      {/* Pancreas - E1-E2 (columns 1-2, row 5) */}
+      {/* Pancreas - D5 (column 5, rows 4-5) */}
       <div className="body-diagram__pancreas">
         {/* Numeric value left of icon */}
         <div className="body-diagram__value-left">
@@ -118,7 +118,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
         />
       </div>
 
-      {/* Liver container - E3-F4 (columns 3-4, rows 5-6) */}
+      {/* Liver container - D1-D2 (columns 1-2, rows 4-5) */}
       <div className="body-diagram__liver-container">
         <ContainerView
           label="Liver"
@@ -127,14 +127,10 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           capacity={100}
           hideHeader={true}
           compactSize={true}
-          degradation={{
-            tier: degradation.liver.tier,
-            maxTier: 5
-          }}
         />
       </div>
 
-      {/* Liver icon - E4-F5 (columns 4-5, rows 5-6) */}
+      {/* Liver icon - D2-D3 (columns 2-3, rows 4-5) */}
       <div className="body-diagram__liver-icon">
         <OrganSprite
           label="Liver"
