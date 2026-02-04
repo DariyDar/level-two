@@ -80,7 +80,7 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - `src/components/planning/` — planning phase UI
 - `data/` — JSON configs for ships and levels
 
-### Current State (v0.7.0)
+### Current State (v0.7.4)
 - Planning phase: drag-and-drop ships to time slots ✅
 - Simulation phase: glucose flow visualization with particles ✅
 - Results phase: basic BG history graph ✅
@@ -104,22 +104,26 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
     - Pancreas: max muscle tier reduction
   - Configuration-driven tier thresholds and effects (`degradationConfig.json`)
   - Real-time tier calculation and effect application
-- Visual Degradation Indicators ✅
-  - Color-coded circles for organ health (green = healthy, pink = degraded)
-  - Liver: 5 circles (max 5 degraded)
-  - Pancreas: 4 circles (max 4 degraded)
-  - Real-time visual feedback during simulation
-- **NEW:** Organ Sprite UI System ✅
-  - OrganSprite component with icon on substrate (rounded square)
-  - Two substrate states: active (light) and inactive (dark)
-  - Muscles & Pancreas: sprite-only display (no progress bars)
-  - Liver & Kidneys: container + sprite combo
-  - Updated layout: Top row (Muscles-BG-Kidneys), Bottom row (Pancreas-Liver)
-  - Organ icons: kidney_icon.png, liver_icon.png, muscle_icon.png, pancreas_icon.png
+- Visual Indicators ✅
+  - Degradation circles: green (healthy) to pink (degraded)
+    - Liver: 5 circles, Pancreas: 4 circles
+  - Muscle tier circles: orange circles above muscle icon (0-5 tiers)
+  - Tier calculation: `getMuscleTierFromRate()` utility function
+- Organ UI System ✅
+  - OrganSprite: icon + label on substrate (rounded square background)
+  - Two substrate states: active (light #4a5568) / inactive (dark #2d3748)
+  - TierCircles component: orange filled/empty circles for muscle tiers
+  - DegradationCircles component: green/pink circles for organ health
+  - Labels moved inside substrates (below icons)
+- Layout: 6×6 CSS Grid ✅
+  - Top row: Muscles (B1-C2) | BG (B3-C4) | Kidneys (B5-C6)
+  - Bottom row: Pancreas (E1-E2) | Liver (E3-F5)
+  - External numeric indicators beside organs (not below)
+  - Wider BG container (80px) with floating value indicator
+  - Compact containers for Liver/Kidneys (60px wide, 90px tall)
 
 ### Known Issues
 - Effect Containers: No threshold-based activation (planned for future)
 - Kidneys: Not fully implemented (basic excretion only)
-- Muscle Rate Tiers: Need update to [0,20,30,50,70,90] from spec
 - Metformin degradation blocking: Not implemented
 - Pipe connections: Visual connections between organs not yet implemented
