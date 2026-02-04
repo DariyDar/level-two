@@ -10,7 +10,14 @@
     { "id": "sandwich", "count": 2 },
     { "id": "pizza", "count": 1 },
     { "id": "oatmeal", "count": 1 },
-    { "id": "chicken", "count": 1 }
+    { "id": "chicken", "count": 1 },
+    { "id": "icecream", "count": 1 },
+    { "id": "popcorn", "count": 1 },
+    { "id": "cookie", "count": 1 },
+    { "id": "caesarsalad", "count": 1 },
+    { "id": "chocolatemuffin", "count": 1 },
+    { "id": "rice", "count": 1 },
+    { "id": "burger", "count": 1 }
   ],
   "availableInterventions": [],
   "preOccupiedSlots": [],
