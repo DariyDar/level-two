@@ -11,6 +11,7 @@ interface OrganSpriteProps {
     maxTier: number;
   };
   size?: 'small' | 'normal' | 'large';
+  showValue?: boolean;
 }
 
 export function OrganSprite({
@@ -20,6 +21,7 @@ export function OrganSprite({
   isActive,
   degradation,
   size = 'normal',
+  showValue = true,
 }: OrganSpriteProps) {
   return (
     <div className={`organ-sprite organ-sprite--${size}`}>
@@ -31,8 +33,8 @@ export function OrganSprite({
         />
       </div>
 
-      <div className="organ-sprite__label">{label}</div>
-      <div className="organ-sprite__value">{Math.round(value)}</div>
+      {label && <div className="organ-sprite__label">{label}</div>}
+      {showValue && <div className="organ-sprite__value">{Math.round(value)}</div>}
 
       {/* Degradation circles */}
       {degradation && degradation.maxTier > 0 && (

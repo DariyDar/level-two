@@ -71,7 +71,8 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
             iconPath="/assets/organs/kidney_icon.png"
             value={kidneyRate}
             isActive={kidneyRate > 0}
-            size="small"
+            size="normal"
+            showValue={false}
           />
         </div>
       </div>
@@ -110,7 +111,8 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
             iconPath="/assets/organs/liver_icon.png"
             value={displayLiverRate}
             isActive={displayLiverRate > 0}
-            size="small"
+            size="normal"
+            showValue={false}
           />
         </div>
       </div>
