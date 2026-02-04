@@ -66,7 +66,7 @@ export function PlanningPhase() {
     for (const placed of placedShips) {
       const ship = allShips.find((s) => s.id === placed.shipId);
       if (ship && isGlucoseShip(ship)) {
-        totalCarbs += ship.load;
+        totalCarbs += ship.carbs ?? ship.load;
       }
     }
 
