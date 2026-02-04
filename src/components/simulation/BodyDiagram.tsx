@@ -1,5 +1,5 @@
 import type { SimulationState } from '../../core/simulation';
-import type { SimpleDegradation } from '../../core/types';
+import type { DegradationState } from '../../core/types';
 import { ContainerView } from './ContainerView';
 import './BodyDiagram.css';
 
@@ -12,18 +12,22 @@ interface InterpolatedValues {
 
 interface BodyDiagramProps {
   state: SimulationState;
-  degradation: SimpleDegradation;
+  degradation: DegradationState;
   interpolated?: InterpolatedValues;
 }
 
 export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramProps) {
-  const { currentLiverRate, currentMuscleRate, containers } = state;
+  const { currentLiverRate, currentMuscleRate, containers, degradationBuffer } = state;
 
   // Use interpolated values if provided, otherwise use state values
   const liverValue = interpolated?.liver ?? containers.liver;
   const bgValue = interpolated?.bg ?? containers.bg;
   const displayLiverRate = interpolated?.liverRate ?? currentLiverRate;
   const displayMuscleRate = interpolated?.muscleRate ?? currentMuscleRate;
+
+  // Display degradation buffer values as percentages (0-100 range)
+  const liverDegradationPercent = Math.min(100, Math.round(degradationBuffer.liver));
+  const pancreasDegradationPercent = Math.min(100, Math.round(degradationBuffer.pancreas));
 
   // Kidney excretion rate (when BG > 180, kidneys start working)
   const kidneyRate = bgValue > 180 ? Math.min((bgValue - 180) * 0.1, 20) : 0;
@@ -73,7 +77,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           capacity={100}
           showRate={Math.round(displayLiverRate)}
           rateDirection="out"
-          degradation={degradation.liver}
+          degradation={liverDegradationPercent}
         />
       </div>
 
@@ -84,7 +88,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           emoji="🫁"
           value={displayMuscleRate > 0 ? 100 : 0}
           capacity={100}
-          degradation={degradation.pancreas}
+          degradation={pancreasDegradationPercent}
           compact
         />
       </div>

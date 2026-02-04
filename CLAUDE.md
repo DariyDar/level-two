@@ -62,12 +62,12 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - `src/components/planning/` — planning phase UI
 - `data/` — JSON configs for ships and levels
 
-### Current State (v0.5.0)
+### Current State (v0.6.0)
 - Planning phase: drag-and-drop ships to time slots ✅
 - Simulation phase: glucose flow visualization with particles ✅
 - Results phase: basic BG history graph ✅
 - Substep simulation: smooth container updates (10 substeps/hour) ✅
-- **NEW:** Pancreas as separate organ ✅
+- Pancreas as separate organ ✅
   - Pancreas monitors BG and regulates muscle activation
   - Muscles receive tier assignment from pancreas
   - Proper organ separation (Pancreas → Muscles)
@@ -78,9 +78,17 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - Carbs vs Glucose separation ✅
   - Ships display carbs (grams) on UI
   - Simulation uses glucose (mg/dL)
+- **NEW:** Tier-based Degradation System ✅
+  - Degradation Buffer: accumulates degradation points
+  - Degradation Tiers: 6 tiers for liver (0-5), 5 tiers for pancreas (0-4)
+  - Tier Effects:
+    - Liver: capacity reduction (100→80→70→60→50→40)
+    - Pancreas: max muscle tier reduction
+  - Configuration-driven tier thresholds and effects (`degradationConfig.json`)
+  - Real-time tier calculation and effect application
 
 ### Known Issues
-- Degradation System: Simple numbers instead of tier-based (planned for v0.6.0)
-- Effect Containers: No threshold-based activation (planned for v0.6.0)
+- Effect Containers: No threshold-based activation (planned for v0.7.0)
 - Kidneys: Not implemented (deferred to future iteration)
 - Muscle Rate Tiers: Need update to [0,20,30,50,70,90] from spec
+- Metformin degradation blocking: Not implemented

@@ -197,7 +197,7 @@ export function SimulationPhase() {
         />
 
         {/* Body Diagram */}
-        <BodyDiagram state={simState} degradation={degradation} interpolated={interpolated} />
+        <BodyDiagram state={simState} degradation={simState.degradation} interpolated={interpolated} />
 
         {/* Ship Queue */}
         <ShipQueue

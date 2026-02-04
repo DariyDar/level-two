@@ -1,0 +1,131 @@
+{
+  "version": "0.6.0",
+  "description": "Tier-based degradation system configuration",
+
+  "organs": {
+    "liver": {
+      "organ": "liver",
+      "description": "Liver degradation reduces container capacity",
+      "maxTier": 5,
+      "baseCapacity": 100,
+
+      "tierThresholds": [
+        { "tier": 0, "bufferMin": 0, "bufferMax": 19 },
+        { "tier": 1, "bufferMin": 20, "bufferMax": 39 },
+        { "tier": 2, "bufferMin": 40, "bufferMax": 59 },
+        { "tier": 3, "bufferMin": 60, "bufferMax": 79 },
+        { "tier": 4, "bufferMin": 80, "bufferMax": 99 },
+        { "tier": 5, "bufferMin": 100, "bufferMax": 999 }
+      ],
+
+      "tierEffects": [
+        { "tier": 0, "capacityReduction": 0, "effectiveCapacity": 100 },
+        { "tier": 1, "capacityReduction": 20, "effectiveCapacity": 80 },
+        { "tier": 2, "capacityReduction": 30, "effectiveCapacity": 70 },
+        { "tier": 3, "capacityReduction": 40, "effectiveCapacity": 60 },
+        { "tier": 4, "capacityReduction": 50, "effectiveCapacity": 50 },
+        { "tier": 5, "capacityReduction": 60, "effectiveCapacity": 40 }
+      ],
+
+      "accumulation": {
+        "description": "Liver degradation accumulates based on BG excess",
+        "sources": [
+          {
+            "id": "bg_excess",
+            "description": "Accumulation from BG exceeding thresholds",
+            "condition": {
+              "type": "container",
+              "container": "bg",
+              "operator": ">",
+              "value": 180
+            },
+            "formula": "(bg - 180) * 0.1 per hour"
+          }
+        ]
+      }
+    },
+
+    "pancreas": {
+      "organ": "pancreas",
+      "description": "Pancreas degradation reduces maximum muscle activation tier",
+      "maxTier": 4,
+
+      "tierThresholds": [
+        { "tier": 0, "bufferMin": 0, "bufferMax": 24 },
+        { "tier": 1, "bufferMin": 25, "bufferMax": 49 },
+        { "tier": 2, "bufferMin": 50, "bufferMax": 74 },
+        { "tier": 3, "bufferMin": 75, "bufferMax": 99 },
+        { "tier": 4, "bufferMin": 100, "bufferMax": 999 }
+      ],
+
+      "tierEffects": [
+        { "tier": 0, "maxTierReduction": 0, "effectiveMaxTier": 5 },
+        { "tier": 1, "maxTierReduction": 1, "effectiveMaxTier": 4 },
+        { "tier": 2, "maxTierReduction": 2, "effectiveMaxTier": 3 },
+        { "tier": 3, "maxTierReduction": 3, "effectiveMaxTier": 2 },
+        { "tier": 4, "maxTierReduction": 4, "effectiveMaxTier": 1 }
+      ],
+
+      "accumulation": {
+        "description": "Pancreas degradation accumulates based on BG variability",
+        "sources": [
+          {
+            "id": "bg_excess",
+            "description": "Accumulation from prolonged high BG",
+            "condition": {
+              "type": "container",
+              "container": "bg",
+              "operator": ">",
+              "value": 200
+            },
+            "formula": "(bg - 200) * 0.05 per hour"
+          },
+          {
+            "id": "bg_low",
+            "description": "Accumulation from hypoglycemia",
+            "condition": {
+              "type": "container",
+              "container": "bg",
+              "operator": "<",
+              "value": 70
+            },
+            "formula": "(70 - bg) * 0.1 per hour"
+          }
+        ]
+      }
+    }
+  },
+
+  "modifiers": {
+    "metformin": {
+      "description": "Metformin effect containers can block degradation accumulation",
+      "thresholds": [
+        {
+          "threshold": 20,
+          "effect": "Block Liver Degradation Tier 1",
+          "blockedTier": 1
+        },
+        {
+          "threshold": 40,
+          "effect": "Block Liver Degradation Tier 2",
+          "blockedTier": 2
+        },
+        {
+          "threshold": 60,
+          "effect": "Block Liver Degradation Tier 3",
+          "blockedTier": 3
+        },
+        {
+          "threshold": 80,
+          "effect": "Block Liver Degradation Tier 4",
+          "blockedTier": 4
+        },
+        {
+          "threshold": 100,
+          "effect": "Block Liver Degradation Tier 5",
+          "blockedTier": 5
+        }
+      ]
+    }
+  }
+}
