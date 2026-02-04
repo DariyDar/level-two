@@ -80,7 +80,7 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - `src/components/planning/` — planning phase UI
 - `data/` — JSON configs for ships and levels
 
-### Current State (v0.6.1)
+### Current State (v0.6.2)
 - Planning phase: drag-and-drop ships to time slots ✅
 - Simulation phase: glucose flow visualization with particles ✅
 - Results phase: basic BG history graph ✅
@@ -96,7 +96,7 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - Carbs vs Glucose separation ✅
   - Ships display carbs (grams) on UI
   - Simulation uses glucose (mg/dL)
-- **NEW:** Tier-based Degradation System ✅
+- Tier-based Degradation System ✅
   - Degradation Buffer: accumulates degradation points
   - Degradation Tiers: 6 tiers for liver (0-5), 5 tiers for pancreas (0-4)
   - Tier Effects:
@@ -104,6 +104,11 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
     - Pancreas: max muscle tier reduction
   - Configuration-driven tier thresholds and effects (`degradationConfig.json`)
   - Real-time tier calculation and effect application
+- **NEW:** Visual Degradation Indicators ✅
+  - Color-coded circles for organ health (green = healthy, pink = degraded)
+  - Liver: 5 circles (max 5 degraded)
+  - Pancreas: 4 circles (max 4 degraded)
+  - Real-time visual feedback during simulation
 
 ### Known Issues
 - Effect Containers: No threshold-based activation (planned for v0.7.0)
