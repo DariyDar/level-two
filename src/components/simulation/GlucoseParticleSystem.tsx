@@ -16,7 +16,7 @@ interface Particle {
   targetY: number;
   driftOffset: number;
   // New fields for glucose tracking
-  glucoseAmount: number; // 1-5 glucose per particle (sugar cube representation)
+  glucoseAmount: number; // 1-15 glucose per particle (sugar cube representation)
   speedModifier: number; // 0.7 for fiber, 1.0 for normal
   hasFiber: boolean; // Whether this particle is from a fiber food
 }
@@ -31,8 +31,8 @@ interface GlucoseParticleSystemProps {
   dissolveProgress: number;
 }
 
-// Glucose per particle (sugar cube representation: 5g carbs = 1 cube)
-const GLUCOSE_PER_PARTICLE = 5;
+// Glucose per particle (sugar cube representation: 15g carbs = 1 cube)
+const GLUCOSE_PER_PARTICLE = 15;
 
 // Visual multiplier for continuous stream (reduced for performance)
 const VISUAL_MULTIPLIER = 1;
