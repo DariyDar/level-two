@@ -62,16 +62,25 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - `src/components/planning/` — planning phase UI
 - `data/` — JSON configs for ships and levels
 
-### Current State (v0.3.0)
+### Current State (v0.5.0)
 - Planning phase: drag-and-drop ships to time slots ✅
 - Simulation phase: glucose flow visualization with particles ✅
 - Results phase: basic BG history graph ✅
-- Particle system: streams from ships → liver → BG → muscles/kidneys
-- **NEW:** Configuration-driven rules system ✅
-  - Organ behavior defined in JSON config files
+- Substep simulation: smooth container updates (10 substeps/hour) ✅
+- **NEW:** Pancreas as separate organ ✅
+  - Pancreas monitors BG and regulates muscle activation
+  - Muscles receive tier assignment from pancreas
+  - Proper organ separation (Pancreas → Muscles)
+- Configuration-driven rules system ✅
+  - Organ behavior defined in JSON config files (`organRules.json`)
   - Rule Engine evaluates conditions and actions
-  - Easy balancing without code changes
+  - Modifiers for degradation, effects, boosts
+- Carbs vs Glucose separation ✅
+  - Ships display carbs (grams) on UI
+  - Simulation uses glucose (mg/dL)
 
 ### Known Issues
-- Particle positions may need fine-tuning
-- Kidneys not implemented (deferred to future iteration)
+- Degradation System: Simple numbers instead of tier-based (planned for v0.6.0)
+- Effect Containers: No threshold-based activation (planned for v0.6.0)
+- Kidneys: Not implemented (deferred to future iteration)
+- Muscle Rate Tiers: Need update to [0,20,30,50,70,90] from spec

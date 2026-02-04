@@ -99,10 +99,27 @@ export interface BGThresholds {
 
 // === Degradation Models ===
 
-export interface SimpleDegradation {
+// v0.5.0: Tier-based degradation system
+export interface DegradationState {
+  liver: {
+    tier: number;        // Current degradation tier (0-5)
+    tierEffects: {
+      capacityReduction: number; // mg/dL reduction from base capacity
+    };
+  };
+  pancreas: {
+    tier: number;        // Current degradation tier (0-4)
+    tierEffects: {
+      maxTierReduction: number; // Reduction in max muscle activation tier
+    };
+  };
+}
+
+// Legacy type for backward compatibility
+export type SimpleDegradation = {
   liver: number;
   pancreas: number;
-}
+};
 
 // === Level Config ===
 

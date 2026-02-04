@@ -59,6 +59,7 @@ export interface SimulationState {
   // Current rates (for display)
   currentLiverRate: number;
   currentMuscleRate: number;
+  currentMuscleTier: number; // Tier assigned by pancreas
 }
 
 interface QueuedShip {
@@ -191,6 +192,7 @@ export class SimulationEngine {
       },
       currentLiverRate: 0,
       currentMuscleRate: 0,
+      currentMuscleTier: 0,
     };
   }
 
@@ -230,6 +232,9 @@ export class SimulationEngine {
 
     // 4. Process liver → BG transfer
     this.processLiverTransfer(substepFraction);
+
+    // 4.5. Process pancreas regulation (determines muscle tier)
+    this.processPancreasRegulation();
 
     // 5. Process muscles drain (BG → utilization)
     this.processMuscleDrain(substepFraction);
@@ -420,14 +425,45 @@ export class SimulationEngine {
     );
   }
 
-  private processMuscleDrain(substepFraction: number): void {
+  private processPancreasRegulation(): void {
+    // Pancreas monitors BG and determines muscle activation tier
     const context = this.buildRuleContext();
-    const result = RuleEngine.evaluateOrganRules(this.rulesConfig.muscles, context);
+    const result = RuleEngine.evaluateOrganRules(this.rulesConfig.pancreas, context);
 
-    this.state.currentMuscleRate = result.finalRate;
+    this.state.currentMuscleTier = result.finalTier;
+  }
+
+  private processMuscleDrain(substepFraction: number): void {
+    // Muscles use tier assigned by pancreas, then apply modifiers
+    const muscleConfig = this.rulesConfig.muscles;
+    const context = this.buildRuleContext();
+
+    let tier = this.state.currentMuscleTier;
+
+    // Apply muscle modifiers (degradation, exercise, boost)
+    for (const modifier of muscleConfig.modifiers) {
+      const conditionMet = RuleEngine.evaluateCondition(modifier.condition, context, {
+        liverBoost: this.state.liverBoost,
+        pancreasBoost: this.state.pancreasBoost,
+      });
+
+      if (conditionMet) {
+        if (modifier.effect.type === 'addTier') {
+          tier += modifier.effect.amount;
+        } else if (modifier.effect.type === 'subtractTier') {
+          tier -= modifier.effect.amount;
+        }
+      }
+    }
+
+    // Clamp tier to valid range
+    tier = Math.max(muscleConfig.minTier, Math.min(tier, muscleConfig.maxTier));
+    const drainRate = muscleConfig.rates[tier];
+
+    this.state.currentMuscleRate = drainRate;
 
     // Drain from BG (proportional to substep fraction)
-    this.state.containers.bg = Math.max(0, this.state.containers.bg - result.finalRate * substepFraction);
+    this.state.containers.bg = Math.max(0, this.state.containers.bg - drainRate * substepFraction);
   }
 
   private updateBoostCooldowns(): void {

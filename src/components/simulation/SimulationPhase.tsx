@@ -219,7 +219,7 @@ export function SimulationPhase() {
           onActivate={handleLiverBoost}
         />
         <BoostButton
-          label="Muscle Boost"
+          label="Pancreas Boost"
           emoji="💪"
           boost={simState.pancreasBoost}
           cooldownMax={3}
