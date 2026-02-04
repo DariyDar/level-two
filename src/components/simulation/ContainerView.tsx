@@ -1,3 +1,4 @@
+import { DegradationCircles } from './DegradationCircles';
 import './ContainerView.css';
 
 interface ContainerViewProps {
@@ -13,7 +14,10 @@ interface ContainerViewProps {
   };
   showRate?: number;
   rateDirection?: 'in' | 'out';
-  degradation?: number;
+  degradation?: {
+    tier: number;      // Current degradation tier
+    maxTier: number;   // Maximum tier for this organ
+  };
   compact?: boolean;
 }
 
@@ -50,9 +54,6 @@ export function ContainerView({
       <div className="container-view__header">
         <span className="container-view__emoji">{emoji}</span>
         <span className="container-view__label">{label}</span>
-        {degradation !== undefined && degradation > 0 && (
-          <span className="container-view__degradation">-{degradation}%</span>
-        )}
       </div>
 
       <div className="container-view__bar">
@@ -100,6 +101,15 @@ export function ContainerView({
           </span>
         )}
       </div>
+
+      {/* Degradation circles */}
+      {degradation && degradation.maxTier > 0 && (
+        <DegradationCircles
+          tier={degradation.tier}
+          maxTier={degradation.maxTier}
+          size={compact ? 'small' : 'normal'}
+        />
+      )}
     </div>
   );
 }

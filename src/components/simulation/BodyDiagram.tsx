@@ -16,18 +16,14 @@ interface BodyDiagramProps {
   interpolated?: InterpolatedValues;
 }
 
-export function BodyDiagram({ state, interpolated }: BodyDiagramProps) {
-  const { currentLiverRate, currentMuscleRate, containers, degradationBuffer } = state;
+export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramProps) {
+  const { currentLiverRate, currentMuscleRate, containers } = state;
 
   // Use interpolated values if provided, otherwise use state values
   const liverValue = interpolated?.liver ?? containers.liver;
   const bgValue = interpolated?.bg ?? containers.bg;
   const displayLiverRate = interpolated?.liverRate ?? currentLiverRate;
   const displayMuscleRate = interpolated?.muscleRate ?? currentMuscleRate;
-
-  // Display degradation buffer values as percentages (0-100 range)
-  const liverDegradationPercent = Math.min(100, Math.round(degradationBuffer.liver));
-  const pancreasDegradationPercent = Math.min(100, Math.round(degradationBuffer.pancreas));
 
   // Kidney excretion rate (when BG > 180, kidneys start working)
   const kidneyRate = bgValue > 180 ? Math.min((bgValue - 180) * 0.1, 20) : 0;
@@ -77,7 +73,10 @@ export function BodyDiagram({ state, interpolated }: BodyDiagramProps) {
           capacity={100}
           showRate={Math.round(displayLiverRate)}
           rateDirection="out"
-          degradation={liverDegradationPercent}
+          degradation={{
+            tier: degradation.liver.tier,
+            maxTier: 5
+          }}
         />
       </div>
 
@@ -88,7 +87,10 @@ export function BodyDiagram({ state, interpolated }: BodyDiagramProps) {
           emoji="🫁"
           value={displayMuscleRate > 0 ? 100 : 0}
           capacity={100}
-          degradation={pancreasDegradationPercent}
+          degradation={{
+            tier: degradation.pancreas.tier,
+            maxTier: 4
+          }}
           compact
         />
       </div>
