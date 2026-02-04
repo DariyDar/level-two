@@ -74,13 +74,24 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 
 ### Key Files
 - `src/version.ts` — version number
-- `src/store/gameStore.ts` — global game state
+- `src/store/gameStore.ts` — global game state (includes mood system)
 - `src/core/simulation.ts` — simulation engine
+- `src/core/types.ts` — TypeScript type definitions (Ship, MoodLevel, MoodEffect, etc.)
+- `src/config/loader.ts` — loads and transforms JSON configs
 - `src/components/simulation/` — simulation UI components
+  - `GlucoseParticleSystem.tsx` — sugar cube particles with fiber support
+  - `FiberIndicator.tsx` — fiber activity indicator
+  - `BodyDiagram.tsx` — organs layout
 - `src/components/planning/` — planning phase UI
-- `data/` — JSON configs for ships and levels
+  - `PlanningHeader.tsx` — header with BG, Mood, Carbs, Simulate
+  - `MoodIndicator.tsx` — 5-level mood display
+  - `ShipCard.tsx` — draggable ship cards with mood/fiber badges
+- `public/data/` — JSON configs for ships and levels
+  - `foods.json` — food items with glucose, carbs, mood, fiber
+  - `levels/*.json` — level configurations
+  - `organRules.json` — organ behavior rules
 
-### Current State (v0.7.4)
+### Current State (v0.9.2)
 - Planning phase: drag-and-drop ships to time slots ✅
 - Simulation phase: glucose flow visualization with particles ✅
 - Results phase: basic BG history graph ✅
@@ -121,9 +132,40 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - External numeric indicators beside organs (not below)
   - Wider BG container (80px) with floating value indicator
   - Compact containers for Liver/Kidneys (60px wide, 90px tall)
+- Food Tags System ✅
+  - Mood tags: +1 (😊) for positive mood, -1 (😔) for negative mood
+  - Fiber tags: 🌿 for foods with fiber content
+  - Visual badges on ship cards (top-right for mood, bottom-right for fiber)
+- Sugar Cube Particle System (v0.8.0) ✅
+  - Visual representation: 🧊 instead of dots
+  - Ratio: 15g glucose = 1 sugar cube
+  - Partial cubes show remainder amount (<15g) as label
+  - Fiber particles: green-tinted cubes with 30% slower speed (0.7x)
+  - Performance: ~20x fewer particles than dot system
+- Fiber Indicator (v0.8.1) ✅
+  - Shows 🌿 "Glucose Income Slowed" when fiber is active
+  - Pulsing animation (opacity 50%→100% over 2s)
+  - Appears for entire segment if any food with fiber is present
+  - Positioned bottom-right of simulation view
+- Mood System (v0.9.0) ✅
+  - MoodLevel: 1-5 scale (1=worst, 5=best)
+  - Starts at 3 (neutral), persists between days
+  - Foods affect mood: +1 or -1 when placed in planning phase
+  - MoodIndicator: 5 emoji faces (😟😐🙂😊😄) in planning header
+  - Active mood level highlighted with scale and glow
+  - Pre-simulation risk check for negative events
+  - Probability table: Mood 1→100%, 2→75%, 3→50%, 4→25%, 5→0%
+  - Max 1 negative event per day (console logging placeholder)
+  - Mood state saved in localStorage alongside degradation
+- Planning UI Layout (v0.9.1-v0.9.2) ✅
+  - Header elements: BG | MoodIndicator | Carbs | Simulate button
+  - Carbs indicator: max-width 500px with flex-grow enabled
+  - Balanced spacing between all header elements
 
 ### Known Issues
 - Effect Containers: No threshold-based activation (planned for future)
 - Kidneys: Not fully implemented (basic excretion only)
 - Metformin degradation blocking: Not implemented
 - Pipe connections: Visual connections between organs not yet implemented
+- Negative Events: Console logging only (actual event implementation pending)
+- Fiber particles: Currently spawn with hasFiber=false (integration with actual ship data pending)
