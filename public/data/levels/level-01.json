@@ -15,8 +15,8 @@
   "availableInterventions": [],
   "preOccupiedSlots": [],
   "carbRequirements": {
-    "min": 60,
-    "max": 120
+    "min": 150,
+    "max": 300
   },
   "interventionCharges": {
     "liverBoost": 3,

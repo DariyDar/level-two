@@ -37,7 +37,8 @@ export interface BoostState {
 
 export interface SimulationState {
   // Time
-  currentTick: number; // 0-17
+  currentTick: number; // 0-17 (interpreted hours)
+  currentSubstep: number; // 0 to (substepsPerHour - 1)
   currentSegment: DaySegment;
   isComplete: boolean;
 
@@ -95,6 +96,9 @@ export interface SimulationConfig {
   pancreasBoostDuration: number;
   pancreasBoostTierBonus: number;
 
+  // Timing (Substep Simulation)
+  substepsPerHour: number; // Number of substeps per interpreted hour
+
   // Initial
   initialBG: number;
   initialLiver: number;
@@ -119,6 +123,7 @@ const DEFAULT_CONFIG: SimulationConfig = {
   pancreasBoostCooldown: 3,
   pancreasBoostDuration: 1,
   pancreasBoostTierBonus: 1,
+  substepsPerHour: 10, // Substep simulation: 10 substeps per interpreted hour for smooth animation
   initialBG: 100,
   initialLiver: 0,
 };
@@ -158,6 +163,7 @@ export class SimulationEngine {
 
     this.state = {
       currentTick: 0,
+      currentSubstep: 0,
       currentSegment: 'Morning',
       isComplete: false,
       containers: {
@@ -192,42 +198,63 @@ export class SimulationEngine {
     return this.state;
   }
 
+  getSubstepsPerHour(): number {
+    return this.config.substepsPerHour;
+  }
+
   isComplete(): boolean {
     return this.state.isComplete;
   }
 
-  // Main tick function - advances simulation by 1 hour
+  // Main tick function - advances simulation by 1 substep
+  // Substep simulation: each interpreted hour is divided into N substeps for smooth animation
   tick(): SimulationState {
     if (this.state.isComplete) return this.state;
 
-    // 1. Check if we need to start unloading a new ship
-    this.checkShipQueue();
+    const substepFraction = 1 / this.config.substepsPerHour;
+    const isHourBoundary = this.state.currentSubstep === 0;
+
+    // === DISCRETE EVENTS (only at hour boundary) ===
+    if (isHourBoundary) {
+      // 1. Check if we need to start unloading a new ship
+      this.checkShipQueue();
+    }
+
+    // === CONTINUOUS PROCESSES (every substep) ===
 
     // 2. Process ship unloading (adds to liver)
-    this.processShipUnloading();
+    this.processShipUnloading(substepFraction);
 
     // 3. Process effect decay
-    this.processEffectDecay();
+    this.processEffectDecay(substepFraction);
 
     // 4. Process liver → BG transfer
-    this.processLiverTransfer();
+    this.processLiverTransfer(substepFraction);
 
     // 5. Process muscles drain (BG → utilization)
-    this.processMuscleDrain();
+    this.processMuscleDrain(substepFraction);
 
-    // 6. Update boost cooldowns
-    this.updateBoostCooldowns();
+    // === SUBSTEP ADVANCEMENT ===
+    this.state.currentSubstep++;
 
-    // 7. Record BG history
-    this.state.bgHistory.push(this.state.containers.bg);
+    // === HOUR BOUNDARY EVENTS ===
+    if (this.state.currentSubstep >= this.config.substepsPerHour) {
+      this.state.currentSubstep = 0;
 
-    // 8. Advance time
-    this.state.currentTick++;
-    this.updateSegment();
+      // 6. Update boost cooldowns (hour boundary)
+      this.updateBoostCooldowns();
 
-    // 9. Check completion
-    if (this.state.currentTick >= 18) {
-      this.state.isComplete = true;
+      // 7. Record BG history (hour boundary)
+      this.state.bgHistory.push(this.state.containers.bg);
+
+      // 8. Advance time (hour boundary)
+      this.state.currentTick++;
+      this.updateSegment();
+
+      // 9. Check completion (hour boundary)
+      if (this.state.currentTick >= 18) {
+        this.state.isComplete = true;
+      }
     }
 
     return this.state;
@@ -334,13 +361,13 @@ export class SimulationEngine {
     }
   }
 
-  private processShipUnloading(): void {
+  private processShipUnloading(substepFraction: number): void {
     const unloading = this.state.unloadingShip;
     if (!unloading) return;
 
-    // Add load to target container
+    // Add load to target container (proportional to substep fraction)
     const container = unloading.targetContainer;
-    this.state.containers[container] += unloading.loadPerTick;
+    this.state.containers[container] += unloading.loadPerTick * substepFraction;
 
     // Clamp liver to capacity
     if (container === 'liver') {
@@ -350,8 +377,9 @@ export class SimulationEngine {
       );
     }
 
-    // Decrease remaining ticks
-    unloading.remainingTicks--;
+    // Decrease remaining ticks (only on hour boundary, handled in tick())
+    // Note: unloading progress is now smooth across substeps
+    unloading.remainingTicks -= substepFraction;
 
     // Check if done
     if (unloading.remainingTicks <= 0) {
@@ -359,29 +387,29 @@ export class SimulationEngine {
     }
   }
 
-  private processEffectDecay(): void {
-    // Metformin decay
+  private processEffectDecay(substepFraction: number): void {
+    // Metformin decay (proportional to substep fraction)
     this.state.containers.metforminEffect = Math.max(
       0,
-      this.state.containers.metforminEffect - this.config.metforminDecayRate
+      this.state.containers.metforminEffect - this.config.metforminDecayRate * substepFraction
     );
 
-    // Exercise decay
+    // Exercise decay (proportional to substep fraction)
     this.state.containers.exerciseEffect = Math.max(
       0,
-      this.state.containers.exerciseEffect - this.config.exerciseDecayRate
+      this.state.containers.exerciseEffect - this.config.exerciseDecayRate * substepFraction
     );
   }
 
-  private processLiverTransfer(): void {
+  private processLiverTransfer(substepFraction: number): void {
     const context = this.buildRuleContext();
     const result = RuleEngine.evaluateOrganRules(this.rulesConfig.liver, context);
 
     this.state.currentLiverRate = result.finalRate;
 
-    // Transfer from liver to BG
+    // Transfer from liver to BG (proportional to substep fraction)
     const liver = this.state.containers.liver;
-    const transfer = Math.min(result.finalRate, liver);
+    const transfer = Math.min(result.finalRate * substepFraction, liver);
     this.state.containers.liver -= transfer;
     this.state.containers.bg += transfer;
 
@@ -392,14 +420,14 @@ export class SimulationEngine {
     );
   }
 
-  private processMuscleDrain(): void {
+  private processMuscleDrain(substepFraction: number): void {
     const context = this.buildRuleContext();
     const result = RuleEngine.evaluateOrganRules(this.rulesConfig.muscles, context);
 
     this.state.currentMuscleRate = result.finalRate;
 
-    // Drain from BG
-    this.state.containers.bg = Math.max(0, this.state.containers.bg - result.finalRate);
+    // Drain from BG (proportional to substep fraction)
+    this.state.containers.bg = Math.max(0, this.state.containers.bg - result.finalRate * substepFraction);
   }
 
   private updateBoostCooldowns(): void {

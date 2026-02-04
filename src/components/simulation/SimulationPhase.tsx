@@ -100,14 +100,16 @@ export function SimulationPhase() {
     : 0;
 
   // Interpolated values for smooth animation
-  const tickDuration = 1000 / speed;
+  // With substep simulation, tick duration is now much shorter
+  const substepsPerHour = engine?.getSubstepsPerHour() ?? 10;
+  const substepDuration = 1000 / (speed * substepsPerHour);
   const interpolated = useInterpolatedValues({
     targetLiver: simState?.containers.liver ?? 0,
     targetBG: simState?.containers.bg ?? 100,
     targetMuscleRate: simState?.currentMuscleRate ?? 0,
     targetLiverRate: simState?.currentLiverRate ?? 0,
     targetDissolveProgress,
-    duration: tickDuration * 0.9, // Finish slightly before next tick
+    duration: substepDuration * 0.9, // Finish slightly before next substep
     isPaused,
   });
 

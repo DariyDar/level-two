@@ -36,9 +36,11 @@ export function useGameLoop({
       return;
     }
 
-    // Calculate tick duration based on speed
-    // 1x = 1000ms, 2x = 500ms, 4x = 250ms
-    const tickDuration = 1000 / speed;
+    // Calculate substep duration based on speed and substeps per hour
+    // With substepsPerHour=10 and speed=1x: 1000ms / (1 * 10) = 100ms per substep
+    // This means 10 substeps per second, completing 1 interpreted hour per second at 1x speed
+    const substepsPerHour = engine.getSubstepsPerHour();
+    const substepDuration = 1000 / (speed * substepsPerHour);
 
     intervalRef.current = window.setInterval(() => {
       if (engine.isComplete()) {
@@ -60,7 +62,7 @@ export function useGameLoop({
         }
         onCompleteRef.current();
       }
-    }, tickDuration);
+    }, substepDuration);
 
     return () => {
       if (intervalRef.current !== null) {
