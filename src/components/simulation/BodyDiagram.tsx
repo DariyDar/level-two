@@ -31,9 +31,8 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
 
   return (
     <div className="body-diagram">
-      {/* Top row: Muscles - BG - Kidneys */}
-      <div className="body-diagram__top-row">
-        {/* Muscles - sprite only */}
+      {/* Muscles - A1-A4 (left column, rows 1-2) */}
+      <div className="body-diagram__muscles">
         <OrganSprite
           label="Muscles"
           iconPath="/assets/organs/muscle_icon.png"
@@ -41,8 +40,10 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           isActive={displayMuscleRate > 0}
           size="normal"
         />
+      </div>
 
-        {/* Blood Glucose - container */}
+      {/* Blood Glucose - A2-A5-A8 (center column, all rows) */}
+      <div className="body-diagram__bg">
         <ContainerView
           label="Blood Glucose"
           emoji="🩸"
@@ -55,31 +56,30 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
             critical: 300,
           }}
         />
-
-        {/* Kidneys - container + sprite */}
-        <div className="body-diagram__organ-group">
-          <ContainerView
-            label="Kidneys"
-            emoji="🫘"
-            value={kidneyRate}
-            capacity={50}
-            showRate={kidneyRate > 0 ? Math.round(kidneyRate) : undefined}
-            rateDirection="in"
-          />
-          <OrganSprite
-            label=""
-            iconPath="/assets/organs/kidney_icon.png"
-            value={kidneyRate}
-            isActive={kidneyRate > 0}
-            size="normal"
-            showValue={false}
-          />
-        </div>
       </div>
 
-      {/* Bottom row: Pancreas - Liver */}
-      <div className="body-diagram__bottom-row">
-        {/* Pancreas - sprite only */}
+      {/* Kidneys - A3-A6 (right column, rows 1-2) */}
+      <div className="body-diagram__kidneys">
+        <ContainerView
+          label="Kidneys"
+          emoji="🫘"
+          value={kidneyRate}
+          capacity={50}
+          showRate={kidneyRate > 0 ? Math.round(kidneyRate) : undefined}
+          rateDirection="in"
+        />
+        <OrganSprite
+          label=""
+          iconPath="/assets/organs/kidney_icon.png"
+          value={kidneyRate}
+          isActive={kidneyRate > 0}
+          size="normal"
+          showValue={false}
+        />
+      </div>
+
+      {/* Pancreas - A4-A7 (left column, rows 2-3) */}
+      <div className="body-diagram__pancreas">
         <OrganSprite
           label="Pancreas"
           iconPath="/assets/organs/pancreas_icon.png"
@@ -91,30 +91,30 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           }}
           size="normal"
         />
+      </div>
 
-        {/* Liver - container + sprite */}
-        <div className="body-diagram__organ-group">
-          <ContainerView
-            label="Liver"
-            emoji="🫀"
-            value={liverValue}
-            capacity={100}
-            showRate={Math.round(displayLiverRate)}
-            rateDirection="out"
-            degradation={{
-              tier: degradation.liver.tier,
-              maxTier: 5
-            }}
-          />
-          <OrganSprite
-            label=""
-            iconPath="/assets/organs/liver_icon.png"
-            value={displayLiverRate}
-            isActive={displayLiverRate > 0}
-            size="normal"
-            showValue={false}
-          />
-        </div>
+      {/* Liver - A8 (center column, row 3) */}
+      <div className="body-diagram__liver">
+        <ContainerView
+          label="Liver"
+          emoji="🫀"
+          value={liverValue}
+          capacity={100}
+          showRate={Math.round(displayLiverRate)}
+          rateDirection="out"
+          degradation={{
+            tier: degradation.liver.tier,
+            maxTier: 5
+          }}
+        />
+        <OrganSprite
+          label=""
+          iconPath="/assets/organs/liver_icon.png"
+          value={displayLiverRate}
+          isActive={displayLiverRate > 0}
+          size="normal"
+          showValue={false}
+        />
       </div>
     </div>
   );
