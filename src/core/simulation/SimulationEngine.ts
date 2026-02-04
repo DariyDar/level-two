@@ -430,7 +430,7 @@ export class SimulationEngine {
     const context = this.buildRuleContext();
     const result = RuleEngine.evaluateOrganRules(this.rulesConfig.pancreas, context);
 
-    this.state.currentMuscleTier = result.finalTier;
+    this.state.currentMuscleTier = result.tier;
   }
 
   private processMuscleDrain(substepFraction: number): void {
