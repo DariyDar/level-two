@@ -10,6 +10,7 @@ import { BodyDiagram } from './BodyDiagram';
 import { BoostButton } from './BoostButton';
 import { ShipQueue } from './ShipQueue';
 import { GlucoseParticleSystem } from './GlucoseParticleSystem';
+import { FiberIndicator } from './FiberIndicator';
 import './SimulationPhase.css';
 
 // Available simulation speeds
@@ -62,6 +63,22 @@ export function SimulationPhase() {
     () => new Map(allShips.map((s) => [s.id, s])),
     [allShips]
   );
+
+  // Check if current segment has any ships with fiber
+  const hasFiberInCurrentSegment = useMemo(() => {
+    if (!simState) return false;
+
+    // Find all ships in the current segment
+    const shipsInSegment = placedShips.filter(
+      (ps) => ps.segment === simState.currentSegment
+    );
+
+    // Check if any of them have fiber property
+    return shipsInSegment.some((ps) => {
+      const ship = shipsMap.get(ps.shipId);
+      return ship?.fiber === true;
+    });
+  }, [simState, placedShips, shipsMap]);
 
   // Game loop callbacks
   const handleTick = useCallback((state: SimulationState) => {
@@ -195,6 +212,9 @@ export function SimulationPhase() {
           isPaused={isPaused}
           dissolveProgress={interpolated.dissolveProgress}
         />
+
+        {/* Fiber Indicator */}
+        <FiberIndicator isActive={hasFiberInCurrentSegment} />
 
         {/* Body Diagram */}
         <BodyDiagram state={simState} degradation={simState.degradation} interpolated={interpolated} />
