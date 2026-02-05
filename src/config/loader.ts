@@ -31,13 +31,19 @@ interface RawLevelConfig {
   description?: string;
   days: number;
   initialBG?: number;
-  availableFoods: AvailableFood[] | string[];
+  availableFoods?: AvailableFood[] | string[]; // Optional: can be in dayConfigs instead
   availableInterventions: string[];
   preOccupiedSlots?: { slot: number; shipId: string }[];
-  carbRequirements: {
+  carbRequirements?: { // Optional: can be in dayConfigs instead
     min: number;
     max: number;
   };
+  dayConfigs?: Array<{ // Day-specific configurations
+    day: number;
+    availableFoods: AvailableFood[] | string[];
+    preOccupiedSlots?: { slot: number; shipId: string }[];
+    carbRequirements: { min: number; max: number };
+  }>;
   initialDegradation?: {
     liver: number;
     pancreas: number;
@@ -83,8 +89,8 @@ function transformIntervention(raw: RawInterventionConfig): Ship {
 }
 
 // Normalize availableFoods to always be AvailableFood[]
-function normalizeAvailableFoods(foods: AvailableFood[] | string[]): AvailableFood[] {
-  if (foods.length === 0) return [];
+function normalizeAvailableFoods(foods?: AvailableFood[] | string[]): AvailableFood[] | undefined {
+  if (!foods || foods.length === 0) return foods as undefined;
 
   // Check if it's already in the new format
   if (typeof foods[0] === 'object') {
@@ -97,13 +103,40 @@ function normalizeAvailableFoods(foods: AvailableFood[] | string[]): AvailableFo
 
 // Transform raw level config
 function transformLevel(raw: RawLevelConfig): LevelConfig {
-  return {
-    ...raw,
+  const transformed: LevelConfig = {
+    id: raw.id,
+    name: raw.name,
+    description: raw.description,
+    days: raw.days,
     initialBG: raw.initialBG ?? 100,
-    availableFoods: normalizeAvailableFoods(raw.availableFoods),
+    availableInterventions: raw.availableInterventions,
     preOccupiedSlots: raw.preOccupiedSlots ?? [],
     initialDegradation: raw.initialDegradation ?? { liver: 0, pancreas: 0 },
+    interventionCharges: raw.interventionCharges,
+    winCondition: raw.winCondition,
   };
+
+  // Handle legacy availableFoods (optional now if dayConfigs exists)
+  if (raw.availableFoods) {
+    transformed.availableFoods = normalizeAvailableFoods(raw.availableFoods);
+  }
+
+  // Handle legacy carbRequirements (optional now if dayConfigs exists)
+  if (raw.carbRequirements) {
+    transformed.carbRequirements = raw.carbRequirements;
+  }
+
+  // Normalize dayConfigs if present
+  if (raw.dayConfigs) {
+    transformed.dayConfigs = raw.dayConfigs.map((dc) => ({
+      day: dc.day,
+      availableFoods: normalizeAvailableFoods(dc.availableFoods) || [],
+      preOccupiedSlots: dc.preOccupiedSlots ?? [],
+      carbRequirements: dc.carbRequirements,
+    }));
+  }
+
+  return transformed;
 }
 
 // Cache for loaded configs
