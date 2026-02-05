@@ -1,30 +1,56 @@
 {
   "id": "level-01",
   "name": "First Steps",
-  "description": "Learn the basics of meal planning.",
-  "days": 1,
+  "description": "Learn the basics of meal planning across three days.",
+  "days": 3,
   "initialBG": 100,
-  "availableFoods": [
-    { "id": "apple", "count": 3 },
-    { "id": "banana", "count": 2 },
-    { "id": "sandwich", "count": 2 },
-    { "id": "pizza", "count": 1 },
-    { "id": "oatmeal", "count": 1 },
-    { "id": "chicken", "count": 1 },
-    { "id": "icecream", "count": 1 },
-    { "id": "popcorn", "count": 1 },
-    { "id": "cookie", "count": 1 },
-    { "id": "caesarsalad", "count": 1 },
-    { "id": "chocolatemuffin", "count": 1 },
-    { "id": "rice", "count": 1 },
-    { "id": "burger", "count": 1 }
+  "dayConfigs": [
+    {
+      "day": 1,
+      "availableFoods": [
+        { "id": "apple", "count": 1 },
+        { "id": "banana", "count": 1 },
+        { "id": "cookie", "count": 1 },
+        { "id": "oatmeal", "count": 1 },
+        { "id": "sandwich", "count": 1 }
+      ],
+      "carbRequirements": {
+        "min": 150,
+        "max": 300
+      }
+    },
+    {
+      "day": 2,
+      "availableFoods": [
+        { "id": "apple", "count": 1 },
+        { "id": "banana", "count": 1 },
+        { "id": "oatmeal", "count": 1 },
+        { "id": "caesarsalad", "count": 1 },
+        { "id": "sandwich", "count": 2 },
+        { "id": "cookie", "count": 1 }
+      ],
+      "carbRequirements": {
+        "min": 165,
+        "max": 300
+      }
+    },
+    {
+      "day": 3,
+      "availableFoods": [
+        { "id": "apple", "count": 1 },
+        { "id": "banana", "count": 2 },
+        { "id": "rice", "count": 1 },
+        { "id": "icecream", "count": 1 },
+        { "id": "sandwich", "count": 1 },
+        { "id": "chocolatemuffin", "count": 1 }
+      ],
+      "carbRequirements": {
+        "min": 175,
+        "max": 300
+      }
+    }
   ],
   "availableInterventions": [],
-  "preOccupiedSlots": [],
-  "carbRequirements": {
-    "min": 150,
-    "max": 300
-  },
   "interventionCharges": {
     "liverBoost": 3,
     "pancreasBoost": 2

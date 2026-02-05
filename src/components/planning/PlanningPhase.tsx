@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
 import {
   DndContext,
@@ -13,6 +13,7 @@ import type { Ship, PlacedShip } from '../../core/types';
 import { slotNumberToPosition, isGlucoseShip } from '../../core/types';
 import { useGameStore } from '../../store/gameStore';
 import { loadAllShips, loadLevel } from '../../config/loader';
+import { getDayConfig } from '../../core/utils/levelUtils';
 import { PlanningHeader } from './PlanningHeader';
 import { SlotGrid, calculateValidDropSlots } from './SlotGrid';
 import { ShipInventory } from './ShipInventory';
@@ -28,6 +29,7 @@ export function PlanningPhase() {
     updateValidation,
     setPhase,
     currentLevel,
+    currentDay,
     setLevel,
     currentMood,
     updateMood,
@@ -61,9 +63,15 @@ export function PlanningPhase() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Get day-specific configuration
+  const dayConfig = useMemo(() => {
+    if (!currentLevel) return null;
+    return getDayConfig(currentLevel, currentDay);
+  }, [currentLevel, currentDay]);
+
   // Validate plan whenever placed ships change
   useEffect(() => {
-    if (!currentLevel) return;
+    if (!currentLevel || !dayConfig) return;
 
     let totalCarbs = 0;
     for (const placed of placedShips) {
@@ -73,7 +81,7 @@ export function PlanningPhase() {
       }
     }
 
-    const { min, max } = currentLevel.carbRequirements;
+    const { min, max } = dayConfig.carbRequirements;
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -92,7 +100,7 @@ export function PlanningPhase() {
       errors,
       warnings,
     });
-  }, [placedShips, allShips, currentLevel, updateValidation]);
+  }, [placedShips, allShips, currentLevel, currentDay, updateValidation]);
 
   // DnD sensors
   const sensors = useSensors(
@@ -275,7 +283,7 @@ export function PlanningPhase() {
 
           <ShipInventory
             allShips={allShips}
-            availableFoods={currentLevel.availableFoods}
+            availableFoods={dayConfig?.availableFoods || []}
             availableInterventions={currentLevel.availableInterventions}
             placedShips={placedShips}
           />

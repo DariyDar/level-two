@@ -139,19 +139,32 @@ export interface PreOccupiedSlot {
   shipId: string;
 }
 
+export interface DayConfig {
+  day: number;
+  availableFoods: AvailableFood[];
+  preOccupiedSlots?: PreOccupiedSlot[];
+  carbRequirements: {
+    min: number;
+    max: number;
+  };
+}
+
 export interface LevelConfig {
   id: string;
   name: string;
   description?: string;
   days: number;
   initialBG?: number; // Starting BG level (default 100)
-  availableFoods: AvailableFood[];
-  availableInterventions: string[];
-  preOccupiedSlots?: PreOccupiedSlot[];
-  carbRequirements: {
+  // Legacy fields (used if dayConfigs not present)
+  availableFoods?: AvailableFood[];
+  carbRequirements?: {
     min: number;
     max: number;
   };
+  // Day-specific configs (overrides legacy fields)
+  dayConfigs?: DayConfig[];
+  availableInterventions: string[];
+  preOccupiedSlots?: PreOccupiedSlot[];
   initialDegradation?: SimpleDegradation;
   interventionCharges: {
     liverBoost: number;

@@ -10,6 +10,7 @@ import type {
   MoodLevel,
   MoodEffect,
 } from '../core/types';
+import { getDayConfig } from '../core/utils/levelUtils';
 
 interface GameState {
   // Current state
@@ -84,19 +85,21 @@ export const useGameStore = create<GameState>()(
       // Actions
       setPhase: (phase) => set({ phase }),
 
-      setLevel: (level) =>
-        set({
+      setLevel: (level) => {
+        const dayConfig = getDayConfig(level, 1); // Day 1 config
+        return set({
           currentLevel: level,
           currentDay: 1,
           placedShips: [],
           planValidation: {
             ...initialValidation,
-            minCarbs: level.carbRequirements.min,
-            maxCarbs: level.carbRequirements.max,
+            minCarbs: dayConfig.carbRequirements.min,
+            maxCarbs: dayConfig.carbRequirements.max,
           },
           results: null,
           degradation: level.initialDegradation ?? initialDegradation,
-        }),
+        });
+      },
 
       placeShip: (ship) =>
         set((state) => ({
