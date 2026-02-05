@@ -127,5 +127,13 @@
         }
       ]
     }
+  },
+
+  "degradationBuffer": {
+    "description": "Degradation Buffer system for Results Phase - converts excess BG into degradation circles",
+    "maxCircles": 5,
+    "thresholdPerCircle": 100,
+    "distributionOrder": ["liver", "pancreas"],
+    "explanation": "Each 100 excess BG activates 1 circle. Circles are distributed alternately: 1st->liver, 2nd->pancreas, 3rd->liver, etc. Each circle adds +1 tier to the organ."
   }
 }

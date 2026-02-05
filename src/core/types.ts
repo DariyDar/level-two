@@ -175,11 +175,20 @@ export interface DayMetrics {
   excessBG: number;
 }
 
+export interface DegradationBuffer {
+  totalCircles: number;      // 0-5 circles activated based on excessBG
+  distribution: {
+    liver: number;            // Number of circles assigned to liver
+    pancreas: number;         // Number of circles assigned to pancreas
+  };
+}
+
 export interface DayResults {
   day: number;
   bgHistory: number[];
   metrics: DayMetrics;
   degradation: SimpleDegradation;
+  degradationBuffer: DegradationBuffer;
   rank: 1 | 2 | 3 | 4 | 5;
   message: string;
 }

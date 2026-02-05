@@ -3,7 +3,8 @@ import { useGameStore } from '../../store/gameStore';
 import { calculateDayResults } from '../../core/results';
 import { BGGraph } from './BGGraph';
 import { RankDisplay } from './RankDisplay';
-import { MetricsDisplay } from './MetricsDisplay';
+// import { MetricsDisplay } from './MetricsDisplay'; // Hidden for now - may be restored later
+import { ExcessBGIndicator } from './ExcessBGIndicator';
 import { DegradationDisplay } from './DegradationDisplay';
 import './ResultsPhase.css';
 
@@ -63,7 +64,9 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
         }}
       />
 
-      <MetricsDisplay metrics={results.metrics} />
+      <ExcessBGIndicator totalCircles={results.degradationBuffer.totalCircles} />
+
+      {/* <MetricsDisplay metrics={results.metrics} /> */}
 
       <DegradationDisplay
         currentDegradation={degradation}

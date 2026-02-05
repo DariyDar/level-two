@@ -1,0 +1,55 @@
+.excess-bg-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.excess-bg-indicator__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.excess-bg-indicator__circles {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.excess-bg-indicator__circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.excess-bg-indicator__circle--active {
+  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+  border-color: #ff6b9d;
+  box-shadow: 0 0 12px rgba(255, 107, 157, 0.4);
+  animation: pulse-circle 2s ease-in-out infinite;
+}
+
+.excess-bg-indicator__circle--inactive {
+  background: #2d3748;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes pulse-circle {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}

@@ -1,4 +1,4 @@
-import type { DayMetrics, DayResults, SimpleDegradation } from '../types';
+import type { DayMetrics, DayResults, SimpleDegradation, DegradationBuffer } from '../types';
 
 interface ResultsConfig {
   bgLow: number;
@@ -167,6 +167,42 @@ export function getRankMessage(rank: 1 | 2 | 3 | 4 | 5): string {
   return messages[rank];
 }
 
+/**
+ * Calculate Degradation Buffer from excess BG
+ * @param excessBG - Total excess BG over threshold (200)
+ * @param thresholdPerCircle - How much excessBG needed for one circle (default: 100)
+ * @param maxCircles - Maximum number of circles (default: 5)
+ * @returns Number of activated circles (0-5)
+ */
+export function calculateDegradationBuffer(
+  excessBG: number,
+  thresholdPerCircle: number = 100,
+  maxCircles: number = 5
+): number {
+  const circles = Math.floor(excessBG / thresholdPerCircle);
+  return Math.min(circles, maxCircles);
+}
+
+/**
+ * Distribute degradation circles to organs based on order
+ * @param circles - Total number of circles to distribute
+ * @param order - Distribution order (e.g., ['liver', 'pancreas'])
+ * @returns Distribution object with circles per organ
+ */
+export function distributeDegradationCircles(
+  circles: number,
+  order: ('liver' | 'pancreas')[] = ['liver', 'pancreas']
+): { liver: number; pancreas: number } {
+  const distribution = { liver: 0, pancreas: 0 };
+
+  for (let i = 0; i < circles; i++) {
+    const organ = order[i % order.length];
+    distribution[organ]++;
+  }
+
+  return distribution;
+}
+
 export function calculateDayResults(
   day: number,
   bgHistory: number[],
@@ -177,11 +213,21 @@ export function calculateDayResults(
   const rank = calculateRank(metrics);
   const message = getRankMessage(rank);
 
+  // New Degradation Buffer system
+  const totalCircles = calculateDegradationBuffer(metrics.excessBG);
+  const distribution = distributeDegradationCircles(totalCircles);
+
+  const degradationBuffer: DegradationBuffer = {
+    totalCircles,
+    distribution,
+  };
+
   return {
     day,
     bgHistory,
     metrics,
     degradation,
+    degradationBuffer,
     rank,
     message,
   };
