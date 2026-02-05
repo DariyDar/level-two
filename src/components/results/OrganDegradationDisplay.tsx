@@ -12,7 +12,7 @@ interface OrganDegradationDisplayProps {
 interface OrganConfig {
   name: string;
   label: string;
-  icon: string;
+  iconPath: string;
   maxTier: number;
 }
 
@@ -20,13 +20,13 @@ const ORGANS: Record<'liver' | 'pancreas', OrganConfig> = {
   liver: {
     name: 'liver',
     label: 'Liver',
-    icon: '🫀', // Will be replaced with actual icon path
+    iconPath: '/assets/organs/liver_icon.png',
     maxTier: 5,
   },
   pancreas: {
     name: 'pancreas',
     label: 'Pancreas',
-    icon: '🥞',
+    iconPath: '/assets/organs/pancreas_icon.png',
     maxTier: 4,
   },
 };
@@ -77,9 +77,11 @@ export function OrganDegradationDisplay({
           return (
             <div key={organKey} className="organ-degradation-display__organ">
               <div className="organ-degradation-display__organ-icon">
-                <span className="organ-degradation-display__icon">
-                  {organ.icon}
-                </span>
+                <img
+                  src={organ.iconPath}
+                  alt={organ.label}
+                  className="organ-degradation-display__icon"
+                />
                 <div className="organ-degradation-display__label">
                   {organ.label}
                 </div>

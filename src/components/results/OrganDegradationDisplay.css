@@ -42,8 +42,9 @@
 }
 
 .organ-degradation-display__icon {
-  font-size: 48px;
-  line-height: 1;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
 }
 
 .organ-degradation-display__label {
