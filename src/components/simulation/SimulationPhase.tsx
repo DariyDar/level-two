@@ -211,6 +211,7 @@ export function SimulationPhase() {
           speed={speed}
           isPaused={isPaused}
           dissolveProgress={interpolated.dissolveProgress}
+          hasFiberInSegment={hasFiberInCurrentSegment}
         />
 
         {/* Fiber Indicator */}

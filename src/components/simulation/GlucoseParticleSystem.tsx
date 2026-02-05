@@ -29,6 +29,7 @@ interface GlucoseParticleSystemProps {
   speed: number;
   isPaused: boolean;
   dissolveProgress: number;
+  hasFiberInSegment: boolean; // Whether current segment has any ships with fiber
 }
 
 // Glucose per particle (sugar cube representation: 15g carbs = 1 cube)
@@ -144,6 +145,7 @@ export function GlucoseParticleSystem({
   speed,
   isPaused,
   dissolveProgress,
+  hasFiberInSegment,
 }: GlucoseParticleSystemProps) {
   const [particles, setParticles] = useState<Particle[]>([]);
   const nextIdRef = useRef(0);
@@ -247,11 +249,11 @@ export function GlucoseParticleSystem({
           return 1000 / (rate * rates.speed * VISUAL_MULTIPLIER);
         };
 
-        // Ship → Liver
+        // Ship → Liver (with fiber slowdown if segment has fiber)
         if (rates.shipUnloading > 0) {
           const interval = getSpawnInterval(rates.shipUnloading);
           while (timestamp - spawnTimes.shipLiver >= interval) {
-            updated.push(spawnParticle('ship-liver', rates.dissolveProgress));
+            updated.push(spawnParticle('ship-liver', rates.dissolveProgress, hasFiberInSegment));
             spawnTimes.shipLiver += interval;
           }
         }
@@ -325,7 +327,7 @@ export function GlucoseParticleSystem({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isPaused, spawnParticle]);
+  }, [isPaused, spawnParticle, hasFiberInSegment]);
 
   return (
     <div className="glucose-particles">

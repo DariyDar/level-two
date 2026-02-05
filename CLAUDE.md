@@ -142,10 +142,12 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - Partial cubes show remainder amount (<15g) as label
   - Fiber particles: green-tinted cubes with 30% slower speed (0.7x)
   - Performance: ~20x fewer particles than dot system
-- Fiber Indicator (v0.8.1) ✅
-  - Shows 🌿 "Glucose Income Slowed" when fiber is active
+- Fiber System (v0.8.1 / v0.12.0) ✅
+  - Fiber Indicator: Shows 🌿 "Glucose Income Slowed" when fiber is active
   - Pulsing animation (opacity 50%→100% over 2s)
   - Appears for entire segment if any food with fiber is present
+  - Segment-wide effect: if any ship in segment has fiber, ALL ships in that segment move glucose slower (0.7x speed)
+  - Only affects ship→liver flow, not other glucose flows
   - Positioned bottom-right of simulation view
 - Mood System (v0.9.0) ✅
   - MoodLevel: 1-5 scale (1=worst, 5=best)
@@ -168,4 +170,3 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - Metformin degradation blocking: Not implemented
 - Pipe connections: Visual connections between organs not yet implemented
 - Negative Events: Console logging only (actual event implementation pending)
-- Fiber particles: Currently spawn with hasFiber=false (integration with actual ship data pending)
