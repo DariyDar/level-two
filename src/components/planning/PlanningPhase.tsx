@@ -49,9 +49,11 @@ export function PlanningPhase() {
         const ships = await loadAllShips();
         setAllShips(ships);
 
-        // Always load level to get fresh config
-        const level = await loadLevel('level-01');
-        setLevel(level);
+        // Only load level if not already loaded (to preserve currentDay)
+        if (!currentLevel) {
+          const level = await loadLevel('level-01');
+          setLevel(level);
+        }
 
         setIsLoading(false);
       } catch (error) {
@@ -100,7 +102,7 @@ export function PlanningPhase() {
       errors,
       warnings,
     });
-  }, [placedShips, allShips, currentLevel, currentDay, updateValidation]);
+  }, [placedShips, allShips, currentLevel, dayConfig, updateValidation]);
 
   // DnD sensors
   const sensors = useSensors(
