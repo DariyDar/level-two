@@ -56,6 +56,7 @@
       "glucose": 200,
       "carbs": 20,
       "fiber": true,
+      "mood": -1,
       "description": "Fresh and healthy, high fiber."
     },
     {
@@ -93,6 +94,7 @@
       "size": "L",
       "glucose": 500,
       "carbs": 50,
+      "mood": -1,
       "description": "Staple food, reliable energy."
     },
     {
@@ -111,6 +113,7 @@
       "size": "L",
       "glucose": 350,
       "carbs": 35,
+      "mood": -1,
       "description": "Slow release, gentle on system."
     },
     {
