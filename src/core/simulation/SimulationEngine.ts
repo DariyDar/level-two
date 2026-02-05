@@ -290,8 +290,8 @@ export class SimulationEngine {
     // 5. Process muscles drain (BG → utilization)
     this.processMuscleDrain(substepFraction);
 
-    // 6. Process degradation accumulation
-    this.processDegradationAccumulation(substepFraction);
+    // 6. Degradation accumulation disabled - now handled in Results Phase
+    // this.processDegradationAccumulation(substepFraction);
 
     // === SUBSTEP ADVANCEMENT ===
     this.state.currentSubstep++;
@@ -300,8 +300,8 @@ export class SimulationEngine {
     if (this.state.currentSubstep >= this.config.substepsPerHour) {
       this.state.currentSubstep = 0;
 
-      // 7. Update degradation tiers (hour boundary)
-      this.updateDegradationTiers();
+      // 7. Degradation tier updates disabled - tiers stay constant during simulation
+      // this.updateDegradationTiers();
 
       // 8. Update boost cooldowns (hour boundary)
       this.updateBoostCooldowns();
@@ -536,79 +536,6 @@ export class SimulationEngine {
 
     // Drain from BG (proportional to substep fraction)
     this.state.containers.bg = Math.max(0, this.state.containers.bg - drainRate * substepFraction);
-  }
-
-  /**
-   * Process degradation accumulation
-   * Called every substep to accumulate degradation in buffers
-   */
-  private processDegradationAccumulation(substepFraction: number): void {
-    const bg = this.state.containers.bg;
-
-    // Liver degradation: accumulates from BG excess (> 180)
-    if (bg > 180) {
-      const liverAccumulation = (bg - 180) * 0.1 * substepFraction;
-      this.state.degradationBuffer.liver = Math.min(
-        999,
-        this.state.degradationBuffer.liver + liverAccumulation
-      );
-    }
-
-    // Pancreas degradation: accumulates from high BG (> 200) or hypoglycemia (< 70)
-    if (bg > 200) {
-      const pancreasAccumulation = (bg - 200) * 0.05 * substepFraction;
-      this.state.degradationBuffer.pancreas = Math.min(
-        999,
-        this.state.degradationBuffer.pancreas + pancreasAccumulation
-      );
-    } else if (bg < 70) {
-      const pancreasAccumulation = (70 - bg) * 0.1 * substepFraction;
-      this.state.degradationBuffer.pancreas = Math.min(
-        999,
-        this.state.degradationBuffer.pancreas + pancreasAccumulation
-      );
-    }
-  }
-
-  /**
-   * Update degradation tiers from buffers
-   * Called at hour boundaries to recalculate tiers and effects
-   */
-  private updateDegradationTiers(): void {
-    const liverConfig = degradationConfig.organs.liver;
-    const pancreasConfig = degradationConfig.organs.pancreas;
-
-    // Calculate liver tier from buffer
-    const liverBuffer = this.state.degradationBuffer.liver;
-    const liverTierIndex = liverConfig.tierThresholds.findIndex(
-      (t) => liverBuffer >= t.bufferMin && liverBuffer <= t.bufferMax
-    );
-    const liverTier = liverTierIndex >= 0 ? liverTierIndex : 0;
-    const liverTierEffect = liverConfig.tierEffects[liverTier];
-
-    // Calculate pancreas tier from buffer
-    const pancreasBuffer = this.state.degradationBuffer.pancreas;
-    const pancreasTierIndex = pancreasConfig.tierThresholds.findIndex(
-      (t) => pancreasBuffer >= t.bufferMin && t.bufferMax >= pancreasBuffer
-    );
-    const pancreasTier = pancreasTierIndex >= 0 ? pancreasTierIndex : 0;
-    const pancreasTierEffect = pancreasConfig.tierEffects[pancreasTier];
-
-    // Update degradation state with new tiers and effects
-    this.state.degradation = {
-      liver: {
-        tier: liverTier,
-        tierEffects: {
-          capacityReduction: liverTierEffect?.capacityReduction ?? 0,
-        },
-      },
-      pancreas: {
-        tier: pancreasTier,
-        tierEffects: {
-          maxTierReduction: pancreasTierEffect?.maxTierReduction ?? 0,
-        },
-      },
-    };
   }
 
   private updateBoostCooldowns(): void {

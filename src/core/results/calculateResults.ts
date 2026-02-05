@@ -203,19 +203,39 @@ export function distributeDegradationCircles(
   return distribution;
 }
 
+/**
+ * Convert degradation circles to points
+ * Each circle represents +1 tier increment for the organ
+ * @param distribution - Number of circles assigned to each organ
+ * @returns Points to add to each organ's degradation
+ */
+export function convertCirclesToPoints(distribution: {
+  liver: number;
+  pancreas: number;
+}): SimpleDegradation {
+  // Points per tier increment (based on tier threshold ranges in degradationConfig.json)
+  const LIVER_POINTS_PER_TIER = 20; // Tier thresholds: 0-19, 20-39, 40-59, etc.
+  const PANCREAS_POINTS_PER_TIER = 25; // Tier thresholds: 0-24, 25-49, 50-74, etc.
+
+  return {
+    liver: distribution.liver * LIVER_POINTS_PER_TIER,
+    pancreas: distribution.pancreas * PANCREAS_POINTS_PER_TIER,
+  };
+}
+
 export function calculateDayResults(
   day: number,
   bgHistory: number[],
   config: Partial<ResultsConfig> = {}
 ): DayResults {
   const metrics = calculateMetrics(bgHistory, config);
-  const degradation = calculateDegradation(bgHistory, config);
   const rank = calculateRank(metrics);
   const message = getRankMessage(rank);
 
-  // New Degradation Buffer system
+  // New Degradation Buffer system - replaces old calculateDegradation()
   const totalCircles = calculateDegradationBuffer(metrics.excessBG);
   const distribution = distributeDegradationCircles(totalCircles);
+  const degradation = convertCirclesToPoints(distribution);
 
   const degradationBuffer: DegradationBuffer = {
     totalCircles,
