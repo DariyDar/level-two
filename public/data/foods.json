@@ -113,6 +113,7 @@
       "size": "L",
       "glucose": 350,
       "carbs": 35,
+      "fiber": true,
       "mood": -1,
       "description": "Slow release, gentle on system."
     },
