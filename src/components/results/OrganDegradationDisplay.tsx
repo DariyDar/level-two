@@ -72,7 +72,7 @@ export function OrganDegradationDisplay({
         {(['liver', 'pancreas'] as const).map((organKey) => {
           const organ = ORGANS[organKey];
           const currentTier = animatedTiers[organKey];
-          const maxCircles = organ.maxTier + 1; // tier 0-5 = 6 circles, tier 0-4 = 5 circles
+          const maxCircles = organ.maxTier; // Liver: 5 circles (tier 0-5), Pancreas: 4 circles (tier 0-4)
 
           return (
             <div key={organKey} className="organ-degradation-display__organ">
