@@ -201,6 +201,7 @@ export const useGameStore = create<GameState>()(
     }),
     {
       name: 'port-management-save',
+      version: 1, // Increment to reset saved state
       partialize: (state) => ({
         degradation: state.degradation,
         currentDay: state.currentDay,
