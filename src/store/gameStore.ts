@@ -98,6 +98,7 @@ export const useGameStore = create<GameState>()(
           },
           results: null,
           degradation: level.initialDegradation ?? initialDegradation,
+          currentMood: 3, // Reset mood to neutral when starting a level
         });
       },
 
