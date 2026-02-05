@@ -70,7 +70,17 @@ export function calculateMetrics(
 
     if (bg > bgHigh) {
       aboveHigh++;
-      excessBG += bg - bgHigh;
+
+      // Progressive degradation: higher zones are more dangerous
+      if (bg <= bgCritical) {
+        // Zone 1: High (200-300) - coefficient 0.5
+        excessBG += (bg - bgHigh) * 0.5;
+      } else {
+        // Zone 1: High (200-300) - coefficient 0.5
+        excessBG += (bgCritical - bgHigh) * 0.5;
+        // Zone 2: Critical (300+) - coefficient 1.0
+        excessBG += (bg - bgCritical) * 1.0;
+      }
     }
 
     if (bg > bgCritical) {
@@ -169,7 +179,7 @@ export function getRankMessage(rank: 1 | 2 | 3 | 4 | 5): string {
 
 /**
  * Calculate Degradation Buffer from excess BG
- * @param excessBG - Total excess BG over threshold (200)
+ * @param excessBG - Total weighted excess BG (progressive zones: 200-300 × 0.5, 300+ × 1.0)
  * @param thresholdPerCircle - How much excessBG needed for one circle (default: 100)
  * @param maxCircles - Maximum number of circles (default: 5)
  * @returns Number of activated circles (0-5)
