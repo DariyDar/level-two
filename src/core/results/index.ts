@@ -4,4 +4,5 @@ export {
   calculateRank,
   getRankMessage,
   calculateDayResults,
+  convertPointsToTier,
 } from './calculateResults';

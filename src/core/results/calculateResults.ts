@@ -223,6 +223,34 @@ export function convertCirclesToPoints(distribution: {
   };
 }
 
+/**
+ * Convert degradation points to tier
+ * @param points - Degradation points for the organ
+ * @param organ - Organ type ('liver' or 'pancreas')
+ * @returns Tier level (0-5 for liver, 0-4 for pancreas)
+ */
+export function convertPointsToTier(
+  points: number,
+  organ: 'liver' | 'pancreas'
+): number {
+  if (organ === 'liver') {
+    // Liver: 0-19=tier0, 20-39=tier1, 40-59=tier2, 60-79=tier3, 80-99=tier4, 100+=tier5
+    if (points < 20) return 0;
+    if (points < 40) return 1;
+    if (points < 60) return 2;
+    if (points < 80) return 3;
+    if (points < 100) return 4;
+    return 5;
+  } else {
+    // Pancreas: 0-24=tier0, 25-49=tier1, 50-74=tier2, 75-99=tier3, 100+=tier4
+    if (points < 25) return 0;
+    if (points < 50) return 1;
+    if (points < 75) return 2;
+    if (points < 100) return 3;
+    return 4;
+  }
+}
+
 export function calculateDayResults(
   day: number,
   bgHistory: number[],

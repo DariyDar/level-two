@@ -5,7 +5,7 @@ import { BGGraph } from './BGGraph';
 import { RankDisplay } from './RankDisplay';
 // import { MetricsDisplay } from './MetricsDisplay'; // Hidden for now - may be restored later
 import { ExcessBGIndicator } from './ExcessBGIndicator';
-import { DegradationDisplay } from './DegradationDisplay';
+import { OrganDegradationDisplay } from './OrganDegradationDisplay';
 import './ResultsPhase.css';
 
 // Mock BG history for testing - in real app this comes from simulation
@@ -68,9 +68,10 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
 
       {/* <MetricsDisplay metrics={results.metrics} /> */}
 
-      <DegradationDisplay
+      <OrganDegradationDisplay
         currentDegradation={degradation}
         addedDegradation={results.degradation}
+        animationDelay={2500}
       />
 
       <div className="results-phase__actions">

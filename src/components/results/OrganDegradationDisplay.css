@@ -1,0 +1,92 @@
+.organ-degradation-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.organ-degradation-display__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.organ-degradation-display__organs {
+  display: flex;
+  gap: 48px;
+  align-items: flex-start;
+}
+
+.organ-degradation-display__organ {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.organ-degradation-display__organ-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: #4a5568;
+  border-radius: 12px;
+  min-width: 100px;
+}
+
+.organ-degradation-display__icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.organ-degradation-display__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: capitalize;
+}
+
+.organ-degradation-display__circles {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.organ-degradation-display__circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  transition: all 0.5s ease;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.organ-degradation-display__circle--healthy {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  border-color: #48bb78;
+  box-shadow: 0 0 8px rgba(72, 187, 120, 0.3);
+}
+
+.organ-degradation-display__circle--degraded {
+  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+  border-color: #ff6b9d;
+  box-shadow: 0 0 8px rgba(255, 107, 157, 0.3);
+  animation: pulse-degraded 2s ease-in-out infinite;
+}
+
+@keyframes pulse-degraded {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
