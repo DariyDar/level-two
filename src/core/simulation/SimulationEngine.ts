@@ -486,13 +486,13 @@ export class SimulationEngine {
     let transferRate = result.finalRate;
 
     // Overflow pass-through mode:
-    // If liver is ≥90% full and a ship is unloading, match output to input rate
+    // If liver is ≥95% full and a ship is unloading, match output to input rate
     // This "pushes out" glucose at the same rate it comes in
     // Note: Liver Boost takes priority (uses its own Tier 2 rate)
     const liverFillPercent = effectiveLiverCapacity > 0
       ? this.state.containers.liver / effectiveLiverCapacity
       : 0;
-    const isOverflow = liverFillPercent >= 0.9;
+    const isOverflow = liverFillPercent >= 0.95;
     const shipUnloadRate = this.state.unloadingShip?.loadPerTick ?? 0;
 
     if (isOverflow && shipUnloadRate > 0 && !this.state.liverBoost.isActive) {

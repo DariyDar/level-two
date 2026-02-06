@@ -19,25 +19,9 @@
         }
       },
       {
-        "id": "liver_overflow",
-        "description": "Emergency dump when liver is nearly full",
-        "priority": 2,
-        "condition": {
-          "type": "container",
-          "container": "liver",
-          "operator": ">=",
-          "value": 0.9,
-          "relative": "capacity"
-        },
-        "action": {
-          "type": "setTier",
-          "tier": 2
-        }
-      },
-      {
         "id": "bg_high_stop",
         "description": "Stop release when blood glucose is high",
-        "priority": 3,
+        "priority": 2,
         "condition": {
           "type": "container",
           "container": "bg",
@@ -52,7 +36,7 @@
       {
         "id": "bg_low_release",
         "description": "Release glucose when blood glucose is low",
-        "priority": 4,
+        "priority": 3,
         "condition": {
           "type": "container",
           "container": "bg",
@@ -67,7 +51,7 @@
       {
         "id": "default_normal",
         "description": "Default: normal release rate",
-        "priority": 5,
+        "priority": 4,
         "condition": {
           "type": "default"
         },
