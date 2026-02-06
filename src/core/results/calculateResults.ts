@@ -223,42 +223,33 @@ export function convertCirclesToPoints(distribution: {
   liver: number;
   pancreas: number;
 }): SimpleDegradation {
-  // Points per tier increment (based on tier threshold ranges in degradationConfig.json)
-  const LIVER_POINTS_PER_TIER = 20; // Tier thresholds: 0-19, 20-39, 40-59, etc.
-  const PANCREAS_POINTS_PER_TIER = 25; // Tier thresholds: 0-24, 25-49, 50-74, etc.
+  // Points per tier increment (unified for both organs)
+  // Tier thresholds: 0-24=tier1, 25-49=tier2, 50-74=tier3, 75-99=tier4, 100+=tier5
+  const POINTS_PER_TIER = 25;
 
   return {
-    liver: distribution.liver * LIVER_POINTS_PER_TIER,
-    pancreas: distribution.pancreas * PANCREAS_POINTS_PER_TIER,
+    liver: distribution.liver * POINTS_PER_TIER,
+    pancreas: distribution.pancreas * POINTS_PER_TIER,
   };
 }
 
 /**
  * Convert degradation points to tier
  * @param points - Degradation points for the organ
- * @param organ - Organ type ('liver' or 'pancreas')
- * @returns Tier level (0-5 for liver, 0-4 for pancreas)
+ * @param _organ - Organ type (unified: both use same thresholds)
+ * @returns Tier level (1-5, where 1 is healthy/non-burnable)
  */
 export function convertPointsToTier(
   points: number,
-  organ: 'liver' | 'pancreas'
+  _organ: 'liver' | 'pancreas'
 ): number {
-  if (organ === 'liver') {
-    // Liver: 0-19=tier0, 20-39=tier1, 40-59=tier2, 60-79=tier3, 80-99=tier4, 100+=tier5
-    if (points < 20) return 0;
-    if (points < 40) return 1;
-    if (points < 60) return 2;
-    if (points < 80) return 3;
-    if (points < 100) return 4;
-    return 5;
-  } else {
-    // Pancreas: 0-24=tier0, 25-49=tier1, 50-74=tier2, 75-99=tier3, 100+=tier4
-    if (points < 25) return 0;
-    if (points < 50) return 1;
-    if (points < 75) return 2;
-    if (points < 100) return 3;
-    return 4;
-  }
+  // Unified tiers for both organs:
+  // 0-24=tier1 (healthy), 25-49=tier2, 50-74=tier3, 75-99=tier4, 100+=tier5
+  if (points < 25) return 1;
+  if (points < 50) return 2;
+  if (points < 75) return 3;
+  if (points < 100) return 4;
+  return 5;
 }
 
 export function calculateDayResults(

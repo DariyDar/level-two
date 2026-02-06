@@ -138,7 +138,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           isActive={displayLiverRate > 0}
           degradation={{
             tier: degradation.liver.tier,
-            maxTier: 5
+            maxTier: 4
           }}
           size="normal"
         />

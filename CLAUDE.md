@@ -107,17 +107,17 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - Carbs vs Glucose separation ✅
   - Ships display carbs (grams) on UI
   - Simulation uses glucose (mg/dL)
-- Tier-based Degradation System ✅
-  - Degradation Buffer: accumulates degradation points
-  - Degradation Tiers: 6 tiers for liver (0-5), 5 tiers for pancreas (0-4)
+- Tier-based Degradation System (v0.14.0) ✅
+  - Unified tiers 1-5 for both organs (tier 1 = healthy/non-burnable)
+  - Points per tier: 25 (unified for both organs)
   - Tier Effects:
-    - Liver: capacity reduction (100→80→70→60→50→40)
-    - Pancreas: max muscle tier reduction
+    - Liver: capacity reduction (150→130→120→110→100)
+    - Pancreas: max muscle tier reduction (5→4→3→2→1)
   - Configuration-driven tier thresholds and effects (`degradationConfig.json`)
   - Real-time tier calculation and effect application
 - Visual Indicators ✅
   - Degradation circles: green (healthy) to pink (degraded)
-    - Liver: 5 circles, Pancreas: 4 circles
+    - Both organs: 4 circles (tiers 2-5, tier 1 is non-burnable)
   - Muscle tier circles: orange circles above muscle icon (0-5 tiers)
   - Tier calculation: `getMuscleTierFromRate()` utility function
 - Organ UI System ✅

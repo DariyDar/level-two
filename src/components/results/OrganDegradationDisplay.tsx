@@ -21,13 +21,13 @@ const ORGANS: Record<'liver' | 'pancreas', OrganConfig> = {
     name: 'liver',
     label: 'Liver',
     iconPath: '/assets/organs/liver_icon.png',
-    maxTier: 5,
+    maxTier: 4, // 4 burnable tiers (2-5), tier 1 is non-burnable
   },
   pancreas: {
     name: 'pancreas',
     label: 'Pancreas',
     iconPath: '/assets/organs/pancreas_icon.png',
-    maxTier: 4,
+    maxTier: 4, // 4 burnable tiers (2-5), tier 1 is non-burnable
   },
 };
 
@@ -72,7 +72,9 @@ export function OrganDegradationDisplay({
         {(['liver', 'pancreas'] as const).map((organKey) => {
           const organ = ORGANS[organKey];
           const currentTier = animatedTiers[organKey];
-          const maxCircles = organ.maxTier; // Liver: 5 circles (tier 0-5), Pancreas: 4 circles (tier 0-4)
+          const maxCircles = organ.maxTier; // 4 circles for burnable tiers (2-5)
+          // Tier 1 = healthy (non-burnable), tiers 2-5 = burnable (shown as circles)
+          const degradedCircles = currentTier - 1; // tier 1 = 0 degraded, tier 5 = 4 degraded
 
           return (
             <div key={organKey} className="organ-degradation-display__organ">
@@ -89,7 +91,7 @@ export function OrganDegradationDisplay({
 
               <div className="organ-degradation-display__circles">
                 {Array.from({ length: maxCircles }, (_, i) => {
-                  const isDegraded = i >= maxCircles - currentTier;
+                  const isDegraded = i >= maxCircles - degradedCircles;
                   return (
                     <div
                       key={i}

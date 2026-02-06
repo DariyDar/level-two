@@ -144,34 +144,43 @@ const DEFAULT_CONFIG: SimulationConfig = {
 
 /**
  * Convert SimpleDegradation (buffer values) to DegradationState (tier-based)
+ * Tiers are now 1-5 for both organs (1 = healthy/non-burnable)
  */
 function convertToDegradationState(simple: SimpleDegradation): DegradationState {
   const liverConfig = degradationConfig.organs.liver;
   const pancreasConfig = degradationConfig.organs.pancreas;
 
-  // Calculate liver tier from buffer
-  const liverTier = liverConfig.tierThresholds.findIndex(
-    (t) => simple.liver >= t.bufferMin && simple.liver <= t.bufferMax
+  // Calculate liver tier from buffer (tiers 1-5, where 1 is healthy)
+  const liverThreshold = liverConfig.tierThresholds.find(
+    (t: { bufferMin: number; bufferMax: number }) =>
+      simple.liver >= t.bufferMin && simple.liver <= t.bufferMax
   );
-  const liverTierEffect = liverConfig.tierEffects[liverTier >= 0 ? liverTier : 0];
+  const liverTier = (liverThreshold as { tier: number })?.tier ?? 1;
+  const liverTierEffect = liverConfig.tierEffects.find(
+    (e: { tier: number }) => e.tier === liverTier
+  );
 
-  // Calculate pancreas tier from buffer
-  const pancreasTier = pancreasConfig.tierThresholds.findIndex(
-    (t) => simple.pancreas >= t.bufferMin && simple.pancreas <= t.bufferMax
+  // Calculate pancreas tier from buffer (tiers 1-5, where 1 is healthy)
+  const pancreasThreshold = pancreasConfig.tierThresholds.find(
+    (t: { bufferMin: number; bufferMax: number }) =>
+      simple.pancreas >= t.bufferMin && simple.pancreas <= t.bufferMax
   );
-  const pancreasTierEffect = pancreasConfig.tierEffects[pancreasTier >= 0 ? pancreasTier : 0];
+  const pancreasTier = (pancreasThreshold as { tier: number })?.tier ?? 1;
+  const pancreasTierEffect = pancreasConfig.tierEffects.find(
+    (e: { tier: number }) => e.tier === pancreasTier
+  );
 
   return {
     liver: {
-      tier: liverTier >= 0 ? liverTier : 0,
+      tier: liverTier,
       tierEffects: {
-        capacityReduction: liverTierEffect?.capacityReduction ?? 0,
+        capacityReduction: (liverTierEffect as { capacityReduction?: number })?.capacityReduction ?? 0,
       },
     },
     pancreas: {
-      tier: pancreasTier >= 0 ? pancreasTier : 0,
+      tier: pancreasTier,
       tierEffects: {
-        maxTierReduction: pancreasTierEffect?.maxTierReduction ?? 0,
+        maxTierReduction: (pancreasTierEffect as { maxTierReduction?: number })?.maxTierReduction ?? 0,
       },
     },
   };

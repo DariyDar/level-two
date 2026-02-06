@@ -1,6 +1,12 @@
 # Organ Parameters and Rules
 # Generated: 2026-02-06
-# Version: v0.13.4
+# Version: v0.14.0
+
+## UNIFIED DEGRADATION SYSTEM
+# Both organs now use the same tier system: tiers 1-5
+# Tier 1 = healthy (non-burnable base level)
+# Tiers 2-5 = burnable (shown as 4 circles)
+# Points per tier: 25 (unified for both organs)
 
 ## LIVER (Печень)
 Parameter,Value,Unit,Description
@@ -20,13 +26,12 @@ Priority,Rule ID,Condition,Action (Tier),Rate (mg/dL/h),Description
 *,pass_through,Liver >= 95% AND ship unloading,= ship rate,variable,Glucose pushed out at input rate
 
 ## LIVER DEGRADATION (Деградация печени)
-Tier,Points Required,Capacity Reduction,Effective Capacity
-0,0-19,0,150
-1,20-39,20,130
-2,40-59,30,120
-3,60-79,40,110
-4,80-99,50,100
-5,100+,60,90
+Tier,Points Required,Capacity Reduction,Effective Capacity,Circles Shown
+1 (healthy),0-24,0,150,0 (non-burnable)
+2,25-49,20,130,1
+3,50-74,30,120,2
+4,75-99,40,110,3
+5,100+,50,100,4
 
 ## PANCREAS (Поджелудочная железа)
 Parameter,Value,Unit,Description
@@ -45,12 +50,12 @@ Modifier ID,Condition,Effect,Description
 pancreas_boost,Pancreas Boost active,+1 tier,Manual boost increases muscle tier
 
 ## PANCREAS DEGRADATION (Деградация ПЖ)
-Tier,Points Required,Max Muscle Tier Reduction,Effective Max Muscle Tier
-0,0-24,0,5
-1,25-49,1,4
-2,50-74,2,3
-3,75-99,3,2
-4,100+,4,1
+Tier,Points Required,Max Muscle Tier Reduction,Effective Max Muscle Tier,Circles Shown
+1 (healthy),0-24,0,5,0 (non-burnable)
+2,25-49,1,4,1
+3,50-74,2,3,2
+4,75-99,3,2,3
+5,100+,4,1,4
 
 ## MUSCLES (Мышцы)
 Parameter,Value,Unit,Description
@@ -74,7 +79,7 @@ Step,Description
 1,Get base tier from Pancreas rules (0 or 3)
 2,Apply Pancreas Boost modifier (+1 if active)
 3,Apply Exercise modifier (+1 if exerciseEffect > 50)
-4,Apply Degradation penalty (-1 if pancreas degradation > 0)
+4,Apply Degradation penalty (-1 if pancreas degradation > tier 1)
 5,Clamp to [minTier ... maxTier - pancreasDegradation.maxTierReduction]
 6,Look up drain rate from muscleDrainRates[tier]
 
@@ -91,6 +96,14 @@ Zone,BG Range,Coefficient,Description
 Normal,0-200,0,No degradation accumulation
 High,200-300,0.5,Moderate degradation rate
 Critical,300+,1.0,Full degradation rate (2x high zone)
+
+## DEGRADATION POINTS TO TIER (Unified for both organs)
+Points,Tier,Description
+0-24,1,Healthy (non-burnable base level)
+25-49,2,Light degradation (1 circle)
+50-74,3,Moderate degradation (2 circles)
+75-99,4,Severe degradation (3 circles)
+100+,5,Maximum degradation (4 circles)
 
 ## BOOSTS CONFIGURATION
 Boost,Cooldown,Duration,Charges (default),Effect
