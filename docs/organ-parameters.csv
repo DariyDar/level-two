@@ -1,6 +1,6 @@
 # Organ Parameters and Rules
 # Generated: 2026-02-06
-# Version: v0.15.2
+# Version: v0.15.3
 
 ## DISABLED FEATURES (Отключенные функции)
 # These features are preserved in code but disabled in UI
@@ -56,8 +56,8 @@ fastInsulinTierBonus,1,tier,Tier bonus when Fast Insulin active
 Priority,Rule ID,Condition,Pancreas Tier,Description
 1,bg_very_high_reaction,BG >= 200,5,Very high BG - maximum insulin at Tier 5
 2,bg_high_reaction,BG >= 150,4,High BG - strong insulin at Tier 4
-3,bg_low_reaction,BG <= 70,0,Low BG - disable insulin (prevent hypoglycemia)
-4,default_basal,Default (BG 70-150),1,Normal BG - basal insulin at Tier 1
+3,bg_low_reaction,BG <= 80,0,Low BG - disable insulin (prevent hypoglycemia)
+4,default_basal,Default (BG 80-150),1,Normal BG - basal insulin at Tier 1
 
 ## PANCREAS MODIFIERS
 Modifier ID,Condition,Effect,Description,Ignores Degradation
@@ -104,7 +104,7 @@ Step,Description
 
 ## BG THRESHOLDS (Пороги глюкозы крови)
 Threshold,Value,Unit,Description,Color
-low,70,mg/dL,Hypoglycemia warning,Yellow
+low,80,mg/dL,Hypoglycemia / Insulin off threshold,Yellow
 target,100,mg/dL,Optimal level,Green
 pancreas_activate,150,mg/dL,Pancreas starts strong insulin (Tier 4),Orange
 high,200,mg/dL,Liver stops / Pancreas max (Tier 5),Orange

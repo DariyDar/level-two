@@ -96,7 +96,7 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - `levels/*.json` — level configurations
 - `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.15.2)
+### Current State (v0.15.3)
 - Planning phase: drag-and-drop ships to time slots ✅
 - Simulation phase: glucose flow visualization with particles ✅
 - Results phase: basic BG history graph ✅
@@ -109,8 +109,8 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - **Pancreas Tier System (v0.15.0)** ✅
   - Pancreas has its own "insulin secretion" tier
   - BG thresholds trigger pancreas tiers:
-    - BG ≤70: Tier 0 (no insulin)
-    - BG 70-150: Tier 1 (basal insulin)
+    - BG ≤80: Tier 0 (no insulin)
+    - BG 80-150: Tier 1 (basal insulin)
     - BG ≥150: Tier 4 (strong insulin)
     - BG ≥200: Tier 5 (maximum insulin)
   - Pancreas tier determines base muscle tier
