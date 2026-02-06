@@ -29,7 +29,7 @@ export function SimulationPhase() {
   const [allShips, setAllShips] = useState<Ship[]>([]);
   const [engine, setEngine] = useState<SimulationEngine | null>(null);
   const [simState, setSimState] = useState<SimulationState | null>(null);
-  const [speed, setSpeed] = useState<SimSpeed>(0.25); // Default to slowest
+  const [speed, setSpeed] = useState<SimSpeed>(0.5); // Default speed
   const [isPaused, setIsPaused] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
