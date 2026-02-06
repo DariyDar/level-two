@@ -1,6 +1,6 @@
 # Organ Parameters and Rules
 # Generated: 2026-02-06
-# Version: v0.15.0
+# Version: v0.15.1
 
 ## UNIFIED DEGRADATION SYSTEM
 # Both organs now use the same tier system: tiers 1-5
@@ -71,12 +71,12 @@ Tier,Points Required,Max Pancreas Tier Reduction,Effective Max Tier,Circles Show
 
 Parameter,Value,Unit,Description
 muscleDrainRates[0],0,mg/dL/h,Tier 0 - No drain
-muscleDrainRates[1],35,mg/dL/h,Tier 1 - Basal
-muscleDrainRates[2],40,mg/dL/h,Tier 2
-muscleDrainRates[3],45,mg/dL/h,Tier 3
-muscleDrainRates[4],50,mg/dL/h,Tier 4
-muscleDrainRates[5],55,mg/dL/h,Tier 5 - Maximum normal
-muscleDrainRates[6],60,mg/dL/h,Tier 6 - Boosted only (Fast Insulin)
+muscleDrainRates[1],50,mg/dL/h,Tier 1 - Basal
+muscleDrainRates[2],100,mg/dL/h,Tier 2
+muscleDrainRates[3],125,mg/dL/h,Tier 3
+muscleDrainRates[4],150,mg/dL/h,Tier 4
+muscleDrainRates[5],200,mg/dL/h,Tier 5 - Maximum normal
+muscleDrainRates[6],250,mg/dL/h,Tier 6 - Boosted only (Fast Insulin)
 minTier,0,tier,Minimum muscle tier
 maxTier,5,tier,Maximum muscle tier (normal)
 boostedMaxTier,6,tier,Maximum muscle tier (with Fast Insulin)
