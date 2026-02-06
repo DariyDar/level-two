@@ -96,11 +96,16 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - `levels/*.json` — level configurations
 - `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.15.0)
+### Current State (v0.15.2)
 - Planning phase: drag-and-drop ships to time slots ✅
 - Simulation phase: glucose flow visualization with particles ✅
 - Results phase: basic BG history graph ✅
 - Substep simulation: smooth container updates (10 substeps/hour) ✅
+- **Liver System (v0.15.2)** ✅
+  - Normal release rate: 150 mg/dL/h
+  - Stops release when BG ≥ 200
+  - PassThrough mode: when liver ≥95% AND ship unloading → output = input rate
+  - Liver Boost: DISABLED (code preserved)
 - **Pancreas Tier System (v0.15.0)** ✅
   - Pancreas has its own "insulin secretion" tier
   - BG thresholds trigger pancreas tiers:
@@ -110,12 +115,15 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
     - BG ≥200: Tier 5 (maximum insulin)
   - Pancreas tier determines base muscle tier
   - Degradation limits max pancreas tier (not directly muscle tier)
+- **Muscle Drain Rates (v0.15.1)** ✅
+  - Tier 0: 0, Tier 1: 50, Tier 2: 100, Tier 3: 125
+  - Tier 4: 150, Tier 5: 200, Tier 6: 250 mg/dL/h
 - **Fast Insulin Boost (v0.15.0)** ✅
   - Renamed from "Pancreas Boost"
   - Orange drop icon (💧)
   - +1 tier bonus when active
   - **Ignores degradation limits** (can reach full tier even when degraded)
-  - Enables hidden 6th muscle tier (rate: 60 mg/dL/h)
+  - Enables hidden 6th muscle tier (rate: 250 mg/dL/h)
 - Configuration-driven rules system ✅
   - Organ behavior defined in JSON config files (`organRules.json`)
   - Rule Engine evaluates conditions and actions
