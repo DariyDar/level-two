@@ -1,6 +1,6 @@
 # Organ Parameters and Rules
 # Generated: 2026-02-06
-# Version: v0.15.4
+# Version: v0.15.5
 
 ## DISABLED FEATURES (Отключенные функции)
 # These features are preserved in code but disabled in UI
@@ -24,12 +24,14 @@ passThrough_threshold,95,%,Overflow pass-through activates at this fill level
 passThrough_condition,Ship unloading,,Pass-through when ship is actively unloading
 
 ## LIVER RULES (Правила печени)
+# PassThrough is the HIGHEST priority - overrides all tier-based rules
+# PassThrough auto-deactivates when liver < 95% (checked every tick)
 Priority,Rule ID,Condition,Action (Tier),Rate (mg/dL/h),Description
+0 (highest),pass_through,Liver >= 95% AND ship unloading,= ship rate,variable,Glucose pushed out at input rate (overrides all)
 1,liver_boost_active,Liver Boost is active,2,75,DISABLED - Manual boost
 2,bg_high_stop,BG >= 200,0,0,Stop release when blood glucose high
 3,bg_low_release,BG <= 100,1,150,Release glucose when BG low
-4,default_normal,Default,1,150,Normal operation
-*,pass_through,Liver >= 95% AND ship unloading,= ship rate,variable,Glucose pushed out at input rate
+4,default_normal,Default (BG 100-200),1,150,Normal operation
 
 ## LIVER DEGRADATION (Деградация печени)
 Tier,Points Required,Capacity Reduction,Effective Capacity,Circles Shown
