@@ -7,7 +7,7 @@
       "organ": "liver",
       "description": "Liver degradation reduces container capacity",
       "maxTier": 5,
-      "baseCapacity": 150,
+      "baseCapacity": 100,
 
       "tierThresholds": [
         { "tier": 1, "bufferMin": 0, "bufferMax": 24, "description": "Healthy (non-burnable)" },
@@ -18,11 +18,11 @@
       ],
 
       "tierEffects": [
-        { "tier": 1, "capacityReduction": 0, "effectiveCapacity": 150 },
-        { "tier": 2, "capacityReduction": 20, "effectiveCapacity": 130 },
-        { "tier": 3, "capacityReduction": 30, "effectiveCapacity": 120 },
-        { "tier": 4, "capacityReduction": 40, "effectiveCapacity": 110 },
-        { "tier": 5, "capacityReduction": 50, "effectiveCapacity": 100 }
+        { "tier": 1, "capacityReduction": 0, "effectiveCapacity": 100 },
+        { "tier": 2, "capacityReduction": 10, "effectiveCapacity": 90 },
+        { "tier": 3, "capacityReduction": 20, "effectiveCapacity": 80 },
+        { "tier": 4, "capacityReduction": 30, "effectiveCapacity": 70 },
+        { "tier": 5, "capacityReduction": 40, "effectiveCapacity": 60 }
       ],
 
       "accumulation": {

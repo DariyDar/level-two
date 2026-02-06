@@ -121,7 +121,7 @@ export interface SimulationConfig {
 // Default configuration values - Updated to match Excel v0.6 "System Parameters" sheet
 // Naming convention: bg = BGContainer, liver = LiverContainer (see types.ts for full mapping)
 const DEFAULT_CONFIG: SimulationConfig = {
-  liverCapacity: 150, // LiverContainer capacity
+  liverCapacity: 100, // LiverContainer capacity
   bgCapacity: 400, // BGContainer capacity (Excel: 400 mg/dL)
   bgLow: 70,
   bgTarget: 100,

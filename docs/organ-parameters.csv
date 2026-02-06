@@ -16,7 +16,7 @@
 
 ## LIVER (Печень)
 Parameter,Value,Unit,Description
-liverCapacity,150,mg/dL,Maximum liver storage capacity
+liverCapacity,100,mg/dL,Maximum liver storage capacity
 liverTransferRates[0],0,mg/dL/h,Tier 0 - Stop (BG >= 200)
 liverTransferRates[1],150,mg/dL/h,Tier 1 - Normal release
 liverTransferRates[2],75,mg/dL/h,Tier 2 - Liver Boost (DISABLED)
@@ -35,11 +35,11 @@ Priority,Rule ID,Condition,Action (Tier),Rate (mg/dL/h),Description
 
 ## LIVER DEGRADATION (Деградация печени)
 Tier,Points Required,Capacity Reduction,Effective Capacity,Circles Shown
-1 (healthy),0-24,0,150,0 (non-burnable)
-2,25-49,20,130,1
-3,50-74,30,120,2
-4,75-99,40,110,3
-5,100+,50,100,4
+1 (healthy),0-24,0,100,0 (non-burnable)
+2,25-49,10,90,1
+3,50-74,20,80,2
+4,75-99,30,70,3
+5,100+,40,60,4
 
 ## PANCREAS (Поджелудочная железа) - NEW TIER SYSTEM v0.15.0
 # Pancreas now has its own tier (insulin secretion tier)

@@ -135,7 +135,7 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - Unified tiers 1-5 for both organs (tier 1 = healthy/non-burnable)
   - Points per tier: 25 (unified for both organs)
   - Tier Effects:
-    - Liver: capacity reduction (150→130→120→110→100)
+    - Liver: capacity reduction (100→90→80→70→60)
     - Pancreas: max tier reduction (5→4→3→2→1)
   - Configuration-driven tier thresholds and effects (`degradationConfig.json`)
   - Real-time tier calculation and effect application
