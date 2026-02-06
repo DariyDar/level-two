@@ -155,9 +155,12 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           label="Liver"
           iconPath="/assets/organs/liver_icon.png"
           isActive={displayLiverRate > 0}
-          degradation={{
-            tier: degradation.liver.tier,
-            maxTier: 4
+          tierConfig={{
+            maxTier: 4,
+            activeTier: 0, // Liver doesn't show active tier flashing
+            degradedTiers: degradation.liver.tier - 1,
+            colorScheme: 'green',
+            position: 'bottom'
           }}
           size="normal"
         />

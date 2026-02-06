@@ -1,6 +1,6 @@
 # Organ Parameters and Rules
 # Generated: 2026-02-06
-# Version: v0.15.3
+# Version: v0.15.4
 
 ## DISABLED FEATURES (Отключенные функции)
 # These features are preserved in code but disabled in UI
@@ -130,11 +130,12 @@ Boost,Cooldown,Duration,Charges (default),Effect,Status
 Liver Boost,3 hours,1 hour,3,Forces Tier 2 (75 mg/dL/h),DISABLED (v0.15.2)
 Fast Insulin,3 hours,1 hour,3,+1 tier + ignores degradation,ACTIVE
 
-## VISUAL INDICATORS (NEW v0.15.0)
-Indicator,State,Color,Animation
-Tier Circle,Healthy,Orange (#f97316),None
-Tier Circle,Degraded,Pink (#ec4899),None
-Tier Circle,Active,Red-Orange (#FF5900),Flashing (0.8s)
-Tier Circle,Active+Boosted,Red-Orange (#FF5900),Fast Flashing (0.5s)
-Tier Circle 6,Boosted Only,Red-Orange (#FF5900),Fast Flashing (0.5s)
-Fast Insulin Button,Active,Red-Orange (#FF5900),Pulsing glow
+## VISUAL INDICATORS (v0.15.4)
+Indicator,State,Color,Animation,Organs
+Tier Circle,Healthy (orange),Orange (#f97316),None,Muscles/Pancreas
+Tier Circle,Healthy (green),Green (#22c55e),None,Liver/Kidneys
+Tier Circle,Degraded,Pink (#ec4899),None,All
+Tier Circle,Active,Red-Orange (#FF5900),Flashing (0.8s),Muscles/Pancreas (all tiers <= active)
+Tier Circle,Active+Boosted,Red-Orange (#FF5900),Fast Flashing (0.5s),Muscles/Pancreas
+Tier Circle 6,Boosted Only,Red-Orange (#FF5900),Fast Flashing (0.5s),Muscles only
+Fast Insulin Button,Active,Red-Orange (#FF5900),Pulsing glow,N/A

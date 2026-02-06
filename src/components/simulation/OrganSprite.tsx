@@ -14,6 +14,7 @@ interface OrganSpriteProps {
     isBoosted?: boolean;    // Fast Insulin active
     showBoostedTier?: boolean; // Show 6th tier (for muscles when tier 6)
     position?: 'top' | 'bottom';
+    colorScheme?: 'orange' | 'green'; // orange for muscles/pancreas, green for liver/kidneys
   };
 
   // Legacy props (for backward compatibility during transition)
@@ -51,6 +52,7 @@ export function OrganSprite({
           degradedTiers={tierConfig.degradedTiers}
           isBoosted={tierConfig.isBoosted}
           showBoostedTier={tierConfig.showBoostedTier}
+          colorScheme={tierConfig.colorScheme}
           size={size === 'large' ? 'normal' : 'small'}
           position="top"
         />
@@ -85,6 +87,7 @@ export function OrganSprite({
           degradedTiers={tierConfig.degradedTiers}
           isBoosted={tierConfig.isBoosted}
           showBoostedTier={tierConfig.showBoostedTier}
+          colorScheme={tierConfig.colorScheme}
           size={size === 'large' ? 'normal' : 'small'}
           position="bottom"
         />
