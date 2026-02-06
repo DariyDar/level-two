@@ -124,7 +124,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           label="Liver"
           emoji="🫀"
           value={liverValue}
-          capacity={100}
+          capacity={150}
           hideHeader={true}
           compactSize={true}
         />
