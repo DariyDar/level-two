@@ -1,0 +1,98 @@
+# Organ Parameters and Rules
+# Generated: 2026-02-06
+# Version: v0.13.4
+
+## LIVER (Печень)
+Parameter,Value,Unit,Description
+liverCapacity,150,mg/dL,Maximum liver storage capacity
+liverTransferRates[0],0,mg/dL/h,Tier 0 - Stop (BG >= 200)
+liverTransferRates[1],50,mg/dL/h,Tier 1 - Normal release
+liverTransferRates[2],75,mg/dL/h,Tier 2 - Liver Boost active
+passThrough_threshold,95,%,Overflow pass-through activates at this fill level
+passThrough_condition,Ship unloading AND no Liver Boost,,Pass-through only when ship is actively unloading
+
+## LIVER RULES (Правила печени)
+Priority,Rule ID,Condition,Action (Tier),Rate (mg/dL/h),Description
+1,liver_boost_active,Liver Boost is active,2,75,Manual boost forces maximum rate
+2,bg_high_stop,BG >= 200,0,0,Stop release when blood glucose high
+3,bg_low_release,BG <= 100,1,50,Release glucose when BG low
+4,default_normal,Default,1,50,Normal operation
+*,pass_through,Liver >= 95% AND ship unloading,= ship rate,variable,Glucose pushed out at input rate
+
+## LIVER DEGRADATION (Деградация печени)
+Tier,Points Required,Capacity Reduction,Effective Capacity
+0,0-19,0,150
+1,20-39,20,130
+2,40-59,30,120
+3,60-79,40,110
+4,80-99,50,100
+5,100+,60,90
+
+## PANCREAS (Поджелудочная железа)
+Parameter,Value,Unit,Description
+pancreasBoostCooldown,3,hours,Cooldown after boost activation
+pancreasBoostDuration,1,hour,How long boost is active
+pancreasBoostTierBonus,1,tier,Tier bonus when boost active
+
+## PANCREAS RULES (Правила ПЖ - определяют tier мышц)
+Priority,Rule ID,Condition,Action (Tier),Description
+1,bg_high_reaction,BG >= 150,3,High BG - activate muscles at Tier 3
+2,bg_low_reaction,BG <= 70,0,Low BG - disable muscles (prevent hypoglycemia)
+3,default_no_drain,Default,0,No muscle activation by default
+
+## PANCREAS MODIFIERS
+Modifier ID,Condition,Effect,Description
+pancreas_boost,Pancreas Boost active,+1 tier,Manual boost increases muscle tier
+
+## PANCREAS DEGRADATION (Деградация ПЖ)
+Tier,Points Required,Max Muscle Tier Reduction,Effective Max Muscle Tier
+0,0-24,0,5
+1,25-49,1,4
+2,50-74,2,3
+3,75-99,3,2
+4,100+,4,1
+
+## MUSCLES (Мышцы)
+Parameter,Value,Unit,Description
+muscleDrainRates[0],0,mg/dL/h,Tier 0 - No drain
+muscleDrainRates[1],35,mg/dL/h,Tier 1
+muscleDrainRates[2],40,mg/dL/h,Tier 2
+muscleDrainRates[3],45,mg/dL/h,Tier 3 - Base activation from pancreas
+muscleDrainRates[4],50,mg/dL/h,Tier 4
+muscleDrainRates[5],55,mg/dL/h,Tier 5 - Maximum
+minTier,0,tier,Minimum muscle tier
+maxTier,5,tier,Maximum muscle tier (before degradation)
+
+## MUSCLE MODIFIERS
+Modifier ID,Condition,Effect,Description
+degradation_penalty,Pancreas degradation > 0,-1 tier,Degradation reduces muscle effectiveness
+exercise_bonus,Exercise Effect > 50,+1 tier,Exercise increases drain
+pancreas_boost,Pancreas Boost active,+1 tier,Boost increases drain
+
+## MUSCLE TIER CALCULATION
+Step,Description
+1,Get base tier from Pancreas rules (0 or 3)
+2,Apply Pancreas Boost modifier (+1 if active)
+3,Apply Exercise modifier (+1 if exerciseEffect > 50)
+4,Apply Degradation penalty (-1 if pancreas degradation > 0)
+5,Clamp to [minTier ... maxTier - pancreasDegradation.maxTierReduction]
+6,Look up drain rate from muscleDrainRates[tier]
+
+## BG THRESHOLDS (Пороги глюкозы крови)
+Threshold,Value,Unit,Description,Color
+low,70,mg/dL,Hypoglycemia warning,Yellow
+target,100,mg/dL,Optimal level,Green
+high,200,mg/dL,Elevated - liver stops / degradation starts,Orange
+critical,300,mg/dL,Critical - accelerated degradation,Red
+capacity,400,mg/dL,Maximum BG container,N/A
+
+## DEGRADATION CALCULATION (Расчет деградации)
+Zone,BG Range,Coefficient,Description
+Normal,0-200,0,No degradation accumulation
+High,200-300,0.5,Moderate degradation rate
+Critical,300+,1.0,Full degradation rate (2x high zone)
+
+## BOOSTS CONFIGURATION
+Boost,Cooldown,Duration,Charges (default),Effect
+Liver Boost,3 hours,1 hour,3,Forces Tier 2 (75 mg/dL/h) ignoring BG rules
+Pancreas Boost,3 hours,1 hour,3,+1 tier to muscle activation
