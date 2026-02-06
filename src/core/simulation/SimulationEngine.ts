@@ -477,11 +477,34 @@ export class SimulationEngine {
     const context = this.buildRuleContext();
     const result = RuleEngine.evaluateOrganRules(this.rulesConfig.liver, context);
 
-    this.state.currentLiverRate = result.finalRate;
+    // Calculate effective liver capacity (with degradation)
+    const effectiveLiverCapacity = Math.max(
+      0,
+      this.config.liverCapacity - this.state.degradation.liver.tierEffects.capacityReduction
+    );
+
+    let transferRate = result.finalRate;
+
+    // Overflow pass-through mode:
+    // If liver is ≥90% full and a ship is unloading, match output to input rate
+    // This "pushes out" glucose at the same rate it comes in
+    // Note: Liver Boost takes priority (uses its own Tier 2 rate)
+    const liverFillPercent = effectiveLiverCapacity > 0
+      ? this.state.containers.liver / effectiveLiverCapacity
+      : 0;
+    const isOverflow = liverFillPercent >= 0.9;
+    const shipUnloadRate = this.state.unloadingShip?.loadPerTick ?? 0;
+
+    if (isOverflow && shipUnloadRate > 0 && !this.state.liverBoost.isActive) {
+      // Pass-through mode: output rate = input rate (glucose "pushed out")
+      transferRate = shipUnloadRate;
+    }
+
+    this.state.currentLiverRate = transferRate;
 
     // Transfer from liver to BG (proportional to substep fraction)
     const liver = this.state.containers.liver;
-    const transfer = Math.min(result.finalRate * substepFraction, liver);
+    const transfer = Math.min(transferRate * substepFraction, liver);
     this.state.containers.liver -= transfer;
     this.state.containers.bg += transfer;
 
