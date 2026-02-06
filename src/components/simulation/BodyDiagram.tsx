@@ -65,7 +65,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           thresholds={{
             low: 70,
             target: 100,
-            high: 180,
+            high: 200,
             critical: 300,
           }}
           floatingValue={true}
