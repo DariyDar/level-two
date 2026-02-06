@@ -75,13 +75,18 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 ### Key Files
 - `src/version.ts` — version number
 - `src/store/gameStore.ts` — global game state (includes mood system)
-- `src/core/simulation.ts` — simulation engine
+- `src/core/simulation/SimulationEngine.ts` — simulation engine with pancreas tier logic
 - `src/core/types.ts` — TypeScript type definitions (Ship, MoodLevel, MoodEffect, etc.)
+- `src/core/rules/types.ts` — rule system types (includes `ignoresDegradation` modifier)
 - `src/config/loader.ts` — loads and transforms JSON configs
+- `src/config/organRules.json` — organ behavior rules (pancreas tiers, muscle rates)
 - `src/components/simulation/` — simulation UI components
   - `GlucoseParticleSystem.tsx` — sugar cube particles with fiber support
   - `FiberIndicator.tsx` — fiber activity indicator
-  - `BodyDiagram.tsx` — organs layout
+  - `BodyDiagram.tsx` — organs layout with tier visualization
+  - `OrganTierCircles.tsx` — unified tier/degradation indicator (v0.15.0)
+  - `OrganSprite.tsx` — organ icon with tier circles
+  - `BoostButton.tsx` — boost buttons (Liver Boost, Fast Insulin)
 - `src/components/planning/` — planning phase UI
   - `PlanningHeader.tsx` — header with BG, Mood, Carbs, Simulate
   - `MoodIndicator.tsx` — 5-level mood display
@@ -89,21 +94,32 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - `public/data/` — JSON configs for ships and levels
   - `foods.json` — food items with glucose, carbs, mood, fiber
   - `levels/*.json` — level configurations
-  - `organRules.json` — organ behavior rules
+- `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.9.2)
+### Current State (v0.15.0)
 - Planning phase: drag-and-drop ships to time slots ✅
 - Simulation phase: glucose flow visualization with particles ✅
 - Results phase: basic BG history graph ✅
 - Substep simulation: smooth container updates (10 substeps/hour) ✅
-- Pancreas as separate organ ✅
-  - Pancreas monitors BG and regulates muscle activation
-  - Muscles receive tier assignment from pancreas
-  - Proper organ separation (Pancreas → Muscles)
+- **Pancreas Tier System (v0.15.0)** ✅
+  - Pancreas has its own "insulin secretion" tier
+  - BG thresholds trigger pancreas tiers:
+    - BG ≤70: Tier 0 (no insulin)
+    - BG 70-150: Tier 1 (basal insulin)
+    - BG ≥150: Tier 4 (strong insulin)
+    - BG ≥200: Tier 5 (maximum insulin)
+  - Pancreas tier determines base muscle tier
+  - Degradation limits max pancreas tier (not directly muscle tier)
+- **Fast Insulin Boost (v0.15.0)** ✅
+  - Renamed from "Pancreas Boost"
+  - Orange drop icon (💧)
+  - +1 tier bonus when active
+  - **Ignores degradation limits** (can reach full tier even when degraded)
+  - Enables hidden 6th muscle tier (rate: 60 mg/dL/h)
 - Configuration-driven rules system ✅
   - Organ behavior defined in JSON config files (`organRules.json`)
   - Rule Engine evaluates conditions and actions
-  - Modifiers for degradation, effects, boosts
+  - Modifiers support `ignoresDegradation` flag
 - Carbs vs Glucose separation ✅
   - Ships display carbs (grams) on UI
   - Simulation uses glucose (mg/dL)
@@ -112,19 +128,21 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - Points per tier: 25 (unified for both organs)
   - Tier Effects:
     - Liver: capacity reduction (150→130→120→110→100)
-    - Pancreas: max muscle tier reduction (5→4→3→2→1)
+    - Pancreas: max tier reduction (5→4→3→2→1)
   - Configuration-driven tier thresholds and effects (`degradationConfig.json`)
   - Real-time tier calculation and effect application
-- Visual Indicators ✅
-  - Degradation circles: green (healthy) to pink (degraded)
-    - Both organs: 4 circles (tiers 2-5, tier 1 is non-burnable)
-  - Muscle tier circles: orange circles above muscle icon (0-5 tiers)
-  - Tier calculation: `getMuscleTierFromRate()` utility function
+- **Unified Tier Circles (v0.15.0)** ✅
+  - `OrganTierCircles` component replaces TierCircles and DegradationCircles
+  - Visual states:
+    - Healthy circles: orange (#f97316)
+    - Degraded circles: bright pink (#ec4899)
+    - Active tier: red-orange (#FF5900) with flashing animation
+    - Boosted active: faster flashing with glow
+  - 6th tier circle appears only when boosted to tier 6
 - Organ UI System ✅
   - OrganSprite: icon + label on substrate (rounded square background)
   - Two substrate states: active (light #4a5568) / inactive (dark #2d3748)
-  - TierCircles component: orange filled/empty circles for muscle tiers
-  - DegradationCircles component: green/pink circles for organ health
+  - Unified OrganTierCircles for both tier and degradation display
   - Labels moved inside substrates (below icons)
 - Layout: 6×6 CSS Grid ✅
   - Top row: Muscles (B1-C2) | BG (B3-C4) | Kidneys (B5-C6)

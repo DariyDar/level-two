@@ -22,6 +22,31 @@
   background: rgba(72, 187, 120, 0.2);
 }
 
+/* Fast Insulin specific styles */
+.boost-button--fast-insulin .boost-button__emoji {
+  color: #f97316; /* orange-500 */
+  filter: drop-shadow(0 0 4px rgba(249, 115, 22, 0.5));
+}
+
+.boost-button--fast-insulin.boost-button--active {
+  border-color: #FF5900; /* red-orange */
+  background: rgba(255, 89, 0, 0.2);
+  animation: fastInsulinPulse 0.8s ease-in-out infinite;
+}
+
+.boost-button--fast-insulin .boost-button__charge--filled {
+  background: #f97316; /* orange-500 */
+}
+
+@keyframes fastInsulinPulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(255, 89, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(255, 89, 0, 0.8);
+  }
+}
+
 .boost-button--disabled {
   opacity: 0.6;
   cursor: not-allowed;

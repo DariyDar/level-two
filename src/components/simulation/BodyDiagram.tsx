@@ -2,7 +2,6 @@ import type { SimulationState } from '../../core/simulation';
 import type { DegradationState } from '../../core/types';
 import { ContainerView } from './ContainerView';
 import { OrganSprite } from './OrganSprite';
-import { getMuscleTierFromRate } from './utils';
 import './BodyDiagram.css';
 
 interface InterpolatedValues {
@@ -19,7 +18,14 @@ interface BodyDiagramProps {
 }
 
 export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramProps) {
-  const { currentLiverRate, currentMuscleRate, containers } = state;
+  const {
+    currentLiverRate,
+    currentMuscleRate,
+    currentPancreasTier,
+    currentMuscleTier,
+    isFastInsulinActive,
+    containers
+  } = state;
 
   // Use interpolated values if provided, otherwise use state values
   const liverValue = interpolated?.liver ?? containers.liver;
@@ -30,8 +36,14 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
   // Kidney excretion rate (when BG > 180, kidneys start working)
   const kidneyRate = bgValue > 180 ? Math.min((bgValue - 180) * 0.1, 20) : 0;
 
-  // Calculate muscle tier from rate
-  const muscleTier = getMuscleTierFromRate(displayMuscleRate);
+  // Calculate degraded tiers for pancreas (tier 1 = 0 degraded, tier 5 = 4 degraded)
+  const pancreasDegradedTiers = degradation.pancreas.tier - 1;
+
+  // Muscle tier comes from simulation state (already calculated with modifiers)
+  const muscleTier = currentMuscleTier;
+
+  // Show 6th tier circle only when muscle tier is 6 (boosted)
+  const showBoostedMuscleTier = muscleTier === 6;
 
   return (
     <div className="body-diagram">
@@ -47,9 +59,13 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           label="Muscle"
           iconPath="/assets/organs/muscle_icon.png"
           isActive={displayMuscleRate > 0}
-          tierIndicator={{
-            tier: muscleTier,
-            maxTier: 5
+          tierConfig={{
+            maxTier: 5,
+            activeTier: muscleTier,
+            degradedTiers: pancreasDegradedTiers, // Muscle tiers limited by pancreas degradation
+            isBoosted: isFastInsulinActive,
+            showBoostedTier: showBoostedMuscleTier,
+            position: 'top'
           }}
           size="normal"
         />
@@ -101,18 +117,21 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
 
       {/* Pancreas - E1-E2 (columns 1-2, row 5) */}
       <div className="body-diagram__pancreas">
-        {/* Numeric value left of icon */}
+        {/* Numeric value left of icon - show current pancreas tier */}
         <div className="body-diagram__value-left">
-          {degradation.pancreas.tier}
+          T{currentPancreasTier}
         </div>
 
         <OrganSprite
           label="Pancreas"
           iconPath="/assets/organs/pancreas_icon.png"
-          isActive={displayMuscleRate > 0}
-          degradation={{
-            tier: degradation.pancreas.tier,
-            maxTier: 4
+          isActive={currentPancreasTier > 0}
+          tierConfig={{
+            maxTier: 5,
+            activeTier: currentPancreasTier,
+            degradedTiers: pancreasDegradedTiers,
+            isBoosted: isFastInsulinActive,
+            position: 'bottom'
           }}
           size="normal"
         />

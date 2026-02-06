@@ -71,9 +71,24 @@
     "description": "Pancreas insulin regulation - controls muscle glucose utilization by monitoring blood glucose",
     "rules": [
       {
-        "id": "bg_high_reaction",
-        "description": "High BG - Activate muscles at Tier 3",
+        "id": "bg_very_high_reaction",
+        "description": "Very high BG (>=200) - Maximum insulin secretion at Tier 5",
         "priority": 1,
+        "condition": {
+          "type": "container",
+          "container": "bg",
+          "operator": ">=",
+          "value": 200
+        },
+        "action": {
+          "type": "setTier",
+          "tier": 5
+        }
+      },
+      {
+        "id": "bg_high_reaction",
+        "description": "High BG (>=150) - Strong insulin secretion at Tier 4",
+        "priority": 2,
         "condition": {
           "type": "container",
           "container": "bg",
@@ -82,13 +97,13 @@
         },
         "action": {
           "type": "setTier",
-          "tier": 3
+          "tier": 4
         }
       },
       {
         "id": "bg_low_reaction",
-        "description": "Low BG - Disable muscle drain",
-        "priority": 2,
+        "description": "Low BG (<=70) - Disable insulin secretion",
+        "priority": 3,
         "condition": {
           "type": "container",
           "container": "bg",
@@ -101,22 +116,22 @@
         }
       },
       {
-        "id": "default_no_drain",
-        "description": "Default - No muscle activation",
-        "priority": 3,
+        "id": "default_basal",
+        "description": "Normal BG (70-150) - Basal insulin at Tier 1",
+        "priority": 4,
         "condition": {
           "type": "default"
         },
         "action": {
           "type": "setTier",
-          "tier": 0
+          "tier": 1
         }
       }
     ],
     "modifiers": [
       {
-        "id": "pancreas_boost",
-        "description": "Manual pancreas boost increases tier",
+        "id": "fast_insulin",
+        "description": "Fast Insulin boost increases tier (ignores degradation)",
         "type": "boost",
         "condition": {
           "type": "boost",
@@ -126,7 +141,8 @@
         "effect": {
           "type": "addTier",
           "amount": 1
-        }
+        },
+        "ignoresDegradation": true
       }
     ],
     "rates": [0, 1, 2, 3, 4, 5],
@@ -138,21 +154,6 @@
     "description": "Muscle glucose utilization - receives tier assignment from pancreas",
     "rules": [],
     "modifiers": [
-      {
-        "id": "degradation_penalty",
-        "description": "Pancreas degradation reduces maximum drain tier",
-        "type": "degradation",
-        "condition": {
-          "type": "degradation",
-          "organ": "pancreas",
-          "operator": ">",
-          "value": 0
-        },
-        "effect": {
-          "type": "subtractTier",
-          "amount": 1
-        }
-      },
       {
         "id": "exercise_bonus",
         "description": "Exercise increases drain tier",
@@ -169,8 +170,8 @@
         }
       },
       {
-        "id": "pancreas_boost",
-        "description": "Pancreas boost increases drain tier",
+        "id": "fast_insulin",
+        "description": "Fast Insulin increases drain tier (ignores degradation)",
         "type": "boost",
         "condition": {
           "type": "boost",
@@ -180,11 +181,13 @@
         "effect": {
           "type": "addTier",
           "amount": 1
-        }
+        },
+        "ignoresDegradation": true
       }
     ],
-    "rates": [0, 35, 40, 45, 50, 55],
+    "rates": [0, 35, 40, 45, 50, 55, 60],
     "minTier": 0,
-    "maxTier": 5
+    "maxTier": 5,
+    "boostedMaxTier": 6
   }
 }

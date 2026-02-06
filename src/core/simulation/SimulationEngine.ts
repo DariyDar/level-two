@@ -70,7 +70,9 @@ export interface SimulationState {
   // Current rates (for display)
   currentLiverRate: number;
   currentMuscleRate: number;
-  currentMuscleTier: number; // Tier assigned by pancreas
+  currentPancreasTier: number; // Raw tier from pancreas rules (before degradation)
+  currentMuscleTier: number; // Final tier for muscles (after all modifiers)
+  isFastInsulinActive: boolean; // Whether Fast Insulin boost is active
 }
 
 interface QueuedShip {
@@ -252,7 +254,9 @@ export class SimulationEngine {
       },
       currentLiverRate: 0,
       currentMuscleRate: 0,
+      currentPancreasTier: 0,
       currentMuscleTier: 0,
+      isFastInsulinActive: false,
     };
   }
 
@@ -525,21 +529,40 @@ export class SimulationEngine {
   }
 
   private processPancreasRegulation(): void {
-    // Pancreas monitors BG and determines muscle activation tier
+    // Pancreas monitors BG and determines insulin secretion tier
     const context = this.buildRuleContext();
     const result = RuleEngine.evaluateOrganRules(this.rulesConfig.pancreas, context);
 
-    this.state.currentMuscleTier = result.tier;
+    // Store raw pancreas tier (before degradation)
+    const rawPancreasTier = result.tier;
+    this.state.currentPancreasTier = rawPancreasTier;
+
+    // Check if Fast Insulin is active
+    const isFastInsulinActive = this.state.pancreasBoost.isActive;
+    this.state.isFastInsulinActive = isFastInsulinActive;
+
+    // Apply degradation to pancreas tier (unless Fast Insulin is active)
+    let effectivePancreasTier = rawPancreasTier;
+    if (!isFastInsulinActive) {
+      const maxTierReduction = this.state.degradation.pancreas.tierEffects.maxTierReduction;
+      const maxAllowedTier = Math.max(0, 5 - maxTierReduction);
+      effectivePancreasTier = Math.min(rawPancreasTier, maxAllowedTier);
+    }
+
+    // Pancreas tier becomes base muscle tier
+    this.state.currentMuscleTier = effectivePancreasTier;
   }
 
   private processMuscleDrain(substepFraction: number): void {
-    // Muscles use tier assigned by pancreas, then apply modifiers
+    // Muscles use tier from pancreas (already has degradation applied), then apply modifiers
     const muscleConfig = this.rulesConfig.muscles;
     const context = this.buildRuleContext();
 
     let tier = this.state.currentMuscleTier;
+    const isFastInsulinActive = this.state.isFastInsulinActive;
 
-    // Apply muscle modifiers (degradation, exercise, boost)
+    // Apply muscle modifiers (exercise, Fast Insulin)
+    // Note: degradation is now applied in processPancreasRegulation
     const modifiers = muscleConfig.modifiers ?? [];
     for (const modifier of modifiers) {
       if (!modifier.condition) continue;
@@ -554,15 +577,25 @@ export class SimulationEngine {
       }
     }
 
-    // Clamp tier to valid range, accounting for pancreas degradation
+    // Determine max tier based on whether Fast Insulin is active
     const minTier = muscleConfig.minTier ?? 0;
-    const maxTier = muscleConfig.maxTier ?? (muscleConfig.rates.length - 1);
-    const effectiveMaxTier = Math.max(
-      minTier,
-      maxTier - this.state.degradation.pancreas.tierEffects.maxTierReduction
-    );
+    const baseMaxTier = muscleConfig.maxTier ?? 5;
+    const boostedMaxTier = muscleConfig.boostedMaxTier ?? baseMaxTier;
+
+    // Fast Insulin allows access to boosted max tier (6) and ignores degradation
+    // Otherwise, degradation reduces max tier
+    let effectiveMaxTier: number;
+    if (isFastInsulinActive) {
+      effectiveMaxTier = boostedMaxTier; // Can reach tier 6
+    } else {
+      const maxTierReduction = this.state.degradation.pancreas.tierEffects.maxTierReduction;
+      effectiveMaxTier = Math.max(minTier, baseMaxTier - maxTierReduction);
+    }
+
     tier = Math.max(minTier, Math.min(tier, effectiveMaxTier));
-    const drainRate = muscleConfig.rates[tier] ?? 0;
+    this.state.currentMuscleTier = tier; // Update with final tier after modifiers
+
+    const drainRate = muscleConfig.rates[tier] ?? muscleConfig.rates[muscleConfig.rates.length - 1] ?? 0;
 
     this.state.currentMuscleRate = drainRate;
 

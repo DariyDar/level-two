@@ -1,0 +1,89 @@
+.organ-tier-circles {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+.organ-tier-circles--top {
+  margin-bottom: 4px;
+}
+
+.organ-tier-circles--bottom {
+  margin-top: 4px;
+}
+
+.organ-tier-circle {
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+/* Size variants */
+.organ-tier-circle--normal {
+  width: 10px;
+  height: 10px;
+}
+
+.organ-tier-circle--small {
+  width: 8px;
+  height: 8px;
+}
+
+/* Healthy state - orange */
+.organ-tier-circle--healthy {
+  background-color: #f97316; /* orange-500 */
+  box-shadow: 0 0 4px rgba(249, 115, 22, 0.5);
+}
+
+/* Degraded state - bright pink */
+.organ-tier-circle--degraded {
+  background-color: #ec4899; /* pink-500 */
+  box-shadow: 0 0 4px rgba(236, 72, 153, 0.5);
+}
+
+/* Active tier - red-orange with flashing */
+.organ-tier-circle--active {
+  background-color: #FF5900; /* red-orange */
+  box-shadow: 0 0 6px rgba(255, 89, 0, 0.7);
+  animation: tierFlash 0.8s ease-in-out infinite;
+}
+
+/* Active tier with boost - red-orange with faster flashing */
+.organ-tier-circle--active-boosted {
+  background-color: #FF5900; /* red-orange */
+  box-shadow: 0 0 8px rgba(255, 89, 0, 0.9);
+  animation: tierFlashBoosted 0.5s ease-in-out infinite;
+}
+
+/* Boosted tier (6th tier) - special styling */
+.organ-tier-circle--boosted-tier {
+  background-color: #FF5900; /* red-orange */
+  box-shadow: 0 0 6px rgba(255, 89, 0, 0.7);
+  animation: tierFlashBoosted 0.5s ease-in-out infinite;
+}
+
+/* Flashing animation for active tier */
+@keyframes tierFlash {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.9);
+  }
+}
+
+/* Faster flashing for boosted state */
+@keyframes tierFlashBoosted {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(255, 89, 0, 1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.95);
+    box-shadow: 0 0 4px rgba(255, 89, 0, 0.5);
+  }
+}

@@ -155,6 +155,7 @@ export interface TierModifier {
   condition?: RuleCondition;
   effect: ModifyTierAction;
   enabled?: boolean;
+  ignoresDegradation?: boolean; // If true, this modifier bypasses degradation limits
 }
 
 // === Organ Rule Configuration ===
@@ -178,6 +179,7 @@ export interface OrganRuleSet {
   // Constraints
   minTier?: number;  // Default: 0
   maxTier?: number;  // Default: rates.length - 1
+  boostedMaxTier?: number; // Max tier when boost active (can exceed maxTier)
 }
 
 // === Complete Rules Configuration ===

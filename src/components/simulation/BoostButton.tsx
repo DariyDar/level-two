@@ -7,6 +7,7 @@ interface BoostButtonProps {
   boost: BoostState;
   cooldownMax: number;
   onActivate: () => void;
+  isFastInsulin?: boolean; // Special styling for Fast Insulin
 }
 
 export function BoostButton({
@@ -15,6 +16,7 @@ export function BoostButton({
   boost,
   cooldownMax,
   onActivate,
+  isFastInsulin = false,
 }: BoostButtonProps) {
   const { charges, maxCharges, cooldownTicks, isActive } = boost;
 
@@ -29,6 +31,7 @@ export function BoostButton({
         'boost-button',
         isActive && 'boost-button--active',
         !canActivate && 'boost-button--disabled',
+        isFastInsulin && 'boost-button--fast-insulin',
       ]
         .filter(Boolean)
         .join(' ')}

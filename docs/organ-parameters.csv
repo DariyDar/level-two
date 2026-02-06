@@ -1,6 +1,6 @@
 # Organ Parameters and Rules
 # Generated: 2026-02-06
-# Version: v0.14.0
+# Version: v0.15.0
 
 ## UNIFIED DEGRADATION SYSTEM
 # Both organs now use the same tier system: tiers 1-5
@@ -33,24 +33,32 @@ Tier,Points Required,Capacity Reduction,Effective Capacity,Circles Shown
 4,75-99,40,110,3
 5,100+,50,100,4
 
-## PANCREAS (Поджелудочная железа)
-Parameter,Value,Unit,Description
-pancreasBoostCooldown,3,hours,Cooldown after boost activation
-pancreasBoostDuration,1,hour,How long boost is active
-pancreasBoostTierBonus,1,tier,Tier bonus when boost active
+## PANCREAS (Поджелудочная железа) - NEW TIER SYSTEM v0.15.0
+# Pancreas now has its own tier (insulin secretion tier)
+# Pancreas tier determines base muscle tier
+# Degradation limits maximum pancreas tier
 
-## PANCREAS RULES (Правила ПЖ - определяют tier мышц)
-Priority,Rule ID,Condition,Action (Tier),Description
-1,bg_high_reaction,BG >= 150,3,High BG - activate muscles at Tier 3
-2,bg_low_reaction,BG <= 70,0,Low BG - disable muscles (prevent hypoglycemia)
-3,default_no_drain,Default,0,No muscle activation by default
+Parameter,Value,Unit,Description
+pancreasBasalTier,1,tier,Basal insulin tier at normal BG (70-150)
+pancreasHighTier,4,tier,Insulin tier at high BG (>=150)
+pancreasVeryHighTier,5,tier,Insulin tier at very high BG (>=200)
+fastInsulinCooldown,3,hours,Cooldown after Fast Insulin activation
+fastInsulinDuration,1,hour,How long Fast Insulin is active
+fastInsulinTierBonus,1,tier,Tier bonus when Fast Insulin active
+
+## PANCREAS RULES (Правила ПЖ - определяют tier инсулина)
+Priority,Rule ID,Condition,Pancreas Tier,Description
+1,bg_very_high_reaction,BG >= 200,5,Very high BG - maximum insulin at Tier 5
+2,bg_high_reaction,BG >= 150,4,High BG - strong insulin at Tier 4
+3,bg_low_reaction,BG <= 70,0,Low BG - disable insulin (prevent hypoglycemia)
+4,default_basal,Default (BG 70-150),1,Normal BG - basal insulin at Tier 1
 
 ## PANCREAS MODIFIERS
-Modifier ID,Condition,Effect,Description
-pancreas_boost,Pancreas Boost active,+1 tier,Manual boost increases muscle tier
+Modifier ID,Condition,Effect,Description,Ignores Degradation
+fast_insulin,Fast Insulin active,+1 tier,Manual boost increases tier,Yes
 
 ## PANCREAS DEGRADATION (Деградация ПЖ)
-Tier,Points Required,Max Muscle Tier Reduction,Effective Max Muscle Tier,Circles Shown
+Tier,Points Required,Max Pancreas Tier Reduction,Effective Max Tier,Circles Shown
 1 (healthy),0-24,0,5,0 (non-burnable)
 2,25-49,1,4,1
 3,50-74,2,3,2
@@ -58,37 +66,43 @@ Tier,Points Required,Max Muscle Tier Reduction,Effective Max Muscle Tier,Circles
 5,100+,4,1,4
 
 ## MUSCLES (Мышцы)
+# Muscle tier is now determined by pancreas tier (after degradation applied)
+# Fast Insulin allows access to tier 6 and ignores degradation
+
 Parameter,Value,Unit,Description
 muscleDrainRates[0],0,mg/dL/h,Tier 0 - No drain
-muscleDrainRates[1],35,mg/dL/h,Tier 1
+muscleDrainRates[1],35,mg/dL/h,Tier 1 - Basal
 muscleDrainRates[2],40,mg/dL/h,Tier 2
-muscleDrainRates[3],45,mg/dL/h,Tier 3 - Base activation from pancreas
+muscleDrainRates[3],45,mg/dL/h,Tier 3
 muscleDrainRates[4],50,mg/dL/h,Tier 4
-muscleDrainRates[5],55,mg/dL/h,Tier 5 - Maximum
+muscleDrainRates[5],55,mg/dL/h,Tier 5 - Maximum normal
+muscleDrainRates[6],60,mg/dL/h,Tier 6 - Boosted only (Fast Insulin)
 minTier,0,tier,Minimum muscle tier
-maxTier,5,tier,Maximum muscle tier (before degradation)
+maxTier,5,tier,Maximum muscle tier (normal)
+boostedMaxTier,6,tier,Maximum muscle tier (with Fast Insulin)
 
 ## MUSCLE MODIFIERS
-Modifier ID,Condition,Effect,Description
-degradation_penalty,Pancreas degradation > 0,-1 tier,Degradation reduces muscle effectiveness
-exercise_bonus,Exercise Effect > 50,+1 tier,Exercise increases drain
-pancreas_boost,Pancreas Boost active,+1 tier,Boost increases drain
+Modifier ID,Condition,Effect,Description,Ignores Degradation
+exercise_bonus,Exercise Effect > 50,+1 tier,Exercise increases drain,No
+fast_insulin,Fast Insulin active,+1 tier,Boost increases drain,Yes
 
-## MUSCLE TIER CALCULATION
+## MUSCLE TIER CALCULATION (NEW v0.15.0)
 Step,Description
-1,Get base tier from Pancreas rules (0 or 3)
-2,Apply Pancreas Boost modifier (+1 if active)
-3,Apply Exercise modifier (+1 if exerciseEffect > 50)
-4,Apply Degradation penalty (-1 if pancreas degradation > tier 1)
-5,Clamp to [minTier ... maxTier - pancreasDegradation.maxTierReduction]
-6,Look up drain rate from muscleDrainRates[tier]
+1,Get base tier from Pancreas rules (0, 1, 4, or 5 based on BG)
+2,Apply Pancreas Degradation (unless Fast Insulin active)
+3,Pass tier to muscles as base muscle tier
+4,Apply Exercise modifier (+1 if exerciseEffect > 50)
+5,Apply Fast Insulin modifier (+1 if active)
+6,Clamp to [minTier ... effectiveMaxTier]
+7,Look up drain rate from muscleDrainRates[tier]
 
 ## BG THRESHOLDS (Пороги глюкозы крови)
 Threshold,Value,Unit,Description,Color
 low,70,mg/dL,Hypoglycemia warning,Yellow
 target,100,mg/dL,Optimal level,Green
-high,200,mg/dL,Elevated - liver stops / degradation starts,Orange
-critical,300,mg/dL,Critical - accelerated degradation,Red
+pancreas_activate,150,mg/dL,Pancreas starts strong insulin (Tier 4),Orange
+high,200,mg/dL,Liver stops / Pancreas max (Tier 5),Orange
+critical,300,mg/dL,Accelerated degradation,Red
 capacity,400,mg/dL,Maximum BG container,N/A
 
 ## DEGRADATION CALCULATION (Расчет деградации)
@@ -106,6 +120,15 @@ Points,Tier,Description
 100+,5,Maximum degradation (4 circles)
 
 ## BOOSTS CONFIGURATION
-Boost,Cooldown,Duration,Charges (default),Effect
-Liver Boost,3 hours,1 hour,3,Forces Tier 2 (75 mg/dL/h) ignoring BG rules
-Pancreas Boost,3 hours,1 hour,3,+1 tier to muscle activation
+Boost,Cooldown,Duration,Charges (default),Effect,Ignores Degradation
+Liver Boost,3 hours,1 hour,3,Forces Tier 2 (75 mg/dL/h) ignoring BG rules,No
+Fast Insulin,3 hours,1 hour,3,+1 tier to pancreas/muscle + ignores degradation,Yes
+
+## VISUAL INDICATORS (NEW v0.15.0)
+Indicator,State,Color,Animation
+Tier Circle,Healthy,Orange (#f97316),None
+Tier Circle,Degraded,Pink (#ec4899),None
+Tier Circle,Active,Red-Orange (#FF5900),Flashing (0.8s)
+Tier Circle,Active+Boosted,Red-Orange (#FF5900),Fast Flashing (0.5s)
+Tier Circle 6,Boosted Only,Red-Orange (#FF5900),Fast Flashing (0.5s)
+Fast Insulin Button,Active,Red-Orange (#FF5900),Pulsing glow
