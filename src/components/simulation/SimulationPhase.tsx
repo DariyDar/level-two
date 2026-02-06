@@ -131,12 +131,13 @@ export function SimulationPhase() {
   });
 
   // Boost handlers
-  const handleLiverBoost = useCallback(() => {
-    if (engine) {
-      engine.activateLiverBoost();
-      setSimState(engine.getState());
-    }
-  }, [engine]);
+  // DISABLED: Liver Boost handler - preserved for future use
+  // const handleLiverBoost = useCallback(() => {
+  //   if (engine) {
+  //     engine.activateLiverBoost();
+  //     setSimState(engine.getState());
+  //   }
+  // }, [engine]);
 
   const handlePancreasBoost = useCallback(() => {
     if (engine) {
@@ -232,6 +233,7 @@ export function SimulationPhase() {
 
       {/* Boost Buttons */}
       <div className="simulation-phase__boosts">
+        {/* DISABLED: Liver Boost - functionality preserved but UI hidden
         <BoostButton
           label="Liver Boost"
           emoji="🔥"
@@ -239,6 +241,7 @@ export function SimulationPhase() {
           cooldownMax={1}
           onActivate={handleLiverBoost}
         />
+        */}
         <BoostButton
           label="Fast Insulin"
           emoji="💧"

@@ -182,9 +182,13 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - Carbs indicator: max-width 500px with flex-grow enabled
   - Balanced spacing between all header elements
 
+### Disabled Features (v0.15.2)
+Features preserved in code but hidden from UI:
+- **Liver Boost**: Button hidden in SimulationPhase.tsx (functionality preserved)
+- **Metformin**: Not implemented
+- **Negative Events**: Console logging only
+
 ### Known Issues
 - Effect Containers: No threshold-based activation (planned for future)
 - Kidneys: Not fully implemented (basic excretion only)
-- Metformin degradation blocking: Not implemented
 - Pipe connections: Visual connections between organs not yet implemented
-- Negative Events: Console logging only (actual event implementation pending)

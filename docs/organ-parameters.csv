@@ -1,6 +1,12 @@
 # Organ Parameters and Rules
 # Generated: 2026-02-06
-# Version: v0.15.1
+# Version: v0.15.2
+
+## DISABLED FEATURES (Отключенные функции)
+# These features are preserved in code but disabled in UI
+# - Liver Boost: Button hidden, functionality in code (v0.15.2)
+# - Metformin: Not implemented
+# - Negative Events: Console logging only
 
 ## UNIFIED DEGRADATION SYSTEM
 # Both organs now use the same tier system: tiers 1-5
@@ -12,17 +18,17 @@
 Parameter,Value,Unit,Description
 liverCapacity,150,mg/dL,Maximum liver storage capacity
 liverTransferRates[0],0,mg/dL/h,Tier 0 - Stop (BG >= 200)
-liverTransferRates[1],50,mg/dL/h,Tier 1 - Normal release
-liverTransferRates[2],75,mg/dL/h,Tier 2 - Liver Boost active
+liverTransferRates[1],150,mg/dL/h,Tier 1 - Normal release
+liverTransferRates[2],75,mg/dL/h,Tier 2 - Liver Boost (DISABLED)
 passThrough_threshold,95,%,Overflow pass-through activates at this fill level
-passThrough_condition,Ship unloading AND no Liver Boost,,Pass-through only when ship is actively unloading
+passThrough_condition,Ship unloading,,Pass-through when ship is actively unloading
 
 ## LIVER RULES (Правила печени)
 Priority,Rule ID,Condition,Action (Tier),Rate (mg/dL/h),Description
-1,liver_boost_active,Liver Boost is active,2,75,Manual boost forces maximum rate
+1,liver_boost_active,Liver Boost is active,2,75,DISABLED - Manual boost
 2,bg_high_stop,BG >= 200,0,0,Stop release when blood glucose high
-3,bg_low_release,BG <= 100,1,50,Release glucose when BG low
-4,default_normal,Default,1,50,Normal operation
+3,bg_low_release,BG <= 100,1,150,Release glucose when BG low
+4,default_normal,Default,1,150,Normal operation
 *,pass_through,Liver >= 95% AND ship unloading,= ship rate,variable,Glucose pushed out at input rate
 
 ## LIVER DEGRADATION (Деградация печени)
