@@ -7,6 +7,7 @@
       "size": "S",
       "load": 100,
       "targetContainer": "metforminEffect",
+      "wpCost": 0,
       "description": "Reduces liver glucose output. Long-lasting effect."
     },
     {

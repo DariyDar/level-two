@@ -10,6 +10,7 @@ interface SlotProps {
   ship?: Ship;
   isOccupied: boolean;
   isPreOccupied: boolean;
+  isBlocked?: boolean; // Slot is blocked by day config — no cards allowed
   groupStartSlot?: number; // The start slot of the valid drop group this slot belongs to
   isHighlighted: boolean;
   isPartOfShip: boolean; // This slot is occupied by a multi-slot ship but not the start
@@ -23,6 +24,7 @@ export function Slot({
   ship,
   isOccupied,
   isPreOccupied,
+  isBlocked = false,
   groupStartSlot,
   isHighlighted,
   isPartOfShip,
@@ -31,7 +33,7 @@ export function Slot({
 }: SlotProps) {
   const { setNodeRef } = useDroppable({
     id: `slot-${slotNumber}`,
-    disabled: isOccupied || isPartOfShip,
+    disabled: isOccupied || isPartOfShip || isBlocked,
     // Pass the group start slot so drop handler knows where to actually place the ship
     data: { slotNumber, groupStartSlot: groupStartSlot ?? slotNumber },
   });
@@ -47,6 +49,7 @@ export function Slot({
         isOccupied && 'slot--occupied',
         isOccupied && shipSlots > 1 && `slot--spans-${shipSlots}`,
         isPreOccupied && 'slot--pre-occupied',
+        isBlocked && 'slot--blocked',
         isHoveredValid && 'slot--drop-valid',
         isHoveredInvalid && 'slot--drop-invalid',
         isHighlighted && 'slot--highlighted',

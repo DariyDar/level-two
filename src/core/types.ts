@@ -152,6 +152,7 @@ export interface DayConfig {
   day: number;
   availableFoods: AvailableFood[];
   preOccupiedSlots?: PreOccupiedSlot[];
+  blockedSlots?: number[]; // Slot numbers (1-18) that cannot accept any cards
   wpBudget?: number; // Override WP budget for this day
   // Legacy day-level carb requirements
   carbRequirements?: {

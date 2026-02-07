@@ -204,10 +204,10 @@ export function PlanningPhase() {
         ? placedShips.filter((s) => s.instanceId !== instanceId)
         : placedShips;
 
-      const valid = calculateValidDropSlots(ship, shipsForCalculation, allShips);
+      const valid = calculateValidDropSlots(ship, shipsForCalculation, allShips, dayConfig?.blockedSlots);
       setValidDropSlots(valid);
     },
-    [placedShips, allShips]
+    [placedShips, allShips, dayConfig]
   );
 
   const handleDragMove = useCallback(
@@ -349,6 +349,7 @@ export function PlanningPhase() {
             activeShip={activeShip}
             hoveredSlot={hoveredSlot}
             segmentValidation={planValidation.segments}
+            blockedSlots={dayConfig?.blockedSlots}
           />
 
           <ShipInventory

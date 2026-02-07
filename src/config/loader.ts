@@ -45,6 +45,7 @@ interface RawLevelConfig {
     day: number;
     availableFoods: AvailableFood[] | string[];
     preOccupiedSlots?: { slot: number; shipId: string }[];
+    blockedSlots?: number[];
     wpBudget?: number;
     carbRequirements?: { min: number; max: number };
     segmentCarbs?: {
@@ -155,6 +156,7 @@ function transformLevel(raw: RawLevelConfig): LevelConfig {
       day: dc.day,
       availableFoods: normalizeAvailableFoods(dc.availableFoods) || [],
       preOccupiedSlots: dc.preOccupiedSlots ?? [],
+      blockedSlots: dc.blockedSlots ?? [],
       wpBudget: dc.wpBudget,
       carbRequirements: dc.carbRequirements,
       segmentCarbs: dc.segmentCarbs,

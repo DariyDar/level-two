@@ -5,6 +5,7 @@ export interface DayConfigResult {
   carbRequirements?: { min: number; max: number };
   segmentCarbs?: Record<DaySegment, SegmentCarbLimits>;
   preOccupiedSlots: PreOccupiedSlot[];
+  blockedSlots: number[];
   wpBudget?: number;
 }
 
@@ -22,6 +23,7 @@ export function getDayConfig(level: LevelConfig, day: number): DayConfigResult {
         carbRequirements: dayConfig.carbRequirements,
         segmentCarbs: dayConfig.segmentCarbs as Record<DaySegment, SegmentCarbLimits> | undefined,
         preOccupiedSlots: dayConfig.preOccupiedSlots || level.preOccupiedSlots || [],
+        blockedSlots: dayConfig.blockedSlots || [],
         wpBudget: dayConfig.wpBudget,
       };
     }
@@ -32,5 +34,6 @@ export function getDayConfig(level: LevelConfig, day: number): DayConfigResult {
     availableFoods: level.availableFoods || [],
     carbRequirements: level.carbRequirements || { min: 0, max: 999 },
     preOccupiedSlots: level.preOccupiedSlots || [],
+    blockedSlots: [],
   };
 }

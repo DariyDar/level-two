@@ -18,6 +18,7 @@ interface SlotGridProps {
   activeShip?: Ship | null;
   hoveredSlot?: number | null;
   segmentValidation?: SegmentValidation[];
+  blockedSlots?: number[];
 }
 
 function getSegmentCarbColor(validation: SegmentValidation): string {
@@ -40,8 +41,10 @@ export function SlotGrid({
   activeShip,
   hoveredSlot,
   segmentValidation,
+  blockedSlots = [],
 }: SlotGridProps) {
   const activeShipSize = activeShip ? SHIP_SIZE_TO_SLOTS[activeShip.size] : 1;
+  const blockedSlotsSet = new Set(blockedSlots);
 
   // Build a map of slot number -> placed ship info
   const slotToShip = new Map<number, { placedShip: PlacedShip; isStart: boolean }>();
@@ -155,6 +158,7 @@ export function SlotGrid({
             ship={shipInfo?.isStart ? ship : undefined}
             isOccupied={!!shipInfo?.isStart}
             isPreOccupied={!!shipInfo?.placedShip.isPreOccupied}
+            isBlocked={blockedSlotsSet.has(slotNumber)}
             groupStartSlot={groupStartSlot}
             isHighlighted={highlightedSlots.has(slotNumber)}
             isPartOfShip={!!shipInfo && !shipInfo.isStart}
@@ -205,10 +209,12 @@ export function SlotGrid({
 export function calculateValidDropSlots(
   ship: Ship,
   placedShips: PlacedShip[],
-  allShips: Ship[]
+  allShips: Ship[],
+  blockedSlots: number[] = []
 ): Set<number> {
   const valid = new Set<number>();
   const slotsRequired = SHIP_SIZE_TO_SLOTS[ship.size];
+  const blockedSet = new Set(blockedSlots);
 
   // Build occupied slots set and food-occupied slots set
   const occupiedSlots = new Set<number>();
@@ -247,20 +253,21 @@ export function calculateValidDropSlots(
     const endIndex = pos.index + slotsRequired - 1;
     if (endIndex > 2) continue; // Doesn't fit in row
 
-    // Check if all required slots are free
+    // Check if all required slots are free (including blocked slots)
     let canPlace = true;
     for (let i = 0; i < slotsRequired; i++) {
-      if (occupiedSlots.has(slotNum + i)) {
+      if (occupiedSlots.has(slotNum + i) || blockedSet.has(slotNum + i)) {
         canPlace = false;
         break;
       }
     }
     if (!canPlace) continue;
 
-    // Check requiresEmptySlotBefore: previous slot must not contain food
+    // Check requiresEmptySlotBefore: previous slot must not contain food or be blocked
     if (ship.requiresEmptySlotBefore) {
       if (slotNum === 1) continue; // Can't place in first slot
       if (foodOccupiedSlots.has(slotNum - 1)) continue; // Previous slot has food
+      if (blockedSet.has(slotNum - 1)) continue; // Previous slot is blocked
     }
 
     // Check group segment limit: max 1 card with same group per segment
