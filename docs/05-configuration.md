@@ -68,7 +68,7 @@ public/
 | M | 2 | 2 | Умеренный |
 | L | 3 | 3 | Плавный, безопасный |
 
-### Таблица продуктов (v0.16.0)
+### Таблица продуктов (v0.16.2)
 
 | ID | Name | Size | Carbs | Glucose | WP | Fiber |
 |----|------|------|-------|---------|-----|-------|
@@ -76,15 +76,26 @@ public/
 | apple | Apple | S | 15 | 150 | 1 | yes |
 | icecream | Ice Cream | S | 15 | 150 | 0 | — |
 | popcorn | Popcorn | S | 15 | 150 | 1 | — |
+| berriesmixed | Mixed Berries | S | 10 | 100 | 2 | yes |
+| milk | Milk 2% | S | 10 | 100 | 3 | — |
 | cookie | Cookie | M | 15 | 150 | 0 | — |
 | caesarsalad | Caesar Salad | M | 15 | 150 | 3 | yes |
 | chocolatemuffin | Chocolate Muffin | M | 15 | 150 | 0 | — |
 | sandwich | Sandwich | M | 25 | 250 | 2 | — |
+| eggsboiled | Boiled Eggs | M | 5 | 50 | 4 | — |
+| greekyogurt | Greek Yogurt | M | 10 | 100 | 3 | — |
+| boiledcarrots | Boiled Carrots | M | 10 | 100 | 4 | yes |
+| chickpeas | Chickpeas | M | 10 | 100 | 3 | yes |
+| cheesewedge | Hard Cheese | M | 3 | 30 | 3 | — |
+| nutsmixed | Mixed Nuts | M | 5 | 50 | 2 | — |
 | chicken | Chicken | L | 10 | 100 | 3 | — |
 | rice | Rice | L | 30 | 300 | 4 | — |
 | burger | Hamburger | L | 30 | 300 | 3 | — |
 | oatmeal | Oatmeal | L | 25 | 250 | 4 | yes |
 | pizza | Pizza | L | 30 | 300 | 3 | — |
+| vegetablestew | Vegetable Stew | L | 10 | 100 | 4 | yes |
+| cottagecheese | Cottage Cheese 5% | L | 10 | 100 | 4 | — |
+| avocado | Avocado | L | 5 | 50 | 3 | yes |
 
 > **Принцип WP:** Сладкое (ice cream, cookie, muffin) бесплатно (WP=0) — это соблазн. Полезная еда (oatmeal, rice, chicken) стоит дорого (3-4 WP). Создаёт дилемму risk/reward.
 

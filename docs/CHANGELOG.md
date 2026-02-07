@@ -15,6 +15,16 @@
 - Удалены MoodIndicator.tsx, MoodIndicator.css
 - Добавлен EyeToggle.tsx (src/components/ui/)
 
+### v0.16.1
+- Удалён общий индикатор углеводов из header (Carbs Xg)
+- Валидация: каждый сегмент обязан набрать минимум carbs для запуска симуляции
+- Carbs отображаются на карточках размещённых в слотах
+
+### v0.16.2
+- Добавлено 11 новых продуктов: eggs, berries, yogurt, milk, vegetable stew, carrots, chickpeas, cottage cheese, cheese, avocado, nuts
+- Fiber у: berries, vegetable stew, carrots, chickpeas, avocado
+- Всего продуктов: 24 (13 оригинальных + 11 новых)
+
 ---
 
 ## 6 февраля (v0.13.1 → v0.15.6)
