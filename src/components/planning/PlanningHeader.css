@@ -44,31 +44,6 @@
   color: #fc8181;
 }
 
-.planning-header__carbs {
-  flex: 1 1 auto;
-  max-width: 500px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.planning-header__carbs-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #a0aec0;
-}
-
-.planning-header__carbs-value {
-  font-weight: 600;
-  color: #e2e8f0;
-}
-
-.planning-header__warning {
-  font-size: 11px;
-  color: #ed8936;
-}
-
 .planning-header__simulate {
   padding: 12px 24px;
   border: none;

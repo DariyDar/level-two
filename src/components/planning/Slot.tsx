@@ -62,6 +62,7 @@ export function Slot({
           instanceId={placedShip.instanceId}
           isPlaced={true}
           isPreOccupied={isPreOccupied}
+          showDetails={true}
         />
       ) : (
         <span className="slot__number">{slotNumber}</span>

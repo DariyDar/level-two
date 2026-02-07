@@ -108,7 +108,8 @@ export function PlanningPhase() {
           max: limits.max,
         });
 
-        if (current > 0 && current < limits.min) {
+        // Every segment must meet its minimum carbs
+        if (current < limits.min) {
           errors.push(`${seg}: need at least ${limits.min}g carbs`);
         }
         if (current > limits.max) {
@@ -126,14 +127,8 @@ export function PlanningPhase() {
       }
     }
 
-    // Check that all segments with limits have enough carbs (only if any food placed at all)
-    const hasAnyFood = totalCarbs > 0;
-    const allSegmentsMeetMin = !dayConfig.segmentCarbs || segments.every(
-      (s) => s.currentCarbs === 0 || s.currentCarbs >= s.min
-    );
-
     updateValidation({
-      isValid: hasAnyFood && errors.length === 0 && allSegmentsMeetMin,
+      isValid: errors.length === 0,
       totalCarbs,
       minCarbs: dayConfig.carbRequirements?.min ?? 0,
       maxCarbs: dayConfig.carbRequirements?.max ?? 999,
@@ -305,7 +300,7 @@ export function PlanningPhase() {
           currentBG={currentLevel.initialBG ?? 100}
           wpRemaining={wpBudget - wpSpent}
           wpBudget={wpBudget}
-          validation={planValidation}
+          isValid={planValidation.isValid}
           onSimulate={handleSimulate}
         />
 
