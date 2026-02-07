@@ -1,6 +1,10 @@
 # Changelog
 
-## 7 февраля (v0.17.0 → v0.18.2)
+## 7 февраля (v0.17.0 → v0.18.3)
+
+### v0.18.3
+- **Muscle Drain Rates adjusted**: `[0, 25, 50, 75, 100, 125, 150]` → `[0, 25, 50, 85, 120, 150, 175]`
+- Steeper ramp at tiers 3-6, Fast Insulin tier 6 = 175/h
 
 ### v0.18.2
 - **Muscle Drain Rates halved**: `[0, 50, 100, 125, 150, 200, 250]` → `[0, 25, 50, 75, 100, 125, 150]`

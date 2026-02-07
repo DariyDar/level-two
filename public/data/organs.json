@@ -16,7 +16,7 @@
       }
     },
     "muscles": {
-      "drainRates": [0, 25, 50, 75, 100, 125, 150]
+      "drainRates": [0, 25, 50, 85, 120, 150, 175]
     },
     "metforminEffect": {
       "capacity": 120,

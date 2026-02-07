@@ -81,10 +81,10 @@ Parameter,Value,Unit,Description
 muscleDrainRates[0],0,mg/dL/h,Tier 0 - No drain
 muscleDrainRates[1],25,mg/dL/h,Tier 1 - Basal
 muscleDrainRates[2],50,mg/dL/h,Tier 2
-muscleDrainRates[3],75,mg/dL/h,Tier 3
-muscleDrainRates[4],100,mg/dL/h,Tier 4
-muscleDrainRates[5],125,mg/dL/h,Tier 5 - Maximum normal
-muscleDrainRates[6],150,mg/dL/h,Tier 6 - Boosted only (Fast Insulin)
+muscleDrainRates[3],85,mg/dL/h,Tier 3
+muscleDrainRates[4],120,mg/dL/h,Tier 4
+muscleDrainRates[5],150,mg/dL/h,Tier 5 - Maximum normal
+muscleDrainRates[6],175,mg/dL/h,Tier 6 - Boosted only (Fast Insulin)
 minTier,0,tier,Minimum muscle tier
 maxTier,5,tier,Maximum muscle tier (normal)
 boostedMaxTier,6,tier,Maximum muscle tier (with Fast Insulin)
