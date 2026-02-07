@@ -31,10 +31,11 @@
       "wpBudget": 12,
       "availableFoods": [
         { "id": "banana", "count": 1 },
+        { "id": "apple", "count": 1 },
         { "id": "icecream", "count": 1 },
         { "id": "cookie", "count": 1 },
         { "id": "popcorn", "count": 1 },
-        { "id": "cheesewedge", "count": 1 }
+        { "id": "sandwich", "count": 1 }
       ],
       "availableInterventions": [
         { "id": "light_exercise", "count": 2 }
@@ -52,9 +53,10 @@
       "day": 3,
       "wpBudget": 12,
       "availableFoods": [
+        { "id": "banana", "count": 1 },
+        { "id": "apple", "count": 1 },
         { "id": "cookie", "count": 1 },
-        { "id": "popcorn", "count": 1 },
-        { "id": "cheesewedge", "count": 1 }
+        { "id": "popcorn", "count": 1 }
       ],
       "availableInterventions": [
         { "id": "light_exercise", "count": 1 },

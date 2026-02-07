@@ -73,8 +73,8 @@ export function ShipCard({
         <div className="ship-card__details">
           <span className="ship-card__name">{ship.name}</span>
           <span className="ship-card__info">
-            {ship.carbs ?? ship.load}g
-            {showDetailedIndicators && ` · ${ship.size === 'S' ? 1 : ship.size === 'M' ? 2 : 3}h`}
+            {ship.loadType === 'Glucose' ? `${ship.carbs ?? ship.load}g` : ''}
+            {showDetailedIndicators && `${ship.loadType === 'Glucose' ? ' · ' : ''}${ship.size === 'S' ? 1 : ship.size === 'M' ? 2 : 3}h`}
           </span>
         </div>
       )}
@@ -115,8 +115,8 @@ export function ShipCardOverlay({ ship }: { ship: Ship }) {
       <div className="ship-card__details">
         <span className="ship-card__name">{ship.name}</span>
         <span className="ship-card__info">
-          {ship.carbs ?? ship.load}g
-          {showDetailedIndicators && ` · ${ship.size === 'S' ? 1 : ship.size === 'M' ? 2 : 3}h`}
+          {ship.loadType === 'Glucose' ? `${ship.carbs ?? ship.load}g` : ''}
+          {showDetailedIndicators && `${ship.loadType === 'Glucose' ? ' · ' : ''}${ship.size === 'S' ? 1 : ship.size === 'M' ? 2 : 3}h`}
         </span>
       </div>
     </div>
