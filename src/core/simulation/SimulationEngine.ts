@@ -18,6 +18,7 @@ export interface ContainerLevel {
   bg: number;
   metforminEffect: number;
   exerciseEffect: number;
+  intenseExerciseEffect: number;
 }
 
 export interface UnloadingShip {
@@ -101,6 +102,7 @@ export interface SimulationConfig {
   // Effect decay
   metforminDecayRate: number;
   exerciseDecayRate: number;
+  intenseExerciseDecayRate: number;
 
   // Boosts
   liverBoostCooldown: number;
@@ -131,6 +133,7 @@ const DEFAULT_CONFIG: SimulationConfig = {
   muscleDrainRates: [0, 30, 35, 40, 45, 50], // Excel v0.6: Linear 30→50 progression
   metforminDecayRate: 7, // TODO: Excel v0.6 specifies 10/hour (to be updated in v0.4.0)
   exerciseDecayRate: 100, // Excel v0.6: 100/hour (1 hour to full decay)
+  intenseExerciseDecayRate: 0, // Intense exercise never decays (persists all day)
   liverBoostCooldown: 3, // Excel v0.6: 3 hours
   liverBoostDuration: 1,
   liverBoostTier: 2,
@@ -229,6 +232,7 @@ export class SimulationEngine {
         bg: this.config.initialBG,
         metforminEffect: 0,
         exerciseEffect: 0,
+        intenseExerciseEffect: 0,
       },
       unloadingShip: null,
       remainingShips: queue,
@@ -380,6 +384,7 @@ export class SimulationEngine {
         bg: this.state.containers.bg,
         metforminEffect: this.state.containers.metforminEffect,
         exerciseEffect: this.state.containers.exerciseEffect,
+        intenseExerciseEffect: this.state.containers.intenseExerciseEffect,
       },
       capacities: {
         liver: effectiveLiverCapacity,
@@ -483,6 +488,12 @@ export class SimulationEngine {
     this.state.containers.exerciseEffect = Math.max(
       0,
       this.state.containers.exerciseEffect - this.config.exerciseDecayRate * substepFraction
+    );
+
+    // Intense exercise decay (rate=0, so this is a no-op — persists all day)
+    this.state.containers.intenseExerciseEffect = Math.max(
+      0,
+      this.state.containers.intenseExerciseEffect - this.config.intenseExerciseDecayRate * substepFraction
     );
   }
 

@@ -170,6 +170,21 @@
         }
       },
       {
+        "id": "intense_exercise_bonus",
+        "description": "Intense Exercise permanent muscle tier boost for the day",
+        "type": "effect",
+        "condition": {
+          "type": "effect",
+          "container": "intenseExerciseEffect",
+          "operator": ">",
+          "value": 0
+        },
+        "effect": {
+          "type": "addTier",
+          "amount": 1
+        }
+      },
+      {
         "id": "fast_insulin",
         "description": "Fast Insulin increases drain tier (ignores degradation)",
         "type": "boost",

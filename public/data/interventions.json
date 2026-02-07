@@ -16,7 +16,21 @@
       "size": "S",
       "load": 60,
       "targetContainer": "exerciseEffect",
+      "wpCost": 2,
+      "group": "exercise",
       "description": "Moderate boost to glucose utilization."
+    },
+    {
+      "id": "intense_exercise",
+      "name": "Intense Exercise",
+      "emoji": "🏋️",
+      "size": "S",
+      "load": 100,
+      "targetContainer": "intenseExerciseEffect",
+      "wpCost": 4,
+      "group": "exercise",
+      "requiresEmptySlotBefore": true,
+      "description": "Intense training — permanent +1 muscle tier for the rest of the day."
     },
     {
       "id": "exercise",
@@ -25,6 +39,7 @@
       "size": "M",
       "load": 100,
       "targetContainer": "exerciseEffect",
+      "group": "exercise",
       "description": "Strong boost to muscle glucose uptake."
     }
   ]

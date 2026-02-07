@@ -8,7 +8,7 @@ type TabType = 'Food' | 'Interventions';
 interface ShipInventoryProps {
   allShips: Ship[];
   availableFoods: AvailableFood[];
-  availableInterventions: string[];
+  availableInterventions: AvailableFood[];
   placedShips: PlacedShip[];
 }
 
@@ -52,12 +52,12 @@ export function ShipInventory({
         }
       }
     } else {
-      for (const id of availableInterventions) {
-        const ship = allShips.find((s) => s.id === id);
+      for (const ai of availableInterventions) {
+        const ship = allShips.find((s) => s.id === ai.id);
         if (!ship) continue;
 
-        const placed = placedCounts.get(id) || 0;
-        const remaining = Math.max(0, 5 - placed); // Limit interventions to 5
+        const placed = placedCounts.get(ai.id) || 0;
+        const remaining = ai.count - placed;
 
         for (let i = 0; i < remaining; i++) {
           items.push({ ship, index: i });

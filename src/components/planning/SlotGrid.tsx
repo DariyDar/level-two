@@ -111,6 +111,19 @@ export function SlotGrid({
           hoveredGroupSlots.add(targetSlot);
         }
       }
+
+      // For requiresEmptySlotBefore: also highlight the conflicting food slot before
+      if (activeShip?.requiresEmptySlotBefore && hoveredSlot > 1) {
+        const prevSlot = hoveredSlot - 1;
+        const prevShipInfo = slotToShip.get(prevSlot);
+        if (prevShipInfo) {
+          const prevShip = ships.find((s) => s.id === prevShipInfo.placedShip.shipId);
+          if (prevShip?.loadType === 'Glucose') {
+            hoveredGroupSlots.add(prevSlot);
+          }
+        }
+      }
+
       isHoveredGroupValid = false;
     }
   }
@@ -197,8 +210,11 @@ export function calculateValidDropSlots(
   const valid = new Set<number>();
   const slotsRequired = SHIP_SIZE_TO_SLOTS[ship.size];
 
-  // Build occupied slots set
+  // Build occupied slots set and food-occupied slots set
   const occupiedSlots = new Set<number>();
+  const foodOccupiedSlots = new Set<number>();
+  const segmentGroupCount: Record<string, number> = { Morning: 0, Day: 0, Evening: 0 };
+
   for (const placed of placedShips) {
     const placedShipConfig = allShips.find((s) => s.id === placed.shipId);
     if (!placedShipConfig) continue;
@@ -212,6 +228,14 @@ export function calculateValidDropSlots(
 
     for (let i = 0; i < size; i++) {
       occupiedSlots.add(startSlot + i);
+      if (placedShipConfig.loadType === 'Glucose') {
+        foodOccupiedSlots.add(startSlot + i);
+      }
+    }
+
+    // Count placed cards with same group per segment
+    if (ship.group && placedShipConfig.group === ship.group) {
+      segmentGroupCount[placed.segment]++;
     }
   }
 
@@ -231,10 +255,20 @@ export function calculateValidDropSlots(
         break;
       }
     }
+    if (!canPlace) continue;
 
-    if (canPlace) {
-      valid.add(slotNum);
+    // Check requiresEmptySlotBefore: previous slot must not contain food
+    if (ship.requiresEmptySlotBefore) {
+      if (slotNum === 1) continue; // Can't place in first slot
+      if (foodOccupiedSlots.has(slotNum - 1)) continue; // Previous slot has food
     }
+
+    // Check group segment limit: max 1 card with same group per segment
+    if (ship.group && segmentGroupCount[pos.segment] >= 1) {
+      continue;
+    }
+
+    valid.add(slotNum);
   }
 
   return valid;

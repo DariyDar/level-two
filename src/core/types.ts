@@ -26,7 +26,8 @@ export type ContainerId =
   | 'liver'
   | 'bg'
   | 'metforminEffect'
-  | 'exerciseEffect';
+  | 'exerciseEffect'
+  | 'intenseExerciseEffect';
 
 // Organs (process/utilize substances):
 //   'liver' (code) = Liver (Excel) - organ with container
@@ -74,6 +75,8 @@ export interface Ship {
   description?: string;
   wpCost?: number; // Willpower cost (0-9, 0 = free)
   fiber?: boolean; // Fiber content (displays leaf icon)
+  group?: string; // Group for per-segment limits (e.g., "exercise")
+  requiresEmptySlotBefore?: boolean; // Previous slot must not contain food
 }
 
 export interface PlacedShip {
@@ -178,7 +181,7 @@ export interface LevelConfig {
   };
   // Day-specific configs (overrides legacy fields)
   dayConfigs?: DayConfig[];
-  availableInterventions: string[];
+  availableInterventions: AvailableFood[];
   preOccupiedSlots?: PreOccupiedSlot[];
   initialDegradation?: SimpleDegradation;
   interventionCharges: {

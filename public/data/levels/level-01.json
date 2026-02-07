@@ -56,7 +56,10 @@
       }
     }
   ],
-  "availableInterventions": [],
+  "availableInterventions": [
+    { "id": "light_exercise", "count": 2 },
+    { "id": "intense_exercise", "count": 1 }
+  ],
   "interventionCharges": {
     "liverBoost": 3,
     "pancreasBoost": 2

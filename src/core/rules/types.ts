@@ -203,6 +203,7 @@ export interface RuleEvaluationContext {
     bg: number;
     metforminEffect: number;
     exerciseEffect: number;
+    intenseExerciseEffect: number;
   };
 
   // Container capacities

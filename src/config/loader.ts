@@ -23,6 +23,9 @@ interface RawInterventionConfig {
   load: number;
   targetContainer: string;
   description?: string;
+  wpCost?: number;
+  group?: string;
+  requiresEmptySlotBefore?: boolean;
 }
 
 interface RawLevelConfig {
@@ -32,7 +35,7 @@ interface RawLevelConfig {
   days: number;
   initialBG?: number;
   availableFoods?: AvailableFood[] | string[]; // Optional: can be in dayConfigs instead
-  availableInterventions: string[];
+  availableInterventions: AvailableFood[] | string[];
   preOccupiedSlots?: { slot: number; shipId: string }[];
   carbRequirements?: { // Optional: can be in dayConfigs instead
     min: number;
@@ -89,8 +92,11 @@ function transformIntervention(raw: RawInterventionConfig): Ship {
     size: raw.size,
     load: raw.load,
     loadType: 'Treatment' as LoadType,
-    targetContainer: raw.targetContainer as 'metforminEffect' | 'exerciseEffect',
+    targetContainer: raw.targetContainer as 'metforminEffect' | 'exerciseEffect' | 'intenseExerciseEffect',
     description: raw.description,
+    wpCost: raw.wpCost ?? 0,
+    group: raw.group,
+    requiresEmptySlotBefore: raw.requiresEmptySlotBefore,
   };
 }
 
@@ -107,6 +113,17 @@ function normalizeAvailableFoods(foods?: AvailableFood[] | string[]): AvailableF
   return (foods as string[]).map(id => ({ id, count: 99 }));
 }
 
+// Normalize availableInterventions to always be AvailableFood[]
+function normalizeAvailableInterventions(interventions?: AvailableFood[] | string[]): AvailableFood[] {
+  if (!interventions || interventions.length === 0) return [];
+
+  if (typeof interventions[0] === 'object') {
+    return interventions as AvailableFood[];
+  }
+
+  return (interventions as string[]).map(id => ({ id, count: 99 }));
+}
+
 // Transform raw level config
 function transformLevel(raw: RawLevelConfig): LevelConfig {
   const transformed: LevelConfig = {
@@ -115,7 +132,7 @@ function transformLevel(raw: RawLevelConfig): LevelConfig {
     description: raw.description,
     days: raw.days,
     initialBG: raw.initialBG ?? 100,
-    availableInterventions: raw.availableInterventions,
+    availableInterventions: normalizeAvailableInterventions(raw.availableInterventions),
     preOccupiedSlots: raw.preOccupiedSlots ?? [],
     initialDegradation: raw.initialDegradation ?? { liver: 0, pancreas: 0 },
     interventionCharges: raw.interventionCharges,
