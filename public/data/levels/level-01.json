@@ -7,13 +7,14 @@
   "dayConfigs": [
     {
       "day": 1,
-      "wpBudget": 8,
+      "wpBudget": 12,
       "availableFoods": [
-        { "id": "oatmeal", "count": 1 },
-        { "id": "sandwich", "count": 1 },
+        { "id": "banana", "count": 1 },
+        { "id": "apple", "count": 1 },
         { "id": "icecream", "count": 1 },
         { "id": "cookie", "count": 1 },
-        { "id": "apple", "count": 1 }
+        { "id": "sandwich", "count": 1 },
+        { "id": "oatmeal", "count": 1 }
       ],
       "availableInterventions": [],
       "preOccupiedSlots": [
@@ -27,11 +28,12 @@
     },
     {
       "day": 2,
-      "wpBudget": 10,
+      "wpBudget": 12,
       "availableFoods": [
+        { "id": "banana", "count": 1 },
+        { "id": "icecream", "count": 1 },
         { "id": "cookie", "count": 1 },
         { "id": "popcorn", "count": 1 },
-        { "id": "icecream", "count": 1 },
         { "id": "cheesewedge", "count": 1 }
       ],
       "availableInterventions": [
