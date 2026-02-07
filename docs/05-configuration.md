@@ -24,7 +24,7 @@ public/
 
 ## foods.json — Корабли с едой
 
-### Схема
+### Схема (v0.16.0)
 
 ```json
 {
@@ -32,16 +32,19 @@ public/
     {
       "id": "apple",
       "name": "Apple",
-      "image": "assets/food/apple.png",
+      "emoji": "🍎",
       "size": "S",
-      "glucose": 15,
-      "description": "Light snack with moderate sugar"
+      "glucose": 150,
+      "carbs": 15,
+      "wpCost": 1,
+      "fiber": true,
+      "description": "Light snack with fiber."
     }
   ]
 }
 ```
 
-> **Примечание:** Параметр `description` не обязателен для кораблей.
+> **Конвертация:** `glucose = carbs × 10` (строгое правило с v0.16.0)
 
 ### Поля
 
@@ -49,10 +52,12 @@ public/
 |------|-----|--------------|----------|
 | `id` | string | ✅ | Уникальный идентификатор |
 | `name` | string | ✅ | Отображаемое название |
-| `image` | string | ❌ | Путь к картинке (если нет — emoji fallback) |
 | `emoji` | string | ❌ | Emoji для placeholder (🍎) |
 | `size` | "S" \| "M" \| "L" | ✅ | Размер корабля |
-| `glucose` | number | ✅ | Количество глюкозы (load) |
+| `glucose` | number | ✅ | Количество глюкозы (mg/dL) = carbs × 10 |
+| `carbs` | number | ✅ | Углеводы в граммах (для UI) |
+| `wpCost` | number | ❌ | Стоимость в WP (0-9, по умолчанию 0) |
+| `fiber` | boolean | ❌ | Наличие клетчатки (замедляет поток ×0.7) |
 | `description` | string | ❌ | Описание для tooltip |
 
 ### Размеры кораблей
@@ -63,84 +68,39 @@ public/
 | M | 2 | 2 | Умеренный |
 | L | 3 | 3 | Плавный, безопасный |
 
-### Пример полного файла
+### Таблица продуктов (v0.16.0)
+
+| ID | Name | Size | Carbs | Glucose | WP | Fiber |
+|----|------|------|-------|---------|-----|-------|
+| banana | Banana | S | 20 | 200 | 1 | — |
+| apple | Apple | S | 15 | 150 | 1 | yes |
+| icecream | Ice Cream | S | 15 | 150 | 0 | — |
+| popcorn | Popcorn | S | 15 | 150 | 1 | — |
+| cookie | Cookie | M | 15 | 150 | 0 | — |
+| caesarsalad | Caesar Salad | M | 15 | 150 | 3 | yes |
+| chocolatemuffin | Chocolate Muffin | M | 15 | 150 | 0 | — |
+| sandwich | Sandwich | M | 25 | 250 | 2 | — |
+| chicken | Chicken | L | 10 | 100 | 3 | — |
+| rice | Rice | L | 30 | 300 | 4 | — |
+| burger | Hamburger | L | 30 | 300 | 3 | — |
+| oatmeal | Oatmeal | L | 25 | 250 | 4 | yes |
+| pizza | Pizza | L | 30 | 300 | 3 | — |
+
+> **Принцип WP:** Сладкое (ice cream, cookie, muffin) бесплатно (WP=0) — это соблазн. Полезная еда (oatmeal, rice, chicken) стоит дорого (3-4 WP). Создаёт дилемму risk/reward.
+
+### Пример записи
 
 ```json
 {
-  "foods": [
-    {
-      "id": "candy",
-      "name": "Candy",
-      "emoji": "🍬",
-      "size": "S",
-      "glucose": 25,
-      "description": "Fast sugar spike. Use carefully."
-    },
-    {
-      "id": "apple",
-      "name": "Apple",
-      "emoji": "🍎",
-      "size": "S",
-      "glucose": 15,
-      "description": "Light snack with moderate sugar."
-    },
-    {
-      "id": "juice",
-      "name": "Orange Juice",
-      "emoji": "🧃",
-      "size": "S",
-      "glucose": 20,
-      "description": "Quick energy, fast absorption."
-    },
-    {
-      "id": "sandwich",
-      "name": "Sandwich",
-      "emoji": "🥪",
-      "size": "M",
-      "glucose": 35,
-      "description": "Balanced meal, steady release."
-    },
-    {
-      "id": "pasta",
-      "name": "Pasta",
-      "emoji": "🍝",
-      "size": "M",
-      "glucose": 45,
-      "description": "High carbs, moderate absorption."
-    },
-    {
-      "id": "rice",
-      "name": "Rice Bowl",
-      "emoji": "🍚",
-      "size": "M",
-      "glucose": 40,
-      "description": "Staple food, reliable energy."
-    },
-    {
-      "id": "oatmeal",
-      "name": "Oatmeal",
-      "emoji": "🥣",
-      "size": "L",
-      "glucose": 40,
-      "description": "Slow release, gentle on system."
-    },
-    {
-      "id": "beans",
-      "name": "Bean Stew",
-      "emoji": "🫘",
-      "size": "L",
-      "glucose": 35,
-      "description": "Very slow absorption, high fiber."
-    },
-    {
-      "id": "salad",
-      "name": "Big Salad",
-      "emoji": "🥗",
-      "size": "L",
-      "glucose": 25,
-      "description": "Low carbs, fills slots, very gentle."
-    }
-  ]
+  "id": "apple",
+  "name": "Apple",
+  "emoji": "🍎",
+  "size": "S",
+  "glucose": 150,
+  "carbs": 15,
+  "wpCost": 1,
+  "fiber": true,
+  "description": "Light snack with fiber."
 }
 ```
 
@@ -226,22 +186,33 @@ public/
 
 ## levels/level-XX.json — Уровни
 
-### Схема
+### Схема (v0.16.0)
 
 ```json
 {
   "id": "level-01",
   "name": "First Steps",
   "description": "Learn the basics of meal planning.",
-  "days": 1,
+  "days": 3,
 
-  "availableFoods": ["apple", "sandwich", "oatmeal"],
+  "availableFoods": [
+    { "id": "apple", "count": 3 },
+    { "id": "sandwich", "count": 2 }
+  ],
   "availableInterventions": [],
 
-  "carbRequirements": {
-    "min": 60,
-    "max": 120
-  },
+  "wpBudget": 16,
+
+  "dayConfigs": [
+    {
+      "day": 1,
+      "segmentCarbs": {
+        "Morning": { "min": 25, "optimal": 30, "max": 35 },
+        "Day": { "min": 30, "optimal": 35, "max": 40 },
+        "Evening": { "min": 20, "optimal": 25, "max": 30 }
+      }
+    }
+  ],
 
   "initialDegradation": {
     "liver": 0,
@@ -268,15 +239,53 @@ public/
 | `name` | string | ✅ | Название для UI |
 | `description` | string | ❌ | Описание уровня |
 | `days` | number | ✅ | Количество дней в уровне |
-| `availableFoods` | string[] | ✅ | Список ID еды из foods.json |
+| `availableFoods` | array | ✅ | Список ID еды из foods.json (с количеством) |
 | `availableInterventions` | string[] | ✅ | Список ID интервенций (может быть пустым) |
-| `carbRequirements.min` | number | ✅ | Минимум углеводов для старта симуляции |
-| `carbRequirements.max` | number | ✅ | Рекомендуемый максимум (warning) |
+| `wpBudget` | number | ❌ | Бюджет WP на уровень (по умолчанию 16) |
+| `dayConfigs` | array | ❌ | Конфиги для отдельных дней (переопределяют уровневые) |
 | `initialDegradation` | object | ❌ | Начальная деградация органов |
 | `interventionCharges` | object | ✅ | Заряды boost кнопок |
 | `winCondition.minRank` | 1-5 | ✅ | Минимальный ранг для прохождения дня |
 | `initialBG` | number | ❌ | Стартовый уровень глюкозы (по умолчанию 100) |
 | `preOccupiedSlots` | array | ❌ | Заранее занятые слоты (нельзя убрать/заменить) |
+
+### Segment Carb Limits (v0.16.0)
+
+Лимиты углеводов задаются **на каждый сегмент дня** вместо дневного min/max.
+
+```json
+"segmentCarbs": {
+  "Morning": { "min": 25, "optimal": 30, "max": 35 },
+  "Day":     { "min": 30, "optimal": 35, "max": 40 },
+  "Evening": { "min": 20, "optimal": 25, "max": 30 }
+}
+```
+
+| Параметр | Описание | Цвет индикатора |
+|----------|----------|-----------------|
+| `min` | Минимум углеводов в сегменте | Жёлтый (если ниже) |
+| `optimal` | Идеальное количество | Зелёный |
+| `max` | Максимум углеводов в сегменте | Жёлтый (если выше), красный (если сильно выше) |
+
+> **Legacy:** Старый формат `carbRequirements: { min, max }` на уровне по-прежнему поддерживается как fallback.
+
+### Формат dayConfigs
+
+Каждый день может переопределять параметры уровня:
+
+```json
+"dayConfigs": [
+  {
+    "day": 1,
+    "segmentCarbs": { ... },
+    "wpBudget": 12,
+    "availableFoods": [ ... ],
+    "preOccupiedSlots": [ ... ]
+  }
+]
+```
+
+Если `dayConfigs` не указан или для конкретного дня нет записи, используются уровневые значения.
 
 ### Формат preOccupiedSlots
 
@@ -295,98 +304,6 @@ public/
   { "id": "sandwich", "count": 2 },
   { "id": "oatmeal", "count": 1 }
 ]
-```
-
-### Примеры уровней
-
-#### level-01.json — Туториал
-
-```json
-{
-  "id": "level-01",
-  "name": "First Steps",
-  "description": "Learn the basics of meal planning.",
-  "days": 1,
-
-  "availableFoods": ["apple", "sandwich", "oatmeal"],
-  "availableInterventions": [],
-
-  "carbRequirements": {
-    "min": 60,
-    "max": 120
-  },
-
-  "interventionCharges": {
-    "liverBoost": 3,
-    "pancreasBoost": 2
-  },
-
-  "winCondition": {
-    "minRank": 2
-  }
-}
-```
-
-#### level-02.json — Интервенции
-
-```json
-{
-  "id": "level-02",
-  "name": "Interventions",
-  "description": "Learn to use metformin and exercise.",
-  "days": 1,
-
-  "availableFoods": ["apple", "sandwich", "pasta", "oatmeal"],
-  "availableInterventions": ["metformin", "exercise"],
-
-  "carbRequirements": {
-    "min": 80,
-    "max": 150
-  },
-
-  "interventionCharges": {
-    "liverBoost": 3,
-    "pancreasBoost": 2
-  },
-
-  "winCondition": {
-    "minRank": 2
-  }
-}
-```
-
-#### level-03.json — Повреждённая печень
-
-```json
-{
-  "id": "level-03",
-  "name": "Damaged Liver",
-  "description": "Your liver is already under stress.",
-  "days": 2,
-
-  "availableFoods": ["apple", "sandwich", "pasta", "oatmeal", "beans"],
-  "availableInterventions": ["metformin", "exercise"],
-
-  "carbRequirements": {
-    "min": 100,
-    "max": 180
-  },
-
-  "initialDegradation": {
-    "liver": 40,
-    "pancreas": 0,
-    "kidney": 0
-  },
-
-  "interventionCharges": {
-    "liverBoost": 2,
-    "pancreasBoost": 2
-  },
-
-  "winCondition": {
-    "minRank": 3
-  }
-}
 ```
 
 ---
@@ -455,7 +372,7 @@ public/
 
 ## Загрузка конфигов в приложении
 
-### TypeScript код
+### TypeScript код (v0.16.0)
 
 ```typescript
 // src/config/loader.ts
@@ -467,6 +384,9 @@ export interface FoodConfig {
   emoji?: string;
   size: 'S' | 'M' | 'L';
   glucose: number;
+  carbs: number;
+  wpCost: number;      // 0-9, по умолчанию 0
+  fiber?: boolean;
   description?: string;
 }
 
@@ -486,12 +406,20 @@ export interface LevelConfig {
   name: string;
   description?: string;
   days: number;
-  availableFoods: string[];
+  availableFoods: Array<{ id: string; count: number }>;
   availableInterventions: string[];
-  carbRequirements: {
+  wpBudget?: number;           // по умолчанию DEFAULT_WP_BUDGET (16)
+  carbRequirements?: {         // legacy, необязательное с v0.16.0
     min: number;
     max: number;
   };
+  dayConfigs?: Array<{
+    day: number;
+    segmentCarbs?: Record<DaySegment, SegmentCarbLimits>;
+    wpBudget?: number;
+    availableFoods?: Array<{ id: string; count: number }>;
+    preOccupiedSlots?: Array<{ slot: number; shipId: string }>;
+  }>;
   initialDegradation?: {
     liver: number;
     pancreas: number;
@@ -505,24 +433,6 @@ export interface LevelConfig {
     minRank: 1 | 2 | 3 | 4 | 5;
   };
 }
-
-// Загрузка
-export async function loadFoods(): Promise<FoodConfig[]> {
-  const response = await fetch('/data/foods.json');
-  const data = await response.json();
-  return data.foods;
-}
-
-export async function loadInterventions(): Promise<InterventionConfig[]> {
-  const response = await fetch('/data/interventions.json');
-  const data = await response.json();
-  return data.interventions;
-}
-
-export async function loadLevel(levelId: string): Promise<LevelConfig> {
-  const response = await fetch(`/data/levels/${levelId}.json`);
-  return response.json();
-}
 ```
 
 ---
@@ -535,6 +445,8 @@ export async function loadLevel(levelId: string): Promise<LevelConfig> {
    - Все ID уникальны
    - size один из: S, M, L
    - glucose > 0
+   - `glucose == carbs × 10` (строгая конвертация)
+   - wpCost >= 0
 
 2. **interventions.json**:
    - Все ID уникальны
@@ -543,21 +455,29 @@ export async function loadLevel(levelId: string): Promise<LevelConfig> {
 3. **level.json**:
    - Все availableFoods существуют в foods.json
    - Все availableInterventions существуют в interventions.json
-   - carbRequirements.min <= carbRequirements.max
+   - segmentCarbs: min <= optimal <= max для каждого сегмента
    - days >= 1
 
 ---
 
 ## Баланс
 
-### Рекомендации по еде
+### Рекомендации по еде (v0.16.0)
 
-| Тип | Size | Glucose | Характер |
-|-----|------|---------|----------|
-| Сладкое | S | 20-30 | Опасно, быстрый spike |
-| Фрукты | S | 10-20 | Умеренно |
-| Обычная еда | M | 30-45 | Стандарт |
-| Сложные углеводы | L | 25-40 | Безопасно |
+| Тип | Size | Carbs | Glucose | WP | Характер |
+|-----|------|-------|---------|-----|----------|
+| Сладкое (соблазн) | S-M | 15 | 150 | 0 | Бесплатно, но spike |
+| Фрукты | S | 15-20 | 150-200 | 1 | Дёшево, умеренно |
+| Обычная еда | M | 15-25 | 150-250 | 2-3 | Стандарт |
+| Полезная еда | L | 10-30 | 100-300 | 3-4 | Дорого, но безопасно |
+
+### Принцип WP-баланса
+
+- **WP = 0** — сладкое, соблазн (ice cream, cookie, muffin)
+- **WP = 1** — лёгкие перекусы (banana, apple, popcorn)
+- **WP = 2-3** — обычная еда (sandwich, chicken, burger, pizza, salad)
+- **WP = 4** — самая полезная (oatmeal, rice)
+- **Бюджет 16 WP** — хватает на ~4-6 полезных продуктов или неограниченное количество сладкого
 
 ### Рекомендации по интервенциям
 

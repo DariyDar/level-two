@@ -69,8 +69,11 @@ export interface Ship {
   /** Size category */
   size: ShipSize;
 
-  /** Amount of cargo to unload */
+  /** Amount of cargo to unload (glucose mg/dL) */
   load: number;
+
+  /** Carbohydrates in grams (for UI display) */
+  carbs: number;
 
   /** Type of cargo */
   loadType: LoadType;
@@ -78,11 +81,14 @@ export interface Ship {
   /** Target container for unloading */
   targetContainer: ContainerId;
 
+  /** Willpower cost to place (0 = free, default 0) */
+  wpCost?: number;
+
+  /** Has fiber (slows glucose flow ×0.7) */
+  fiber?: boolean;
+
   /** Optional description for UI */
   description?: string;
-
-  /** Optional tags for special effects (future) */
-  tags?: string[];
 }
 
 // === Placed Ship (in planning grid) ===
@@ -528,6 +534,42 @@ export interface SimpleDegradation {
 ## Level Models
 
 ```typescript
+// === Segment Carb Limits (v0.16.0) ===
+
+export interface SegmentCarbLimits {
+  /** Minimum carbs for this segment */
+  min: number;
+
+  /** Optimal carbs for this segment */
+  optimal: number;
+
+  /** Maximum carbs for this segment */
+  max: number;
+}
+
+// === Day Config (v0.16.0) ===
+
+export interface DayConfig {
+  /** Day number (1-indexed) */
+  day: number;
+
+  /** Per-segment carb limits */
+  segmentCarbs?: Record<DaySegment, SegmentCarbLimits>;
+
+  /** WP budget override for this day */
+  wpBudget?: number;
+
+  /** Override available foods for this day */
+  availableFoods?: Array<{ id: string; count: number }>;
+
+  /** Pre-occupied slots for this day */
+  preOccupiedSlots?: Array<{ slot: number; shipId: string }>;
+}
+
+// === WP Constants ===
+
+export const DEFAULT_WP_BUDGET = 16;
+
 // === Level Config ===
 
 export interface LevelConfig {
@@ -543,11 +585,17 @@ export interface LevelConfig {
   /** Number of days to complete */
   days: number;
 
-  /** Carb requirements */
-  carbRequirements: {
+  /** Legacy carb requirements (replaced by segmentCarbs in v0.16.0) */
+  carbRequirements?: {
     min: number;
     max: number;
   };
+
+  /** WP budget for this level (default: DEFAULT_WP_BUDGET) */
+  wpBudget?: number;
+
+  /** Per-day configurations */
+  dayConfigs?: DayConfig[];
 
   /** Available ship IDs */
   availableShips: string[];
@@ -615,6 +663,19 @@ export interface GameState {
   /** Validation state */
   planValidation: PlanValidation;
 
+  // === WP System (v0.16.0) ===
+
+  /** Total WP budget for current day */
+  wpBudget: number;
+
+  /** WP spent on placed ships */
+  wpSpent: number;
+
+  // === UI Toggle (v0.16.0) ===
+
+  /** Show detailed indicators (hours, numeric organ values) */
+  showDetailedIndicators: boolean;
+
   // === Simulation ===
 
   /** Simulation runtime state */
@@ -634,6 +695,25 @@ export interface GameState {
   levelProgress: LevelProgress | null;
 }
 
+// === Segment Validation (v0.16.0) ===
+
+export interface SegmentValidation {
+  /** Which segment */
+  segment: DaySegment;
+
+  /** Current carbs placed in this segment */
+  currentCarbs: number;
+
+  /** Minimum carbs for this segment */
+  min: number;
+
+  /** Optimal carbs for this segment */
+  optimal: number;
+
+  /** Maximum carbs for this segment */
+  max: number;
+}
+
 // === Plan Validation ===
 
 export interface PlanValidation {
@@ -643,11 +723,8 @@ export interface PlanValidation {
   /** Total carbs planned */
   totalCarbs: number;
 
-  /** Min carbs required */
-  minCarbs: number;
-
-  /** Max carbs recommended */
-  maxCarbs: number;
+  /** Per-segment validation (v0.16.0) */
+  segments: SegmentValidation[];
 
   /** Validation errors */
   errors: string[];

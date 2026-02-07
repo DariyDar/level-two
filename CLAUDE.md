@@ -74,33 +74,65 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 
 ### Key Files
 - `src/version.ts` — version number
-- `src/store/gameStore.ts` — global game state (includes mood system)
+- `src/store/gameStore.ts` — global game state (WP system, eye toggle)
 - `src/core/simulation/SimulationEngine.ts` — simulation engine with pancreas tier logic
-- `src/core/types.ts` — TypeScript type definitions (Ship, MoodLevel, MoodEffect, etc.)
+- `src/core/types.ts` — TypeScript type definitions (Ship, SegmentCarbLimits, PlanValidation, etc.)
+- `src/core/utils/levelUtils.ts` — day config resolution (segmentCarbs, wpBudget)
 - `src/core/rules/types.ts` — rule system types (includes `ignoresDegradation` modifier)
-- `src/config/loader.ts` — loads and transforms JSON configs
+- `src/config/loader.ts` — loads and transforms JSON configs (foods with wpCost)
 - `src/config/organRules.json` — organ behavior rules (pancreas tiers, muscle rates)
 - `src/components/simulation/` — simulation UI components
   - `GlucoseParticleSystem.tsx` — sugar cube particles with fiber support
   - `FiberIndicator.tsx` — fiber activity indicator
-  - `BodyDiagram.tsx` — organs layout with tier visualization
+  - `BodyDiagram.tsx` — organs layout with tier visualization (eye toggle support)
   - `OrganTierCircles.tsx` — unified tier/degradation indicator (v0.15.0)
   - `OrganSprite.tsx` — organ icon with tier circles
   - `BoostButton.tsx` — boost buttons (Liver Boost, Fast Insulin)
 - `src/components/planning/` — planning phase UI
-  - `PlanningHeader.tsx` — header with BG, Mood, Carbs, Simulate
-  - `MoodIndicator.tsx` — 5-level mood display
-  - `ShipCard.tsx` — draggable ship cards with mood/fiber badges
+  - `PlanningHeader.tsx` — header with BG, WP, Carbs, Simulate
+  - `ShipCard.tsx` — draggable ship cards with WP cost/fiber badges
+  - `SlotGrid.tsx` — slot grid with segment carb indicators
+- `src/components/ui/` — shared UI components
+  - `EyeToggle.tsx` — toggle for detailed indicators visibility
 - `public/data/` — JSON configs for ships and levels
-  - `foods.json` — food items with glucose, carbs, mood, fiber
-  - `levels/*.json` — level configurations
+  - `foods.json` — food items with glucose, carbs, wpCost, fiber
+  - `levels/*.json` — level configurations (segmentCarbs, wpBudget)
 - `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.15.3)
+### Current State (v0.16.0)
 - Planning phase: drag-and-drop ships to time slots ✅
 - Simulation phase: glucose flow visualization with particles ✅
 - Results phase: basic BG history graph ✅
 - Substep simulation: smooth container updates (10 substeps/hour) ✅
+- **Willpower Points System (v0.16.0)** ✅
+  - WP budget per day (default: 16, configurable per level/day)
+  - Each food card has a WP cost (0-9)
+  - Free cards (WP=0): Ice Cream, Cookie, Chocolate Muffin (temptation mechanic)
+  - Healthy foods cost more WP (Oatmeal: 4, Rice: 4, Chicken: 3)
+  - WP spent on placement, refunded on removal
+  - Cannot place card if insufficient WP
+  - WP indicator in planning header: `WP: X/16`
+  - WP cost badge on cards (yellow number, top-right)
+- **Segment Carb Limits (v0.16.0)** ✅
+  - Carb limits per segment (Morning/Day/Evening) instead of per day
+  - Three parameters: min, optimal, max
+  - Segment header shows: `MORNING  25 - 35g  [32g]`
+  - Color-coded current indicator:
+    - Green: close to optimal
+    - Yellow: approaching min/max boundary
+    - Red: outside min/max range
+  - Default values: Morning 25-30-35, Day 30-35-40, Evening 20-25-30
+- **Eye Toggle (v0.16.0)** ✅
+  - Toggle button (bottom-right corner, eye icon)
+  - Default: off (semi-transparent closed eye)
+  - Controls visibility of:
+    - Ship card hours (1h, 2h, 3h) — hidden by default
+    - Simulation numeric organ indicators — hidden by default
+  - Always visible: BG numeric value, tier circles
+- **Food Parameters Update (v0.16.0)** ✅
+  - Strict conversion: glucose = carbs × 10
+  - Updated all food carbs and glucose values
+  - Removed mood field from all foods
 - **Liver System (v0.15.2)** ✅
   - Normal release rate: 150 mg/dL/h
   - Stops release when BG ≥ 200
@@ -119,82 +151,31 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - Tier 0: 0, Tier 1: 50, Tier 2: 100, Tier 3: 125
   - Tier 4: 150, Tier 5: 200, Tier 6: 250 mg/dL/h
 - **Fast Insulin Boost (v0.15.0)** ✅
-  - Renamed from "Pancreas Boost"
-  - Orange drop icon (💧)
-  - +1 tier bonus when active
-  - **Ignores degradation limits** (can reach full tier even when degraded)
+  - Orange drop icon, +1 tier bonus when active
+  - **Ignores degradation limits**
   - Enables hidden 6th muscle tier (rate: 250 mg/dL/h)
 - Configuration-driven rules system ✅
-  - Organ behavior defined in JSON config files (`organRules.json`)
-  - Rule Engine evaluates conditions and actions
-  - Modifiers support `ignoresDegradation` flag
-- Carbs vs Glucose separation ✅
-  - Ships display carbs (grams) on UI
-  - Simulation uses glucose (mg/dL)
+- Carbs vs Glucose separation ✅ (strict: glucose = carbs × 10)
 - Tier-based Degradation System (v0.14.0) ✅
-  - Unified tiers 1-5 for both organs (tier 1 = healthy/non-burnable)
-  - Points per tier: 25 (unified for both organs)
-  - Tier Effects:
-    - Liver: capacity reduction (100→90→80→70→60)
-    - Pancreas: max tier reduction (5→4→3→2→1)
-  - Configuration-driven tier thresholds and effects (`degradationConfig.json`)
-  - Real-time tier calculation and effect application
-- **Unified Tier Circles (v0.15.0)** ✅
-  - `OrganTierCircles` component replaces TierCircles and DegradationCircles
-  - Visual states:
-    - Healthy circles: orange (#f97316)
-    - Degraded circles: bright pink (#ec4899)
-    - Active tier: red-orange (#FF5900) with flashing animation
-    - Boosted active: faster flashing with glow
-  - 6th tier circle appears only when boosted to tier 6
-- Organ UI System ✅
-  - OrganSprite: icon + label on substrate (rounded square background)
-  - Two substrate states: active (light #4a5568) / inactive (dark #2d3748)
-  - Unified OrganTierCircles for both tier and degradation display
-  - Labels moved inside substrates (below icons)
+  - Unified tiers 1-5, Liver: capacity reduction, Pancreas: max tier reduction
+- Unified Tier Circles (v0.15.0) ✅
+- Organ UI System ✅ (OrganSprite, substrates, tier circles)
 - Layout: 6×6 CSS Grid ✅
-  - Top row: Muscles (B1-C2) | BG (B3-C4) | Kidneys (B5-C6)
-  - Bottom row: Pancreas (E1-E2) | Liver (E3-F5)
-  - External numeric indicators beside organs (not below)
-  - Wider BG container (80px) with floating value indicator
-  - Compact containers for Liver/Kidneys (60px wide, 90px tall)
 - Food Tags System ✅
-  - Mood tags: +1 (😊) for positive mood, -1 (😔) for negative mood
-  - Fiber tags: 🌿 for foods with fiber content
-  - Visual badges on ship cards (top-right for mood, bottom-right for fiber)
+  - WP cost badge (top-right, yellow number) for foods with wpCost > 0
+  - Fiber badge (bottom-right, 🌿) for foods with fiber
 - Sugar Cube Particle System (v0.8.0) ✅
-  - Visual representation: 🧊 instead of dots
-  - Ratio: 15g glucose = 1 sugar cube
-  - Partial cubes show remainder amount (<15g) as label
-  - Fiber particles: green-tinted cubes with 30% slower speed (0.7x)
-  - Performance: ~20x fewer particles than dot system
-- Fiber System (v0.8.1 / v0.12.0) ✅
-  - Fiber Indicator: Shows 🌿 "Glucose Income Slowed" when fiber is active
-  - Pulsing animation (opacity 50%→100% over 2s)
-  - Appears for entire segment if any food with fiber is present
-  - Segment-wide effect: if any ship in segment has fiber, ALL ships in that segment move glucose slower (0.7x speed)
-  - Only affects ship→liver flow, not other glucose flows
-  - Positioned bottom-right of simulation view
-- Mood System (v0.9.0) ✅
-  - MoodLevel: 1-5 scale (1=worst, 5=best)
-  - Starts at 3 (neutral), persists between days
-  - Foods affect mood: +1 or -1 when placed in planning phase
-  - MoodIndicator: 5 emoji faces (😟😐🙂😊😄) in planning header
-  - Active mood level highlighted with scale and glow
-  - Pre-simulation risk check for negative events
-  - Probability table: Mood 1→100%, 2→75%, 3→50%, 4→25%, 5→0%
-  - Max 1 negative event per day (console logging placeholder)
-  - Mood state saved in localStorage alongside degradation
-- Planning UI Layout (v0.9.1-v0.9.2) ✅
-  - Header elements: BG | MoodIndicator | Carbs | Simulate button
-  - Carbs indicator: max-width 500px with flex-grow enabled
-  - Balanced spacing between all header elements
+- Fiber System (v0.12.0) ✅
+
+### Removed Features (v0.16.0)
+- **Mood System**: Fully removed (types, store, components, CSS, food data)
+  - Was: MoodLevel 1-5, MoodIndicator, mood badges on cards
+  - Replaced by: WP system for strategic resource management
 
 ### Disabled Features (v0.15.2)
 Features preserved in code but hidden from UI:
 - **Liver Boost**: Button hidden in SimulationPhase.tsx (functionality preserved)
 - **Metformin**: Not implemented
-- **Negative Events**: Console logging only
 
 ### Known Issues
 - Effect Containers: No threshold-based activation (planned for future)
