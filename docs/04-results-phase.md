@@ -165,35 +165,48 @@ function calculateMetrics(bgHistory: number[]): DayMetrics {
 
 ## Система деградации
 
-### Расчёт очков деградации
+### Расчёт excessBG (v0.18.0)
+
+ExcessBG рассчитывается из BG history с зональными коэффициентами:
+
+```typescript
+// Зоны деградации (из calculateResults.ts):
+for (const bg of bgHistory) {
+  if (bg > bgHigh) {  // bgHigh = 200
+    if (bg <= bgCritical) {  // 200-300 zone
+      excessBG += (bg - bgHigh) * 1.5;    // coefficient 1.5 (was 0.5)
+    } else {  // 300+ zone
+      excessBG += (bgCritical - bgHigh) * 1.5;  // 200-300 portion
+      excessBG += (bg - bgCritical) * 3.0;       // 300+ portion (was 1.0)
+    }
+  }
+}
+```
+
+### Degradation Pipeline
+
+ExcessBG → circles → distribution → points → tiers:
+
+1. **Circles**: `Math.ceil(excessBG / thresholdPerCircle)` где threshold = 100
+2. **Distribution**: чередование liver → pancreas → liver → ...
+3. **Points**: каждый circle = 25 points к органу
+4. **Tiers**: 0-24 = tier 1, 25-49 = tier 2, ... , 100+ = tier 5
+
+### Расчёт очков деградации (legacy reference)
 
 ```typescript
 interface DegradationConfig {
   // Порог, с которого начинается деградация
   bgThreshold: number;           // 200
 
-  // Множитель: насколько сильно BG влияет на деградацию
-  bgMultiplier: number;          // 0.1
+  // Зональные коэффициенты (v0.18.0)
+  highZoneCoefficient: number;      // 1.5 (200-300)
+  criticalZoneCoefficient: number;  // 3.0 (300+)
 
-  // Дополнительная деградация за критический уровень
-  criticalMultiplier: number;    // 0.3
-
-  // Максимум деградации за день
-  maxDailyDegradation: number;   // 30
-}
-
-function calculateDegradationPoints(
-  metrics: DayMetrics,
-  config: DegradationConfig
-): number {
-  // Базовая деградация от excess BG
-  let points = metrics.excessBG * config.bgMultiplier;
-
-  // Дополнительно за критические значения
-  points += metrics.timeAboveCritical * config.criticalMultiplier * 10;
-
-  // Ограничиваем максимумом
-  return Math.min(Math.round(points), config.maxDailyDegradation);
+  // Degradation buffer
+  thresholdPerCircle: number;    // 100
+  maxCircles: number;            // 5
+  pointsPerCircle: number;       // 25
 }
 ```
 

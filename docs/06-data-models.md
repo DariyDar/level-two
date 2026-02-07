@@ -28,7 +28,8 @@ export type ContainerId =
   | 'bg'
   | 'kidney'
   | 'metforminEffect'
-  | 'exerciseEffect';
+  | 'exerciseEffect'
+  | 'intenseExerciseEffect';  // v0.17.0
 
 export type OrganId = 'liver' | 'pancreas' | 'muscles' | 'kidney';
 ```
@@ -86,6 +87,12 @@ export interface Ship {
 
   /** Has fiber (slows glucose flow ×0.7) */
   fiber?: boolean;
+
+  /** Exercise group for segment limits (v0.17.0) */
+  group?: string;
+
+  /** Requires no food in slot N-1 (v0.17.0) */
+  requiresEmptySlotBefore?: boolean;
 
   /** Optional description for UI */
   description?: string;
@@ -547,7 +554,7 @@ export interface SegmentCarbLimits {
   max: number;
 }
 
-// === Day Config (v0.16.0) ===
+// === Day Config (v0.17.2) ===
 
 export interface DayConfig {
   /** Day number (1-indexed) */
@@ -562,6 +569,12 @@ export interface DayConfig {
   /** Override available foods for this day */
   availableFoods?: Array<{ id: string; count: number }>;
 
+  /** Available interventions for this day (v0.17.2) */
+  availableInterventions?: Array<{ id: string; count: number }>;
+
+  /** Blocked slots — cannot place cards here (v0.17.1) */
+  blockedSlots?: number[];
+
   /** Pre-occupied slots for this day */
   preOccupiedSlots?: Array<{ slot: number; shipId: string }>;
 }
@@ -570,7 +583,7 @@ export interface DayConfig {
 
 export const DEFAULT_WP_BUDGET = 16;
 
-// === Level Config ===
+// === Level Config (v0.17.2) ===
 
 export interface LevelConfig {
   /** Unique level ID */
@@ -585,20 +598,17 @@ export interface LevelConfig {
   /** Number of days to complete */
   days: number;
 
-  /** Legacy carb requirements (replaced by segmentCarbs in v0.16.0) */
-  carbRequirements?: {
-    min: number;
-    max: number;
-  };
-
-  /** WP budget for this level (default: DEFAULT_WP_BUDGET) */
+  /** WP budget for this level — fallback (default: DEFAULT_WP_BUDGET) */
   wpBudget?: number;
 
-  /** Per-day configurations */
+  /** Per-day configurations (primary config source since v0.17.2) */
   dayConfigs?: DayConfig[];
 
-  /** Available ship IDs */
-  availableShips: string[];
+  /** Available foods — fallback if not specified per-day */
+  availableFoods?: Array<{ id: string; count: number }>;
+
+  /** Available interventions — fallback if not specified per-day (v0.17.2) */
+  availableInterventions?: Array<{ id: string; count: number }>;
 
   /** Starting degradation (optional) */
   initialDegradation?: SimpleDegradation;

@@ -78,9 +78,11 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - `src/core/simulation/SimulationEngine.ts` — simulation engine with pancreas tier logic
 - `src/core/types.ts` — TypeScript type definitions (Ship, SegmentCarbLimits, PlanValidation, etc.)
 - `src/core/utils/levelUtils.ts` — day config resolution (segmentCarbs, wpBudget)
-- `src/core/rules/types.ts` — rule system types (includes `ignoresDegradation` modifier)
-- `src/config/loader.ts` — loads and transforms JSON configs (foods with wpCost)
-- `src/config/organRules.json` — organ behavior rules (pancreas tiers, muscle rates)
+- `src/core/rules/types.ts` — rule system types (includes `ignoresDegradation`, `minBaseTier` modifier)
+- `src/core/results/calculateResults.ts` — results phase: excessBG calculation, degradation pipeline
+- `src/config/loader.ts` — loads and transforms JSON configs (foods, interventions with wpCost)
+- `src/config/organRules.json` — organ behavior rules (pancreas tiers, liver thresholds, muscle rates)
+- `src/config/degradationConfig.json` — degradation system configuration
 - `src/components/simulation/` — simulation UI components
   - `GlucoseParticleSystem.tsx` — sugar cube particles with fiber support
   - `FiberIndicator.tsx` — fiber activity indicator
@@ -91,23 +93,63 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - `src/components/planning/` — planning phase UI
   - `PlanningHeader.tsx` — header with BG, WP, Carbs, Simulate
   - `ShipCard.tsx` — draggable ship cards with WP cost/fiber badges
-  - `SlotGrid.tsx` — slot grid with segment carb indicators
+  - `ShipInventory.tsx` — unified inventory (food + interventions, no tabs)
+  - `SlotGrid.tsx` — slot grid with segment carb indicators, blocked slots, exercise group limits
 - `src/components/ui/` — shared UI components
   - `EyeToggle.tsx` — toggle for detailed indicators visibility
 - `public/data/` — JSON configs for ships and levels
   - `foods.json` — food items with glucose, carbs, wpCost, fiber
-  - `levels/*.json` — level configurations (segmentCarbs, wpBudget)
+  - `interventions.json` — intervention cards with wpCost, group, requiresEmptySlotBefore
+  - `levels/*.json` — level configurations (per-day segmentCarbs, wpBudget, blockedSlots)
 - `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.16.0)
+### Current State (v0.18.1)
 - Planning phase: drag-and-drop ships to time slots ✅
 - Simulation phase: glucose flow visualization with particles ✅
 - Results phase: basic BG history graph ✅
 - Substep simulation: smooth container updates (10 substeps/hour) ✅
+- **Simulation Rebalancing (v0.18.0-v0.18.1)** ✅
+  - **Gradual pancreas response** — softer insulin tiers for realistic BG dynamics
+    - BG ≤80: Tier 0 (no insulin)
+    - BG 80-150: Tier 1 (basal, 50/h drain)
+    - BG ≥150: Tier 2 (elevated, 100/h drain)
+    - BG ≥200: Tier 3 (moderate, 125/h drain)
+    - BG ≥300: Tier 4 (strong, 150/h drain)
+  - **Raised liver stop threshold** — liver stops release at BG ≥300 (was 200)
+    - BG ≥250: reduced release rate 75 mg/dL/h
+    - BG ≥300: full stop (tier 0)
+  - **Increased degradation rates** — excessBG coefficients ×3
+    - Zone 200-300: coefficient 1.5 (was 0.5)
+    - Zone 300+: coefficient 3.0 (was 1.0)
+  - **Exercise hypoglycemia fix** — exercise modifiers require `minBaseTier: 1`
+    - Exercise only adds +1 tier when muscles already activated by pancreas
+    - Prevents BG dropping below 70 due to exercise at low BG
+- **Exercise Interventions (v0.17.0)** ✅
+  - **light_exercise**: size S, wpCost 2, exerciseEffect, group "exercise"
+  - **intense_exercise**: size S, wpCost 4, intenseExerciseEffect, permanent +1 tier muscles
+    - `requiresEmptySlotBefore`: slot N-1 must not contain food
+    - Slot 1 forbidden (no previous slot)
+    - Red highlight on invalid slot + blocking food slot during drag
+  - Group limit: max 1 exercise card per segment
+  - Inventory limits: per-day count via `availableInterventions: [{id, count}]`
+- **Blocked Slots (v0.17.1)** ✅
+  - `blockedSlots: number[]` in DayConfig — slots where cards cannot be placed
+  - Visual styling: gray background, lock icon, disabled state
+  - Metformin card: wpCost 0
+- **Per-Day Interventions (v0.17.2)** ✅
+  - `availableInterventions` moved from LevelConfig to DayConfig
+  - Each day specifies its own intervention inventory `[{id, count}]`
+- **Unified Inventory (v0.17.5)** ✅
+  - Food and interventions in single list (no tabs)
+  - Intervention cards hide load/volume display
+- **Pre-placed Cards (v0.16.3)** ✅
+  - `preOccupiedSlots` in DayConfig — cards placed at level start
+  - WP deducted automatically, cards cannot be removed
 - **Willpower Points System (v0.16.0)** ✅
   - WP budget per day (default: 16, configurable per level/day)
-  - Each food card has a WP cost (0-9)
-  - Free cards (WP=0): Ice Cream, Cookie, Chocolate Muffin (temptation mechanic)
+  - Each card has a WP cost (0-9), including interventions
+  - Free cards (WP=0): Ice Cream, Chocolate Muffin (temptation mechanic)
+  - Cookie: WP=2 (changed from 0 in v0.17.3)
   - Healthy foods cost more WP (Oatmeal: 4, Rice: 4, Chicken: 3)
   - WP spent on placement, refunded on removal
   - Cannot place card if insufficient WP
@@ -121,7 +163,6 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
     - Green: close to optimal
     - Yellow: approaching min/max boundary
     - Red: outside min/max range
-  - Default values: Morning 25-30-35, Day 30-35-40, Evening 20-25-30
 - **Eye Toggle (v0.16.0)** ✅
   - Toggle button (bottom-right corner, eye icon)
   - Default: off (semi-transparent closed eye)
@@ -129,22 +170,15 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
     - Ship card hours (1h, 2h, 3h) — hidden by default
     - Simulation numeric organ indicators — hidden by default
   - Always visible: BG numeric value, tier circles
-- **Food Parameters Update (v0.16.0)** ✅
-  - Strict conversion: glucose = carbs × 10
-  - Updated all food carbs and glucose values
-  - Removed mood field from all foods
-- **Liver System (v0.15.2)** ✅
+- **Liver System (v0.18.1)** ✅
   - Normal release rate: 150 mg/dL/h
-  - Stops release when BG ≥ 200
+  - Reduced release at BG ≥250: 75 mg/dL/h
+  - Stops release when BG ≥300
   - PassThrough mode: when liver ≥95% AND ship unloading → output = input rate
   - Liver Boost: DISABLED (code preserved)
-- **Pancreas Tier System (v0.15.0)** ✅
-  - Pancreas has its own "insulin secretion" tier
-  - BG thresholds trigger pancreas tiers:
-    - BG ≤80: Tier 0 (no insulin)
-    - BG 80-150: Tier 1 (basal insulin)
-    - BG ≥150: Tier 4 (strong insulin)
-    - BG ≥200: Tier 5 (maximum insulin)
+- **Pancreas Tier System (v0.18.0)** ✅
+  - Gradual insulin response (softened from v0.15.0)
+  - BG thresholds → pancreas tiers: 0/1/2/3/4 (was 0/1/4/5)
   - Pancreas tier determines base muscle tier
   - Degradation limits max pancreas tier (not directly muscle tier)
 - **Muscle Drain Rates (v0.15.1)** ✅
@@ -181,3 +215,4 @@ Features preserved in code but hidden from UI:
 - Effect Containers: No threshold-based activation (planned for future)
 - Kidneys: Not fully implemented (basic excretion only)
 - Pipe connections: Visual connections between organs not yet implemented
+- Metformin: Card exists but full effect system not implemented

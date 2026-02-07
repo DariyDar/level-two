@@ -1,5 +1,25 @@
 # Changelog
 
+## 7 февраля (v0.17.0 → v0.18.1)
+
+### Ключевые
+1. **Exercise Interventions (v0.17.0)** — Карточки упражнений: light_exercise (WP=2, +1 temp tier) и intense_exercise (WP=4, permanent +1 tier). Группа "exercise" — макс 1 на сегмент. `requiresEmptySlotBefore` для intense_exercise.
+2. **Blocked Slots (v0.17.1)** — `blockedSlots` в DayConfig: слоты, куда нельзя ставить карточки. Визуальный стиль: серый фон, иконка замка.
+3. **Per-Day Interventions (v0.17.2)** — `availableInterventions` перенесён из LevelConfig в DayConfig. Каждый день имеет свой набор интервенций `[{id, count}]`.
+4. **Simulation Rebalancing (v0.18.0)** — Смягчена реакция поджелудочной (тиры 2/3/4 вместо 4/5) + ×3 коэффициенты excessBG (1.5 для 200-300, 3.0 для 300+). Деградация стала значимой.
+5. **Liver Threshold + Exercise Fix (v0.18.1)** — Печень останавливается при BG ≥300 (было 200), сниженная скорость 75/h при BG ≥250. Упражнения работают только при baseTier ≥ 1 (предотвращает гипогликемию).
+
+### Мелкие
+- v0.16.3: Pre-placed cards (preOccupiedSlots), WP auto-deduction
+- v0.17.3: Cookie wpCost 0→2
+- v0.17.4: Дни 2-3 level-01 расширены (больше еды, выше WP). Скрыт load на карточках интервенций.
+- v0.17.5: Объединённый инвентарь без вкладок (еда + интервенции в одном списке). Тег v0.17.5 — точка отката перед ребалансом.
+- v0.18.0: Поджелудочная: BG ≥150→Tier 2, BG ≥200→Tier 3, BG ≥300→Tier 4
+- v0.18.1: `minBaseTier` в TierModifier, exercise_bonus и intense_exercise_bonus требуют baseTier ≥ 1
+- docs: Обновлена вся документация проекта (CLAUDE.md, docs/)
+
+---
+
 ## 7 февраля (v0.16.0)
 
 ### Ключевые

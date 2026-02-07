@@ -78,7 +78,7 @@ public/
 | popcorn | Popcorn | S | 15 | 150 | 1 | — |
 | berriesmixed | Mixed Berries | S | 10 | 100 | 2 | yes |
 | milk | Milk 2% | S | 10 | 100 | 3 | — |
-| cookie | Cookie | M | 15 | 150 | 0 | — |
+| cookie | Cookie | M | 15 | 150 | 2 | — |
 | caesarsalad | Caesar Salad | M | 15 | 150 | 3 | yes |
 | chocolatemuffin | Chocolate Muffin | M | 15 | 150 | 0 | — |
 | sandwich | Sandwich | M | 25 | 250 | 2 | — |
@@ -97,7 +97,7 @@ public/
 | cottagecheese | Cottage Cheese 5% | L | 10 | 100 | 4 | — |
 | avocado | Avocado | L | 5 | 50 | 3 | yes |
 
-> **Принцип WP:** Сладкое (ice cream, cookie, muffin) бесплатно (WP=0) — это соблазн. Полезная еда (oatmeal, rice, chicken) стоит дорого (3-4 WP). Создаёт дилемму risk/reward.
+> **Принцип WP:** Сладкое (ice cream, muffin) бесплатно (WP=0) — это соблазн. Cookie стоит 2 WP (v0.17.3). Полезная еда (oatmeal, rice, chicken) стоит дорого (3-4 WP). Создаёт дилемму risk/reward.
 
 ### Пример записи
 
@@ -137,7 +137,7 @@ public/
 }
 ```
 
-### Поля
+### Поля (v0.17.0)
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -148,6 +148,9 @@ public/
 | `size` | "S" \| "M" \| "L" | ✅ | Размер корабля |
 | `load` | number | ✅ | Количество вещества |
 | `targetContainer` | string | ✅ | Целевой effect container |
+| `wpCost` | number | ❌ | Стоимость в WP (по умолчанию 0) |
+| `group` | string | ❌ | Группа для лимитов (e.g. "exercise") |
+| `requiresEmptySlotBefore` | boolean | ❌ | Слот N-1 не должен содержать еду |
 | `description` | string | ❌ | Описание |
 
 ### Целевые контейнеры
@@ -155,49 +158,23 @@ public/
 | targetContainer | Эффект |
 |-----------------|--------|
 | `metforminEffect` | Подавляет деградацию печени |
-| `exerciseEffect` | Ускоряет утилизацию глюкозы мышцами |
+| `exerciseEffect` | Временный +1 tier мышцам (при exerciseEffect > 50) |
+| `intenseExerciseEffect` | Перманентный +1 tier мышцам (не затухает) |
 
-### Пример файла
+### Текущие интервенции
 
-```json
-{
-  "interventions": [
-    {
-      "id": "metformin",
-      "name": "Metformin",
-      "emoji": "💊",
-      "size": "S",
-      "load": 100,
-      "targetContainer": "metforminEffect",
-      "description": "Reduces liver degradation effects."
-    },
-    {
-      "id": "light_exercise",
-      "name": "Light Exercise",
-      "emoji": "🚶",
-      "size": "M",
-      "load": 60,
-      "targetContainer": "exerciseEffect",
-      "description": "Moderate boost to glucose utilization."
-    },
-    {
-      "id": "exercise",
-      "name": "Exercise",
-      "emoji": "🏃",
-      "size": "M",
-      "load": 100,
-      "targetContainer": "exerciseEffect",
-      "description": "Strong boost to muscle glucose uptake."
-    }
-  ]
-}
-```
+| ID | Emoji | Size | Load | WP | Group | Target | Special |
+|----|-------|------|------|----|-------|--------|---------|
+| metformin | 💊 | S | 100 | 0 | — | metforminEffect | — |
+| light_exercise | 🚶 | S | 100 | 2 | exercise | exerciseEffect | — |
+| intense_exercise | 🏋️ | S | 100 | 4 | exercise | intenseExerciseEffect | requiresEmptySlotBefore |
+| exercise | 🏃 | M | 100 | 0 | exercise | exerciseEffect | (legacy, unused in level-01) |
 
 ---
 
 ## levels/level-XX.json — Уровни
 
-### Схема (v0.16.0)
+### Схема (v0.17.2)
 
 ```json
 {
@@ -206,22 +183,25 @@ public/
   "description": "Learn the basics of meal planning.",
   "days": 3,
 
-  "availableFoods": [
-    { "id": "apple", "count": 3 },
-    { "id": "sandwich", "count": 2 }
-  ],
-  "availableInterventions": [],
-
-  "wpBudget": 16,
-
   "dayConfigs": [
     {
       "day": 1,
+      "wpBudget": 12,
+      "availableFoods": [
+        { "id": "banana", "count": 5 },
+        { "id": "apple", "count": 5 }
+      ],
+      "availableInterventions": [
+        { "id": "light_exercise", "count": 2 },
+        { "id": "intense_exercise", "count": 1 }
+      ],
       "segmentCarbs": {
         "Morning": { "min": 25, "optimal": 30, "max": 35 },
         "Day": { "min": 30, "optimal": 35, "max": 40 },
         "Evening": { "min": 20, "optimal": 25, "max": 30 }
-      }
+      },
+      "blockedSlots": [],
+      "preOccupiedSlots": []
     }
   ],
 
@@ -242,7 +222,7 @@ public/
 }
 ```
 
-### Поля
+### Поля LevelConfig
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -250,15 +230,14 @@ public/
 | `name` | string | ✅ | Название для UI |
 | `description` | string | ❌ | Описание уровня |
 | `days` | number | ✅ | Количество дней в уровне |
-| `availableFoods` | array | ✅ | Список ID еды из foods.json (с количеством) |
-| `availableInterventions` | string[] | ✅ | Список ID интервенций (может быть пустым) |
-| `wpBudget` | number | ❌ | Бюджет WP на уровень (по умолчанию 16) |
-| `dayConfigs` | array | ❌ | Конфиги для отдельных дней (переопределяют уровневые) |
+| `availableFoods` | array | ❌ | Fallback список еды (если не задан в dayConfig) |
+| `availableInterventions` | array | ❌ | Fallback интервенции (если не задан в dayConfig) |
+| `wpBudget` | number | ❌ | Fallback бюджет WP (по умолчанию 16) |
+| `dayConfigs` | array | ✅ | Конфиги для каждого дня |
 | `initialDegradation` | object | ❌ | Начальная деградация органов |
 | `interventionCharges` | object | ✅ | Заряды boost кнопок |
 | `winCondition.minRank` | 1-5 | ✅ | Минимальный ранг для прохождения дня |
 | `initialBG` | number | ❌ | Стартовый уровень глюкозы (по умолчанию 100) |
-| `preOccupiedSlots` | array | ❌ | Заранее занятые слоты (нельзя убрать/заменить) |
 
 ### Segment Carb Limits (v0.16.0)
 
@@ -280,9 +259,9 @@ public/
 
 > **Legacy:** Старый формат `carbRequirements: { min, max }` на уровне по-прежнему поддерживается как fallback.
 
-### Формат dayConfigs
+### Формат dayConfigs (v0.17.2)
 
-Каждый день может переопределять параметры уровня:
+Каждый день имеет свой полный конфиг:
 
 ```json
 "dayConfigs": [
@@ -290,13 +269,25 @@ public/
     "day": 1,
     "segmentCarbs": { ... },
     "wpBudget": 12,
-    "availableFoods": [ ... ],
-    "preOccupiedSlots": [ ... ]
+    "availableFoods": [ { "id": "banana", "count": 5 } ],
+    "availableInterventions": [ { "id": "light_exercise", "count": 2 } ],
+    "blockedSlots": [6, 12],
+    "preOccupiedSlots": [ { "slot": 1, "shipId": "oatmeal" } ]
   }
 ]
 ```
 
-Если `dayConfigs` не указан или для конкретного дня нет записи, используются уровневые значения.
+| DayConfig поле | Тип | Описание |
+|----------------|-----|----------|
+| `day` | number | Номер дня (1-indexed) |
+| `segmentCarbs` | object | Лимиты углеводов на сегмент |
+| `wpBudget` | number | WP бюджет на день |
+| `availableFoods` | `[{id, count}]` | Еда доступная в этот день |
+| `availableInterventions` | `[{id, count}]` | Интервенции доступные в этот день (v0.17.2) |
+| `blockedSlots` | `number[]` | Заблокированные слоты (v0.17.1) |
+| `preOccupiedSlots` | `[{slot, shipId}]` | Предустановленные карточки |
+
+Если `dayConfigs` не указан или для конкретного дня нет записи, используются уровневые значения как fallback.
 
 ### Формат preOccupiedSlots
 
@@ -359,8 +350,8 @@ public/
   },
 
   "rateTiers": {
-    "liverTransfer": [0, 30, 50],
-    "muscleDrain": [0, 20, 30, 50, 70, 90],
+    "liverTransfer": [0, 150, 75],
+    "muscleDrain": [0, 50, 100, 125, 150, 200, 250],
     "kidneyIntake": [0, 30, 50]
   },
 
@@ -383,7 +374,7 @@ public/
 
 ## Загрузка конфигов в приложении
 
-### TypeScript код (v0.16.0)
+### TypeScript код (v0.17.2)
 
 ```typescript
 // src/config/loader.ts
@@ -409,6 +400,9 @@ export interface InterventionConfig {
   size: 'S' | 'M' | 'L';
   load: number;
   targetContainer: string;
+  wpCost?: number;                  // v0.17.0
+  group?: string;                   // v0.17.0 (e.g. "exercise")
+  requiresEmptySlotBefore?: boolean; // v0.17.0
   description?: string;
 }
 
@@ -417,18 +411,16 @@ export interface LevelConfig {
   name: string;
   description?: string;
   days: number;
-  availableFoods: Array<{ id: string; count: number }>;
-  availableInterventions: string[];
-  wpBudget?: number;           // по умолчанию DEFAULT_WP_BUDGET (16)
-  carbRequirements?: {         // legacy, необязательное с v0.16.0
-    min: number;
-    max: number;
-  };
+  availableFoods?: Array<{ id: string; count: number }>;   // fallback
+  availableInterventions?: Array<{ id: string; count: number }>; // fallback (v0.17.2)
+  wpBudget?: number;           // fallback, по умолчанию DEFAULT_WP_BUDGET (16)
   dayConfigs?: Array<{
     day: number;
     segmentCarbs?: Record<DaySegment, SegmentCarbLimits>;
     wpBudget?: number;
     availableFoods?: Array<{ id: string; count: number }>;
+    availableInterventions?: Array<{ id: string; count: number }>; // v0.17.2
+    blockedSlots?: number[];            // v0.17.1
     preOccupiedSlots?: Array<{ slot: number; shipId: string }>;
   }>;
   initialDegradation?: {
@@ -482,21 +474,23 @@ export interface LevelConfig {
 | Обычная еда | M | 15-25 | 150-250 | 2-3 | Стандарт |
 | Полезная еда | L | 10-30 | 100-300 | 3-4 | Дорого, но безопасно |
 
-### Принцип WP-баланса
+### Принцип WP-баланса (v0.17.3)
 
-- **WP = 0** — сладкое, соблазн (ice cream, cookie, muffin)
+- **WP = 0** — сладкое, соблазн (ice cream, muffin, metformin)
 - **WP = 1** — лёгкие перекусы (banana, apple, popcorn)
-- **WP = 2-3** — обычная еда (sandwich, chicken, burger, pizza, salad)
-- **WP = 4** — самая полезная (oatmeal, rice)
-- **Бюджет 16 WP** — хватает на ~4-6 полезных продуктов или неограниченное количество сладкого
+- **WP = 2** — cookie, light_exercise, sandwich, nuts
+- **WP = 3** — обычная еда (chicken, burger, pizza, salad)
+- **WP = 4** — самая полезная (oatmeal, rice) и intense_exercise
+- **Бюджет 12 WP** (level-01) — хватает на ~3-4 полезных продукта
 
-### Рекомендации по интервенциям
+### Рекомендации по интервенциям (v0.17.0)
 
-| Интервенция | Size | Load | Эффект |
-|-------------|------|------|--------|
-| Metformin | S | 80-120 | Долгий эффект (~17ч) |
-| Light Exercise | S-M | 40-60 | Короткий эффект (~1-2ч) |
-| Exercise | M | 80-100 | Средний эффект (~2ч) |
+| Интервенция | Size | Load | WP | Эффект |
+|-------------|------|------|----|--------|
+| Metformin | S | 100 | 0 | Долгий эффект (~17ч), блокирует деградацию |
+| Light Exercise | S | 100 | 2 | Временный +1 tier мышцам (~2ч) |
+| Intense Exercise | S | 100 | 4 | Перманентный +1 tier мышцам (до конца дня) |
+| Exercise | M | 100 | 0 | Средний эффект (~2ч) (legacy) |
 
 ---
 

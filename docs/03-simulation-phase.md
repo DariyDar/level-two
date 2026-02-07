@@ -336,32 +336,20 @@ class SimulationEngine {
 
 **Роль:** Буфер глюкозы, сглаживает поступление в кровь
 
-```typescript
-interface LiverConfig {
-  capacity: number;              // 100
-  transferRates: number[];       // [0, 30, 50] units/hour
+**Rates:** `[0, 150, 75]` — tier 0: stop, tier 1: normal 150/h, tier 2: reduced 75/h
 
-  rules: [
-    // При низком BG — сливаем из печени
-    {
-      condition: { container: 'bg', op: 'lte', value: 100 },
-      action: { type: 'transfer', to: 'bg', rateTier: 1 }
-    },
-    // При высоком BG — останавливаем слив
-    {
-      condition: { container: 'bg', op: 'gte', value: 200 },
-      action: { type: 'transfer', to: 'bg', rateTier: 0 }
-    },
-    // При переполнении печени — аварийный сброс
-    {
-      condition: { container: 'liver', op: 'gte', value: 100 },
-      action: { type: 'transfer', to: 'bg', rateTier: 2 }
-    }
-  ];
-}
-```
+**Rules (v0.18.1):**
+| Priority | ID | Condition | Tier | Rate |
+|----------|---|-----------|------|------|
+| 1 | liver_boost_active | Liver Boost active | 2 | 75/h (max transfer) |
+| 2 | bg_critical_stop | BG ≥ 300 | 0 | 0 (stop) |
+| 3 | bg_high_reduce | BG ≥ 250 | 2 | 75/h (reduced) |
+| 4 | bg_low_release | BG ≤ 100 | 1 | 150/h (normal) |
+| 5 | default_normal | Default | 1 | 150/h |
 
-**Деградация влияет на:** Уменьшение capacity
+**PassThrough mode:** когда liver ≥95% AND корабль разгружается → output = input rate (обходит правила)
+
+**Деградация влияет на:** Уменьшение capacity (tier 1-5: 100/90/80/70/60)
 
 ### BG Container (Кровь)
 
@@ -382,34 +370,27 @@ interface BGConfig {
 
 ### Pancreas + Muscles (Поджелудочная + Мышцы)
 
-**Роль:** Pancreas управляет скоростью, Muscles утилизируют глюкозу
+**Роль:** Pancreas определяет tier инсулина по BG, передаёт Muscles. Muscles утилизируют глюкозу.
 
-```typescript
-interface PancreasConfig {
-  baseRateTier: number;       // 3 (номинальный)
-  maxRateTier: number;        // 5
+**Pancreas Rules (v0.18.0 — gradual response):**
+| Priority | ID | Condition | Pancreas Tier | Muscle Drain |
+|----------|---|-----------|---------------|-------------|
+| 1 | bg_critical | BG ≥ 300 | 4 | 150/h |
+| 2 | bg_very_high | BG ≥ 200 | 3 | 125/h |
+| 3 | bg_high | BG ≥ 150 | 2 | 100/h |
+| 4 | bg_low | BG ≤ 80 | 0 | 0 |
+| 5 | default_basal | Default | 1 | 50/h |
 
-  // Правила активации
-  rules: [
-    {
-      condition: { container: 'bg', op: 'gte', value: 150 },
-      action: { type: 'setMuscleTier', tier: 3 }
-    },
-    {
-      condition: { container: 'bg', op: 'lte', value: 100 },
-      action: { type: 'setMuscleTier', tier: 0 }
-    }
-  ];
-}
+**Muscle Drain Rates:** `[0, 50, 100, 125, 150, 200, 250]` (tiers 0-6)
 
-interface MusclesConfig {
-  drainRates: number[];       // [0, 20, 30, 50, 70, 90] units/hour
-}
-```
+**Modifiers applied after base tier:**
+- **Fast Insulin** (+1 tier, ignores degradation, enables tier 6 = 250/h)
+- **Exercise** (+1 tier, only if `baseTier ≥ 1` — prevents hypoglycemia) (v0.18.1)
+- **Intense Exercise** (+1 tier permanent, only if `baseTier ≥ 1`) (v0.18.1)
 
-**Деградация влияет на:** Уменьшение maxRateTier
+**Деградация влияет на:** Уменьшение maxTier поджелудочной (tier 1-5: max 5/4/3/2/1)
 
-**Exercise влияет на:** +1 к текущему tier
+**Exercise fix (v0.18.1):** `minBaseTier: 1` — exercise modifiers only apply when pancreas has already activated muscles (baseTier > 0). This prevents BG dropping below 70 due to exercise when pancreas tier is 0.
 
 ### Kidney (Почки)
 
@@ -465,12 +446,28 @@ interface ExerciseEffectConfig {
   capacity: number;           // 100
   decayRate: number;          // 50 units/hour (~2 часа)
 
+  // Modifier: +1 tier when exerciseEffect > 50 AND baseTier >= 1
   thresholds: [
     { level: 50, effect: { muscleRateTierBonus: 1 } },
-    { level: 80, effect: { muscleRateTierBonus: 2 } },
   ];
 }
 ```
+
+### Intense Exercise Effect (v0.17.0)
+
+```typescript
+interface IntenseExerciseEffectConfig {
+  capacity: number;           // 100
+  decayRate: number;          // 0 (permanent — no decay)
+
+  // Modifier: +1 tier when intenseExerciseEffect > 0 AND baseTier >= 1
+  thresholds: [
+    { level: 0, effect: { muscleRateTierBonus: 1 } },
+  ];
+}
+```
+
+> **Note:** intense_exercise provides a permanent +1 tier boost from the moment it loads until end of day (decayRate = 0).
 
 ---
 
