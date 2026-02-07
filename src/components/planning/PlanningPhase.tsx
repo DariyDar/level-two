@@ -72,6 +72,42 @@ export function PlanningPhase() {
     return getDayConfig(currentLevel, currentDay);
   }, [currentLevel, currentDay]);
 
+  // Initialize pre-occupied ships from day config
+  useEffect(() => {
+    if (!dayConfig || allShips.length === 0) return;
+
+    const preOccSlots = dayConfig.preOccupiedSlots;
+    if (!preOccSlots || preOccSlots.length === 0) return;
+
+    // Calculate total WP cost of pre-occupied ships
+    let preOccWpCost = 0;
+    for (const po of preOccSlots) {
+      const ship = allShips.find((s) => s.id === po.shipId);
+      if (ship) preOccWpCost += ship.wpCost ?? 0;
+    }
+
+    // Place pre-occupied ships if not already placed
+    const alreadyPlaced = placedShips.some((s) => s.isPreOccupied);
+    if (!alreadyPlaced) {
+      for (const po of preOccSlots) {
+        const pos = slotNumberToPosition(po.slot);
+        placeShip({
+          instanceId: `pre-${po.shipId}-${po.slot}`,
+          shipId: po.shipId,
+          segment: pos.segment,
+          row: pos.row,
+          startSlot: pos.index,
+          isPreOccupied: true,
+        });
+      }
+    }
+
+    // Ensure WP accounts for pre-occupied ships (handles retry where wpSpent resets to 0)
+    if (wpSpent < preOccWpCost) {
+      spendWp(preOccWpCost - wpSpent);
+    }
+  }, [dayConfig, allShips, currentDay, placedShips, wpSpent, placeShip, spendWp]);
+
   // Validate plan whenever placed ships change
   useEffect(() => {
     if (!currentLevel || !dayConfig) return;

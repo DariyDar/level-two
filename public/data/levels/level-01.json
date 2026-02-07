@@ -14,6 +14,9 @@
         { "id": "oatmeal", "count": 1 },
         { "id": "sandwich", "count": 1 }
       ],
+      "preOccupiedSlots": [
+        { "slot": 7, "shipId": "chicken" }
+      ],
       "segmentCarbs": {
         "Morning": { "min": 25, "optimal": 30, "max": 35 },
         "Day": { "min": 30, "optimal": 35, "max": 40 },

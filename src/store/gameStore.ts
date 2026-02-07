@@ -124,6 +124,7 @@ export const useGameStore = create<GameState>()(
         set((state) => ({
           // Keep pre-occupied ships when clearing
           placedShips: state.placedShips.filter((s) => s.isPreOccupied),
+          wpSpent: 0, // Reset WP; PlanningPhase effect will re-add pre-occupied WP cost
         })),
 
       setBgHistory: (history) => set({ bgHistory: history }),
