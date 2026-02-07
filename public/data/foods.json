@@ -151,6 +151,7 @@
       "glucose": 100,
       "carbs": 10,
       "wpCost": 2,
+      "fiber": true,
       "description": "Antioxidant-rich snack."
     },
     {
@@ -181,6 +182,7 @@
       "glucose": 100,
       "carbs": 10,
       "wpCost": 4,
+      "fiber": true,
       "description": "Hearty and nutritious."
     },
     {
@@ -191,6 +193,7 @@
       "glucose": 100,
       "carbs": 10,
       "wpCost": 4,
+      "fiber": true,
       "description": "Soft, naturally sweet."
     },
     {
@@ -201,6 +204,7 @@
       "glucose": 100,
       "carbs": 10,
       "wpCost": 3,
+      "fiber": true,
       "description": "Plant protein, versatile legume."
     },
     {
@@ -231,6 +235,7 @@
       "glucose": 50,
       "carbs": 5,
       "wpCost": 3,
+      "fiber": true,
       "description": "Healthy fats, creamy texture."
     },
     {
