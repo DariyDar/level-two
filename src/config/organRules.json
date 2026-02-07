@@ -232,7 +232,7 @@
         "ignoresDegradation": true
       }
     ],
-    "rates": [0, 50, 100, 125, 150, 200, 250],
+    "rates": [0, 25, 50, 75, 100, 125, 150],
     "minTier": 0,
     "maxTier": 5,
     "boostedMaxTier": 6

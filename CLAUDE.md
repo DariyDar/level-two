@@ -181,13 +181,13 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - BG thresholds → pancreas tiers: 0/1/2/3/4 (was 0/1/4/5)
   - Pancreas tier determines base muscle tier
   - Degradation limits max pancreas tier (not directly muscle tier)
-- **Muscle Drain Rates (v0.15.1)** ✅
-  - Tier 0: 0, Tier 1: 50, Tier 2: 100, Tier 3: 125
-  - Tier 4: 150, Tier 5: 200, Tier 6: 250 mg/dL/h
+- **Muscle Drain Rates (v0.18.2)** ✅
+  - Tier 0: 0, Tier 1: 25, Tier 2: 50, Tier 3: 75
+  - Tier 4: 100, Tier 5: 125, Tier 6: 150 mg/dL/h
 - **Fast Insulin Boost (v0.15.0)** ✅
   - Orange drop icon, +1 tier bonus when active
   - **Ignores degradation limits**
-  - Enables hidden 6th muscle tier (rate: 250 mg/dL/h)
+  - Enables hidden 6th muscle tier (rate: 150 mg/dL/h)
 - Configuration-driven rules system ✅
 - Carbs vs Glucose separation ✅ (strict: glucose = carbs × 10)
 - Tier-based Degradation System (v0.14.0) ✅

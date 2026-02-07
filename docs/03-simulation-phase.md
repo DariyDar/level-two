@@ -381,10 +381,10 @@ interface BGConfig {
 | 4 | bg_low | BG ≤ 80 | 0 | 0 |
 | 5 | default_basal | Default | 1 | 50/h |
 
-**Muscle Drain Rates:** `[0, 50, 100, 125, 150, 200, 250]` (tiers 0-6)
+**Muscle Drain Rates:** `[0, 25, 50, 75, 100, 125, 150]` (tiers 0-6)
 
 **Modifiers applied after base tier:**
-- **Fast Insulin** (+1 tier, ignores degradation, enables tier 6 = 250/h)
+- **Fast Insulin** (+1 tier, ignores degradation, enables tier 6 = 150/h)
 - **Exercise** (+1 tier, only if `baseTier ≥ 1` — prevents hypoglycemia) (v0.18.1)
 - **Intense Exercise** (+1 tier permanent, only if `baseTier ≥ 1`) (v0.18.1)
 

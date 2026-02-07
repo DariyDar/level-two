@@ -351,7 +351,7 @@ public/
 
   "rateTiers": {
     "liverTransfer": [0, 150, 75],
-    "muscleDrain": [0, 50, 100, 125, 150, 200, 250],
+    "muscleDrain": [0, 25, 50, 75, 100, 125, 150],
     "kidneyIntake": [0, 30, 50]
   },
 

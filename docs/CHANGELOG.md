@@ -1,6 +1,11 @@
 # Changelog
 
-## 7 февраля (v0.17.0 → v0.18.1)
+## 7 февраля (v0.17.0 → v0.18.2)
+
+### v0.18.2
+- **Muscle Drain Rates halved**: `[0, 50, 100, 125, 150, 200, 250]` → `[0, 25, 50, 75, 100, 125, 150]`
+- Fast Insulin tier 6 now 150/h (was 250/h)
+
 
 ### Ключевые
 1. **Exercise Interventions (v0.17.0)** — Карточки упражнений: light_exercise (WP=2, +1 temp tier) и intense_exercise (WP=4, permanent +1 tier). Группа "exercise" — макс 1 на сегмент. `requiresEmptySlotBefore` для intense_exercise.
