@@ -132,6 +132,116 @@
       "carbs": 30,
       "wpCost": 3,
       "description": "Tasty but carb-heavy."
+    },
+    {
+      "id": "eggsboiled",
+      "name": "Boiled Eggs",
+      "emoji": "🥚",
+      "size": "M",
+      "glucose": 50,
+      "carbs": 5,
+      "wpCost": 4,
+      "description": "High protein, very low carbs."
+    },
+    {
+      "id": "berriesmixed",
+      "name": "Mixed Berries",
+      "emoji": "🫐",
+      "size": "S",
+      "glucose": 100,
+      "carbs": 10,
+      "wpCost": 2,
+      "description": "Antioxidant-rich snack."
+    },
+    {
+      "id": "greekyogurt",
+      "name": "Greek Yogurt",
+      "emoji": "🥛",
+      "size": "M",
+      "glucose": 100,
+      "carbs": 10,
+      "wpCost": 3,
+      "description": "Creamy, protein-rich dairy."
+    },
+    {
+      "id": "milk",
+      "name": "Milk 2%",
+      "emoji": "🥛",
+      "size": "S",
+      "glucose": 100,
+      "carbs": 10,
+      "wpCost": 3,
+      "description": "Classic dairy drink."
+    },
+    {
+      "id": "vegetablestew",
+      "name": "Vegetable Stew",
+      "emoji": "🥘",
+      "size": "L",
+      "glucose": 100,
+      "carbs": 10,
+      "wpCost": 4,
+      "description": "Hearty and nutritious."
+    },
+    {
+      "id": "boiledcarrots",
+      "name": "Boiled Carrots",
+      "emoji": "🥕",
+      "size": "M",
+      "glucose": 100,
+      "carbs": 10,
+      "wpCost": 4,
+      "description": "Soft, naturally sweet."
+    },
+    {
+      "id": "chickpeas",
+      "name": "Chickpeas",
+      "emoji": "🫘",
+      "size": "M",
+      "glucose": 100,
+      "carbs": 10,
+      "wpCost": 3,
+      "description": "Plant protein, versatile legume."
+    },
+    {
+      "id": "cottagecheese",
+      "name": "Cottage Cheese 5%",
+      "emoji": "🧀",
+      "size": "L",
+      "glucose": 100,
+      "carbs": 10,
+      "wpCost": 4,
+      "description": "Mild, protein-packed dairy."
+    },
+    {
+      "id": "cheesewedge",
+      "name": "Hard Cheese",
+      "emoji": "🧀",
+      "size": "M",
+      "glucose": 30,
+      "carbs": 3,
+      "wpCost": 3,
+      "description": "Rich flavor, minimal carbs."
+    },
+    {
+      "id": "avocado",
+      "name": "Avocado",
+      "emoji": "🥑",
+      "size": "L",
+      "glucose": 50,
+      "carbs": 5,
+      "wpCost": 3,
+      "description": "Healthy fats, creamy texture."
+    },
+    {
+      "id": "nutsmixed",
+      "name": "Mixed Nuts",
+      "emoji": "🥜",
+      "size": "M",
+      "glucose": 50,
+      "carbs": 5,
+      "wpCost": 2,
+      "description": "Crunchy, energy-dense snack."
     }
   ]
 }
