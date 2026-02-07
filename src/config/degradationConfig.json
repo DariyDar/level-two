@@ -37,7 +37,7 @@
               "operator": ">",
               "value": 200
             },
-            "formula": "(bg - 200) * 0.1 per hour"
+            "formula": "(bg - 200) * 1.5 coefficient in excessBG (zone 200-300)"
           }
         ]
       }
@@ -76,7 +76,7 @@
               "operator": ">",
               "value": 200
             },
-            "formula": "(bg - 200) * 0.05 per hour"
+            "formula": "(bg - 200) * 1.5 coefficient in excessBG (zone 200-300), shared with liver"
           },
           {
             "id": "bg_low",

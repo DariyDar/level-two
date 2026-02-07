@@ -73,13 +73,13 @@ export function calculateMetrics(
 
       // Progressive degradation: higher zones are more dangerous
       if (bg <= bgCritical) {
-        // Zone 1: High (200-300) - coefficient 0.5
-        excessBG += (bg - bgHigh) * 0.5;
+        // Zone 1: High (200-300) - coefficient 1.5
+        excessBG += (bg - bgHigh) * 1.5;
       } else {
-        // Zone 1: High (200-300) - coefficient 0.5
-        excessBG += (bgCritical - bgHigh) * 0.5;
-        // Zone 2: Critical (300+) - coefficient 1.0
-        excessBG += (bg - bgCritical) * 1.0;
+        // Zone 1: High (200-300) - coefficient 1.5
+        excessBG += (bgCritical - bgHigh) * 1.5;
+        // Zone 2: Critical (300+) - coefficient 3.0
+        excessBG += (bg - bgCritical) * 3.0;
       }
     }
 
