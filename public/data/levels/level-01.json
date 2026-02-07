@@ -7,13 +7,15 @@
   "dayConfigs": [
     {
       "day": 1,
+      "wpBudget": 8,
       "availableFoods": [
-        { "id": "apple", "count": 1 },
-        { "id": "banana", "count": 1 },
-        { "id": "cookie", "count": 1 },
         { "id": "oatmeal", "count": 1 },
-        { "id": "sandwich", "count": 1 }
+        { "id": "sandwich", "count": 1 },
+        { "id": "icecream", "count": 1 },
+        { "id": "cookie", "count": 1 },
+        { "id": "apple", "count": 1 }
       ],
+      "availableInterventions": [],
       "preOccupiedSlots": [
         { "slot": 7, "shipId": "chicken" }
       ],
@@ -25,13 +27,18 @@
     },
     {
       "day": 2,
+      "wpBudget": 10,
       "availableFoods": [
-        { "id": "apple", "count": 1 },
-        { "id": "banana", "count": 1 },
-        { "id": "oatmeal", "count": 1 },
-        { "id": "caesarsalad", "count": 1 },
-        { "id": "sandwich", "count": 2 },
-        { "id": "cookie", "count": 1 }
+        { "id": "cookie", "count": 1 },
+        { "id": "popcorn", "count": 1 },
+        { "id": "icecream", "count": 1 },
+        { "id": "cheesewedge", "count": 1 }
+      ],
+      "availableInterventions": [
+        { "id": "light_exercise", "count": 2 }
+      ],
+      "preOccupiedSlots": [
+        { "slot": 7, "shipId": "chicken" }
       ],
       "segmentCarbs": {
         "Morning": { "min": 25, "optimal": 30, "max": 35 },
@@ -41,24 +48,26 @@
     },
     {
       "day": 3,
+      "wpBudget": 12,
       "availableFoods": [
-        { "id": "apple", "count": 1 },
-        { "id": "banana", "count": 2 },
-        { "id": "rice", "count": 1 },
-        { "id": "icecream", "count": 1 },
-        { "id": "sandwich", "count": 1 },
-        { "id": "chocolatemuffin", "count": 1 }
+        { "id": "cookie", "count": 1 },
+        { "id": "popcorn", "count": 1 },
+        { "id": "cheesewedge", "count": 1 }
       ],
+      "availableInterventions": [
+        { "id": "light_exercise", "count": 1 },
+        { "id": "intense_exercise", "count": 1 }
+      ],
+      "preOccupiedSlots": [
+        { "slot": 1, "shipId": "icecream" }
+      ],
+      "blockedSlots": [6, 12],
       "segmentCarbs": {
         "Morning": { "min": 25, "optimal": 30, "max": 35 },
         "Day": { "min": 30, "optimal": 35, "max": 40 },
         "Evening": { "min": 20, "optimal": 25, "max": 30 }
       }
     }
-  ],
-  "availableInterventions": [
-    { "id": "light_exercise", "count": 2 },
-    { "id": "intense_exercise", "count": 1 }
   ],
   "interventionCharges": {
     "liverBoost": 3,

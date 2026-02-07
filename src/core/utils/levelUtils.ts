@@ -2,6 +2,7 @@ import type { LevelConfig, AvailableFood, PreOccupiedSlot, SegmentCarbLimits, Da
 
 export interface DayConfigResult {
   availableFoods: AvailableFood[];
+  availableInterventions: AvailableFood[];
   carbRequirements?: { min: number; max: number };
   segmentCarbs?: Record<DaySegment, SegmentCarbLimits>;
   preOccupiedSlots: PreOccupiedSlot[];
@@ -20,6 +21,7 @@ export function getDayConfig(level: LevelConfig, day: number): DayConfigResult {
     if (dayConfig) {
       return {
         availableFoods: dayConfig.availableFoods,
+        availableInterventions: dayConfig.availableInterventions,
         carbRequirements: dayConfig.carbRequirements,
         segmentCarbs: dayConfig.segmentCarbs as Record<DaySegment, SegmentCarbLimits> | undefined,
         preOccupiedSlots: dayConfig.preOccupiedSlots || level.preOccupiedSlots || [],
@@ -32,6 +34,7 @@ export function getDayConfig(level: LevelConfig, day: number): DayConfigResult {
   // Fall back to legacy fields
   return {
     availableFoods: level.availableFoods || [],
+    availableInterventions: level.availableInterventions || [],
     carbRequirements: level.carbRequirements || { min: 0, max: 999 },
     preOccupiedSlots: level.preOccupiedSlots || [],
     blockedSlots: [],

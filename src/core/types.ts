@@ -151,6 +151,7 @@ export interface SegmentCarbLimits {
 export interface DayConfig {
   day: number;
   availableFoods: AvailableFood[];
+  availableInterventions: AvailableFood[];
   preOccupiedSlots?: PreOccupiedSlot[];
   blockedSlots?: number[]; // Slot numbers (1-18) that cannot accept any cards
   wpBudget?: number; // Override WP budget for this day
@@ -182,7 +183,7 @@ export interface LevelConfig {
   };
   // Day-specific configs (overrides legacy fields)
   dayConfigs?: DayConfig[];
-  availableInterventions: AvailableFood[];
+  availableInterventions?: AvailableFood[]; // Legacy: level-wide (use dayConfigs instead)
   preOccupiedSlots?: PreOccupiedSlot[];
   initialDegradation?: SimpleDegradation;
   interventionCharges: {

@@ -355,7 +355,7 @@ export function PlanningPhase() {
           <ShipInventory
             allShips={allShips}
             availableFoods={dayConfig?.availableFoods || []}
-            availableInterventions={currentLevel.availableInterventions}
+            availableInterventions={dayConfig?.availableInterventions || []}
             placedShips={placedShips}
           />
         </div>

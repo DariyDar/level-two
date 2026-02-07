@@ -35,7 +35,7 @@ interface RawLevelConfig {
   days: number;
   initialBG?: number;
   availableFoods?: AvailableFood[] | string[]; // Optional: can be in dayConfigs instead
-  availableInterventions: AvailableFood[] | string[];
+  availableInterventions?: AvailableFood[] | string[]; // Legacy: level-wide
   preOccupiedSlots?: { slot: number; shipId: string }[];
   carbRequirements?: { // Optional: can be in dayConfigs instead
     min: number;
@@ -44,6 +44,7 @@ interface RawLevelConfig {
   dayConfigs?: Array<{ // Day-specific configurations
     day: number;
     availableFoods: AvailableFood[] | string[];
+    availableInterventions?: AvailableFood[] | string[];
     preOccupiedSlots?: { slot: number; shipId: string }[];
     blockedSlots?: number[];
     wpBudget?: number;
@@ -133,12 +134,16 @@ function transformLevel(raw: RawLevelConfig): LevelConfig {
     description: raw.description,
     days: raw.days,
     initialBG: raw.initialBG ?? 100,
-    availableInterventions: normalizeAvailableInterventions(raw.availableInterventions),
     preOccupiedSlots: raw.preOccupiedSlots ?? [],
     initialDegradation: raw.initialDegradation ?? { liver: 0, pancreas: 0 },
     interventionCharges: raw.interventionCharges,
     winCondition: raw.winCondition,
   };
+
+  // Handle legacy level-wide availableInterventions
+  if (raw.availableInterventions) {
+    transformed.availableInterventions = normalizeAvailableInterventions(raw.availableInterventions);
+  }
 
   // Handle legacy availableFoods (optional now if dayConfigs exists)
   if (raw.availableFoods) {
@@ -155,6 +160,7 @@ function transformLevel(raw: RawLevelConfig): LevelConfig {
     transformed.dayConfigs = raw.dayConfigs.map((dc) => ({
       day: dc.day,
       availableFoods: normalizeAvailableFoods(dc.availableFoods) || [],
+      availableInterventions: normalizeAvailableInterventions(dc.availableInterventions),
       preOccupiedSlots: dc.preOccupiedSlots ?? [],
       blockedSlots: dc.blockedSlots ?? [],
       wpBudget: dc.wpBudget,
