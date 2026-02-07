@@ -156,6 +156,7 @@ export interface TierModifier {
   effect: ModifyTierAction;
   enabled?: boolean;
   ignoresDegradation?: boolean; // If true, this modifier bypasses degradation limits
+  minBaseTier?: number; // Modifier only applies if base tier (before modifiers) >= this value
 }
 
 // === Organ Rule Configuration ===

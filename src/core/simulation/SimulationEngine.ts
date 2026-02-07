@@ -570,6 +570,7 @@ export class SimulationEngine {
     const context = this.buildRuleContext();
 
     let tier = this.state.currentMuscleTier;
+    const baseTier = tier; // Save base tier from pancreas (before modifiers)
     const isFastInsulinActive = this.state.isFastInsulinActive;
 
     // Apply muscle modifiers (exercise, Fast Insulin)
@@ -577,6 +578,11 @@ export class SimulationEngine {
     const modifiers = muscleConfig.modifiers ?? [];
     for (const modifier of modifiers) {
       if (!modifier.condition) continue;
+
+      // Skip modifier if base tier doesn't meet minimum requirement
+      // (e.g., exercise only works when muscles activated by pancreas)
+      if (modifier.minBaseTier !== undefined && baseTier < modifier.minBaseTier) continue;
+
       const conditionMet = RuleEngine.evaluateCondition(modifier.condition, context);
 
       if (conditionMet) {

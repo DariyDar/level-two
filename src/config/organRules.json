@@ -19,14 +19,14 @@
         }
       },
       {
-        "id": "bg_high_stop",
-        "description": "Stop release when blood glucose is high",
+        "id": "bg_critical_stop",
+        "description": "Stop release when blood glucose is critical (>=300)",
         "priority": 2,
         "condition": {
           "type": "container",
           "container": "bg",
           "operator": ">=",
-          "value": 200
+          "value": 300
         },
         "action": {
           "type": "setTier",
@@ -34,9 +34,24 @@
         }
       },
       {
+        "id": "bg_high_reduce",
+        "description": "Reduced release when blood glucose is high (>=250)",
+        "priority": 3,
+        "condition": {
+          "type": "container",
+          "container": "bg",
+          "operator": ">=",
+          "value": 250
+        },
+        "action": {
+          "type": "setTier",
+          "tier": 2
+        }
+      },
+      {
         "id": "bg_low_release",
         "description": "Release glucose when blood glucose is low",
-        "priority": 3,
+        "priority": 4,
         "condition": {
           "type": "container",
           "container": "bg",
@@ -51,7 +66,7 @@
       {
         "id": "default_normal",
         "description": "Default: normal release rate",
-        "priority": 4,
+        "priority": 5,
         "condition": {
           "type": "default"
         },
@@ -171,8 +186,9 @@
     "modifiers": [
       {
         "id": "exercise_bonus",
-        "description": "Exercise increases drain tier",
+        "description": "Exercise increases drain tier (only when muscles activated by pancreas)",
         "type": "effect",
+        "minBaseTier": 1,
         "condition": {
           "type": "effect",
           "container": "exerciseEffect",
@@ -186,8 +202,9 @@
       },
       {
         "id": "intense_exercise_bonus",
-        "description": "Intense Exercise permanent muscle tier boost for the day",
+        "description": "Intense Exercise permanent muscle tier boost (only when muscles activated)",
         "type": "effect",
+        "minBaseTier": 1,
         "condition": {
           "type": "effect",
           "container": "intenseExerciseEffect",
