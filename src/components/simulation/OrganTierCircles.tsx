@@ -12,6 +12,9 @@ interface OrganTierCirclesProps {
   isBoosted?: boolean;       // Fast Insulin active - shows boost color
   showBoostedTier?: boolean; // Show 6th tier circle (only when boosted to tier 6)
 
+  // Color scheme
+  colorScheme?: 'orange' | 'green'; // Orange for muscles/pancreas, green for liver/kidneys
+
   // Layout
   size?: 'small' | 'normal';
   position?: 'top' | 'bottom';
@@ -22,13 +25,13 @@ interface OrganTierCirclesProps {
  *
  * Visual states (left to right):
  * - Degraded circles: bright pink (#ec4899)
- * - Healthy circles: orange (#f97316)
- * - Active tier circle: red-orange (#FF5900) + flashing animation
- * - When boosted: active tier uses boost color + flashing
+ * - Healthy circles: orange (#f97316) or green (#22c55e)
+ * - Active tier circles: ALL tiers up to and including activeTier flash
+ * - When boosted: active tiers use boost color + flashing
  *
- * Example for maxTier=5, degradedTiers=2, activeTier=3:
- *   [pink][pink][orange][ACTIVE-orange][orange]
- *         ^degraded^     ^tier 3 flashing^
+ * Example for maxTier=5, degradedTiers=2, activeTier=4:
+ *   [pink][pink][FLASH][FLASH][orange]
+ *         ^degraded^  ^tiers 3,4 flashing^
  */
 export function OrganTierCircles({
   maxTier,
@@ -36,6 +39,7 @@ export function OrganTierCircles({
   degradedTiers,
   isBoosted = false,
   showBoostedTier = false,
+  colorScheme = 'orange',
   size = 'normal',
   position = 'top',
 }: OrganTierCirclesProps) {
@@ -47,21 +51,25 @@ export function OrganTierCircles({
   for (let i = 0; i < totalCircles; i++) {
     const tierNumber = i + 1; // Tiers are 1-indexed
     const isDegraded = i < degradedTiers;
-    const isActive = tierNumber === activeTier;
+    // Flash all tiers up to and including activeTier (but not degraded ones)
+    const isActiveOrBelow = tierNumber <= activeTier && !isDegraded;
     const isBoostedTier = i === maxTier; // The 6th circle (index 5 when maxTier=5)
 
     // Determine circle state
     let stateClass = '';
     if (isDegraded) {
       stateClass = 'organ-tier-circle--degraded';
-    } else if (isActive) {
+    } else if (isActiveOrBelow) {
       stateClass = isBoosted
         ? 'organ-tier-circle--active-boosted'
         : 'organ-tier-circle--active';
-    } else if (isBoostedTier) {
+    } else if (isBoostedTier && showBoostedTier) {
       stateClass = 'organ-tier-circle--boosted-tier';
     } else {
-      stateClass = 'organ-tier-circle--healthy';
+      // Healthy state - use color scheme
+      stateClass = colorScheme === 'green'
+        ? 'organ-tier-circle--healthy-green'
+        : 'organ-tier-circle--healthy';
     }
 
     circles.push(
