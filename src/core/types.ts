@@ -12,9 +12,9 @@ export type DaySegment = 'Morning' | 'Day' | 'Evening';
 
 export type GamePhase = 'Planning' | 'Simulation' | 'Results';
 
-export type MoodLevel = 1 | 2 | 3 | 4 | 5;
+// === Willpower Points ===
 
-export type MoodEffect = 1 | -1; // +1 for positive, -1 for negative
+export const DEFAULT_WP_BUDGET = 16;
 
 // Naming Convention Mapping (Excel v0.6 ↔ Code):
 // Containers (store substances):
@@ -72,7 +72,7 @@ export interface Ship {
   loadType: LoadType;
   targetContainer: ContainerId;
   description?: string;
-  mood?: MoodEffect; // Mood effect: +1 (positive 😊) or -1 (negative 😔)
+  wpCost?: number; // Willpower cost (0-9, 0 = free)
   fiber?: boolean; // Fiber content (displays leaf icon)
 }
 
@@ -139,13 +139,27 @@ export interface PreOccupiedSlot {
   shipId: string;
 }
 
+export interface SegmentCarbLimits {
+  min: number;
+  optimal: number;
+  max: number;
+}
+
 export interface DayConfig {
   day: number;
   availableFoods: AvailableFood[];
   preOccupiedSlots?: PreOccupiedSlot[];
-  carbRequirements: {
+  wpBudget?: number; // Override WP budget for this day
+  // Legacy day-level carb requirements
+  carbRequirements?: {
     min: number;
     max: number;
+  };
+  // Segment-level carb requirements (preferred)
+  segmentCarbs?: {
+    Morning?: SegmentCarbLimits;
+    Day?: SegmentCarbLimits;
+    Evening?: SegmentCarbLimits;
   };
 }
 
@@ -155,6 +169,7 @@ export interface LevelConfig {
   description?: string;
   days: number;
   initialBG?: number; // Starting BG level (default 100)
+  wpBudget?: number; // Level-wide WP budget override
   // Legacy fields (used if dayConfigs not present)
   availableFoods?: AvailableFood[];
   carbRequirements?: {
@@ -218,11 +233,20 @@ export type SlotId = `${DaySegment}-${0 | 1}-${0 | 1 | 2}`;
 
 // === Validation ===
 
+export interface SegmentValidation {
+  segment: DaySegment;
+  currentCarbs: number;
+  min: number;
+  optimal: number;
+  max: number;
+}
+
 export interface PlanValidation {
   isValid: boolean;
   totalCarbs: number;
   minCarbs: number;
   maxCarbs: number;
+  segments: SegmentValidation[];
   errors: string[];
   warnings: string[];
 }

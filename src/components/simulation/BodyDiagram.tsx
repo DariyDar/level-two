@@ -1,5 +1,6 @@
 import type { SimulationState } from '../../core/simulation';
 import type { DegradationState } from '../../core/types';
+import { useGameStore } from '../../store/gameStore';
 import { ContainerView } from './ContainerView';
 import { OrganSprite } from './OrganSprite';
 import './BodyDiagram.css';
@@ -18,6 +19,7 @@ interface BodyDiagramProps {
 }
 
 export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramProps) {
+  const showDetailedIndicators = useGameStore((s) => s.showDetailedIndicators);
   const {
     currentLiverRate,
     currentMuscleRate,
@@ -50,9 +52,11 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
       {/* Muscles - B1-C2 (columns 1-2, rows 2-3) */}
       <div className="body-diagram__muscles">
         {/* Numeric value left of icon */}
-        <div className="body-diagram__value-left">
-          {Math.round(displayMuscleRate)}/h
-        </div>
+        {showDetailedIndicators && (
+          <div className="body-diagram__value-left">
+            {Math.round(displayMuscleRate)}/h
+          </div>
+        )}
 
         {/* Muscle icon with tier circles */}
         <OrganSprite
@@ -103,9 +107,11 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
       {/* Kidneys icon - B6-C6 (column 6, rows 2-3) */}
       <div className="body-diagram__kidneys-icon">
         {/* Numeric value right of container */}
-        <div className="body-diagram__value-right">
-          {Math.round(kidneyRate)}
-        </div>
+        {showDetailedIndicators && (
+          <div className="body-diagram__value-right">
+            {Math.round(kidneyRate)}
+          </div>
+        )}
 
         <OrganSprite
           label="Kidney"
@@ -118,9 +124,11 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
       {/* Pancreas - E1-E2 (columns 1-2, row 5) */}
       <div className="body-diagram__pancreas">
         {/* Numeric value left of icon - show current pancreas tier */}
-        <div className="body-diagram__value-left">
-          T{currentPancreasTier}
-        </div>
+        {showDetailedIndicators && (
+          <div className="body-diagram__value-left">
+            T{currentPancreasTier}
+          </div>
+        )}
 
         <OrganSprite
           label="Pancreas"
@@ -166,9 +174,11 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
         />
 
         {/* Numeric value right of icon */}
-        <div className="body-diagram__value-right">
-          {Math.round(displayLiverRate)}/h
-        </div>
+        {showDetailedIndicators && (
+          <div className="body-diagram__value-right">
+            {Math.round(displayLiverRate)}/h
+          </div>
+        )}
       </div>
     </div>
   );

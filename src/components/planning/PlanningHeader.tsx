@@ -1,33 +1,22 @@
-import type { PlanValidation, MoodLevel } from '../../core/types';
-import { MoodIndicator } from './MoodIndicator';
+import type { PlanValidation } from '../../core/types';
 import './PlanningHeader.css';
 
 interface PlanningHeaderProps {
   currentBG: number;
-  currentMood: MoodLevel;
+  wpRemaining: number;
+  wpBudget: number;
   validation: PlanValidation;
   onSimulate: () => void;
 }
 
 export function PlanningHeader({
   currentBG,
-  currentMood,
+  wpRemaining,
+  wpBudget,
   validation,
   onSimulate,
 }: PlanningHeaderProps) {
-  const { totalCarbs, minCarbs, maxCarbs, isValid, warnings } = validation;
-
-  // Calculate progress percentage
-  const progressPercent = Math.min((totalCarbs / maxCarbs) * 100, 100);
-  const minThreshold = (minCarbs / maxCarbs) * 100;
-
-  // Determine bar color
-  let barColor = '#4a5568'; // Gray - not enough
-  if (totalCarbs >= minCarbs && totalCarbs <= maxCarbs) {
-    barColor = '#48bb78'; // Green - optimal
-  } else if (totalCarbs > maxCarbs) {
-    barColor = '#fc8181'; // Red - too much
-  }
+  const { totalCarbs, isValid, warnings } = validation;
 
   return (
     <div className="planning-header">
@@ -36,30 +25,22 @@ export function PlanningHeader({
         <span className="planning-header__value">{currentBG}</span>
       </div>
 
-      <MoodIndicator mood={currentMood} />
+      <div className="planning-header__wp">
+        <span className="planning-header__label">WP</span>
+        <span className={`planning-header__value ${wpRemaining <= 0 ? 'planning-header__value--depleted' : ''}`}>
+          {wpRemaining}/{wpBudget}
+        </span>
+      </div>
 
       <div className="planning-header__carbs">
         <div className="planning-header__carbs-label">
           <span>Carbs</span>
           <span className="planning-header__carbs-value">
-            {totalCarbs}g / {minCarbs}-{maxCarbs}g
+            {totalCarbs}g
           </span>
         </div>
-        <div className="planning-header__progress-container">
-          <div
-            className="planning-header__progress-min"
-            style={{ left: `${minThreshold}%` }}
-          />
-          <div
-            className="planning-header__progress-bar"
-            style={{
-              width: `${progressPercent}%`,
-              backgroundColor: barColor,
-            }}
-          />
-        </div>
         {warnings.length > 0 && (
-          <span className="planning-header__warning">⚠️ {warnings[0]}</span>
+          <span className="planning-header__warning">{warnings[0]}</span>
         )}
       </div>
 
@@ -68,7 +49,7 @@ export function PlanningHeader({
         onClick={onSimulate}
         disabled={!isValid}
       >
-        Simulate ▶
+        Simulate
       </button>
     </div>
   );

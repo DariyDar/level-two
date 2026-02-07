@@ -14,9 +14,10 @@
         { "id": "oatmeal", "count": 1 },
         { "id": "sandwich", "count": 1 }
       ],
-      "carbRequirements": {
-        "min": 150,
-        "max": 300
+      "segmentCarbs": {
+        "Morning": { "min": 25, "optimal": 30, "max": 35 },
+        "Day": { "min": 30, "optimal": 35, "max": 40 },
+        "Evening": { "min": 20, "optimal": 25, "max": 30 }
       }
     },
     {
@@ -29,9 +30,10 @@
         { "id": "sandwich", "count": 2 },
         { "id": "cookie", "count": 1 }
       ],
-      "carbRequirements": {
-        "min": 165,
-        "max": 300
+      "segmentCarbs": {
+        "Morning": { "min": 25, "optimal": 30, "max": 35 },
+        "Day": { "min": 30, "optimal": 35, "max": 40 },
+        "Evening": { "min": 20, "optimal": 25, "max": 30 }
       }
     },
     {
@@ -44,9 +46,10 @@
         { "id": "sandwich", "count": 1 },
         { "id": "chocolatemuffin", "count": 1 }
       ],
-      "carbRequirements": {
-        "min": 175,
-        "max": 300
+      "segmentCarbs": {
+        "Morning": { "min": 25, "optimal": 30, "max": 35 },
+        "Day": { "min": 30, "optimal": 35, "max": 40 },
+        "Evening": { "min": 20, "optimal": 25, "max": 30 }
       }
     }
   ],

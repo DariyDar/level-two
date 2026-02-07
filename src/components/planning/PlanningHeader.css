@@ -17,6 +17,16 @@
   min-width: 70px;
 }
 
+.planning-header__wp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 16px;
+  background: #1a202c;
+  border-radius: 8px;
+  min-width: 70px;
+}
+
 .planning-header__label {
   font-size: 11px;
   color: #718096;
@@ -28,6 +38,10 @@
   font-size: 24px;
   font-weight: 700;
   color: #48bb78;
+}
+
+.planning-header__value--depleted {
+  color: #fc8181;
 }
 
 .planning-header__carbs {
@@ -48,29 +62,6 @@
 .planning-header__carbs-value {
   font-weight: 600;
   color: #e2e8f0;
-}
-
-.planning-header__progress-container {
-  position: relative;
-  height: 8px;
-  background: #1a202c;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.planning-header__progress-bar {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.2s ease, background-color 0.2s ease;
-}
-
-.planning-header__progress-min {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: #4299e1;
-  z-index: 1;
 }
 
 .planning-header__warning {

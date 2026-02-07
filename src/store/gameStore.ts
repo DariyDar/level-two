@@ -7,9 +7,8 @@ import type {
   LevelConfig,
   DayResults,
   PlanValidation,
-  MoodLevel,
-  MoodEffect,
 } from '../core/types';
+import { DEFAULT_WP_BUDGET } from '../core/types';
 import { getDayConfig } from '../core/utils/levelUtils';
 
 interface GameState {
@@ -31,10 +30,12 @@ interface GameState {
   // Persistent (between days/levels)
   degradation: SimpleDegradation;
 
-  // Mood system
-  currentMood: MoodLevel; // Current mood level (1-5)
-  negativeEventPlanned: boolean; // Whether negative event is planned for this day
-  negativeEventsToday: number; // Count of negative events today (max 1 per day)
+  // Willpower Points
+  wpBudget: number;
+  wpSpent: number;
+
+  // UI toggles
+  showDetailedIndicators: boolean;
 
   // Actions
   setPhase: (phase: GamePhase) => void;
@@ -47,9 +48,10 @@ interface GameState {
   startNextDay: () => void;
   retryDay: () => void;
   updateValidation: (validation: PlanValidation) => void;
-  updateMood: (delta: MoodEffect) => void;
-  checkNegativeEvent: () => void;
-  resetDayCounters: () => void;
+  setWpBudget: (budget: number) => void;
+  spendWp: (amount: number) => void;
+  refundWp: (amount: number) => void;
+  toggleDetailedIndicators: () => void;
 }
 
 const initialDegradation: SimpleDegradation = {
@@ -62,6 +64,7 @@ const initialValidation: PlanValidation = {
   totalCarbs: 0,
   minCarbs: 0,
   maxCarbs: 0,
+  segments: [],
   errors: [],
   warnings: [],
 };
@@ -78,27 +81,29 @@ export const useGameStore = create<GameState>()(
       bgHistory: [],
       results: null,
       degradation: initialDegradation,
-      currentMood: 3, // Start at middle mood level
-      negativeEventPlanned: false,
-      negativeEventsToday: 0,
+      wpBudget: DEFAULT_WP_BUDGET,
+      wpSpent: 0,
+      showDetailedIndicators: false,
 
       // Actions
       setPhase: (phase) => set({ phase }),
 
       setLevel: (level) => {
         const dayConfig = getDayConfig(level, 1); // Day 1 config
+        const wpBudget = dayConfig.wpBudget ?? level.wpBudget ?? DEFAULT_WP_BUDGET;
         return set({
           currentLevel: level,
           currentDay: 1,
           placedShips: [],
           planValidation: {
             ...initialValidation,
-            minCarbs: dayConfig.carbRequirements.min,
-            maxCarbs: dayConfig.carbRequirements.max,
+            minCarbs: dayConfig.carbRequirements?.min ?? 0,
+            maxCarbs: dayConfig.carbRequirements?.max ?? 999,
           },
           results: null,
           degradation: level.initialDegradation ?? initialDegradation,
-          currentMood: 3, // Reset mood to neutral when starting a level
+          wpBudget,
+          wpSpent: 0,
         });
       },
 
@@ -133,75 +138,44 @@ export const useGameStore = create<GameState>()(
         })),
 
       startNextDay: () =>
-        set((state) => ({
-          currentDay: state.currentDay + 1,
-          phase: 'Planning',
-          placedShips: [],
-          bgHistory: [],
-          results: null,
-          negativeEventPlanned: false,
-          negativeEventsToday: 0,
-        })),
+        set((state) => {
+          let wpBudget = DEFAULT_WP_BUDGET;
+          if (state.currentLevel) {
+            const dayConfig = getDayConfig(state.currentLevel, state.currentDay + 1);
+            wpBudget = dayConfig.wpBudget ?? state.currentLevel.wpBudget ?? DEFAULT_WP_BUDGET;
+          }
+          return {
+            currentDay: state.currentDay + 1,
+            phase: 'Planning',
+            placedShips: [],
+            bgHistory: [],
+            results: null,
+            wpBudget,
+            wpSpent: 0,
+          };
+        }),
 
-      // Retry returns to Planning of the same day (not reset level)
       retryDay: () =>
         set((state) => ({
           phase: 'Planning',
           placedShips: state.placedShips.filter((s) => s.isPreOccupied),
           bgHistory: [],
           results: null,
-          negativeEventPlanned: false,
-          negativeEventsToday: 0,
+          wpSpent: 0,
         })),
 
       updateValidation: (validation) => set({ planValidation: validation }),
 
-      // Mood system actions
-      updateMood: (delta) =>
-        set((state) => ({
-          currentMood: Math.max(1, Math.min(5, state.currentMood + delta)) as MoodLevel,
-        })),
+      setWpBudget: (budget) => set({ wpBudget: budget }),
 
-      checkNegativeEvent: () =>
-        set((state) => {
-          const maxNegEventsPerDay = 1;
+      spendWp: (amount) =>
+        set((state) => ({ wpSpent: state.wpSpent + amount })),
 
-          // If already at max negative events, skip check
-          if (state.negativeEventsToday >= maxNegEventsPerDay) {
-            console.log('[Mood] Max negative events reached, skipping check');
-            return {};
-          }
+      refundWp: (amount) =>
+        set((state) => ({ wpSpent: Math.max(0, state.wpSpent - amount) })),
 
-          // Calculate probability based on mood
-          const probabilities: Record<MoodLevel, number> = {
-            1: 1.0,   // 100%
-            2: 0.75,  // 75%
-            3: 0.5,   // 50%
-            4: 0.25,  // 25%
-            5: 0.0,   // 0%
-          };
-
-          const probability = probabilities[state.currentMood];
-          const roll = Math.random();
-          const eventOccurs = roll < probability;
-
-          console.log(`[Mood] Pre-simulation check: Mood=${state.currentMood}, P=${probability * 100}%, Roll=${roll.toFixed(3)}, Event=${eventOccurs}`);
-
-          if (eventOccurs) {
-            return {
-              negativeEventPlanned: true,
-              negativeEventsToday: state.negativeEventsToday + 1,
-            };
-          }
-
-          return { negativeEventPlanned: false };
-        }),
-
-      resetDayCounters: () =>
-        set({
-          negativeEventPlanned: false,
-          negativeEventsToday: 0,
-        }),
+      toggleDetailedIndicators: () =>
+        set((state) => ({ showDetailedIndicators: !state.showDetailedIndicators })),
     }),
     {
       name: 'port-management-save',
@@ -209,7 +183,6 @@ export const useGameStore = create<GameState>()(
       partialize: (state) => ({
         degradation: state.degradation,
         currentDay: state.currentDay,
-        currentMood: state.currentMood,
       }),
     }
   )

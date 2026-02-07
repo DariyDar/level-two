@@ -5,8 +5,9 @@
       "name": "Banana",
       "emoji": "🍌",
       "size": "S",
-      "glucose": 180,
-      "carbs": 18,
+      "glucose": 200,
+      "carbs": 20,
+      "wpCost": 1,
       "description": "Natural energy, potassium rich."
     },
     {
@@ -14,8 +15,9 @@
       "name": "Apple",
       "emoji": "🍎",
       "size": "S",
-      "glucose": 250,
-      "carbs": 25,
+      "glucose": 150,
+      "carbs": 15,
+      "wpCost": 1,
       "fiber": true,
       "description": "Light snack with fiber."
     },
@@ -24,9 +26,9 @@
       "name": "Ice Cream",
       "emoji": "🍦",
       "size": "S",
-      "glucose": 300,
-      "carbs": 30,
-      "mood": 1,
+      "glucose": 150,
+      "carbs": 15,
+      "wpCost": 0,
       "description": "Sweet treat, instant happiness."
     },
     {
@@ -36,6 +38,7 @@
       "size": "S",
       "glucose": 150,
       "carbs": 15,
+      "wpCost": 1,
       "description": "Light snack, quick energy."
     },
     {
@@ -43,9 +46,9 @@
       "name": "Cookie",
       "emoji": "🍪",
       "size": "M",
-      "glucose": 350,
-      "carbs": 35,
-      "mood": 1,
+      "glucose": 150,
+      "carbs": 15,
+      "wpCost": 0,
       "description": "Sweet treat, comforting."
     },
     {
@@ -53,10 +56,10 @@
       "name": "Caesar Salad",
       "emoji": "🥗",
       "size": "M",
-      "glucose": 200,
-      "carbs": 20,
+      "glucose": 150,
+      "carbs": 15,
+      "wpCost": 3,
       "fiber": true,
-      "mood": -1,
       "description": "Fresh and healthy, high fiber."
     },
     {
@@ -64,9 +67,9 @@
       "name": "Chocolate Muffin",
       "emoji": "🧁",
       "size": "M",
-      "glucose": 500,
-      "carbs": 50,
-      "mood": 1,
+      "glucose": 150,
+      "carbs": 15,
+      "wpCost": 0,
       "description": "Decadent dessert, mood booster."
     },
     {
@@ -74,8 +77,9 @@
       "name": "Sandwich",
       "emoji": "🥪",
       "size": "M",
-      "glucose": 400,
-      "carbs": 40,
+      "glucose": 250,
+      "carbs": 25,
+      "wpCost": 2,
       "description": "Balanced meal, steady release."
     },
     {
@@ -83,8 +87,9 @@
       "name": "Chicken Meal",
       "emoji": "🍗",
       "size": "L",
-      "glucose": 300,
-      "carbs": 30,
+      "glucose": 100,
+      "carbs": 10,
+      "wpCost": 3,
       "description": "Protein-rich, slow energy release."
     },
     {
@@ -92,9 +97,9 @@
       "name": "Bowl of Rice",
       "emoji": "🍚",
       "size": "L",
-      "glucose": 500,
-      "carbs": 50,
-      "mood": -1,
+      "glucose": 300,
+      "carbs": 30,
+      "wpCost": 4,
       "description": "Staple food, reliable energy."
     },
     {
@@ -102,8 +107,9 @@
       "name": "Hamburger",
       "emoji": "🍔",
       "size": "L",
-      "glucose": 450,
-      "carbs": 45,
+      "glucose": 300,
+      "carbs": 30,
+      "wpCost": 3,
       "description": "Filling meal, mixed nutrients."
     },
     {
@@ -111,10 +117,10 @@
       "name": "Oatmeal",
       "emoji": "🥣",
       "size": "L",
-      "glucose": 350,
-      "carbs": 35,
+      "glucose": 250,
+      "carbs": 25,
+      "wpCost": 4,
       "fiber": true,
-      "mood": -1,
       "description": "Slow release, gentle on system."
     },
     {
@@ -122,8 +128,9 @@
       "name": "Pepperoni Pizza Slice",
       "emoji": "🍕",
       "size": "L",
-      "glucose": 370,
-      "carbs": 37,
+      "glucose": 300,
+      "carbs": 30,
+      "wpCost": 3,
       "description": "Tasty but carb-heavy."
     }
   ]

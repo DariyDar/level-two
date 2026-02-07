@@ -11,13 +11,36 @@
   padding: 12px;
 }
 
+.slot-grid__segment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 .slot-grid__segment-title {
   color: #e2e8f0;
   font-size: 14px;
   font-weight: 600;
-  margin: 0 0 8px 4px;
+  margin: 0 0 0 4px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.slot-grid__segment-range {
+  color: #a0aec0;
+  font-size: 13px;
+  margin-left: auto;
+}
+
+.slot-grid__segment-current {
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  min-width: 36px;
+  text-align: center;
 }
 
 .slot-grid__row {

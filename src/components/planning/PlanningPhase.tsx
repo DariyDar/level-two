@@ -9,8 +9,8 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { v4 as uuidv4 } from 'uuid';
-import type { Ship, PlacedShip } from '../../core/types';
-import { slotNumberToPosition, isGlucoseShip } from '../../core/types';
+import type { Ship, PlacedShip, SegmentValidation } from '../../core/types';
+import { slotNumberToPosition, isGlucoseShip, DAY_SEGMENTS } from '../../core/types';
 import { useGameStore } from '../../store/gameStore';
 import { loadAllShips, loadLevel } from '../../config/loader';
 import { getDayConfig } from '../../core/utils/levelUtils';
@@ -31,9 +31,10 @@ export function PlanningPhase() {
     currentLevel,
     currentDay,
     setLevel,
-    currentMood,
-    updateMood,
-    checkNegativeEvent,
+    wpBudget,
+    wpSpent,
+    spendWp,
+    refundWp,
   } = useGameStore();
 
   const [allShips, setAllShips] = useState<Ship[]>([]);
@@ -75,30 +76,68 @@ export function PlanningPhase() {
   useEffect(() => {
     if (!currentLevel || !dayConfig) return;
 
+    // Calculate carbs per segment
+    const segmentCarbTotals: Record<string, number> = { Morning: 0, Day: 0, Evening: 0 };
     let totalCarbs = 0;
+
     for (const placed of placedShips) {
       const ship = allShips.find((s) => s.id === placed.shipId);
       if (ship && isGlucoseShip(ship)) {
-        totalCarbs += ship.carbs ?? ship.load;
+        const carbs = ship.carbs ?? ship.load;
+        totalCarbs += carbs;
+        segmentCarbTotals[placed.segment] += carbs;
       }
     }
 
-    const { min, max } = dayConfig.carbRequirements;
     const errors: string[] = [];
     const warnings: string[] = [];
+    const segments: SegmentValidation[] = [];
 
-    if (totalCarbs < min) {
-      errors.push(`Need at least ${min}g carbs`);
+    // Validate per segment if segmentCarbs defined
+    if (dayConfig.segmentCarbs) {
+      for (const seg of DAY_SEGMENTS) {
+        const limits = dayConfig.segmentCarbs[seg];
+        if (!limits) continue;
+
+        const current = segmentCarbTotals[seg];
+        segments.push({
+          segment: seg,
+          currentCarbs: current,
+          min: limits.min,
+          optimal: limits.optimal,
+          max: limits.max,
+        });
+
+        if (current > 0 && current < limits.min) {
+          errors.push(`${seg}: need at least ${limits.min}g carbs`);
+        }
+        if (current > limits.max) {
+          warnings.push(`${seg}: too many carbs (max ${limits.max}g)`);
+        }
+      }
+    } else if (dayConfig.carbRequirements) {
+      // Legacy day-level validation
+      const { min, max } = dayConfig.carbRequirements;
+      if (totalCarbs < min) {
+        errors.push(`Need at least ${min}g carbs`);
+      }
+      if (totalCarbs > max) {
+        warnings.push(`High carbs may cause spikes`);
+      }
     }
-    if (totalCarbs > max) {
-      warnings.push(`High carbs may cause spikes`);
-    }
+
+    // Check that all segments with limits have enough carbs (only if any food placed at all)
+    const hasAnyFood = totalCarbs > 0;
+    const allSegmentsMeetMin = !dayConfig.segmentCarbs || segments.every(
+      (s) => s.currentCarbs === 0 || s.currentCarbs >= s.min
+    );
 
     updateValidation({
-      isValid: errors.length === 0,
+      isValid: hasAnyFood && errors.length === 0 && allSegmentsMeetMin,
       totalCarbs,
-      minCarbs: min,
-      maxCarbs: max,
+      minCarbs: dayConfig.carbRequirements?.min ?? 0,
+      maxCarbs: dayConfig.carbRequirements?.max ?? 999,
+      segments,
       errors,
       warnings,
     });
@@ -173,11 +212,8 @@ export function PlanningPhase() {
         const isPreOccupied = placedShips.find(s => s.instanceId === instanceId)?.isPreOccupied;
 
         if (wasPlaced && instanceId && !isPreOccupied) {
-          // Revert mood effect when removing ship
           const ship = active.data.current?.ship as Ship;
-          if (ship.mood) {
-            updateMood(-ship.mood as 1 | -1); // Reverse the effect
-          }
+          refundWp(ship.wpCost ?? 0);
           removeShip(instanceId);
         }
         return;
@@ -190,11 +226,8 @@ export function PlanningPhase() {
         const isPreOccupied = placedShips.find(s => s.instanceId === instanceId)?.isPreOccupied;
 
         if (wasPlaced && instanceId && !isPreOccupied) {
-          // Revert mood effect when removing ship
           const ship = active.data.current?.ship as Ship;
-          if (ship.mood) {
-            updateMood(-ship.mood as 1 | -1); // Reverse the effect
-          }
+          refundWp(ship.wpCost ?? 0);
           removeShip(instanceId);
         }
         return;
@@ -214,11 +247,15 @@ export function PlanningPhase() {
       const wasPlaced = active.data.current?.isPlaced;
       const oldInstanceId = active.data.current?.instanceId;
 
-      // Remove old placement if moving (mood reverts then reapplies - net zero change)
+      // Check WP budget (only if placing from inventory, not moving)
+      const wpCost = ship.wpCost ?? 0;
+      if (!wasPlaced && wpCost > 0) {
+        const wpRemaining = wpBudget - wpSpent;
+        if (wpRemaining < wpCost) return; // Not enough WP
+      }
+
+      // Remove old placement if moving
       if (wasPlaced && oldInstanceId) {
-        if (ship.mood) {
-          updateMood(-ship.mood as 1 | -1); // Reverse old effect
-        }
         removeShip(oldInstanceId);
       }
 
@@ -236,19 +273,17 @@ export function PlanningPhase() {
 
       placeShip(newPlacement);
 
-      // Apply mood effect when placing ship
-      if (ship.mood) {
-        updateMood(ship.mood);
+      // Spend WP when placing from inventory (not when moving)
+      if (!wasPlaced && wpCost > 0) {
+        spendWp(wpCost);
       }
     },
-    [validDropSlots, placedShips, placeShip, removeShip, updateMood]
+    [validDropSlots, placedShips, placeShip, removeShip, wpBudget, wpSpent, spendWp]
   );
 
   const handleSimulate = useCallback(() => {
-    // Check for negative event before starting simulation
-    checkNegativeEvent();
     setPhase('Simulation');
-  }, [setPhase, checkNegativeEvent]);
+  }, [setPhase]);
 
   if (isLoading || !currentLevel) {
     return (
@@ -268,7 +303,8 @@ export function PlanningPhase() {
       <div className="planning-phase">
         <PlanningHeader
           currentBG={currentLevel.initialBG ?? 100}
-          currentMood={currentMood}
+          wpRemaining={wpBudget - wpSpent}
+          wpBudget={wpBudget}
           validation={planValidation}
           onSimulate={handleSimulate}
         />
@@ -281,6 +317,7 @@ export function PlanningPhase() {
             highlightedSlots={new Set()}
             activeShip={activeShip}
             hoveredSlot={hoveredSlot}
+            segmentValidation={planValidation.segments}
           />
 
           <ShipInventory

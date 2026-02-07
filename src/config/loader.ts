@@ -10,7 +10,7 @@ interface RawFoodConfig {
   glucose: number;
   carbs: number; // Carbohydrates in grams (for UI display)
   description?: string;
-  mood?: 1 | -1; // Mood effect: +1 (positive) or -1 (negative)
+  wpCost?: number; // Willpower cost (0-9)
   fiber?: boolean;
 }
 
@@ -42,7 +42,13 @@ interface RawLevelConfig {
     day: number;
     availableFoods: AvailableFood[] | string[];
     preOccupiedSlots?: { slot: number; shipId: string }[];
-    carbRequirements: { min: number; max: number };
+    wpBudget?: number;
+    carbRequirements?: { min: number; max: number };
+    segmentCarbs?: {
+      Morning?: { min: number; optimal: number; max: number };
+      Day?: { min: number; optimal: number; max: number };
+      Evening?: { min: number; optimal: number; max: number };
+    };
   }>;
   initialDegradation?: {
     liver: number;
@@ -69,7 +75,7 @@ function transformFood(raw: RawFoodConfig): Ship {
     loadType: 'Glucose' as LoadType,
     targetContainer: 'liver',
     description: raw.description,
-    mood: raw.mood,
+    wpCost: raw.wpCost ?? 0,
     fiber: raw.fiber,
   };
 }
@@ -132,7 +138,9 @@ function transformLevel(raw: RawLevelConfig): LevelConfig {
       day: dc.day,
       availableFoods: normalizeAvailableFoods(dc.availableFoods) || [],
       preOccupiedSlots: dc.preOccupiedSlots ?? [],
+      wpBudget: dc.wpBudget,
       carbRequirements: dc.carbRequirements,
+      segmentCarbs: dc.segmentCarbs,
     }));
   }
 

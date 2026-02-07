@@ -1,7 +1,7 @@
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import type { Ship } from '../../core/types';
-import { SHIP_SIZE_TO_SLOTS } from '../../core/types';
+import { useGameStore } from '../../store/gameStore';
 import './ShipCard.css';
 
 interface ShipCardProps {
@@ -21,6 +21,7 @@ export function ShipCard({
   remainingCount,
   showDetails = false,
 }: ShipCardProps) {
+  const showDetailedIndicators = useGameStore((s) => s.showDetailedIndicators);
   const draggableId = instanceId ?? `inventory-${ship.id}`;
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -37,7 +38,7 @@ export function ShipCard({
     transform: CSS.Transform.toString(transform),
   };
 
-  const slotsRequired = SHIP_SIZE_TO_SLOTS[ship.size];
+  const wpCost = ship.wpCost ?? 0;
 
   return (
     <div
@@ -58,12 +59,9 @@ export function ShipCard({
     >
       <span className="ship-card__emoji">{ship.emoji}</span>
 
-      {/* Mood icon - top right */}
-      {ship.mood === 1 && (
-        <span className="ship-card__badge ship-card__badge--mood">😊</span>
-      )}
-      {ship.mood === -1 && (
-        <span className="ship-card__badge ship-card__badge--mood">😔</span>
+      {/* WP cost badge - top right */}
+      {wpCost > 0 && (
+        <span className="ship-card__badge ship-card__badge--wp">{wpCost}</span>
       )}
 
       {/* Fiber icon - bottom right */}
@@ -75,7 +73,8 @@ export function ShipCard({
         <div className="ship-card__details">
           <span className="ship-card__name">{ship.name}</span>
           <span className="ship-card__info">
-            {ship.carbs ?? ship.load}g • {slotsRequired}h
+            {ship.carbs ?? ship.load}g
+            {showDetailedIndicators && ` · ${ship.size === 'S' ? 1 : ship.size === 'M' ? 2 : 3}h`}
           </span>
         </div>
       )}
@@ -89,7 +88,8 @@ export function ShipCard({
 
 // Drag overlay version (no drag handlers)
 export function ShipCardOverlay({ ship }: { ship: Ship }) {
-  const slotsRequired = SHIP_SIZE_TO_SLOTS[ship.size];
+  const showDetailedIndicators = useGameStore((s) => s.showDetailedIndicators);
+  const wpCost = ship.wpCost ?? 0;
 
   return (
     <div
@@ -102,12 +102,9 @@ export function ShipCardOverlay({ ship }: { ship: Ship }) {
     >
       <span className="ship-card__emoji">{ship.emoji}</span>
 
-      {/* Mood icon - top right */}
-      {ship.mood === 1 && (
-        <span className="ship-card__badge ship-card__badge--mood">😊</span>
-      )}
-      {ship.mood === -1 && (
-        <span className="ship-card__badge ship-card__badge--mood">😔</span>
+      {/* WP cost badge - top right */}
+      {wpCost > 0 && (
+        <span className="ship-card__badge ship-card__badge--wp">{wpCost}</span>
       )}
 
       {/* Fiber icon - bottom right */}
@@ -118,7 +115,8 @@ export function ShipCardOverlay({ ship }: { ship: Ship }) {
       <div className="ship-card__details">
         <span className="ship-card__name">{ship.name}</span>
         <span className="ship-card__info">
-          {ship.carbs ?? ship.load}g • {slotsRequired}h
+          {ship.carbs ?? ship.load}g
+          {showDetailedIndicators && ` · ${ship.size === 'S' ? 1 : ship.size === 'M' ? 2 : 3}h`}
         </span>
       </div>
     </div>

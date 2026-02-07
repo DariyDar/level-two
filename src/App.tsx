@@ -2,6 +2,7 @@ import { useGameStore } from './store/gameStore';
 import { PlanningPhase } from './components/planning';
 import { SimulationPhase } from './components/simulation';
 import { ResultsPhase } from './components/results';
+import { EyeToggle } from './components/ui/EyeToggle';
 import { VERSION } from './version';
 import './App.css';
 
@@ -23,6 +24,8 @@ function App() {
         {phase === 'Simulation' && <SimulationPhase />}
         {phase === 'Results' && <ResultsPhase bgHistory={bgHistory} />}
       </main>
+
+      <EyeToggle />
 
       <footer className="app-footer">
         <div className="degradation-status">
