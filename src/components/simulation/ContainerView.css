@@ -128,34 +128,38 @@
   border-radius: 0;
 }
 
-/* Chevron pattern overlay — scrolling ^-rows inside fill */
+/* Chevron pattern overlay — scrolling rows inside fill */
+/* 2 rows per tile (28px spacing), row 2 offset +8px for stagger */
 .container-view__fill--flow-up::before,
 .container-view__fill--flow-down::before {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 14'%3E%3Cpolyline points='10,11 20,4 30,11' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' opacity='0.2'/%3E%3C/svg%3E");
-  background-size: 40px 14px;
+  background-size: 40px 56px;
   background-repeat: repeat;
   pointer-events: none;
 }
 
+/* Up flow: ^ chevrons scrolling upward */
 .container-view__fill--flow-up::before {
-  animation: containerChevronUp 0.8s linear infinite;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 56'%3E%3Cpolyline points='10,20 20,12 30,20' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' opacity='0.2'/%3E%3Cpolyline points='18,48 28,40 38,48' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' opacity='0.2'/%3E%3C/svg%3E");
+  animation: containerChevronUp 2s linear infinite;
 }
 
+/* Down flow: v chevrons scrolling downward */
 .container-view__fill--flow-down::before {
-  animation: containerChevronDown 0.8s linear infinite;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 56'%3E%3Cpolyline points='10,8 20,16 30,8' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' opacity='0.2'/%3E%3Cpolyline points='18,36 28,44 38,36' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' opacity='0.2'/%3E%3C/svg%3E");
+  animation: containerChevronDown 2s linear infinite;
 }
 
 @keyframes containerChevronUp {
   from { background-position-y: 0; }
-  to { background-position-y: -14px; }
+  to { background-position-y: -56px; }
 }
 
 @keyframes containerChevronDown {
   from { background-position-y: 0; }
-  to { background-position-y: 14px; }
+  to { background-position-y: 56px; }
 }
 
 /* Floating value indicator for BG */
