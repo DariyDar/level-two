@@ -1,6 +1,6 @@
 .planning-header {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 16px;
   padding: 12px 16px;
   background: #2d3748;
@@ -46,9 +46,11 @@
 
 .planning-header__simulate {
   margin-left: auto;
-  padding: 12px 24px;
+  padding: 0 24px;
   border: none;
   border-radius: 8px;
+  display: flex;
+  align-items: center;
   background: #48bb78;
   color: white;
   font-size: 14px;
