@@ -51,7 +51,7 @@ const BG_TO_KIDNEYS = 'M 47,15 L 33,15';
 const BG_TO_MUSCLES = 'M 63,15 L 78,15';
 
 // Pancreas → Muscles: vertical orange pipe (insulin signal, centered on pancreas backdrop)
-const PANCREAS_TO_MUSCLES = 'M 76,39 L 76,18';
+const PANCREAS_TO_MUSCLES = 'M 81,39 L 81,18';
 
 // Stroke widths
 const WALL_WIDTH = 2.5;
