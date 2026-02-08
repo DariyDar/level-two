@@ -28,14 +28,14 @@ interface PipeSystemProps {
 // Ship slot pipes: from ship slot positions up to liver container
 // Slot X positions match ship queue grid (3 columns: ~18%, ~50%, ~82%)
 // Each pipe routes vertically up then horizontally into the liver container bottom (~y47)
-// Staggered horizontal routing levels (y52, y55, y58) to avoid overlap
+// Horizontal bends near bottom of body-diagram, right pipe above middle pipe
 const SHIP_PIPES = [
   // Slot 0 (left): fully vertical into LC
   'M 18,73 L 18,47',
-  // Slot 1 (center): up from x≈50, turn left into LC
-  'M 50,73 L 50,55 L 23,55 L 23,47',
-  // Slot 2 (right): up from x≈82, turn left into LC
-  'M 82,73 L 82,58 L 28,58 L 28,47',
+  // Slot 1 (center): up from x≈50, bend at y=66 (lowest), turn left into LC
+  'M 50,73 L 50,66 L 23,66 L 23,47',
+  // Slot 2 (right): up from x≈82, bend at y=63 (above middle), turn left into LC
+  'M 82,73 L 82,63 L 28,63 L 28,47',
 ];
 
 // Liver → BG: normal pipe (lower horizontal)
@@ -115,18 +115,18 @@ const SHIP_INTAKE_X = [18, 50, 82];
 const SHIP_INTAKE_Y = 73;
 
 // Funnel-shaped particle positions (dx, dy in CSS pixels from intake point)
-// Shifted 5px up; chaotic scatter across the full funnel area
+// Half-height funnel; chaotic scatter across the area
 const SUCTION_PARTICLES = [
   { dx: 0, dy: -1 },
-  { dx: -3, dy: 2 },
-  { dx: 4, dy: 1 },
+  { dx: -2, dy: 1 },
+  { dx: 3, dy: 0 },
+  { dx: -4, dy: 3 },
+  { dx: 1, dy: 2 },
+  { dx: 5, dy: 2 },
+  { dx: -3, dy: 4 },
+  { dx: 6, dy: 4 },
   { dx: -7, dy: 6 },
-  { dx: 2, dy: 5 },
-  { dx: 8, dy: 4 },
-  { dx: -4, dy: 9 },
-  { dx: 10, dy: 8 },
-  { dx: -11, dy: 13 },
-  { dx: 6, dy: 12 },
+  { dx: 4, dy: 6 },
 ];
 
 // Pseudo-random animation delay stagger for chaotic appearance
