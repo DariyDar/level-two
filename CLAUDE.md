@@ -101,7 +101,7 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - `src/components/ui/` — shared UI components
   - `EyeToggle.tsx` — toggle for detailed indicators visibility
 - `public/data/` — JSON configs for ships and levels
-  - `foods.json` — food items with glucose, carbs, wpCost, fiber
+  - `foods.json` — food items with glucose, carbs, wpCost
   - `interventions.json` — intervention cards with wpCost, group, requiresEmptySlotBefore
   - `levels/*.json` — level configurations (per-day segmentCarbs, wpBudget, blockedSlots)
 - `docs/organ-parameters.csv` — organ parameters documentation
@@ -182,10 +182,12 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
     - Ship card hours (1h, 2h, 3h) — hidden by default
     - Simulation numeric organ indicators — hidden by default
   - Always visible: BG numeric value, tier circles
-- **Liver System (v0.18.1)** ✅
-  - Normal release rate: 150 mg/dL/h
-  - Reduced release at BG ≥250: 75 mg/dL/h
-  - Stops release when BG ≥300
+- **Liver System (v0.19.5)** ✅
+  - BG ≤100: release 100/h (gluconeogenesis)
+  - BG 101-150: 0/h (normal range, liver silent)
+  - BG >150: release 50/h (elevated BG response)
+  - BG ≥250: release 75/h (strong response)
+  - BG ≥300: 0/h (critical stop)
   - PassThrough mode: when liver ≥95% AND ship unloading → output = input rate
   - Liver Boost: DISABLED (code preserved)
 - **Pancreas Tier System (v0.18.0)** ✅
@@ -209,19 +211,21 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - Layout: 6×6 CSS Grid ✅
 - Food Tags System ✅
   - WP cost badge (top-right, yellow number) for foods with wpCost > 0
-  - Fiber badge (bottom-right, 🌿) for foods with fiber
 - Sugar Cube Particle System (v0.8.0) ✅
-- Fiber System (v0.12.0) ✅
 
 ### Removed Features (v0.16.0)
 - **Mood System**: Fully removed (types, store, components, CSS, food data)
   - Was: MoodLevel 1-5, MoodIndicator, mood badges on cards
   - Replaced by: WP system for strategic resource management
 
-### Disabled Features (v0.15.2)
+### Disabled Features (v0.19.6)
 Features preserved in code but hidden from UI:
 - **Liver Boost**: Button hidden in SimulationPhase.tsx (functionality preserved)
 - **Metformin**: Not implemented
+- **Fiber System**: Disabled in v0.19.6 (backlog for future)
+  - Was: fiber badge on cards, FiberIndicator component, particle slowdown (0.7x speed)
+  - Code preserved: FiberIndicator.tsx/css, GlucoseParticleSystem.css fiber styles, Ship.fiber type
+  - Data removed: `fiber: true` removed from foods.json
 
 ### Known Issues
 - Effect Containers: No threshold-based activation (planned for future)

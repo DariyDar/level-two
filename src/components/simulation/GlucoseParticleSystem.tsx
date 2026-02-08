@@ -15,10 +15,7 @@ interface Particle {
   targetX: number;
   targetY: number;
   driftOffset: number;
-  // New fields for glucose tracking
   glucoseAmount: number; // 1-15 glucose per particle (sugar cube representation)
-  speedModifier: number; // 0.7 for fiber, 1.0 for normal
-  hasFiber: boolean; // Whether this particle is from a fiber food
 }
 
 interface GlucoseParticleSystemProps {
@@ -29,7 +26,6 @@ interface GlucoseParticleSystemProps {
   speed: number;
   isPaused: boolean;
   dissolveProgress: number;
-  hasFiberInSegment: boolean; // Whether current segment has any ships with fiber
 }
 
 // Glucose per particle (sugar cube representation: 15g carbs = 1 cube)
@@ -145,7 +141,6 @@ export function GlucoseParticleSystem({
   speed,
   isPaused,
   dissolveProgress,
-  hasFiberInSegment,
 }: GlucoseParticleSystemProps) {
   const [particles, setParticles] = useState<Particle[]>([]);
   const nextIdRef = useRef(0);
@@ -184,7 +179,6 @@ export function GlucoseParticleSystem({
   const spawnParticle = useCallback((
     flow: FlowType,
     currentDissolve: number,
-    hasFiber: boolean = false,
     glucoseAmount: number = GLUCOSE_PER_PARTICLE
   ): Particle => {
     const start = getSpawnPosition(flow, currentDissolve);
@@ -202,8 +196,6 @@ export function GlucoseParticleSystem({
       targetY: target.y,
       driftOffset: Math.random() * Math.PI * 2,
       glucoseAmount,
-      speedModifier: hasFiber ? 0.7 : 1.0,
-      hasFiber,
     };
   }, []);
 
@@ -249,11 +241,11 @@ export function GlucoseParticleSystem({
           return 1000 / (rate * rates.speed * VISUAL_MULTIPLIER);
         };
 
-        // Ship → Liver (with fiber slowdown if segment has fiber)
+        // Ship → Liver
         if (rates.shipUnloading > 0) {
           const interval = getSpawnInterval(rates.shipUnloading);
           while (timestamp - spawnTimes.shipLiver >= interval) {
-            updated.push(spawnParticle('ship-liver', rates.dissolveProgress, hasFiberInSegment));
+            updated.push(spawnParticle('ship-liver', rates.dissolveProgress));
             spawnTimes.shipLiver += interval;
           }
         }
@@ -287,8 +279,7 @@ export function GlucoseParticleSystem({
 
         // Update particles
         updated = updated.map(p => {
-          // Apply speed modifier (fiber slows particles by 30%)
-          const newProgress = p.progress + progressPerSecond * deltaSeconds * p.speedModifier;
+          const newProgress = p.progress + progressPerSecond * deltaSeconds;
 
           // Remove when reached destination (no absorption animation)
           if (newProgress >= 1) {
@@ -327,14 +318,14 @@ export function GlucoseParticleSystem({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isPaused, spawnParticle, hasFiberInSegment]);
+  }, [isPaused, spawnParticle]);
 
   return (
     <div className="glucose-particles">
       {particles.map(p => (
         <div
           key={p.id}
-          className={`glucose-particles__particle ${p.hasFiber ? 'glucose-particles__particle--fiber' : ''}`}
+          className="glucose-particles__particle"
           style={{
             left: `${p.x}%`,
             top: `${p.y}%`,

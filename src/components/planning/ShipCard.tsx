@@ -64,11 +64,6 @@ export function ShipCard({
         <span className="ship-card__badge ship-card__badge--wp">{wpCost}</span>
       )}
 
-      {/* Fiber icon - bottom right */}
-      {ship.fiber && (
-        <span className="ship-card__badge ship-card__badge--fiber">🌿</span>
-      )}
-
       {showDetails && (
         <div className="ship-card__details">
           <span className="ship-card__name">{ship.name}</span>
@@ -105,11 +100,6 @@ export function ShipCardOverlay({ ship }: { ship: Ship }) {
       {/* WP cost badge - top right */}
       {wpCost > 0 && (
         <span className="ship-card__badge ship-card__badge--wp">{wpCost}</span>
-      )}
-
-      {/* Fiber icon - bottom right */}
-      {ship.fiber && (
-        <span className="ship-card__badge ship-card__badge--fiber">🌿</span>
       )}
 
       <div className="ship-card__details">
