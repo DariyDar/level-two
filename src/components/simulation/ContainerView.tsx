@@ -23,6 +23,7 @@ interface ContainerViewProps {
   floatingValue?: boolean;     // Show value as floating indicator (for BG)
   compactSize?: boolean;       // Use compact dimensions (narrower/shorter)
   circular?: boolean;          // Circular container shape (liver/kidneys)
+  flowDirection?: 'up' | 'down'; // Chevron pattern scroll direction (filling/emptying)
 }
 
 export function ContainerView({
@@ -39,6 +40,7 @@ export function ContainerView({
   floatingValue = false,
   compactSize = false,
   circular = false,
+  flowDirection,
 }: ContainerViewProps) {
   const fillPercent = Math.min(100, (value / capacity) * 100);
 
@@ -108,7 +110,7 @@ export function ContainerView({
 
         {/* Fill */}
         <div
-          className="container-view__fill"
+          className={`container-view__fill ${flowDirection === 'up' ? 'container-view__fill--flow-up' : flowDirection === 'down' ? 'container-view__fill--flow-down' : ''}`}
           style={{
             height: `${fillPercent}%`,
             backgroundColor: fillColor,

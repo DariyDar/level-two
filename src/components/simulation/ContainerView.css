@@ -128,6 +128,36 @@
   border-radius: 0;
 }
 
+/* Chevron pattern overlay — scrolling ^-rows inside fill */
+.container-view__fill--flow-up::before,
+.container-view__fill--flow-down::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 14'%3E%3Cpolyline points='10,11 20,4 30,11' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' opacity='0.2'/%3E%3C/svg%3E");
+  background-size: 40px 14px;
+  background-repeat: repeat;
+  pointer-events: none;
+}
+
+.container-view__fill--flow-up::before {
+  animation: containerChevronUp 0.8s linear infinite;
+}
+
+.container-view__fill--flow-down::before {
+  animation: containerChevronDown 0.8s linear infinite;
+}
+
+@keyframes containerChevronUp {
+  from { background-position-y: 0; }
+  to { background-position-y: -14px; }
+}
+
+@keyframes containerChevronDown {
+  from { background-position-y: 0; }
+  to { background-position-y: 14px; }
+}
+
 /* Floating value indicator for BG */
 .container-view__floating-value {
   position: absolute;
