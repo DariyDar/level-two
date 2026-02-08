@@ -102,10 +102,15 @@
   flex-direction: column;
 }
 
-/* BG container bar - stretches to fill */
+/* BG container bar - stretches to fill, pill shape */
 .body-diagram__bg .container-view .container-view__bar {
   width: 100px;
   flex: 1;
+  border-radius: 50px;
+}
+
+.body-diagram__bg .container-view .container-view__fill {
+  border-radius: 0 0 48px 48px;
 }
 
 .body-diagram__bg .container-view .container-view__value {
