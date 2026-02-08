@@ -53,15 +53,16 @@ const BG_TO_MUSCLES = 'M 63,15 L 78,15';
 // Pancreas → Muscles: vertical orange pipe (insulin signal, centered on pancreas backdrop)
 const PANCREAS_TO_MUSCLES = 'M 82.5,39 L 82.5,18';
 
-// Stroke widths
-const WALL_WIDTH = 2.5;
-const FILL_WIDTH = 1.5;
-const ARROW_WIDTH = 0.8;
+// Stroke widths (pixels, thanks to non-scaling-stroke)
+// Wall visible edge = (WALL - FILL) / 2 = 2px — matches container border: 2px
+const WALL_WIDTH = 6;
+const FILL_WIDTH = 2;
+const ARROW_WIDTH = 1;
 
-// Passthrough is wider
-const PT_WALL_WIDTH = 4;
-const PT_FILL_WIDTH = 2.8;
-const PT_ARROW_WIDTH = 1.2;
+// Passthrough is wider (same 2px wall edge)
+const PT_WALL_WIDTH = 8;
+const PT_FILL_WIDTH = 4;
+const PT_ARROW_WIDTH = 1.5;
 
 // Convert rate to animation duration (higher rate = faster arrows)
 function rateToDuration(rate: number): string {

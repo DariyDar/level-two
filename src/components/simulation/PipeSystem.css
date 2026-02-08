@@ -13,6 +13,13 @@
   height: 100%;
 }
 
+/* All pipe strokes use non-scaling to keep consistent pixel width */
+.pipe-wall,
+.pipe-fill,
+.pipe-arrows {
+  vector-effect: non-scaling-stroke;
+}
+
 /* Pipe wall — always visible */
 .pipe-wall {
   fill: none;
