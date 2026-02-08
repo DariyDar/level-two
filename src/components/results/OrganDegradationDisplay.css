@@ -38,12 +38,12 @@
   padding: 16px;
   background: #4a5568;
   border-radius: 12px;
-  min-width: 100px;
+  min-width: 110px;
 }
 
 .organ-degradation-display__icon {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   object-fit: contain;
 }
 
