@@ -57,12 +57,13 @@ const PANCREAS_TO_MUSCLES = 'M 82.5,39 L 82.5,18';
 // Wall visible edge = (WALL - FILL) / 2 = 2px — matches container border: 2px
 const WALL_WIDTH = 12;
 const FILL_WIDTH = 8;
-const ARROW_WIDTH = 8;
 
 // Passthrough is wider (same 2px wall edge)
 const PT_WALL_WIDTH = 20;
 const PT_FILL_WIDTH = 16;
-const PT_ARROW_WIDTH = 16;
+
+// Number of chevron indicators per pipe
+const CHEVRON_COUNT = 3;
 
 // Convert rate to animation duration (higher rate = faster arrows)
 function rateToDuration(rate: number): string {
@@ -79,6 +80,36 @@ function tierToDuration(tier: number): string {
   return `${duration.toFixed(2)}s`;
 }
 
+// Animated chevron flow along a pipe path
+function ChevronFlow({
+  path,
+  flowDuration,
+  isPaused,
+}: {
+  path: string;
+  flowDuration: string;
+  isPaused: boolean;
+}) {
+  const dur = parseFloat(flowDuration);
+
+  return (
+    <g>
+      {Array.from({ length: CHEVRON_COUNT }, (_, i) => (
+        <polyline
+          key={i}
+          points="-0.8,-0.5 0.8,0 -0.8,0.5"
+          className={`pipe-chevron ${isPaused ? 'pipe-chevron--paused' : ''}`}
+          style={{
+            offsetPath: `path('${path}')`,
+            animationDuration: flowDuration,
+            animationDelay: `${-(i / CHEVRON_COUNT) * dur}s`,
+          } as React.CSSProperties}
+        />
+      ))}
+    </g>
+  );
+}
+
 interface PipeProps {
   path: string;
   active: boolean;
@@ -87,7 +118,6 @@ interface PipeProps {
   isPaused: boolean;
   wallWidth?: number;
   fillWidth?: number;
-  arrowWidth?: number;
 }
 
 function Pipe({
@@ -98,19 +128,10 @@ function Pipe({
   isPaused,
   wallWidth = WALL_WIDTH,
   fillWidth = FILL_WIDTH,
-  arrowWidth = ARROW_WIDTH,
 }: PipeProps) {
   const fillClass = active
     ? `pipe-fill pipe-fill--${type}`
     : 'pipe-fill';
-
-  const arrowClass = [
-    'pipe-arrows',
-    active && 'pipe-arrows--active',
-    isPaused && 'pipe-arrows--paused',
-  ]
-    .filter(Boolean)
-    .join(' ');
 
   return (
     <g>
@@ -118,13 +139,14 @@ function Pipe({
       <path d={path} className="pipe-wall" strokeWidth={wallWidth} />
       {/* Inner fill */}
       <path d={path} className={fillClass} strokeWidth={fillWidth} />
-      {/* Flow arrows */}
-      <path
-        d={path}
-        className={arrowClass}
-        strokeWidth={arrowWidth}
-        style={{ '--flow-duration': flowDuration } as React.CSSProperties}
-      />
+      {/* Chevron flow indicators */}
+      {active && (
+        <ChevronFlow
+          path={path}
+          flowDuration={flowDuration}
+          isPaused={isPaused}
+        />
+      )}
     </g>
   );
 }
@@ -175,7 +197,6 @@ export function PipeSystem({
           isPaused={isPaused}
           wallWidth={PT_WALL_WIDTH}
           fillWidth={PT_FILL_WIDTH}
-          arrowWidth={PT_ARROW_WIDTH}
         />
 
         {/* === Liver → BG: normal pipe (lower) === */}

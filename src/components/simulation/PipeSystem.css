@@ -15,8 +15,7 @@
 
 /* All pipe strokes use non-scaling to keep consistent pixel width */
 .pipe-wall,
-.pipe-fill,
-.pipe-arrows {
+.pipe-fill {
   vector-effect: non-scaling-stroke;
 }
 
@@ -46,31 +45,26 @@
   stroke: #f97316;
 }
 
-/* Flow arrows — animated dashes */
-.pipe-arrows {
+/* Chevron flow indicators */
+.pipe-chevron {
   fill: none;
-  stroke: transparent;
-  stroke-linecap: butt;
-  stroke-linejoin: round;
-  stroke-dasharray: 3 9;
+  stroke: rgba(255, 255, 255, 0.8);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  offset-distance: 0%;
+  offset-rotate: auto;
+  animation: chevronFlow linear infinite;
 }
 
-/* Active arrows — visible and animated */
-.pipe-arrows--active {
-  stroke: rgba(255, 255, 255, 0.7);
-  animation: pipeFlowForward var(--flow-duration, 1.5s) linear infinite;
-}
-
-/* Paused state */
-.pipe-arrows--paused {
+.pipe-chevron--paused {
   animation-play-state: paused;
 }
 
-@keyframes pipeFlowForward {
+@keyframes chevronFlow {
   from {
-    stroke-dashoffset: 12;
+    offset-distance: 0%;
   }
   to {
-    stroke-dashoffset: 0;
+    offset-distance: 100%;
   }
 }
