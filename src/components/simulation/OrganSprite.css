@@ -17,14 +17,24 @@
   transition: background-color 0.3s ease;
 }
 
-/* Inactive state - darker substrate */
+/* Inactive state - default substrate */
 .organ-sprite__substrate--inactive {
-  background-color: #2d3748; /* Dark gray */
+  background-color: #545F73;
 }
 
-/* Active state - lighter substrate */
+/* Active state - pulsing substrate */
 .organ-sprite__substrate--active {
-  background-color: #4a5568; /* Light gray */
+  background-color: #545F73;
+  animation: substratePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes substratePulse {
+  0%, 100% {
+    background-color: #545F73;
+  }
+  50% {
+    background-color: #7A8599;
+  }
 }
 
 /* Icon image */

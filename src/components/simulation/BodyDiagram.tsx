@@ -47,6 +47,9 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
   // Show 6th tier circle only when muscle tier is 6 (boosted)
   const showBoostedMuscleTier = muscleTier === 6;
 
+  // Kidney activity tier (0-4 based on kidneyRate)
+  const kidneyTier = kidneyRate > 15 ? 4 : kidneyRate > 10 ? 3 : kidneyRate > 5 ? 2 : kidneyRate > 0 ? 1 : 0;
+
   return (
     <div className="body-diagram">
       {/* Kidneys icon - top left */}
@@ -55,6 +58,12 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           label="Kidney"
           iconPath="/assets/organs/kidney_icon.png"
           isActive={kidneyRate > 0}
+          tierConfig={{
+            maxTier: 4,
+            activeTier: kidneyTier,
+            degradedTiers: 0,
+            position: 'top'
+          }}
           size="normal"
         />
         {showDetailedIndicators && (
@@ -103,7 +112,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
       <div className="body-diagram__bg">
         <ContainerView
           label="Blood Glucose"
-          emoji="🩸"
+          emoji=""
           value={bgValue}
           capacity={400}
           thresholds={{
@@ -113,7 +122,9 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
             critical: 300,
           }}
           floatingValue={true}
+          hideHeader={true}
         />
+        <div className="body-diagram__bg-label">Blood Glucose</div>
       </div>
 
       {/* Liver icon - bottom left */}

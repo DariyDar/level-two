@@ -83,8 +83,17 @@
   transform: translateX(-50%);
   z-index: 10;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.body-diagram__bg-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #a0aec0;
+  margin-top: 8px;
+  white-space: nowrap;
 }
 
 /* BG container bar - full height of available space */
