@@ -50,11 +50,12 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
   // Kidney activity tier (0-4 based on kidneyRate)
   const kidneyTier = kidneyRate > 15 ? 4 : kidneyRate > 10 ? 3 : kidneyRate > 5 ? 2 : kidneyRate > 0 ? 1 : 0;
 
-  // Flow directions for container chevron patterns
-  const bgNetRate = displayLiverRate - displayMuscleRate - kidneyRate;
+  // Flow directions use raw engine rates (no interpolation lag)
+  const rawKidneyRate = containers.bg > 180 ? Math.min((containers.bg - 180) * 0.1, 20) : 0;
+  const bgNetRate = currentLiverRate - currentMuscleRate - rawKidneyRate;
   const bgFlowDir: 'up' | 'down' | undefined = bgNetRate > 1 ? 'up' : bgNetRate < -1 ? 'down' : undefined;
-  const liverFlowDir: 'up' | 'down' | undefined = displayLiverRate > 0 ? 'down' : undefined;
-  const kidneyFlowDir: 'up' | 'down' | undefined = kidneyRate > 0 ? 'up' : undefined;
+  const liverFlowDir: 'up' | 'down' | undefined = currentLiverRate > 0 ? 'down' : undefined;
+  const kidneyFlowDir: 'up' | 'down' | undefined = rawKidneyRate > 0 ? 'up' : undefined;
 
   return (
     <div className="body-diagram">
