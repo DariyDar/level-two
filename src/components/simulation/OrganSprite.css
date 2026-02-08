@@ -50,8 +50,8 @@
 }
 
 .organ-sprite--normal .organ-sprite__substrate {
-  width: 60px;
-  min-height: 75px;
+  width: 80px;
+  min-height: 110px;
 }
 
 .organ-sprite--large .organ-sprite__substrate {

@@ -49,16 +49,35 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
 
   return (
     <div className="body-diagram">
-      {/* Muscles - B1-C2 (columns 1-2, rows 2-3) */}
-      <div className="body-diagram__muscles">
-        {/* Numeric value left of icon */}
+      {/* Kidneys icon - top left */}
+      <div className="body-diagram__kidneys-icon">
+        <OrganSprite
+          label="Kidney"
+          iconPath="/assets/organs/kidney_icon.png"
+          isActive={kidneyRate > 0}
+          size="normal"
+        />
         {showDetailedIndicators && (
-          <div className="body-diagram__value-left">
-            {Math.round(displayMuscleRate)}/h
+          <div className="body-diagram__value-label">
+            {Math.round(kidneyRate)}/h
           </div>
         )}
+      </div>
 
-        {/* Muscle icon with tier circles */}
+      {/* Kidneys container - half behind kidneys icon, peeks right */}
+      <div className="body-diagram__kidneys-container">
+        <ContainerView
+          label="Kidneys"
+          emoji="🫘"
+          value={kidneyRate}
+          capacity={50}
+          hideHeader={true}
+          compactSize={true}
+        />
+      </div>
+
+      {/* Muscles - top right */}
+      <div className="body-diagram__muscles">
         <OrganSprite
           label="Muscle"
           iconPath="/assets/organs/muscle_icon.png"
@@ -66,16 +85,21 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           tierConfig={{
             maxTier: 5,
             activeTier: muscleTier,
-            degradedTiers: pancreasDegradedTiers, // Muscle tiers limited by pancreas degradation
+            degradedTiers: pancreasDegradedTiers,
             isBoosted: isFastInsulinActive,
             showBoostedTier: showBoostedMuscleTier,
             position: 'top'
           }}
           size="normal"
         />
+        {showDetailedIndicators && (
+          <div className="body-diagram__value-label">
+            {Math.round(displayMuscleRate)}/h
+          </div>
+        )}
       </div>
 
-      {/* Blood Glucose - B3-C4 (columns 3-4, rows 2-3) */}
+      {/* Blood Glucose - center, full height */}
       <div className="body-diagram__bg">
         <ContainerView
           label="Blood Glucose"
@@ -92,60 +116,29 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
         />
       </div>
 
-      {/* Kidneys container - B5-C5 (column 5, rows 2-3) */}
-      <div className="body-diagram__kidneys-container">
-        <ContainerView
-          label="Kidneys"
-          emoji="🫘"
-          value={kidneyRate}
-          capacity={50}
-          hideHeader={true}
-          compactSize={true}
-        />
-      </div>
-
-      {/* Kidneys icon - B6-C6 (column 6, rows 2-3) */}
-      <div className="body-diagram__kidneys-icon">
-        {/* Numeric value right of container */}
-        {showDetailedIndicators && (
-          <div className="body-diagram__value-right">
-            {Math.round(kidneyRate)}
-          </div>
-        )}
-
+      {/* Liver icon - bottom left */}
+      <div className="body-diagram__liver-icon">
         <OrganSprite
-          label="Kidney"
-          iconPath="/assets/organs/kidney_icon.png"
-          isActive={kidneyRate > 0}
-          size="normal"
-        />
-      </div>
-
-      {/* Pancreas - E1-E2 (columns 1-2, row 5) */}
-      <div className="body-diagram__pancreas">
-        {/* Numeric value left of icon - show current pancreas tier */}
-        {showDetailedIndicators && (
-          <div className="body-diagram__value-left">
-            T{currentPancreasTier}
-          </div>
-        )}
-
-        <OrganSprite
-          label="Pancreas"
-          iconPath="/assets/organs/pancreas_icon.png"
-          isActive={currentPancreasTier > 0}
+          label="Liver"
+          iconPath="/assets/organs/liver_icon.png"
+          isActive={displayLiverRate > 0}
           tierConfig={{
-            maxTier: 5,
-            activeTier: currentPancreasTier,
-            degradedTiers: pancreasDegradedTiers,
-            isBoosted: isFastInsulinActive,
-            position: 'bottom'
+            maxTier: 4,
+            activeTier: 0,
+            degradedTiers: degradation.liver.tier - 1,
+            colorScheme: 'green',
+            position: 'top'
           }}
           size="normal"
         />
+        {showDetailedIndicators && (
+          <div className="body-diagram__value-label">
+            {Math.round(displayLiverRate)}/h
+          </div>
+        )}
       </div>
 
-      {/* Liver container - E3-F4 (columns 3-4, rows 5-6) */}
+      {/* Liver container - half behind liver icon, peeks right */}
       <div className="body-diagram__liver-container">
         <ContainerView
           label="Liver"
@@ -157,26 +150,24 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
         />
       </div>
 
-      {/* Liver icon - E4-F5 (columns 4-5, rows 5-6) */}
-      <div className="body-diagram__liver-icon">
+      {/* Pancreas - bottom right */}
+      <div className="body-diagram__pancreas">
         <OrganSprite
-          label="Liver"
-          iconPath="/assets/organs/liver_icon.png"
-          isActive={displayLiverRate > 0}
+          label="Pancreas"
+          iconPath="/assets/organs/pancreas_icon.png"
+          isActive={currentPancreasTier > 0}
           tierConfig={{
-            maxTier: 4,
-            activeTier: 0, // Liver doesn't show active tier flashing
-            degradedTiers: degradation.liver.tier - 1,
-            colorScheme: 'green',
-            position: 'bottom'
+            maxTier: 5,
+            activeTier: currentPancreasTier,
+            degradedTiers: pancreasDegradedTiers,
+            isBoosted: isFastInsulinActive,
+            position: 'top'
           }}
           size="normal"
         />
-
-        {/* Numeric value right of icon */}
         {showDetailedIndicators && (
-          <div className="body-diagram__value-right">
-            {Math.round(displayLiverRate)}/h
+          <div className="body-diagram__value-label">
+            T{currentPancreasTier}
           </div>
         )}
       </div>
