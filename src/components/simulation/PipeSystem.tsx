@@ -30,12 +30,12 @@ interface PipeSystemProps {
 // Each pipe routes vertically up then horizontally into the liver container bottom (~y47)
 // Staggered horizontal routing levels (y52, y55, y58) to avoid overlap
 const SHIP_PIPES = [
-  // Slot 0 (left): up from x≈18, turn right into LC left
-  'M 18,73 L 18,52 L 28,52 L 28,47',
-  // Slot 1 (center): up from x≈50, turn left into LC center
-  'M 50,73 L 50,55 L 33,55 L 33,47',
-  // Slot 2 (right): up from x≈82, turn left into LC right
-  'M 82,73 L 82,58 L 37,58 L 37,47',
+  // Slot 0 (left): fully vertical into LC
+  'M 18,73 L 18,47',
+  // Slot 1 (center): up from x≈50, turn left into LC
+  'M 50,73 L 50,55 L 23,55 L 23,47',
+  // Slot 2 (right): up from x≈82, turn left into LC
+  'M 82,73 L 82,58 L 28,58 L 28,47',
 ];
 
 // Liver → BG: normal pipe (lower horizontal)
