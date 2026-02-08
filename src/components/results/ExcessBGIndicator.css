@@ -9,12 +9,12 @@
 }
 
 .excess-bg-indicator__title {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   color: rgba(255, 255, 255, 0.9);
   margin: 0;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
 .excess-bg-indicator__hearts {
@@ -75,7 +75,7 @@
 }
 
 .excess-bg-indicator__subtitle {
-  font-size: 12px;
+  font-size: 15px;
   color: rgba(255, 255, 255, 0.5);
   letter-spacing: 0.3px;
 }

@@ -28,6 +28,10 @@
   stroke: #e53e3e;
 }
 
+.bg-graph__zone--normal {
+  fill: rgba(72, 187, 120, 0.1);
+}
+
 .bg-graph__zone--high {
   fill: rgba(237, 137, 54, 0.1);
 }

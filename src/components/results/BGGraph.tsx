@@ -34,7 +34,13 @@ export function BGGraph({ bgHistory, thresholds }: BGGraphProps) {
   return (
     <div className="bg-graph">
       <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-        {/* Danger zone backgrounds */}
+        {/* Zone backgrounds */}
+        <rect
+          className="bg-graph__zone bg-graph__zone--normal"
+          x="0" width="100"
+          y={getY(thresholds.high)}
+          height={getY(thresholds.low) - getY(thresholds.high)}
+        />
         <rect
           className="bg-graph__zone bg-graph__zone--high"
           x="0" width="100"

@@ -89,16 +89,16 @@ export function OrganDegradationDisplay({
                 </div>
               </div>
 
-              <div className="organ-degradation-display__circles">
+              <div className="organ-degradation-display__markers">
                 {Array.from({ length: maxCircles }, (_, i) => {
                   const isDegraded = i >= maxCircles - degradedCircles;
                   return (
-                    <div
+                    <span
                       key={i}
-                      className={`organ-degradation-display__circle ${
+                      className={`organ-degradation-display__marker ${
                         isDegraded
-                          ? 'organ-degradation-display__circle--degraded'
-                          : 'organ-degradation-display__circle--healthy'
+                          ? 'organ-degradation-display__marker--degraded'
+                          : 'organ-degradation-display__marker--healthy'
                       }`}
                     />
                   );
