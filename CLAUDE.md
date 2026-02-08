@@ -84,7 +84,9 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - `src/config/organRules.json` — organ behavior rules (pancreas tiers, liver thresholds, muscle rates)
 - `src/config/degradationConfig.json` — degradation system configuration
 - `src/components/simulation/` — simulation UI components
-  - `GlucoseParticleSystem.tsx` — sugar cube particles (25 mg/dL per cube, paths to container centers)
+  - `PipeSystem.tsx` — SVG pipe overlay with chevron flow indicators (v0.21.0+)
+  - `PipeSystem.css` — pipe styles (wall/fill/chevron, non-scaling-stroke)
+  - `GlucoseParticleSystem.tsx` — sugar cube particles (SUPERSEDED by PipeSystem in v0.21.0, code preserved)
   - `FiberIndicator.tsx` — fiber activity indicator (disabled)
   - `BodyDiagram.tsx` — absolute-positioned organs layout (corner organs, center BG)
   - `OrganTierCircles.tsx` — unified tier/degradation indicator (degradation from right)
@@ -106,8 +108,18 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - `levels/*.json` — level configurations (per-day segmentCarbs, wpBudget, blockedSlots)
 - `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.20.11)
+### Current State (v0.21.17)
 - Planning phase: drag-and-drop ships to time slots ✅
+- **SVG Pipe System (v0.21.0-v0.21.17)** ✅
+  - SVG overlay with pipes connecting organs (Ship→Liver, Liver→BG, BG→Muscles, BG→Kidneys, Pancreas→Muscles)
+  - Pipe wall (#4a5568) + inner fill (blue for glucose, orange for insulin)
+  - `vector-effect: non-scaling-stroke` for uniform pixel-width pipes in stretched SVG
+  - Chevron flow indicators (v0.21.17): V-shaped `>` polylines animated via CSS `offset-path`
+  - 3 chevrons per active pipe, speed proportional to flow rate
+  - Passthrough pipe: wider (wall 20px, fill 16px) vs normal (wall 12px, fill 8px)
+  - Z-index layering: pipe-system(1) < containers(2) < organ backdrops(3) < BG(10)
+  - Ship slot pipes: 3 routes from ship queue to liver, staggered horizontal routing
+  - Replaces GlucoseParticleSystem (sugar cube particles)
 - **Body Diagram Layout (v0.20.0)** ✅
   - Absolute positioning instead of 6×6 CSS Grid
   - 4 organs at corners: K (top-left), M (top-right), L (bottom-left), P (bottom-right)
@@ -120,11 +132,6 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - Muscles/Pancreas: yellow (#E2BC28) default, red-orange (#FF5900) active
   - Liver/Kidneys: green (#22c55e) default
   - Degradation circles (pink) display from RIGHT side (matching results phase)
-- **Glucose Particle System (v0.20.7-v0.20.8)** ✅
-  - Particles fly to center of target containers
-  - 25 mg/dL per sugar cube icon (was 15)
-  - z-index: 20 (above all diagram layers)
-  - Paths: Ship→LC center, LC→BG center, BG→Muscles, BG→KC center
 - **Fast Insulin Button (v0.20.11)** ✅
   - Numeric usage count badge (top-right corner of button substrate)
   - Replaced charge circles with single count number
@@ -138,7 +145,7 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - **Layout Swap (v0.19.0)** ✅
   - Desktop: Inventory LEFT, SlotGrid RIGHT (swapped)
   - Mobile: SlotGrid on top via CSS order
-- Simulation phase: glucose flow visualization with particles ✅
+- Simulation phase: glucose flow visualization with SVG pipes ✅
 - Results phase: basic BG history graph ✅
 - Substep simulation: smooth container updates (10 substeps/hour) ✅
 - **Simulation Rebalancing (v0.18.0-v0.18.1)** ✅
@@ -233,26 +240,26 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - Layout: Absolute positioning with corner organs ✅ (was 6×6 CSS Grid before v0.20.0)
 - Food Tags System ✅
   - WP cost badge (top-right, yellow number) for foods with wpCost > 0
-- Sugar Cube Particle System (v0.8.0, updated v0.20.8) ✅
-  - 25 mg/dL per cube, paths to container centers
 
 ### Removed Features (v0.16.0)
 - **Mood System**: Fully removed (types, store, components, CSS, food data)
   - Was: MoodLevel 1-5, MoodIndicator, mood badges on cards
   - Replaced by: WP system for strategic resource management
 
-### Disabled Features (v0.19.6)
+### Disabled Features (v0.19.6+)
 Features preserved in code but hidden from UI:
 - **Liver Boost**: Button hidden in SimulationPhase.tsx (functionality preserved)
 - **Metformin**: Not implemented
 - **Fiber System**: Disabled in v0.19.6 (backlog for future)
   - Was: fiber badge on cards, FiberIndicator component, particle slowdown (0.7x speed)
-  - Code preserved: FiberIndicator.tsx/css, GlucoseParticleSystem.css fiber styles, Ship.fiber type
+  - Code preserved: FiberIndicator.tsx/css, Ship.fiber type
   - Data removed: `fiber: true` removed from foods.json
+- **Glucose Particle System**: Superseded by SVG Pipe System in v0.21.0
+  - Code preserved: GlucoseParticleSystem.tsx/css (not rendered in SimulationPhase)
 
 ### Known Issues
 - Effect Containers: No threshold-based activation (planned for future)
 - Kidneys: Not fully implemented (basic excretion only)
-- Pipe connections: Visual connections between organs not yet implemented
 - Metformin: Card exists but full effect system not implemented
 - interventionCharges from level config not connected to SimulationEngine (hardcoded to 2)
+- GlucoseParticleSystem files still in codebase (unused since v0.21.0, can be cleaned up)

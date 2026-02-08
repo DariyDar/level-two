@@ -5,6 +5,28 @@ All notable changes to Port Management will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.21.17] - 2026-02-08
+
+### Added
+- **SVG Pipe System** (v0.21.0)
+  - Replaced GlucoseParticleSystem with SVG pipe overlay
+  - Pipes: Ship→Liver (3 routes), Liver→BG (normal + passthrough), BG→Muscles, BG→Kidneys, Pancreas→Muscles
+  - `vector-effect: non-scaling-stroke` for uniform pixel-width pipes
+  - Pipe wall + inner fill coloring (blue for glucose, orange for insulin)
+
+- **Chevron Flow Indicators** (v0.21.17)
+  - V-shaped `>` polylines animated via CSS `offset-path` + `offset-distance`
+  - 3 chevrons per active pipe, speed proportional to flow rate
+  - Replaces flat stroke-dash arrow indicators
+
+### Fixed
+- Pipe positioning: Y offset correction, X alignment with ship slot grid positions (v0.21.1)
+- Z-index layering: pipes(1) < containers(2) < organ backdrops(3) < BG(10) (v0.21.8-v0.21.9)
+- Non-uniform pipe wall widths from SVG stretching (v0.21.10)
+- Dash indicators appearing solid due to stroke-linecap: round overlap (v0.21.16)
+
+---
+
 ## [0.3.0] - 2026-02-03
 
 ### Added

@@ -578,6 +578,46 @@ function useGameLoop(engine: SimulationEngine | null) {
      └─────────────────┘
 ```
 
+### SVG Pipe System (v0.21.0+)
+
+Визуализация потоков глюкозы через SVG-трубы вместо частиц.
+
+**Архитектура:**
+- `PipeSystem.tsx` — SVG overlay (`viewBox="0 0 100 100"`, `preserveAspectRatio="none"`)
+- `PipeSystem.css` — стили труб с `vector-effect: non-scaling-stroke`
+- Координаты в процентах от body-diagram контейнера
+
+**Маршруты труб:**
+```
+Ship Slot 0 → Liver:  M 18,73 L 18,47          (vertical)
+Ship Slot 1 → Liver:  M 50,73 L 50,55 L 23,55 L 23,47  (right→up→left)
+Ship Slot 2 → Liver:  M 82,73 L 82,58 L 28,58 L 28,47  (right→up→left)
+Liver → BG (normal):  M 35,40 L 47,40
+Liver → BG (passthrough): M 35,37 L 47,37       (wider pipe)
+BG → Kidneys:         M 47,15 L 33,15
+BG → Muscles:         M 63,15 L 78,15
+Pancreas → Muscles:   M 82.5,39 L 82.5,18       (insulin, orange)
+```
+
+**Размеры (пиксели, non-scaling-stroke):**
+| Pipe | Wall | Fill |
+|------|------|------|
+| Normal | 12px | 8px |
+| Passthrough | 20px | 16px |
+
+**Индикаторы потока (v0.21.17):**
+- V-образные шевроны `>` (polyline), 3 штуки на трубу
+- CSS `offset-path` + `offset-distance` анимация
+- Скорость: `rateToDuration(rate)` — выше rate → быстрее анимация
+
+**Z-index layering:**
+```
+z-index: 1  — pipe-system (SVG overlay)
+z-index: 2  — kidney/liver containers (KC/LC)
+z-index: 3  — organ backdrops (kidneys, muscles, liver, pancreas icons)
+z-index: 10 — BG container
+```
+
 ### Ship Unloading Animation
 
 ```
@@ -589,8 +629,7 @@ function useGameLoop(engine: SimulationEngine | null) {
 └─────────┘
 
 Поток к контейнеру:
-🥣 ──●──●──●──► [Liver]
-      glucose particles
+Ship ═══▶═══▶═══▶ [Liver]  (pipe with chevron flow)
 ```
 
 ---
@@ -624,6 +663,11 @@ function useGameLoop(engine: SimulationEngine | null) {
 - K (top-left), M (top-right), L (bottom-left), P (bottom-right)
 - BG pill-shaped container centered, full height
 - KC/LC containers half-hidden behind organ substrates
+
+### PipeSystem.tsx (v0.21.0+)
+- SVG overlay с трубами между органами
+- Chevron flow indicators (v0.21.17)
+- Props: activeShipSlot, liverToBgRate, bgToMusclesRate, bgToKidneysRate, pancreasTier, speed, isPaused
 
 ### ContainerView.tsx
 - Визуализация уровня
