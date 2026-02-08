@@ -1,0 +1,69 @@
+.pipe-system {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.pipe-system__svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Pipe wall — always visible */
+.pipe-wall {
+  fill: none;
+  stroke: #4a5568;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Pipe inner fill — inactive (empty) */
+.pipe-fill {
+  fill: none;
+  stroke: #1a202c;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Active glucose pipe fill */
+.pipe-fill--glucose {
+  stroke: #4299e1;
+}
+
+/* Active insulin pipe fill */
+.pipe-fill--insulin {
+  stroke: #f97316;
+}
+
+/* Flow arrows — animated dashes */
+.pipe-arrows {
+  fill: none;
+  stroke: transparent;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 3 9;
+}
+
+/* Active arrows — visible and animated */
+.pipe-arrows--active {
+  stroke: rgba(255, 255, 255, 0.7);
+  animation: pipeFlowForward var(--flow-duration, 1.5s) linear infinite;
+}
+
+/* Paused state */
+.pipe-arrows--paused {
+  animation-play-state: paused;
+}
+
+@keyframes pipeFlowForward {
+  from {
+    stroke-dashoffset: 12;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}

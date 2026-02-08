@@ -74,6 +74,7 @@ export interface SimulationState {
   currentPancreasTier: number; // Raw tier from pancreas rules (before degradation)
   currentMuscleTier: number; // Final tier for muscles (after all modifiers)
   isFastInsulinActive: boolean; // Whether Fast Insulin boost is active
+  isLiverPassthrough: boolean; // Liver overflow pass-through mode active
 }
 
 interface QueuedShip {
@@ -261,6 +262,7 @@ export class SimulationEngine {
       currentPancreasTier: 0,
       currentMuscleTier: 0,
       isFastInsulinActive: false,
+      isLiverPassthrough: false,
     };
   }
 
@@ -519,11 +521,13 @@ export class SimulationEngine {
     const isOverflow = liverFillPercent >= 0.95;
     const shipUnloadRate = this.state.unloadingShip?.loadPerTick ?? 0;
 
-    if (isOverflow && shipUnloadRate > 0 && !this.state.liverBoost.isActive) {
+    const isPassthrough = isOverflow && shipUnloadRate > 0 && !this.state.liverBoost.isActive;
+    if (isPassthrough) {
       // Pass-through mode: output rate = input rate (glucose "pushed out")
       transferRate = shipUnloadRate;
     }
 
+    this.state.isLiverPassthrough = isPassthrough;
     this.state.currentLiverRate = transferRate;
 
     // Transfer from liver to BG (proportional to substep fraction)

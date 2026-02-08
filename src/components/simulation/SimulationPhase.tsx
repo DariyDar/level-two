@@ -9,7 +9,7 @@ import { loadAllShips } from '../../config/loader';
 import { BodyDiagram } from './BodyDiagram';
 import { BoostButton } from './BoostButton';
 import { ShipQueue } from './ShipQueue';
-import { GlucoseParticleSystem } from './GlucoseParticleSystem';
+import { PipeSystem } from './PipeSystem';
 import './SimulationPhase.css';
 
 // Available simulation speeds
@@ -184,17 +184,23 @@ export function SimulationPhase() {
         </div>
       </div>
 
-      {/* Main simulation area with particles */}
+      {/* Main simulation area with pipe system */}
       <div className="simulation-phase__main">
-        {/* Particle System - spans both BodyDiagram and ShipQueue */}
-        <GlucoseParticleSystem
-          shipUnloading={simState.unloadingShip?.loadPerTick ?? 0}
+        {/* Pipe System - spans both BodyDiagram and ShipQueue */}
+        <PipeSystem
+          activeShipSlot={
+            simState.unloadingShip
+              ? placedShips.find(p => p.instanceId === simState.unloadingShip!.instanceId)?.startSlot ?? null
+              : null
+          }
+          shipUnloadingRate={simState.unloadingShip?.loadPerTick ?? 0}
           liverToBgRate={interpolated.liverRate}
+          isLiverPassthrough={simState.isLiverPassthrough}
           bgToMusclesRate={interpolated.muscleRate}
           bgToKidneysRate={interpolated.bg > 180 ? Math.min((interpolated.bg - 180) * 0.1, 20) : 0}
+          pancreasTier={simState.currentPancreasTier}
           speed={speed}
           isPaused={isPaused}
-          dissolveProgress={interpolated.dissolveProgress}
         />
 
         {/* Body Diagram */}

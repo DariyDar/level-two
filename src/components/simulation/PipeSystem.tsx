@@ -1,0 +1,214 @@
+import './PipeSystem.css';
+
+interface PipeSystemProps {
+  // Ship → Liver: which slot (0, 1, 2) is active, null if none
+  activeShipSlot: number | null;
+  shipUnloadingRate: number;
+
+  // Liver → BG
+  liverToBgRate: number;
+  isLiverPassthrough: boolean;
+
+  // BG → Muscles
+  bgToMusclesRate: number;
+
+  // BG → Kidneys
+  bgToKidneysRate: number;
+
+  // Pancreas → Muscles (insulin)
+  pancreasTier: number; // 0 = inactive
+
+  speed: number;
+  isPaused: boolean;
+}
+
+// Pipe route definitions (SVG path data in viewBox 0 0 100 100)
+// All paths drawn in flow direction for correct arrow animation
+
+// Ship slot pipes: from ship area (bottom) up to liver container
+const SHIP_PIPES = [
+  // Slot 0 (left): up from x=20, turn right into LC bottom
+  'M 20,80 L 20,59 L 27,59 L 27,55',
+  // Slot 1 (center): straight up into LC center
+  'M 30,80 L 30,55',
+  // Slot 2 (right): up from x=40, turn left into LC bottom
+  'M 40,80 L 40,59 L 33,59 L 33,55',
+];
+
+// Liver → BG: normal pipe (lower horizontal)
+const LIVER_TO_BG_NORMAL = 'M 36,48 L 50,48';
+
+// Liver → BG: passthrough pipe (upper horizontal, wider)
+const LIVER_TO_BG_PASSTHROUGH = 'M 36,40 L 50,40';
+
+// BG → Kidneys: horizontal left from BG to KC
+const BG_TO_KIDNEYS = 'M 50,22 L 38,22';
+
+// BG → Muscles: horizontal right from BG to muscles
+const BG_TO_MUSCLES = 'M 60,22 L 73,22';
+
+// Pancreas → Muscles: vertical orange pipe (insulin signal)
+const PANCREAS_TO_MUSCLES = 'M 82,47 L 82,27';
+
+// Stroke widths
+const WALL_WIDTH = 2.5;
+const FILL_WIDTH = 1.5;
+const ARROW_WIDTH = 0.8;
+
+// Passthrough is wider
+const PT_WALL_WIDTH = 4;
+const PT_FILL_WIDTH = 2.8;
+const PT_ARROW_WIDTH = 1.2;
+
+// Convert rate to animation duration (higher rate = faster arrows)
+function rateToDuration(rate: number): string {
+  if (rate <= 0) return '2s';
+  // Map: 25/h → 2s, 100/h → 0.8s, 175/h → 0.4s
+  const duration = Math.max(0.3, 2.5 - rate / 70);
+  return `${duration.toFixed(2)}s`;
+}
+
+function tierToDuration(tier: number): string {
+  if (tier <= 0) return '2s';
+  // Tier 1 → 2s, Tier 4 → 0.5s
+  const duration = Math.max(0.4, 2.5 - tier * 0.5);
+  return `${duration.toFixed(2)}s`;
+}
+
+interface PipeProps {
+  path: string;
+  active: boolean;
+  type: 'glucose' | 'insulin';
+  flowDuration: string;
+  isPaused: boolean;
+  wallWidth?: number;
+  fillWidth?: number;
+  arrowWidth?: number;
+}
+
+function Pipe({
+  path,
+  active,
+  type,
+  flowDuration,
+  isPaused,
+  wallWidth = WALL_WIDTH,
+  fillWidth = FILL_WIDTH,
+  arrowWidth = ARROW_WIDTH,
+}: PipeProps) {
+  const fillClass = active
+    ? `pipe-fill pipe-fill--${type}`
+    : 'pipe-fill';
+
+  const arrowClass = [
+    'pipe-arrows',
+    active && 'pipe-arrows--active',
+    isPaused && 'pipe-arrows--paused',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  return (
+    <g>
+      {/* Pipe wall — always visible */}
+      <path d={path} className="pipe-wall" strokeWidth={wallWidth} />
+      {/* Inner fill */}
+      <path d={path} className={fillClass} strokeWidth={fillWidth} />
+      {/* Flow arrows */}
+      <path
+        d={path}
+        className={arrowClass}
+        strokeWidth={arrowWidth}
+        style={{ '--flow-duration': flowDuration } as React.CSSProperties}
+      />
+    </g>
+  );
+}
+
+export function PipeSystem({
+  activeShipSlot,
+  shipUnloadingRate,
+  liverToBgRate,
+  isLiverPassthrough,
+  bgToMusclesRate,
+  bgToKidneysRate,
+  pancreasTier,
+  speed,
+  isPaused,
+}: PipeSystemProps) {
+  const shipDuration = rateToDuration(shipUnloadingRate * speed);
+  const liverDuration = rateToDuration(liverToBgRate * speed);
+  const musclesDuration = rateToDuration(bgToMusclesRate * speed);
+  const kidneysDuration = rateToDuration(bgToKidneysRate * speed);
+  const insulinDuration = tierToDuration(pancreasTier);
+
+  return (
+    <div className="pipe-system">
+      <svg
+        className="pipe-system__svg"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+      >
+        {/* === Ship → Liver pipes (3) === */}
+        {SHIP_PIPES.map((path, i) => (
+          <Pipe
+            key={`ship-${i}`}
+            path={path}
+            active={activeShipSlot === i}
+            type="glucose"
+            flowDuration={shipDuration}
+            isPaused={isPaused}
+          />
+        ))}
+
+        {/* === Liver → BG: passthrough pipe (upper, wider) === */}
+        <Pipe
+          path={LIVER_TO_BG_PASSTHROUGH}
+          active={isLiverPassthrough && liverToBgRate > 0}
+          type="glucose"
+          flowDuration={liverDuration}
+          isPaused={isPaused}
+          wallWidth={PT_WALL_WIDTH}
+          fillWidth={PT_FILL_WIDTH}
+          arrowWidth={PT_ARROW_WIDTH}
+        />
+
+        {/* === Liver → BG: normal pipe (lower) === */}
+        <Pipe
+          path={LIVER_TO_BG_NORMAL}
+          active={!isLiverPassthrough && liverToBgRate > 0}
+          type="glucose"
+          flowDuration={liverDuration}
+          isPaused={isPaused}
+        />
+
+        {/* === BG → Kidneys === */}
+        <Pipe
+          path={BG_TO_KIDNEYS}
+          active={bgToKidneysRate > 0}
+          type="glucose"
+          flowDuration={kidneysDuration}
+          isPaused={isPaused}
+        />
+
+        {/* === BG → Muscles (glucose drain) === */}
+        <Pipe
+          path={BG_TO_MUSCLES}
+          active={bgToMusclesRate > 0}
+          type="glucose"
+          flowDuration={musclesDuration}
+          isPaused={isPaused}
+        />
+
+        {/* === Pancreas → Muscles (insulin, orange) === */}
+        <Pipe
+          path={PANCREAS_TO_MUSCLES}
+          active={pancreasTier > 0}
+          type="insulin"
+          flowDuration={insulinDuration}
+          isPaused={isPaused}
+        />
+      </svg>
+    </div>
+  );
+}
