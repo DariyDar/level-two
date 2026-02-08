@@ -68,3 +68,27 @@
     offset-distance: 100%;
   }
 }
+
+/* Suction VFX — particles converging toward pipe intake */
+.pipe-suction {
+  fill: rgba(66, 153, 225, 0.7);
+  animation: suctionPull 1.2s ease-in infinite;
+}
+
+.pipe-suction--paused {
+  animation-play-state: paused;
+}
+
+@keyframes suctionPull {
+  0% {
+    transform: translate(var(--sx), var(--sy));
+    opacity: 0.8;
+  }
+  60% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+}

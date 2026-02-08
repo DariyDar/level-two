@@ -110,6 +110,45 @@ function ChevronFlow({
   );
 }
 
+// Intake positions for ship pipes (bottom ends where glucose enters)
+const SHIP_INTAKE_X = [18, 50, 82];
+const SHIP_INTAKE_Y = 73;
+const SUCTION_PARTICLE_COUNT = 6;
+const SUCTION_RADIUS_PX = 14; // CSS pixels
+
+// Suction VFX: particles converging toward pipe intake
+function SuctionEffect({
+  x,
+  y,
+  isPaused,
+}: {
+  x: number;
+  y: number;
+  isPaused: boolean;
+}) {
+  return (
+    <g>
+      {Array.from({ length: SUCTION_PARTICLE_COUNT }, (_, i) => {
+        const angle = (i / SUCTION_PARTICLE_COUNT) * Math.PI * 2;
+        return (
+          <circle
+            key={i}
+            cx={x}
+            cy={y}
+            r="0.8"
+            className={`pipe-suction ${isPaused ? 'pipe-suction--paused' : ''}`}
+            style={{
+              '--sx': `${Math.cos(angle) * SUCTION_RADIUS_PX}px`,
+              '--sy': `${Math.sin(angle) * SUCTION_RADIUS_PX}px`,
+              animationDelay: `${-(i / SUCTION_PARTICLE_COUNT) * 1.2}s`,
+            } as React.CSSProperties}
+          />
+        );
+      })}
+    </g>
+  );
+}
+
 interface PipeProps {
   path: string;
   active: boolean;
@@ -187,6 +226,15 @@ export function PipeSystem({
             isPaused={isPaused}
           />
         ))}
+
+        {/* === Suction VFX at active ship pipe intake === */}
+        {activeShipSlot !== null && (
+          <SuctionEffect
+            x={SHIP_INTAKE_X[activeShipSlot]}
+            y={SHIP_INTAKE_Y}
+            isPaused={isPaused}
+          />
+        )}
 
         {/* === Liver → BG: passthrough pipe (upper, wider) === */}
         <Pipe
