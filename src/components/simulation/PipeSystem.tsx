@@ -115,18 +115,22 @@ const SHIP_INTAKE_X = [18, 50, 82];
 const SHIP_INTAKE_Y = 73;
 
 // Funnel-shaped particle positions (dx, dy in CSS pixels from intake point)
-// Funnel opens downward: wider spread at greater depth
+// Shifted 5px up; chaotic scatter across the full funnel area
 const SUCTION_PARTICLES = [
-  // Near intake (narrow, small offset)
-  { dx: -2, dy: 4 },
-  { dx: 2, dy: 4 },
-  // Mid funnel
-  { dx: -6, dy: 11 },
-  { dx: 6, dy: 11 },
-  // Wide bottom of funnel
-  { dx: -11, dy: 18 },
-  { dx: 11, dy: 18 },
+  { dx: 0, dy: -1 },
+  { dx: -3, dy: 2 },
+  { dx: 4, dy: 1 },
+  { dx: -7, dy: 6 },
+  { dx: 2, dy: 5 },
+  { dx: 8, dy: 4 },
+  { dx: -4, dy: 9 },
+  { dx: 10, dy: 8 },
+  { dx: -11, dy: 13 },
+  { dx: 6, dy: 12 },
 ];
+
+// Pseudo-random animation delay stagger for chaotic appearance
+const SUCTION_DELAYS = [0, 0.55, 0.25, 0.85, 0.45, 1.0, 0.15, 0.7, 0.35, 0.9];
 
 // Suction VFX: funnel-shaped particles converging toward pipe intake
 function SuctionEffect({
@@ -150,7 +154,7 @@ function SuctionEffect({
           style={{
             '--sx': `${p.dx}px`,
             '--sy': `${p.dy}px`,
-            animationDelay: `${-(i / SUCTION_PARTICLES.length) * 1.2}s`,
+            animationDelay: `${-SUCTION_DELAYS[i]}s`,
           } as React.CSSProperties}
         />
       ))}
