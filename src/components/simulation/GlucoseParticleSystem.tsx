@@ -28,8 +28,8 @@ interface GlucoseParticleSystemProps {
   dissolveProgress: number;
 }
 
-// Glucose per particle (sugar cube representation: 15g carbs = 1 cube)
-const GLUCOSE_PER_PARTICLE = 15;
+// Glucose per particle (sugar cube representation: 25 mg/dL = 1 cube)
+const GLUCOSE_PER_PARTICLE = 25;
 
 // Visual multiplier for continuous stream (reduced for performance)
 const VISUAL_MULTIPLIER = 1;
@@ -91,28 +91,28 @@ function getSpawnPosition(flow: FlowType, dissolveProgress: number): { x: number
 function getTargetPosition(flow: FlowType): { x: number; y: number } {
   switch (flow) {
     case 'ship-liver':
-      // Target: liver container bottom
+      // Target: liver container center
       return {
         x: POINTS.liverBottom.x + (Math.random() - 0.5) * 4,
-        y: POINTS.liverBottom.y + (Math.random() - 0.5) * 2,
+        y: (POINTS.liverTop.y + POINTS.liverBottom.y) / 2 + (Math.random() - 0.5) * 4,
       };
     case 'liver-bg':
-      // Target: BG bar lower-left area
+      // Target: BG container center
       return {
-        x: POINTS.bgBottom.x - 4 + (Math.random() - 0.5) * 4,
-        y: POINTS.bgBottom.y - 6 + (Math.random() - 0.5) * 4,
+        x: POINTS.bgBottom.x + (Math.random() - 0.5) * 4,
+        y: (POINTS.bgTop.y + POINTS.bgBottom.y) / 2 + (Math.random() - 0.5) * 6,
       };
     case 'bg-muscles':
-      // Target: muscles substrate (top-right)
+      // Target: muscles substrate center (top-right, no container)
       return {
-        x: POINTS.musclesLeft.x,
+        x: POINTS.musclesLeft.x + 5,
         y: POINTS.musclesLeft.y + (Math.random() - 0.5) * 6,
       };
     case 'bg-kidneys':
-      // Target: kidneys area (top-left)
+      // Target: kidneys container center (top-left)
       return {
-        x: POINTS.kidneysRight.x,
-        y: POINTS.kidneysRight.y + (Math.random() - 0.5) * 6,
+        x: POINTS.kidneysRight.x - 5 + (Math.random() - 0.5) * 4,
+        y: POINTS.kidneysRight.y + 4 + (Math.random() - 0.5) * 6,
       };
   }
 }
