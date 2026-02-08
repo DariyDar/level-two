@@ -17,60 +17,70 @@
   letter-spacing: 1px;
 }
 
-.excess-bg-indicator__hearts {
+.excess-bg-indicator__markers {
   display: flex;
   gap: 10px;
   align-items: center;
 }
 
-.excess-bg-indicator__heart {
+.excess-bg-indicator__marker {
   display: inline-block;
   width: 32px;
   height: 32px;
+  position: relative;
   transition: all 0.3s ease;
 }
 
-/* Heart shape via clip-path */
-.excess-bg-indicator__heart::before {
+/* Healthy = green circle */
+.excess-bg-indicator__marker--healthy {
+  border-radius: 50%;
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  border: 2px solid #48bb78;
+  box-shadow: 0 0 8px rgba(72, 187, 120, 0.3);
+}
+
+/* Damaged = bright pink cross (X rotated 45deg) */
+.excess-bg-indicator__marker--damaged {
+  border: none;
+  background: none;
+}
+
+.excess-bg-indicator__marker--damaged::before,
+.excess-bg-indicator__marker--damaged::after {
   content: '';
-  display: block;
-  width: 100%;
-  height: 100%;
-  clip-path: path('M16 28 C16 28 2 20 2 10 A6 6 0 0 1 16 6 A6 6 0 0 1 30 10 C30 20 16 28 16 28Z');
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 3px;
+  background: #ff6b9d;
+  box-shadow: 0 0 8px rgba(255, 107, 157, 0.5);
 }
 
-.excess-bg-indicator__heart--healthy::before {
-  background: #48bb78;
+.excess-bg-indicator__marker--damaged::before {
+  width: 6px;
+  height: 26px;
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 
-.excess-bg-indicator__heart--damaged::before {
-  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
-  animation: pulse-heart 2s ease-in-out infinite;
+.excess-bg-indicator__marker--damaged::after {
+  width: 26px;
+  height: 6px;
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 
-@keyframes pulse-heart {
+.excess-bg-indicator__marker--transferring::before,
+.excess-bg-indicator__marker--transferring::after {
+  animation: transfer-cross 0.6s ease-in-out 3;
+}
+
+@keyframes transfer-cross {
   0%, 100% {
-    transform: scale(1);
-    opacity: 1;
+    transform: translate(-50%, -50%) rotate(45deg) scale(1);
+    box-shadow: 0 0 8px rgba(255, 107, 157, 0.5);
   }
   50% {
-    transform: scale(1.08);
-    opacity: 0.85;
-  }
-}
-
-.excess-bg-indicator__heart--transferring::before {
-  animation: transfer-heart 0.6s ease-in-out 3;
-}
-
-@keyframes transfer-heart {
-  0%, 100% {
-    transform: scale(1);
-    filter: drop-shadow(0 0 6px rgba(255, 107, 157, 0.4));
-  }
-  50% {
-    transform: scale(1.2);
-    filter: drop-shadow(0 0 12px rgba(255, 107, 157, 0.8));
+    transform: translate(-50%, -50%) rotate(45deg) scale(1.2);
+    box-shadow: 0 0 16px rgba(255, 107, 157, 0.8);
   }
 }
 

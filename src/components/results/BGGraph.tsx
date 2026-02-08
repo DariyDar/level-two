@@ -28,7 +28,7 @@ export function BGGraph({ bgHistory, thresholds }: BGGraphProps) {
 
   const pathD = `M ${points.join(' L ')}`;
 
-  // Build colored segments for zones above high/critical
+  // Build colored segments for all zones
   const segments = buildColoredSegments(bgHistory, thresholds, getY);
 
   return (
@@ -90,7 +90,8 @@ export function BGGraph({ bgHistory, thresholds }: BGGraphProps) {
             key={i}
             className={`bg-graph__point ${
               bg > thresholds.critical ? 'bg-graph__point--critical' :
-              bg > thresholds.high ? 'bg-graph__point--high' : ''
+              bg > thresholds.high ? 'bg-graph__point--high' :
+              bg >= thresholds.low ? 'bg-graph__point--normal' : ''
             }`}
             cx={(i / (bgHistory.length - 1)) * 100}
             cy={getY(bg)}
@@ -117,23 +118,26 @@ export function BGGraph({ bgHistory, thresholds }: BGGraphProps) {
   );
 }
 
-// Build SVG path segments where BG is above high or critical thresholds
+type BgZone = 'normal' | 'high' | 'critical';
+
+// Build SVG path segments colored by BG zone
 function buildColoredSegments(
   bgHistory: number[],
-  thresholds: { high: number; critical: number },
+  thresholds: { low: number; high: number; critical: number },
   getY: (bg: number) => number
-): { d: string; zone: 'high' | 'critical' }[] {
-  const segments: { d: string; zone: 'high' | 'critical' }[] = [];
+): { d: string; zone: BgZone }[] {
+  const segments: { d: string; zone: BgZone }[] = [];
   const len = bgHistory.length;
   if (len < 2) return segments;
 
-  let currentZone: 'high' | 'critical' | null = null;
+  let currentZone: BgZone | null = null;
   let currentPoints: string[] = [];
 
-  const getZone = (bg: number): 'high' | 'critical' | null => {
+  const getZone = (bg: number): BgZone | null => {
     if (bg > thresholds.critical) return 'critical';
     if (bg > thresholds.high) return 'high';
-    return null;
+    if (bg >= thresholds.low) return 'normal';
+    return null; // below low — uses base line color
   };
 
   for (let i = 0; i < len; i++) {
@@ -143,41 +147,26 @@ function buildColoredSegments(
     const zone = getZone(bg);
 
     if (zone !== null) {
-      if (currentZone === null) {
-        // Start new segment - include interpolated start if previous point was in normal zone
-        if (i > 0) {
-          const prevBg = bgHistory[i - 1];
-          const prevX = ((i - 1) / (len - 1)) * 100;
-          const threshold = zone === 'critical' ? thresholds.critical : thresholds.high;
-          if (prevBg <= threshold) {
-            const t = (threshold - prevBg) / (bg - prevBg);
-            const interpX = prevX + t * (x - prevX);
-            currentPoints.push(`${interpX},${getY(threshold)}`);
-          }
-        }
-        currentZone = zone;
-        currentPoints.push(`${x},${y}`);
-      } else if (zone === currentZone) {
-        currentPoints.push(`${x},${y}`);
-      } else {
-        // Zone changed (high <-> critical) - flush current, start new
-        if (currentPoints.length >= 2) {
+      if (currentZone === null || zone !== currentZone) {
+        // Flush previous segment
+        if (currentZone !== null && currentPoints.length >= 2) {
           segments.push({ d: `M ${currentPoints.join(' L ')}`, zone: currentZone });
         }
+        // Start new segment with overlap from previous point
+        currentPoints = [];
+        if (i > 0) {
+          const prevX = ((i - 1) / (len - 1)) * 100;
+          const prevY = getY(bgHistory[i - 1]);
+          currentPoints.push(`${prevX},${prevY}`);
+        }
         currentZone = zone;
-        currentPoints = [`${x},${y}`];
+        currentPoints.push(`${x},${y}`);
+      } else {
+        currentPoints.push(`${x},${y}`);
       }
     } else {
       if (currentZone !== null && currentPoints.length >= 1) {
-        // Interpolate end point at threshold boundary
-        const prevBg = bgHistory[i - 1];
-        const prevX = ((i - 1) / (len - 1)) * 100;
-        const threshold = currentZone === 'critical' ? thresholds.critical : thresholds.high;
-        if (prevBg > threshold) {
-          const t = (threshold - bg) / (prevBg - bg);
-          const interpX = x - t * (x - prevX);
-          currentPoints.push(`${interpX},${getY(threshold)}`);
-        }
+        currentPoints.push(`${x},${y}`);
         if (currentPoints.length >= 2) {
           segments.push({ d: `M ${currentPoints.join(' L ')}`, zone: currentZone });
         }

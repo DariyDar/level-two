@@ -41,10 +41,14 @@
 }
 
 .bg-graph__line {
-  stroke: #4299e1;
+  stroke: #a0aec0;
   stroke-width: 1.5;
   stroke-linejoin: round;
   stroke-linecap: round;
+}
+
+.bg-graph__line--normal {
+  stroke: #48bb78;
 }
 
 .bg-graph__line--high {
@@ -56,7 +60,11 @@
 }
 
 .bg-graph__point {
-  fill: #4299e1;
+  fill: #a0aec0;
+}
+
+.bg-graph__point--normal {
+  fill: #48bb78;
 }
 
 .bg-graph__point--high {

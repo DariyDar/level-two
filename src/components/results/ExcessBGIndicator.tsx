@@ -32,23 +32,23 @@ export function ExcessBGIndicator({
     }
   }, [totalCircles, onAnimationComplete]);
 
-  // Damaged hearts fill from the right
+  // Damaged markers fill from the right
   const isDamaged = (i: number) => i >= maxCircles - totalCircles;
 
   return (
     <div className="excess-bg-indicator">
       <h3 className="excess-bg-indicator__title">Excess BG</h3>
-      <div className="excess-bg-indicator__hearts">
+      <div className="excess-bg-indicator__markers">
         {Array.from({ length: maxCircles }, (_, i) => {
           const damaged = isDamaged(i);
           return (
             <span
               key={i}
-              className={`excess-bg-indicator__heart ${
+              className={`excess-bg-indicator__marker ${
                 damaged
-                  ? 'excess-bg-indicator__heart--damaged'
-                  : 'excess-bg-indicator__heart--healthy'
-              } ${isAnimating && damaged ? 'excess-bg-indicator__heart--transferring' : ''}`}
+                  ? 'excess-bg-indicator__marker--damaged'
+                  : 'excess-bg-indicator__marker--healthy'
+              } ${isAnimating && damaged ? 'excess-bg-indicator__marker--transferring' : ''}`}
             />
           );
         })}

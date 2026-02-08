@@ -68,39 +68,36 @@
   transition: all 0.5s ease;
 }
 
-/* Cross shape via ::before and ::after (+ rotated 45deg = X) */
-.organ-degradation-display__marker::before,
-.organ-degradation-display__marker::after {
+/* Healthy = green circle */
+.organ-degradation-display__marker--healthy {
+  border-radius: 50%;
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  border: 2px solid #48bb78;
+  box-shadow: 0 0 8px rgba(72, 187, 120, 0.3);
+}
+
+/* Degraded = bright pink cross (X rotated 45deg) */
+.organ-degradation-display__marker--degraded::before,
+.organ-degradation-display__marker--degraded::after {
   content: '';
   position: absolute;
   top: 50%;
   left: 50%;
-  border-radius: 2px;
+  border-radius: 3px;
+  background: #ff6b9d;
+  box-shadow: 0 0 8px rgba(255, 107, 157, 0.5);
 }
 
-.organ-degradation-display__marker::before {
-  width: 4px;
+.organ-degradation-display__marker--degraded::before {
+  width: 6px;
   height: 20px;
   transform: translate(-50%, -50%) rotate(45deg);
 }
 
-.organ-degradation-display__marker::after {
-  width: 20px;
-  height: 4px;
-  transform: translate(-50%, -50%) rotate(45deg);
-}
-
-.organ-degradation-display__marker--healthy::before,
-.organ-degradation-display__marker--healthy::after {
-  background: #48bb78;
-  box-shadow: 0 0 6px rgba(72, 187, 120, 0.3);
-}
-
-.organ-degradation-display__marker--degraded::before,
 .organ-degradation-display__marker--degraded::after {
-  background: #ff6b9d;
-  box-shadow: 0 0 6px rgba(255, 107, 157, 0.4);
-  animation: pulse-degraded 2s ease-in-out infinite;
+  width: 20px;
+  height: 6px;
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 
 @keyframes pulse-degraded {
