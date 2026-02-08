@@ -111,6 +111,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
 
       {/* Blood Glucose - center, full height */}
       <div className="body-diagram__bg">
+        <div className="body-diagram__bg-label">Blood Glucose</div>
         <ContainerView
           label="Blood Glucose"
           emoji=""
@@ -125,7 +126,6 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           floatingValue={true}
           hideHeader={true}
         />
-        <div className="body-diagram__bg-label">Blood Glucose</div>
       </div>
 
       {/* Liver icon - bottom left */}
