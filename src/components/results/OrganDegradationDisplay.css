@@ -79,7 +79,7 @@
 /* Degraded = dashed green circle outline + bright pink cross */
 .organ-degradation-display__marker--degraded {
   border-radius: 50%;
-  border: 2px dashed #48bb78;
+  border: 2px dashed #ff6b9d;
   background: none;
   box-sizing: border-box;
 }

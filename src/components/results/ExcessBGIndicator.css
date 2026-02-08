@@ -2,8 +2,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 16px;
+  gap: 14px;
+  padding: 20px 16px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
 }
@@ -42,7 +42,7 @@
 /* Damaged = dashed green circle outline + bright pink cross */
 .excess-bg-indicator__marker--damaged {
   border-radius: 50%;
-  border: 2px dashed #48bb78;
+  border: 2px dashed #ff6b9d;
   background: none;
   box-sizing: border-box;
 }

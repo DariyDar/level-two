@@ -1,8 +1,8 @@
 .results-phase {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
+  gap: 12px;
+  padding: 8px 16px 16px;
   max-width: 400px;
   margin: 0 auto;
 }
