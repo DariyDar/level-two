@@ -113,10 +113,22 @@ function ChevronFlow({
 // Intake positions for ship pipes (bottom ends where glucose enters)
 const SHIP_INTAKE_X = [18, 50, 82];
 const SHIP_INTAKE_Y = 73;
-const SUCTION_PARTICLE_COUNT = 6;
-const SUCTION_RADIUS_PX = 14; // CSS pixels
 
-// Suction VFX: particles converging toward pipe intake
+// Funnel-shaped particle positions (dx, dy in CSS pixels from intake point)
+// Funnel opens downward: wider spread at greater depth
+const SUCTION_PARTICLES = [
+  // Near intake (narrow, small offset)
+  { dx: -2, dy: 4 },
+  { dx: 2, dy: 4 },
+  // Mid funnel
+  { dx: -6, dy: 11 },
+  { dx: 6, dy: 11 },
+  // Wide bottom of funnel
+  { dx: -11, dy: 18 },
+  { dx: 11, dy: 18 },
+];
+
+// Suction VFX: funnel-shaped particles converging toward pipe intake
 function SuctionEffect({
   x,
   y,
@@ -128,23 +140,20 @@ function SuctionEffect({
 }) {
   return (
     <g>
-      {Array.from({ length: SUCTION_PARTICLE_COUNT }, (_, i) => {
-        const angle = (i / SUCTION_PARTICLE_COUNT) * Math.PI * 2;
-        return (
-          <circle
-            key={i}
-            cx={x}
-            cy={y}
-            r="0.8"
-            className={`pipe-suction ${isPaused ? 'pipe-suction--paused' : ''}`}
-            style={{
-              '--sx': `${Math.cos(angle) * SUCTION_RADIUS_PX}px`,
-              '--sy': `${Math.sin(angle) * SUCTION_RADIUS_PX}px`,
-              animationDelay: `${-(i / SUCTION_PARTICLE_COUNT) * 1.2}s`,
-            } as React.CSSProperties}
-          />
-        );
-      })}
+      {SUCTION_PARTICLES.map((p, i) => (
+        <circle
+          key={i}
+          cx={x}
+          cy={y}
+          r="0.5"
+          className={`pipe-suction ${isPaused ? 'pipe-suction--paused' : ''}`}
+          style={{
+            '--sx': `${p.dx}px`,
+            '--sy': `${p.dy}px`,
+            animationDelay: `${-(i / SUCTION_PARTICLES.length) * 1.2}s`,
+          } as React.CSSProperties}
+        />
+      ))}
     </g>
   );
 }

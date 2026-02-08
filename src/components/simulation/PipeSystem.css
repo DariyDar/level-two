@@ -69,9 +69,11 @@
   }
 }
 
-/* Suction VFX — particles converging toward pipe intake */
+/* Suction VFX — funnel particles converging toward pipe intake */
 .pipe-suction {
   fill: rgba(66, 153, 225, 0.7);
+  transform-box: fill-box;
+  transform-origin: center;
   animation: suctionPull 1.2s ease-in infinite;
 }
 
@@ -81,14 +83,14 @@
 
 @keyframes suctionPull {
   0% {
-    transform: translate(var(--sx), var(--sy));
-    opacity: 0.8;
+    transform: translate(var(--sx), var(--sy)) scale(1);
+    opacity: 0.7;
   }
-  60% {
+  50% {
     opacity: 0.5;
   }
   100% {
-    transform: translate(0, 0);
+    transform: translate(0, 0) scale(0.2);
     opacity: 0;
   }
 }
