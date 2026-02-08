@@ -110,7 +110,7 @@ export function ContainerView({
 
         {/* Fill */}
         <div
-          className={`container-view__fill ${flowDirection === 'up' ? 'container-view__fill--flow-up' : flowDirection === 'down' ? 'container-view__fill--flow-down' : ''}`}
+          className={`container-view__fill ${flowDirection === 'up' ? 'container-view__fill--flow-up' : flowDirection === 'down' ? 'container-view__fill--flow-down' : 'container-view__fill--flow-static'}`}
           style={{
             height: `${fillPercent}%`,
             backgroundColor: fillColor,
