@@ -6,7 +6,7 @@ interface OrganTierCirclesProps {
   activeTier: number;        // Currently active tier (0 = none active)
 
   // Degradation
-  degradedTiers: number;     // Number of degraded tiers (from left, 0-4)
+  degradedTiers: number;     // Number of degraded tiers (from right, 0-4)
 
   // Boost state
   isBoosted?: boolean;       // Fast Insulin active - shows boost color
@@ -24,14 +24,14 @@ interface OrganTierCirclesProps {
  * Unified tier indicator for organs
  *
  * Visual states (left to right):
- * - Degraded circles: bright pink (#ec4899)
- * - Healthy circles: orange (#f97316) or green (#22c55e)
  * - Active tier circles: ALL tiers up to and including activeTier flash
+ * - Healthy circles: yellow (#E2BC28) or green (#22c55e)
+ * - Degraded circles (from right): bright pink (#ec4899)
  * - When boosted: active tiers use boost color + flashing
  *
- * Example for maxTier=5, degradedTiers=2, activeTier=4:
- *   [pink][pink][FLASH][FLASH][orange]
- *         ^degraded^  ^tiers 3,4 flashing^
+ * Example for maxTier=5, degradedTiers=2, activeTier=3:
+ *   [FLASH][FLASH][FLASH][pink][pink]
+ *   ^tiers 1-3 flashing^  ^degraded^
  */
 export function OrganTierCircles({
   maxTier,
@@ -50,7 +50,7 @@ export function OrganTierCircles({
 
   for (let i = 0; i < totalCircles; i++) {
     const tierNumber = i + 1; // Tiers are 1-indexed
-    const isDegraded = i < degradedTiers;
+    const isDegraded = i >= maxTier - degradedTiers && i < maxTier;
     // Flash all tiers up to and including activeTier (but not degraded ones)
     const isActiveOrBelow = tierNumber <= activeTier && !isDegraded;
     const isBoostedTier = i === maxTier; // The 6th circle (index 5 when maxTier=5)
