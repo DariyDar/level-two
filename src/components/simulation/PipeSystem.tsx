@@ -25,30 +25,33 @@ interface PipeSystemProps {
 // Pipe route definitions (SVG path data in viewBox 0 0 100 100)
 // All paths drawn in flow direction for correct arrow animation
 
-// Ship slot pipes: from ship area (bottom) up to liver container
+// Ship slot pipes: from ship slot positions up to liver container
+// Slot X positions match ship queue grid (3 columns: ~18%, ~50%, ~82%)
+// Each pipe routes vertically up then horizontally into the liver container bottom (~y47)
+// Staggered horizontal routing levels (y52, y55, y58) to avoid overlap
 const SHIP_PIPES = [
-  // Slot 0 (left): up from x=20, turn right into LC bottom
-  'M 20,80 L 20,59 L 27,59 L 27,55',
-  // Slot 1 (center): straight up into LC center
-  'M 30,80 L 30,55',
-  // Slot 2 (right): up from x=40, turn left into LC bottom
-  'M 40,80 L 40,59 L 33,59 L 33,55',
+  // Slot 0 (left): up from x≈18, turn right into LC left
+  'M 18,73 L 18,52 L 28,52 L 28,47',
+  // Slot 1 (center): up from x≈50, turn left into LC center
+  'M 50,73 L 50,55 L 33,55 L 33,47',
+  // Slot 2 (right): up from x≈82, turn left into LC right
+  'M 82,73 L 82,58 L 37,58 L 37,47',
 ];
 
 // Liver → BG: normal pipe (lower horizontal)
-const LIVER_TO_BG_NORMAL = 'M 36,48 L 50,48';
+const LIVER_TO_BG_NORMAL = 'M 37,42 L 47,42';
 
 // Liver → BG: passthrough pipe (upper horizontal, wider)
-const LIVER_TO_BG_PASSTHROUGH = 'M 36,40 L 50,40';
+const LIVER_TO_BG_PASSTHROUGH = 'M 37,35 L 47,35';
 
 // BG → Kidneys: horizontal left from BG to KC
-const BG_TO_KIDNEYS = 'M 50,22 L 38,22';
+const BG_TO_KIDNEYS = 'M 47,15 L 35,15';
 
 // BG → Muscles: horizontal right from BG to muscles
-const BG_TO_MUSCLES = 'M 60,22 L 73,22';
+const BG_TO_MUSCLES = 'M 63,15 L 78,15';
 
 // Pancreas → Muscles: vertical orange pipe (insulin signal)
-const PANCREAS_TO_MUSCLES = 'M 82,47 L 82,27';
+const PANCREAS_TO_MUSCLES = 'M 80,39 L 80,18';
 
 // Stroke widths
 const WALL_WIDTH = 2.5;
