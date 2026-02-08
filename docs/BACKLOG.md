@@ -64,3 +64,43 @@
 - Добавлено: 2-3 скалярных параметра на орган
 - Поведение: плавное, непрерывное, полностью предсказуемое по формуле
 - Комплексность кода: снижается (меньше ветвлений, нет tier lookup)
+
+---
+
+## Removed: Star Rating System (v0.22.0)
+
+**Удалена в v0.22.0** — заменена на assessment по кружкам деградации.
+
+### Старая логика рейтинга (1-5 звёзд)
+
+Рейтинг рассчитывался в `calculateRank(metrics: DayMetrics)` на основе трёх метрик:
+- `timeInRange` — % времени BG в диапазоне 70–200
+- `timeBelowLow` — % времени BG < 70
+- `timeAboveCritical` — % времени BG > 300
+
+**Алгоритм:**
+
+1. Штрафы (приоритетные):
+   - `timeBelowLow > 20%` ИЛИ `timeAboveCritical > 30%` → 1 звезда (Poor)
+   - `timeBelowLow > 10%` ИЛИ `timeAboveCritical > 20%` → 2 звезды (Below Average)
+
+2. По timeInRange:
+   - ≥ 80% → 5 звёзд (Excellent)
+   - ≥ 60% → 4 звезды (Good)
+   - ≥ 40% → 3 звезды (Average)
+   - < 40% → 2 звезды (Below Average)
+
+**Условие победы:** `rank >= winCondition.minRank` (по умолчанию minRank=2)
+
+**Сообщения:**
+- 1: "Dangerous glucose levels! Review your meal plan."
+- 2: "Room for improvement. Try balancing your meals."
+- 3: "Decent day. Keep working on consistency."
+- 4: "Good job! Your planning is paying off."
+- 5: "Excellent! Perfect glucose management!"
+
+**Компоненты:** RankDisplay.tsx (⭐ эмодзи + label + message), RankDisplay.css
+
+### Причина удаления
+
+Рейтинг на основе timeInRange был абстрактным — игрок не понимал связь между звёздами и механикой деградации. Новая система (assessment по кружкам деградации) напрямую привязана к видимой механике: видишь кружки → видишь оценку.

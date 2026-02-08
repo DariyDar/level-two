@@ -1,4 +1,5 @@
-import type { DayMetrics, DayResults, SimpleDegradation, DegradationBuffer } from '../types';
+import type { DayMetrics, DayResults, SimpleDegradation, DegradationBuffer, DayAssessment } from '../types';
+import { DEFAULT_ASSESSMENT_THRESHOLDS } from '../types';
 
 interface ResultsConfig {
   bgLow: number;
@@ -138,43 +139,16 @@ export function calculateDegradation(
   };
 }
 
-export function calculateRank(metrics: DayMetrics): 1 | 2 | 3 | 4 | 5 {
-  const { timeInRange, timeBelowLow, timeAboveCritical } = metrics;
-
-  // Penalties
-  if (timeBelowLow > 20 || timeAboveCritical > 30) {
-    return 1; // Poor - dangerous levels
-  }
-
-  if (timeBelowLow > 10 || timeAboveCritical > 20) {
-    return 2; // Below average
-  }
-
-  // Based on time in range
-  if (timeInRange >= 80) {
-    return 5; // Excellent
-  }
-
-  if (timeInRange >= 60) {
-    return 4; // Good
-  }
-
-  if (timeInRange >= 40) {
-    return 3; // Average
-  }
-
-  return 2; // Below average
-}
-
-export function getRankMessage(rank: 1 | 2 | 3 | 4 | 5): string {
-  const messages: Record<number, string> = {
-    1: 'Dangerous glucose levels! Review your meal plan.',
-    2: 'Room for improvement. Try balancing your meals.',
-    3: 'Decent day. Keep working on consistency.',
-    4: 'Good job! Your planning is paying off.',
-    5: 'Excellent! Perfect glucose management!',
-  };
-  return messages[rank];
+/**
+ * Calculate assessment based on degradation circles earned this day
+ * @param totalCircles - Number of degradation circles (0-5)
+ * @returns Assessment label
+ */
+export function calculateAssessment(totalCircles: number): DayAssessment {
+  if (totalCircles <= DEFAULT_ASSESSMENT_THRESHOLDS.excellent) return 'Excellent';
+  if (totalCircles <= DEFAULT_ASSESSMENT_THRESHOLDS.decent) return 'Decent';
+  if (totalCircles < DEFAULT_ASSESSMENT_THRESHOLDS.defeat) return 'Poor';
+  return 'Defeat';
 }
 
 /**
@@ -258,10 +232,8 @@ export function calculateDayResults(
   config: Partial<ResultsConfig> = {}
 ): DayResults {
   const metrics = calculateMetrics(bgHistory, config);
-  const rank = calculateRank(metrics);
-  const message = getRankMessage(rank);
 
-  // New Degradation Buffer system - replaces old calculateDegradation()
+  // Degradation Buffer system
   const totalCircles = calculateDegradationBuffer(metrics.excessBG);
   const distribution = distributeDegradationCircles(totalCircles);
   const degradation = convertCirclesToPoints(distribution);
@@ -271,13 +243,14 @@ export function calculateDayResults(
     distribution,
   };
 
+  const assessment = calculateAssessment(totalCircles);
+
   return {
     day,
     bgHistory,
     metrics,
     degradation,
     degradationBuffer,
-    rank,
-    message,
+    assessment,
   };
 }

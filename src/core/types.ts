@@ -191,11 +191,20 @@ export interface LevelConfig {
     pancreasBoost: number;
   };
   winCondition: {
-    minRank: 1 | 2 | 3 | 4 | 5;
+    maxDegradationCircles?: number; // Default: 5. Defeat if circles >= this value
   };
 }
 
 // === Results Models ===
+
+export type DayAssessment = 'Excellent' | 'Decent' | 'Poor' | 'Defeat';
+
+export const DEFAULT_ASSESSMENT_THRESHOLDS = {
+  excellent: 0,  // 0 circles
+  decent: 1,     // 1 circle
+  poor: 2,       // 2-3 circles
+  defeat: 4,     // 4-5 circles
+} as const;
 
 export interface DayMetrics {
   averageBG: number;
@@ -222,8 +231,7 @@ export interface DayResults {
   metrics: DayMetrics;
   degradation: SimpleDegradation;
   degradationBuffer: DegradationBuffer;
-  rank: 1 | 2 | 3 | 4 | 5;
-  message: string;
+  assessment: DayAssessment;
 }
 
 // === Slot Models ===

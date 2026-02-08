@@ -68,3 +68,27 @@
     box-shadow: 0 0 24px rgba(255, 107, 157, 0.8);
   }
 }
+
+.excess-bg-indicator__assessment {
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.excess-bg-indicator__assessment--excellent {
+  color: #48bb78;
+}
+
+.excess-bg-indicator__assessment--decent {
+  color: #ecc94b;
+}
+
+.excess-bg-indicator__assessment--poor {
+  color: #ed8936;
+}
+
+.excess-bg-indicator__assessment--defeat {
+  color: #e53e3e;
+}

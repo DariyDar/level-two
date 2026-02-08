@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
+import type { DayAssessment } from '../../core/types';
 import './ExcessBGIndicator.css';
 
 interface ExcessBGIndicatorProps {
   totalCircles: number; // 0-5
+  assessment: DayAssessment;
   onAnimationComplete?: () => void; // Callback when animation completes
 }
 
 export function ExcessBGIndicator({
   totalCircles,
+  assessment,
   onAnimationComplete,
 }: ExcessBGIndicatorProps) {
   const maxCircles = 5;
@@ -15,12 +18,10 @@ export function ExcessBGIndicator({
 
   useEffect(() => {
     if (totalCircles > 0) {
-      // Start pulsing animation after a short delay
       const timer = setTimeout(() => {
         setIsAnimating(true);
       }, 500);
 
-      // Trigger completion callback after animation
       const completeTimer = setTimeout(() => {
         onAnimationComplete?.();
       }, 2000);
@@ -46,6 +47,9 @@ export function ExcessBGIndicator({
             } ${isAnimating && i < totalCircles ? 'excess-bg-indicator__circle--transferring' : ''}`}
           />
         ))}
+      </div>
+      <div className={`excess-bg-indicator__assessment excess-bg-indicator__assessment--${assessment.toLowerCase()}`}>
+        {assessment === 'Excellent' ? 'Excellent!' : assessment}
       </div>
     </div>
   );

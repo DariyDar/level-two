@@ -1,8 +1,7 @@
 export {
   calculateMetrics,
   calculateDegradation,
-  calculateRank,
-  getRankMessage,
+  calculateAssessment,
   calculateDayResults,
   convertPointsToTier,
 } from './calculateResults';

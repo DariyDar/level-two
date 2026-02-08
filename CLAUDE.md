@@ -79,7 +79,7 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - `src/core/types.ts` — TypeScript type definitions (Ship, SegmentCarbLimits, PlanValidation, etc.)
 - `src/core/utils/levelUtils.ts` — day config resolution (segmentCarbs, wpBudget)
 - `src/core/rules/types.ts` — rule system types (includes `ignoresDegradation`, `minBaseTier` modifier)
-- `src/core/results/calculateResults.ts` — results phase: excessBG calculation, degradation pipeline
+- `src/core/results/calculateResults.ts` — results phase: excessBG calculation, degradation pipeline, assessment
 - `src/config/loader.ts` — loads and transforms JSON configs (foods, interventions with wpCost)
 - `src/config/organRules.json` — organ behavior rules (pancreas tiers, liver thresholds, muscle rates)
 - `src/config/degradationConfig.json` — degradation system configuration
@@ -108,7 +108,7 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - `levels/*.json` — level configurations (per-day segmentCarbs, wpBudget, blockedSlots)
 - `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.21.30) — TAG: "Planning, Simulation - Stable"
+### Current State (v0.22.0) — TAG: "Planning, Simulation - Stable"
 - Planning phase: drag-and-drop ships to time slots ✅
 - **SVG Pipe System (v0.21.0-v0.21.23)** ✅
   - SVG overlay with pipes connecting organs (Ship→Liver, Liver→BG, BG→Muscles, BG→Kidneys, Pancreas→Muscles)
@@ -162,7 +162,12 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - Desktop: Inventory LEFT, SlotGrid RIGHT (swapped)
   - Mobile: SlotGrid on top via CSS order
 - Simulation phase: glucose flow visualization with SVG pipes ✅
-- Results phase: basic BG history graph ✅
+- **Results Phase (v0.22.0)** ✅
+  - BG history graph + ExcessBG circles + assessment label
+  - Assessment based on degradation circles: Excellent (0), Decent (1), Poor (2-3), Defeat (4-5)
+  - Defeat = level failed (only Retry), Excellent = no Retry shown
+  - Win condition: `maxDegradationCircles` in level config (default 5)
+  - Star rating system removed (see BACKLOG.md)
 - Substep simulation: smooth container updates (10 substeps/hour) ✅
 - **Simulation Rebalancing (v0.18.0-v0.18.1)** ✅
   - **Gradual pancreas response** — softer insulin tiers for realistic BG dynamics

@@ -2,8 +2,6 @@ import { useMemo } from 'react';
 import { useGameStore } from '../../store/gameStore';
 import { calculateDayResults } from '../../core/results';
 import { BGGraph } from './BGGraph';
-import { RankDisplay } from './RankDisplay';
-// import { MetricsDisplay } from './MetricsDisplay'; // Hidden for now - may be restored later
 import { ExcessBGIndicator } from './ExcessBGIndicator';
 import { OrganDegradationDisplay } from './OrganDegradationDisplay';
 import './ResultsPhase.css';
@@ -20,7 +18,6 @@ interface ResultsPhaseProps {
 export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps) {
   const {
     currentDay,
-    currentLevel,
     degradation,
     setResults,
     startNextDay,
@@ -32,15 +29,12 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
     return calculateDayResults(currentDay, bgHistory);
   }, [currentDay, bgHistory]);
 
-  // Check if passed
-  const minRank = currentLevel?.winCondition.minRank ?? 2;
-  const passed = results.rank >= minRank;
+  const { assessment } = results;
+  const defeated = assessment === 'Defeat';
+  const excellent = assessment === 'Excellent';
 
   const handleContinue = () => {
-    // Save results to store (updates degradation)
     setResults(results);
-
-    // Move to next day
     startNextDay();
   };
 
@@ -52,8 +46,6 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
     <div className="results-phase">
       <h2 className="results-phase__title">Day {currentDay} Results</h2>
 
-      <RankDisplay rank={results.rank} message={results.message} />
-
       <BGGraph
         bgHistory={bgHistory}
         thresholds={{
@@ -64,9 +56,10 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
         }}
       />
 
-      <ExcessBGIndicator totalCircles={results.degradationBuffer.totalCircles} />
-
-      {/* <MetricsDisplay metrics={results.metrics} /> */}
+      <ExcessBGIndicator
+        totalCircles={results.degradationBuffer.totalCircles}
+        assessment={assessment}
+      />
 
       <OrganDegradationDisplay
         currentDegradation={degradation}
@@ -75,18 +68,20 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
       />
 
       <div className="results-phase__actions">
-        {passed ? (
+        {defeated ? (
+          <p className="results-phase__fail-message">
+            Too much damage! Try a different approach.
+          </p>
+        ) : (
           <button className="results-phase__button results-phase__button--primary" onClick={handleContinue}>
             Continue →
           </button>
-        ) : (
-          <p className="results-phase__fail-message">
-            Need at least {minRank} stars to continue. Try again!
-          </p>
         )}
-        <button className="results-phase__button results-phase__button--secondary" onClick={handleRetry}>
-          Retry Day
-        </button>
+        {!excellent && (
+          <button className="results-phase__button results-phase__button--secondary" onClick={handleRetry}>
+            Retry Day
+          </button>
+        )}
       </div>
     </div>
   );
