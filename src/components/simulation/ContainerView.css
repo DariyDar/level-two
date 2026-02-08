@@ -113,6 +113,17 @@
   height: 90px;
 }
 
+/* Circular mode - round container (liver/kidneys) */
+.container-view--circular .container-view__bar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+}
+
+.container-view--circular .container-view__fill {
+  border-radius: 0;
+}
+
 /* Floating value indicator for BG */
 .container-view__floating-value {
   position: absolute;

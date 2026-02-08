@@ -22,6 +22,7 @@ interface ContainerViewProps {
   hideHeader?: boolean;        // Hide emoji/label header
   floatingValue?: boolean;     // Show value as floating indicator (for BG)
   compactSize?: boolean;       // Use compact dimensions (narrower/shorter)
+  circular?: boolean;          // Circular container shape (liver/kidneys)
 }
 
 export function ContainerView({
@@ -37,6 +38,7 @@ export function ContainerView({
   hideHeader = false,
   floatingValue = false,
   compactSize = false,
+  circular = false,
 }: ContainerViewProps) {
   const fillPercent = Math.min(100, (value / capacity) * 100);
 
@@ -56,7 +58,7 @@ export function ContainerView({
   }
 
   return (
-    <div className={`container-view ${compact ? 'container-view--compact' : ''} ${compactSize ? 'container-view--compact-size' : ''}`}>
+    <div className={`container-view ${compact ? 'container-view--compact' : ''} ${compactSize ? 'container-view--compact-size' : ''} ${circular ? 'container-view--circular' : ''}`}>
       {!hideHeader && (
         <div className="container-view__header">
           <span className="container-view__emoji">{emoji}</span>
