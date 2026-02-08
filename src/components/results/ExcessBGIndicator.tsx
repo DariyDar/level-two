@@ -5,12 +5,14 @@ import './ExcessBGIndicator.css';
 interface ExcessBGIndicatorProps {
   totalCircles: number; // 0-5
   assessment: DayAssessment;
+  defeatThreshold?: number; // Max circles before defeat (default 5)
   onAnimationComplete?: () => void; // Callback when animation completes
 }
 
 export function ExcessBGIndicator({
   totalCircles,
   assessment,
+  defeatThreshold = 5,
   onAnimationComplete,
 }: ExcessBGIndicatorProps) {
   const maxCircles = 5;
@@ -50,6 +52,9 @@ export function ExcessBGIndicator({
       </div>
       <div className={`excess-bg-indicator__assessment excess-bg-indicator__assessment--${assessment.toLowerCase()}`}>
         {assessment === 'Excellent' ? 'Excellent!' : assessment}
+      </div>
+      <div className="excess-bg-indicator__subtitle">
+        {defeatThreshold - totalCircles} degradation{defeatThreshold - totalCircles !== 1 ? 's' : ''} till defeat
       </div>
     </div>
   );

@@ -50,7 +50,6 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
         bgHistory={bgHistory}
         thresholds={{
           low: 70,
-          target: 100,
           high: 200,
           critical: 300,
         }}
@@ -59,6 +58,7 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
       <ExcessBGIndicator
         totalCircles={results.degradationBuffer.totalCircles}
         assessment={assessment}
+        defeatThreshold={5}
       />
 
       <OrganDegradationDisplay
