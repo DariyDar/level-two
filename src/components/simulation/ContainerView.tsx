@@ -43,9 +43,10 @@ export function ContainerView({
   const fillPercent = Math.min(100, (value / capacity) * 100);
 
   // Determine fill color based on thresholds
+  // For BG (floatingValue mode): fill stays static blue, color goes to floating badge
   let fillColor = '#4299e1'; // Default blue
 
-  if (thresholds) {
+  if (thresholds && !floatingValue) {
     if (thresholds.critical && value >= thresholds.critical) {
       fillColor = '#e53e3e'; // Red
     } else if (thresholds.high && value >= thresholds.high) {
@@ -54,6 +55,18 @@ export function ContainerView({
       fillColor = '#48bb78'; // Green
     } else if (thresholds.low && value < thresholds.low) {
       fillColor = '#ecc94b'; // Yellow
+    }
+  }
+
+  // Floating value badge state (BG only)
+  let floatingClass = '';
+  if (floatingValue && thresholds) {
+    if (thresholds.critical && value >= thresholds.critical) {
+      floatingClass = 'container-view__floating-value--critical';
+    } else if (thresholds.high && value >= thresholds.high) {
+      floatingClass = 'container-view__floating-value--high';
+    } else if (thresholds.low && value < thresholds.low) {
+      floatingClass = 'container-view__floating-value--low';
     }
   }
 
@@ -103,7 +116,7 @@ export function ContainerView({
         >
           {/* Floating value indicator for BG */}
           {floatingValue && (
-            <div className="container-view__floating-value">
+            <div className={`container-view__floating-value ${floatingClass}`}>
               {Math.round(value)}
             </div>
           )}

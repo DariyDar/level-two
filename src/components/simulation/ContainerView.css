@@ -144,3 +144,30 @@
   z-index: 10;
   white-space: nowrap;
 }
+
+/* BG low (< 70): yellow, blink */
+.container-view__floating-value--low {
+  --blink-color: #ecc94b;
+  animation: bgBlink 1s ease-in-out infinite;
+}
+
+/* BG high (200-300): orange, blink */
+.container-view__floating-value--high {
+  --blink-color: #ed8936;
+  animation: bgBlink 1s ease-in-out infinite;
+}
+
+/* BG critical (300+): red, fast blink */
+.container-view__floating-value--critical {
+  --blink-color: #e53e3e;
+  animation: bgBlink 0.5s ease-in-out infinite;
+}
+
+@keyframes bgBlink {
+  0%, 100% {
+    background: var(--blink-color);
+  }
+  50% {
+    background: #ffffff;
+  }
+}
