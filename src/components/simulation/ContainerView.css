@@ -113,6 +113,10 @@
   height: 110px;
 }
 
+.container-view--compact-size .container-view__value {
+  display: none;
+}
+
 /* Circular mode - round container (liver/kidneys) */
 .container-view--circular .container-view__bar {
   width: 70px;
