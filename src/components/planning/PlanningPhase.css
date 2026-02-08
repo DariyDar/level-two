@@ -22,6 +22,11 @@
   gap: 16px;
 }
 
+/* Mobile: SlotGrid (last-child) appears on top despite DOM order */
+.planning-phase__content > *:last-child {
+  order: -1;
+}
+
 /* Responsive - tablet and up */
 @media (min-width: 768px) {
   .planning-phase {
@@ -33,11 +38,13 @@
     align-items: flex-start;
   }
 
+  /* Desktop: ShipInventory (first) fills, SlotGrid (last) fixed */
   .planning-phase__content > *:first-child {
-    flex: 0 0 auto;
+    flex: 1;
   }
 
   .planning-phase__content > *:last-child {
-    flex: 1;
+    flex: 0 0 auto;
+    order: 0;
   }
 }

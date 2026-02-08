@@ -14,6 +14,7 @@ import { slotNumberToPosition, isGlucoseShip, DAY_SEGMENTS } from '../../core/ty
 import { useGameStore } from '../../store/gameStore';
 import { loadAllShips, loadLevel } from '../../config/loader';
 import { getDayConfig } from '../../core/utils/levelUtils';
+import { useBgPrediction } from '../../hooks/useBgPrediction';
 import { PlanningHeader } from './PlanningHeader';
 import { SlotGrid, calculateValidDropSlots } from './SlotGrid';
 import { ShipInventory } from './ShipInventory';
@@ -35,6 +36,7 @@ export function PlanningPhase() {
     wpSpent,
     spendWp,
     refundWp,
+    degradation,
   } = useGameStore();
 
   const [allShips, setAllShips] = useState<Ship[]>([]);
@@ -173,6 +175,14 @@ export function PlanningPhase() {
       warnings,
     });
   }, [placedShips, allShips, currentLevel, dayConfig, updateValidation]);
+
+  // BG prediction for sparkline graph
+  const bgPrediction = useBgPrediction(
+    placedShips,
+    allShips,
+    degradation,
+    currentLevel?.initialBG ?? 100
+  );
 
   // DnD sensors
   const sensors = useSensors(
@@ -338,9 +348,17 @@ export function PlanningPhase() {
           wpBudget={wpBudget}
           isValid={planValidation.isValid}
           onSimulate={handleSimulate}
+          bgPrediction={bgPrediction.bgHistory}
         />
 
         <div className="planning-phase__content">
+          <ShipInventory
+            allShips={allShips}
+            availableFoods={dayConfig?.availableFoods || []}
+            availableInterventions={dayConfig?.availableInterventions || []}
+            placedShips={placedShips}
+          />
+
           <SlotGrid
             placedShips={placedShips}
             ships={allShips}
@@ -350,13 +368,6 @@ export function PlanningPhase() {
             hoveredSlot={hoveredSlot}
             segmentValidation={planValidation.segments}
             blockedSlots={dayConfig?.blockedSlots}
-          />
-
-          <ShipInventory
-            allShips={allShips}
-            availableFoods={dayConfig?.availableFoods || []}
-            availableInterventions={dayConfig?.availableInterventions || []}
-            placedShips={placedShips}
           />
         </div>
       </div>

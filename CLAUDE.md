@@ -91,10 +91,13 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - `OrganSprite.tsx` — organ icon with tier circles
   - `BoostButton.tsx` — boost buttons (Liver Boost, Fast Insulin)
 - `src/components/planning/` — planning phase UI
-  - `PlanningHeader.tsx` — header with BG, WP, Carbs, Simulate
+  - `PlanningHeader.tsx` — header with BG, WP, BG prediction sparkline, Simulate
+  - `BgSparkline.tsx` — compact SVG sparkline for BG prediction in planning header
   - `ShipCard.tsx` — draggable ship cards with WP cost/fiber badges
   - `ShipInventory.tsx` — unified inventory (food + interventions, no tabs)
   - `SlotGrid.tsx` — slot grid with segment carb indicators, blocked slots, exercise group limits
+- `src/hooks/` — custom React hooks
+  - `useBgPrediction.ts` — debounced BG prediction using SimulationEngine
 - `src/components/ui/` — shared UI components
   - `EyeToggle.tsx` — toggle for detailed indicators visibility
 - `public/data/` — JSON configs for ships and levels
@@ -103,8 +106,17 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - `levels/*.json` — level configurations (per-day segmentCarbs, wpBudget, blockedSlots)
 - `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.18.1)
+### Current State (v0.19.0)
 - Planning phase: drag-and-drop ships to time slots ✅
+- **BG Prediction Graph (v0.19.0)** ✅
+  - SVG sparkline in planning header, shows predicted BG curve
+  - Reuses SimulationEngine synchronously (debounce 300ms)
+  - Zone backgrounds: green (70-150), yellow (150-200), red (200-300)
+  - Threshold lines at BG 200 and 300, segment dividers at hours 6 and 12
+  - Updates on every plan change (card placed/removed)
+- **Layout Swap (v0.19.0)** ✅
+  - Desktop: Inventory LEFT, SlotGrid RIGHT (swapped)
+  - Mobile: SlotGrid on top via CSS order
 - Simulation phase: glucose flow visualization with particles ✅
 - Results phase: basic BG history graph ✅
 - Substep simulation: smooth container updates (10 substeps/hour) ✅

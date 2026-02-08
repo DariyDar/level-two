@@ -1,0 +1,41 @@
+.bg-sparkline {
+  flex: 1;
+  min-width: 120px;
+  max-width: 300px;
+  height: 48px;
+  background: #1a202c;
+  border-radius: 8px;
+  padding: 4px 8px;
+  overflow: hidden;
+}
+
+.bg-sparkline__svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.bg-sparkline__divider {
+  stroke: #4a5568;
+  stroke-width: 1;
+  stroke-dasharray: 2, 3;
+  opacity: 0.6;
+}
+
+.bg-sparkline__threshold {
+  stroke: #ed8936;
+  stroke-width: 0.5;
+  stroke-dasharray: 3, 3;
+  opacity: 0.5;
+}
+
+.bg-sparkline__threshold--critical {
+  stroke: #e53e3e;
+}
+
+.bg-sparkline__line {
+  stroke: #4299e1;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}

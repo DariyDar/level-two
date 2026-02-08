@@ -1,3 +1,4 @@
+import { BgSparkline } from './BgSparkline';
 import './PlanningHeader.css';
 
 interface PlanningHeaderProps {
@@ -6,6 +7,7 @@ interface PlanningHeaderProps {
   wpBudget: number;
   isValid: boolean;
   onSimulate: () => void;
+  bgPrediction: number[];
 }
 
 export function PlanningHeader({
@@ -14,6 +16,7 @@ export function PlanningHeader({
   wpBudget,
   isValid,
   onSimulate,
+  bgPrediction,
 }: PlanningHeaderProps) {
   return (
     <div className="planning-header">
@@ -28,6 +31,8 @@ export function PlanningHeader({
           {wpRemaining}/{wpBudget}
         </span>
       </div>
+
+      <BgSparkline bgHistory={bgPrediction} />
 
       <button
         className="planning-header__simulate"
