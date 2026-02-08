@@ -52,7 +52,7 @@
   stroke: transparent;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 3 9;
+  stroke-dasharray: 2 6;
 }
 
 /* Active arrows — visible and animated */
@@ -68,7 +68,7 @@
 
 @keyframes pipeFlowForward {
   from {
-    stroke-dashoffset: 12;
+    stroke-dashoffset: 8;
   }
   to {
     stroke-dashoffset: 0;

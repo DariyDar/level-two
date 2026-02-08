@@ -39,10 +39,10 @@ const SHIP_PIPES = [
 ];
 
 // Liver → BG: normal pipe (lower horizontal)
-const LIVER_TO_BG_NORMAL = 'M 35,42 L 47,42';
+const LIVER_TO_BG_NORMAL = 'M 35,40 L 47,40';
 
 // Liver → BG: passthrough pipe (upper horizontal, wider)
-const LIVER_TO_BG_PASSTHROUGH = 'M 35,35 L 47,35';
+const LIVER_TO_BG_PASSTHROUGH = 'M 35,37 L 47,37';
 
 // BG → Kidneys: horizontal left from BG to KC
 const BG_TO_KIDNEYS = 'M 47,15 L 33,15';
@@ -57,12 +57,12 @@ const PANCREAS_TO_MUSCLES = 'M 82.5,39 L 82.5,18';
 // Wall visible edge = (WALL - FILL) / 2 = 2px — matches container border: 2px
 const WALL_WIDTH = 12;
 const FILL_WIDTH = 8;
-const ARROW_WIDTH = 2;
+const ARROW_WIDTH = 8;
 
 // Passthrough is wider (same 2px wall edge)
 const PT_WALL_WIDTH = 20;
 const PT_FILL_WIDTH = 16;
-const PT_ARROW_WIDTH = 3;
+const PT_ARROW_WIDTH = 16;
 
 // Convert rate to animation duration (higher rate = faster arrows)
 function rateToDuration(rate: number): string {
