@@ -57,7 +57,6 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
 
       <ExcessBGIndicator
         totalCircles={results.degradationBuffer.totalCircles}
-        assessment={assessment}
         defeatThreshold={5}
       />
 
