@@ -108,18 +108,34 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - `levels/*.json` — level configurations (per-day segmentCarbs, wpBudget, blockedSlots)
 - `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.21.17)
+### Current State (v0.21.30) — TAG: "Planning, Simulation - Stable"
 - Planning phase: drag-and-drop ships to time slots ✅
-- **SVG Pipe System (v0.21.0-v0.21.17)** ✅
+- **SVG Pipe System (v0.21.0-v0.21.23)** ✅
   - SVG overlay with pipes connecting organs (Ship→Liver, Liver→BG, BG→Muscles, BG→Kidneys, Pancreas→Muscles)
   - Pipe wall (#4a5568) + inner fill (blue for glucose, orange for insulin)
   - `vector-effect: non-scaling-stroke` for uniform pixel-width pipes in stretched SVG
   - Chevron flow indicators (v0.21.17): V-shaped `>` polylines animated via CSS `offset-path`
   - 3 chevrons per active pipe, speed proportional to flow rate
+  - Rounded pipe bends with quadratic Bézier curves (v0.21.23)
+  - Flattened chevron angle: ±0.7 SVG units (v0.21.24)
   - Passthrough pipe: wider (wall 20px, fill 16px) vs normal (wall 12px, fill 8px)
   - Z-index layering: pipe-system(1) < containers(2) < organ backdrops(3) < BG(10)
   - Ship slot pipes: 3 routes from ship queue to liver, staggered horizontal routing
+  - Suction VFX (v0.21.18): funnel particles at active ship pipe intake
   - Replaces GlucoseParticleSystem (sugar cube particles)
+- **Container Fill Patterns (v0.21.25-v0.21.30)** ✅
+  - CSS `::before` pseudo-element with SVG `background-image` tile overlay
+  - 80×120px tile with 7 pseudo-random scattered elements, white stroke, opacity 0.2
+  - Three states: flow-up (^ chevrons scrolling up), flow-down (v chevrons scrolling down), flow-static (horizontal dashes, no animation)
+  - Flow direction computed from raw engine rates (no interpolation lag, v0.21.30)
+  - BG: net rate = liverRate - muscleRate - kidneyRate (±1 threshold)
+  - Liver: down when liverRate > 0; Kidneys: up when kidneyRate > 0
+  - Animation: 120px/4s scroll via `background-position-y`
+- **BG Indicator Redesign (v0.21.22)** ✅
+  - Floating value badge on top of BG fill (replaces separate value display)
+  - Color-coded: normal (dark), low (<70, yellow), high (200-300, orange), critical (300+, red blink)
+  - Green target threshold removed from BG container (v0.21.24)
+  - BG label font-size increased to 14px (v0.21.24)
 - **Body Diagram Layout (v0.20.0)** ✅
   - Absolute positioning instead of 6×6 CSS Grid
   - 4 organs at corners: K (top-left), M (top-right), L (bottom-left), P (bottom-right)
@@ -240,6 +256,7 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - Layout: Absolute positioning with corner organs ✅ (was 6×6 CSS Grid before v0.20.0)
 - Food Tags System ✅
   - WP cost badge (top-right, yellow number) for foods with wpCost > 0
+- Sugar Cube Particle System (v0.8.0) — SUPERSEDED by SVG Pipe System in v0.21.0
 
 ### Removed Features (v0.16.0)
 - **Mood System**: Fully removed (types, store, components, CSS, food data)

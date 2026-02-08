@@ -578,7 +578,7 @@ function useGameLoop(engine: SimulationEngine | null) {
      └─────────────────┘
 ```
 
-### SVG Pipe System (v0.21.0+)
+### SVG Pipe System (v0.21.0-v0.21.23)
 
 Визуализация потоков глюкозы через SVG-трубы вместо частиц.
 
@@ -590,8 +590,8 @@ function useGameLoop(engine: SimulationEngine | null) {
 **Маршруты труб:**
 ```
 Ship Slot 0 → Liver:  M 18,73 L 18,47          (vertical)
-Ship Slot 1 → Liver:  M 50,73 L 50,55 L 23,55 L 23,47  (right→up→left)
-Ship Slot 2 → Liver:  M 82,73 L 82,58 L 28,58 L 28,47  (right→up→left)
+Ship Slot 1 → Liver:  M 50,73 ... Q curves ... L 23,47  (rounded bends, r≈3 SVG units)
+Ship Slot 2 → Liver:  M 82,73 ... Q curves ... L 28,47  (rounded bends, r≈3 SVG units)
 Liver → BG (normal):  M 35,40 L 47,40
 Liver → BG (passthrough): M 35,37 L 47,37       (wider pipe)
 BG → Kidneys:         M 47,15 L 33,15
@@ -606,9 +606,15 @@ Pancreas → Muscles:   M 82.5,39 L 82.5,18       (insulin, orange)
 | Passthrough | 20px | 16px |
 
 **Индикаторы потока (v0.21.17):**
-- V-образные шевроны `>` (polyline), 3 штуки на трубу
+- V-образные шевроны `>` (polyline `points="-0.3,-0.7 0.3,0 -0.3,0.7"`), 3 штуки на трубу
 - CSS `offset-path` + `offset-distance` анимация
 - Скорость: `rateToDuration(rate)` — выше rate → быстрее анимация
+- Скруглённые изгибы труб (quadratic Bézier, v0.21.23)
+
+**Suction VFX (v0.21.18):**
+- 10 частиц-воронка у входа активной ship-трубы
+- CSS `translate(var(--sx), var(--sy)) → scale(0.2)` анимация
+- Стагерированные задержки для хаотичного вида
 
 **Z-index layering:**
 ```
@@ -617,6 +623,40 @@ z-index: 2  — kidney/liver containers (KC/LC)
 z-index: 3  — organ backdrops (kidneys, muscles, liver, pancreas icons)
 z-index: 10 — BG container
 ```
+
+### Container Fill Patterns (v0.21.25-v0.21.30)
+
+Паттерны внутри заливки контейнеров, показывающие направление потока.
+
+**Архитектура:**
+- CSS `::before` pseudo-element на `.container-view__fill`
+- SVG `background-image` data URL тайл (80×120px)
+- 7 элементов на псевдо-случайных позициях (white, stroke-width 2.25, opacity 0.2)
+
+**Три состояния:**
+| Класс | Элемент | Анимация | Когда |
+|-------|---------|----------|-------|
+| `--flow-up` | `^` шевроны | Скролл вверх 120px/4s | Контейнер наполняется |
+| `--flow-down` | `v` шевроны | Скролл вниз 120px/4s | Контейнер опустошается |
+| `--flow-static` | `—` чёрточки | Нет | Нет нетто-потока (±1 порог) |
+
+**Вычисление направления (BodyDiagram.tsx):**
+- Использует **сырые** engine rate (не интерполированные — убрана задержка ~90мс)
+- BG: `bgNetRate = currentLiverRate - currentMuscleRate - rawKidneyRate`
+  - > 1 → up, < -1 → down, иначе static
+- Liver: `currentLiverRate > 0` → down, иначе static
+- Kidneys: `rawKidneyRate > 0` → up, иначе static
+
+### BG Floating Value (v0.21.22)
+
+**Индикатор значения BG** — бейдж поверх заливки контейнера.
+
+| Диапазон | Фон | Эффект |
+|----------|-----|--------|
+| 70-200 | #2d3748 (тёмный) | — |
+| < 70 | #ecc94b (жёлтый) | — |
+| 200-300 | #ed8936 (оранжевый) | — |
+| ≥ 300 | #e53e3e (красный) | Мигание через белый (0.5s) |
 
 ### Ship Unloading Animation
 
@@ -664,14 +704,17 @@ Ship ═══▶═══▶═══▶ [Liver]  (pipe with chevron flow)
 - BG pill-shaped container centered, full height
 - KC/LC containers half-hidden behind organ substrates
 
-### PipeSystem.tsx (v0.21.0+)
+### PipeSystem.tsx (v0.21.0-v0.21.23)
 - SVG overlay с трубами между органами
-- Chevron flow indicators (v0.21.17)
-- Props: activeShipSlot, liverToBgRate, bgToMusclesRate, bgToKidneysRate, pancreasTier, speed, isPaused
+- Chevron flow indicators (v0.21.17), rounded bends (v0.21.23)
+- Suction VFX at active ship pipe intake (v0.21.18)
+- Props: activeShipSlot, liverToBgRate, bgToMusclesRate, bgToKidneysRate, pancreasTier, speed, isPaused, isLiverPassthrough
 
 ### ContainerView.tsx
-- Визуализация уровня
-- Анимация изменений (framer-motion)
+- Визуализация уровня контейнера (fill bar)
+- Fill pattern overlay: шевроны (up/down) или чёрточки (static) — v0.21.25+
+- Floating BG value badge (v0.21.22)
+- Props: flowDirection ('up' | 'down' | undefined), floatingValue, thresholds
 
 ### OrganView.tsx
 - Иконка органа
