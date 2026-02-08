@@ -55,14 +55,14 @@ const PANCREAS_TO_MUSCLES = 'M 82.5,39 L 82.5,18';
 
 // Stroke widths (pixels, thanks to non-scaling-stroke)
 // Wall visible edge = (WALL - FILL) / 2 = 2px — matches container border: 2px
-const WALL_WIDTH = 6;
-const FILL_WIDTH = 2;
-const ARROW_WIDTH = 1;
+const WALL_WIDTH = 8;
+const FILL_WIDTH = 4;
+const ARROW_WIDTH = 1.5;
 
 // Passthrough is wider (same 2px wall edge)
-const PT_WALL_WIDTH = 8;
-const PT_FILL_WIDTH = 4;
-const PT_ARROW_WIDTH = 1.5;
+const PT_WALL_WIDTH = 12;
+const PT_FILL_WIDTH = 8;
+const PT_ARROW_WIDTH = 2;
 
 // Convert rate to animation duration (higher rate = faster arrows)
 function rateToDuration(rate: number): string {
