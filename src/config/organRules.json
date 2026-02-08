@@ -77,7 +77,7 @@
       }
     ],
     "modifiers": [],
-    "rates": [0, 150, 75],
+    "rates": [0, 100, 50],
     "minTier": 0,
     "maxTier": 2
   },

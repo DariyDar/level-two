@@ -100,7 +100,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           value={kidneyRate}
           capacity={50}
           hideHeader={true}
-          circular={true}
+          compactSize={true}
         />
       </div>
 
@@ -153,7 +153,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           value={liverValue}
           capacity={100}
           hideHeader={true}
-          circular={true}
+          compactSize={true}
         />
       </div>
 
