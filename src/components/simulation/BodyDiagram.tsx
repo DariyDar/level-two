@@ -119,7 +119,6 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
           capacity={400}
           thresholds={{
             low: 70,
-            target: 100,
             high: 200,
             critical: 300,
           }}

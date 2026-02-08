@@ -97,7 +97,7 @@ function ChevronFlow({
       {Array.from({ length: CHEVRON_COUNT }, (_, i) => (
         <polyline
           key={i}
-          points="-0.3,-1.0 0.3,0 -0.3,1.0"
+          points="-0.3,-0.7 0.3,0 -0.3,0.7"
           className={`pipe-chevron ${isPaused ? 'pipe-chevron--paused' : ''}`}
           style={{
             offsetPath: `path('${path}')`,
