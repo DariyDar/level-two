@@ -39,10 +39,12 @@
   box-shadow: 0 0 8px rgba(72, 187, 120, 0.3);
 }
 
-/* Damaged = bright pink cross (X rotated 45deg) */
+/* Damaged = dashed dark-green circle outline + bright pink cross */
 .excess-bg-indicator__marker--damaged {
-  border: none;
+  border-radius: 50%;
+  border: 2px dashed #276749;
   background: none;
+  box-sizing: border-box;
 }
 
 .excess-bg-indicator__marker--damaged::before,

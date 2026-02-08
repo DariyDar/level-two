@@ -76,7 +76,14 @@
   box-shadow: 0 0 8px rgba(72, 187, 120, 0.3);
 }
 
-/* Degraded = bright pink cross (X rotated 45deg) */
+/* Degraded = dashed dark-green circle outline + bright pink cross */
+.organ-degradation-display__marker--degraded {
+  border-radius: 50%;
+  border: 2px dashed #276749;
+  background: none;
+  box-sizing: border-box;
+}
+
 .organ-degradation-display__marker--degraded::before,
 .organ-degradation-display__marker--degraded::after {
   content: '';
