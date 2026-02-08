@@ -153,10 +153,11 @@ export function PipeSystem({
         preserveAspectRatio="none"
       >
         {/* === Ship → Liver pipes (3) === */}
-        {SHIP_PIPES.map((path, i) => (
+        {/* Render order [0, 2, 1]: center pipe (slot 1) on top of right pipe (slot 2) */}
+        {[0, 2, 1].map((i) => (
           <Pipe
             key={`ship-${i}`}
-            path={path}
+            path={SHIP_PIPES[i]}
             active={activeShipSlot === i}
             type="glucose"
             flowDuration={shipDuration}
