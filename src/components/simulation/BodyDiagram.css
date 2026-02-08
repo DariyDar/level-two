@@ -53,10 +53,10 @@
 
 /* === Containers half-hidden behind organ backdrops === */
 
-/* Kidneys container - half behind kidneys icon, peeks right */
+/* Kidneys container - half behind kidneys icon, bottom-aligned with substrate */
 .body-diagram__kidneys-container {
   position: absolute;
-  top: 42px;
+  top: calc(42px + 16px);
   left: calc(42px + 40px);
   z-index: 1;
   display: flex;

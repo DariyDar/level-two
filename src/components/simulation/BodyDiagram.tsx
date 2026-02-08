@@ -62,6 +62,7 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
             maxTier: 4,
             activeTier: kidneyTier,
             degradedTiers: 0,
+            colorScheme: 'green',
             position: 'top'
           }}
           size="normal"
