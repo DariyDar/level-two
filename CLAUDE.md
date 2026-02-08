@@ -65,7 +65,7 @@ What counts as "significant":
 
 ## Project Context
 
-This is "Port Management" — a metabolic simulation game teaching blood glucose management through a port/ship metaphor.
+This is "Port Planner" — a metabolic simulation game teaching blood glucose management through a port/ship metaphor.
 
 ### Tech Stack
 - React 19 + TypeScript + Vite
@@ -79,7 +79,7 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - `src/core/types.ts` — TypeScript type definitions (Ship, SegmentCarbLimits, PlanValidation, etc.)
 - `src/core/utils/levelUtils.ts` — day config resolution (segmentCarbs, wpBudget)
 - `src/core/rules/types.ts` — rule system types (includes `ignoresDegradation`, `minBaseTier` modifier)
-- `src/core/results/calculateResults.ts` — results phase: excessBG calculation, degradation pipeline, assessment
+- `src/core/results/calculateResults.ts` — results phase: excessBG calculation, degradation pipeline, assessment (Excellent/Decent/Poor/Defeat)
 - `src/config/loader.ts` — loads and transforms JSON configs (foods, interventions with wpCost)
 - `src/config/organRules.json` — organ behavior rules (pancreas tiers, liver thresholds, muscle rates)
 - `src/config/degradationConfig.json` — degradation system configuration
@@ -98,6 +98,14 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - `ShipCard.tsx` — draggable ship cards with WP cost/fiber badges
   - `ShipInventory.tsx` — unified inventory (food + interventions, no tabs)
   - `SlotGrid.tsx` — slot grid with segment carb indicators, blocked slots, exercise group limits
+- `src/components/results/` — results phase UI
+  - `ResultsPhase.tsx` — results orchestrator (assessment, pass/fail logic, day counter)
+  - `BGGraph.tsx` — SVG BG history graph with zone coloring (buildColoredSegments)
+  - `BGGraph.css` — graph styles (zones, lines, points, labels)
+  - `ExcessBGIndicator.tsx` — excess BG circles/crosses with subtitle
+  - `ExcessBGIndicator.css` — marker styles (green circles, pink crosses, dashed circles)
+  - `OrganDegradationDisplay.tsx` — liver/pancreas degradation with icons and markers
+  - `OrganDegradationDisplay.css` — organ icon and marker styles
 - `src/hooks/` — custom React hooks
   - `useBgPrediction.ts` — debounced BG prediction using SimulationEngine
 - `src/components/ui/` — shared UI components
@@ -108,7 +116,7 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - `levels/*.json` — level configurations (per-day segmentCarbs, wpBudget, blockedSlots)
 - `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.22.0) — TAG: "Planning, Simulation - Stable"
+### Current State (v0.22.9) — TAG: "All Phases - stable feb8"
 - Planning phase: drag-and-drop ships to time slots ✅
 - **SVG Pipe System (v0.21.0-v0.21.23)** ✅
   - SVG overlay with pipes connecting organs (Ship→Liver, Liver→BG, BG→Muscles, BG→Kidneys, Pancreas→Muscles)
@@ -162,12 +170,28 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - Desktop: Inventory LEFT, SlotGrid RIGHT (swapped)
   - Mobile: SlotGrid on top via CSS order
 - Simulation phase: glucose flow visualization with SVG pipes ✅
-- **Results Phase (v0.22.0)** ✅
-  - BG history graph + ExcessBG circles + assessment label
-  - Assessment based on degradation circles: Excellent (0), Decent (1), Poor (2-3), Defeat (4-5)
-  - Defeat = level failed (only Retry), Excellent = no Retry shown
-  - Win condition: `maxDegradationCircles` in level config (default 5)
-  - Star rating system removed (see BACKLOG.md)
+- **Results Phase (v0.22.0-v0.22.9)** ✅
+  - **Assessment System** (replaced star rating):
+    - Based on total degradation circles: Excellent (0), Decent (1), Poor (2-3), Defeat (4-5)
+    - Defeat = level failed (only Retry), Excellent = no Retry shown
+    - Win condition: `maxDegradationCircles` in level config (default 5)
+    - Star rating system removed (see BACKLOG.md)
+  - **BG History Graph** with zone coloring:
+    - Green zone (70-200), orange zone (200-300), red zone (300+)
+    - Line and points colored by zone (green/orange/red)
+    - Threshold lines at 200 (high) and 300 (critical), labels (#718096)
+    - X-axis time labels: 06:00, 12:00, 18:00, 00:00
+  - **ExcessBG Indicator** (v0.22.2-v0.22.9):
+    - 5 markers: healthy = green circles, damaged = pink crosses (45deg) in dashed pink circle
+    - Damaged markers fill from RIGHT side
+    - Subtitle: "{N} degradation(s) till defeat" — 19px white, count in bold
+    - Title "EXCESS BG" in graph label color (#718096)
+  - **Organ Degradation Display** (v0.22.3-v0.22.9):
+    - Liver + Pancreas with icons (56×56px in 110px container)
+    - 4 markers each: healthy = green circles, degraded = pink crosses in dashed pink circle
+    - Title "DEGRADATIONS" in graph label color (#718096)
+  - **Layout**: title "Day X/Y Results" with total days from level config
+  - **Header**: "Port Planner" (renamed from Port Management in v0.22.7)
 - Substep simulation: smooth container updates (10 substeps/hour) ✅
 - **Simulation Rebalancing (v0.18.0-v0.18.1)** ✅
   - **Gradual pancreas response** — softer insulin tiers for realistic BG dynamics

@@ -1,4 +1,4 @@
-# Port Management - Обзор проекта
+# Port Planner - Обзор проекта
 
 ## Документация
 
@@ -10,7 +10,7 @@
 | 01 | [Architecture](01-architecture.md) | Структура проекта, технологии, data flow | В работе |
 | 02 | [Planning Phase](02-planning-phase.md) | Фаза планирования: UI, drag-and-drop, валидация | В работе |
 | 03 | [Simulation Phase](03-simulation-phase.md) | Движок симуляции, органы, правила | В работе |
-| 04 | [Results Phase](04-results-phase.md) | Расчёт результатов, деградация, ранги | В работе |
+| 04 | [Results Phase](04-results-phase.md) | Расчёт результатов, деградация, оценка (assessment) | ✅ Актуализирован |
 | 05 | [Configuration](05-configuration.md) | Конфиги кораблей, органов, уровней, балансировка | В работе |
 | 06 | [Data Models](06-data-models.md) | TypeScript интерфейсы и типы | В работе |
 

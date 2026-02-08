@@ -1,5 +1,63 @@
 # Changelog
 
+## 8 февраля (v0.22.0 → v0.22.9) — Results Phase Redesign
+
+### v0.22.0 — Assessment System (replaces Star Rating)
+- **Удалена система рангов/звёзд** (calculateRank, getRankMessage, RankDisplay)
+- **Новая система оценки** на основе кругов деградации:
+  - Excellent (0 кругов) — только Continue
+  - Decent (1 круг) — Continue + Retry
+  - Poor (2-3 круга) — Continue + Retry
+  - Defeat (4-5 кругов) — только Retry
+- Win condition: `maxDegradationCircles` в level config (было `minRank`)
+- Тип `DayAssessment` и `DEFAULT_ASSESSMENT_THRESHOLDS` в types.ts
+
+### v0.22.1 — BG Graph Zone Coloring
+- Зоны фона на графике: зелёная (70-200), оранжевая (200-300), красная (300+)
+- Линия и точки графика раскрашены по зонам
+- Подпись "X degradations till defeat" под ExcessBG
+- Убран зелёный порог (target 100) с графика
+
+### v0.22.2 — Circle Redesign
+- Круги заполняются справа (damaged markers fill from right)
+- Убрано отображение текстовой оценки (Decent/Poor/etc)
+
+### v0.22.3 — Cross Markers
+- Круги деградации заменены на розовые крестики (45°) через CSS ::before/::after
+- Заголовок EXCESS BG увеличен до 18px
+- Подпись увеличена до 15px
+
+### v0.22.4 — Visual Polish
+- Здоровые маркеры = зелёные круги (восстановлены), повреждённые = розовые крестики
+- Линия графика в зоне 70-200 зелёного цвета
+- Базовый цвет линии серый (#a0aec0)
+
+### v0.22.5 — Dashed Circle Outlines
+- Пунктирный круг вокруг крестиков деградации (тёмно-зелёный)
+
+### v0.22.6 — Subtitle & Title Styling
+- Пунктир = тот же зелёный что и здоровые круги (#48bb78)
+- Крестики чуть тоньше (5px)
+- Подпись: 19px, белый, число жирным (`<strong>`)
+- DEGRADATION → DEGRADATIONS
+- Заголовки EXCESS BG и DEGRADATIONS цветом #718096
+- Убрана строка "Day 1 First Steps" из хедера
+- Заголовок результатов: "Day X/Y Results" (с общим числом дней)
+
+### v0.22.7 — UI Refinements
+- Port Management → **Port Planner**
+- Уменьшены отступы хедера и results phase
+- EXCESS BG: увеличен padding (20px)
+- Пунктир вокруг крестиков: розовый (#ff6b9d) вместо зелёного
+
+### v0.22.8
+- Откат увеличения спрайтов органов (80×110px)
+
+### v0.22.9
+- Иконки органов в results phase: 48→56px, контейнер 100→110px
+
+---
+
 ## 8 февраля (v0.21.0 → v0.21.17)
 
 ### v0.21.0 — SVG Pipe System
