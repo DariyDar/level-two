@@ -84,12 +84,12 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
 - `src/config/organRules.json` — organ behavior rules (pancreas tiers, liver thresholds, muscle rates)
 - `src/config/degradationConfig.json` — degradation system configuration
 - `src/components/simulation/` — simulation UI components
-  - `GlucoseParticleSystem.tsx` — sugar cube particles with fiber support
-  - `FiberIndicator.tsx` — fiber activity indicator
-  - `BodyDiagram.tsx` — organs layout with tier visualization (eye toggle support)
-  - `OrganTierCircles.tsx` — unified tier/degradation indicator (v0.15.0)
-  - `OrganSprite.tsx` — organ icon with tier circles
-  - `BoostButton.tsx` — boost buttons (Liver Boost, Fast Insulin)
+  - `GlucoseParticleSystem.tsx` — sugar cube particles (25 mg/dL per cube, paths to container centers)
+  - `FiberIndicator.tsx` — fiber activity indicator (disabled)
+  - `BodyDiagram.tsx` — absolute-positioned organs layout (corner organs, center BG)
+  - `OrganTierCircles.tsx` — unified tier/degradation indicator (degradation from right)
+  - `OrganSprite.tsx` — organ icon with tier circles, substrate pulse animation
+  - `BoostButton.tsx` — boost buttons with numeric charge badge (top-right)
 - `src/components/planning/` — planning phase UI
   - `PlanningHeader.tsx` — header with BG, WP, BG prediction sparkline, Simulate
   - `BgSparkline.tsx` — compact SVG sparkline for BG prediction in planning header
@@ -106,8 +106,29 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - `levels/*.json` — level configurations (per-day segmentCarbs, wpBudget, blockedSlots)
 - `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.19.0)
+### Current State (v0.20.11)
 - Planning phase: drag-and-drop ships to time slots ✅
+- **Body Diagram Layout (v0.20.0)** ✅
+  - Absolute positioning instead of 6×6 CSS Grid
+  - 4 organs at corners: K (top-left), M (top-right), L (bottom-left), P (bottom-right)
+  - BG container centered, full height, pill-shaped (semicircle ends)
+  - KC/LC containers half-hidden behind organ substrates, peeking right
+  - Organ substrates: 80×110px, default color #545F73, pulse animation when active
+  - Tier circles position: 'top' for all organs
+  - BG centered between left containers and right substrates (`left: calc(50% + 20px)`)
+- **Tier Circle Colors (v0.20.9-v0.20.10)** ✅
+  - Muscles/Pancreas: yellow (#E2BC28) default, red-orange (#FF5900) active
+  - Liver/Kidneys: green (#22c55e) default
+  - Degradation circles (pink) display from RIGHT side (matching results phase)
+- **Glucose Particle System (v0.20.7-v0.20.8)** ✅
+  - Particles fly to center of target containers
+  - 25 mg/dL per sugar cube icon (was 15)
+  - z-index: 20 (above all diagram layers)
+  - Paths: Ship→LC center, LC→BG center, BG→Muscles, BG→KC center
+- **Fast Insulin Button (v0.20.11)** ✅
+  - Numeric usage count badge (top-right corner of button substrate)
+  - Replaced charge circles with single count number
+  - Orange badge with remaining charges
 - **BG Prediction Graph (v0.19.0)** ✅
   - SVG sparkline in planning header, shows predicted BG curve
   - Reuses SimulationEngine synchronously (debounce 300ms)
@@ -202,16 +223,18 @@ This is "Port Management" — a metabolic simulation game teaching blood glucose
   - Orange drop icon, +1 tier bonus when active
   - **Ignores degradation limits**
   - Enables hidden 6th muscle tier (rate: 175 mg/dL/h)
+  - Numeric charge count badge (top-right of button)
 - Configuration-driven rules system ✅
 - Carbs vs Glucose separation ✅ (strict: glucose = carbs × 10)
 - Tier-based Degradation System (v0.14.0) ✅
   - Unified tiers 1-5, Liver: capacity reduction, Pancreas: max tier reduction
 - Unified Tier Circles (v0.15.0) ✅
 - Organ UI System ✅ (OrganSprite, substrates, tier circles)
-- Layout: 6×6 CSS Grid ✅
+- Layout: Absolute positioning with corner organs ✅ (was 6×6 CSS Grid before v0.20.0)
 - Food Tags System ✅
   - WP cost badge (top-right, yellow number) for foods with wpCost > 0
-- Sugar Cube Particle System (v0.8.0) ✅
+- Sugar Cube Particle System (v0.8.0, updated v0.20.8) ✅
+  - 25 mg/dL per cube, paths to container centers
 
 ### Removed Features (v0.16.0)
 - **Mood System**: Fully removed (types, store, components, CSS, food data)
@@ -232,3 +255,4 @@ Features preserved in code but hidden from UI:
 - Kidneys: Not fully implemented (basic excretion only)
 - Pipe connections: Visual connections between organs not yet implemented
 - Metformin: Card exists but full effect system not implemented
+- interventionCharges from level config not connected to SimulationEngine (hardcoded to 2)

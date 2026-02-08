@@ -106,10 +106,15 @@ Ship → Liver (buffer) → BG (blood) → Muscles (utilization)
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Примечание по Body Diagram:**
-- Kidney убран из диаграммы (не реализуется на данном этапе)
-- Визуально: Muscles слева, Liver справа (поменяли местами)
-- Показана связь Pancreas → Muscles (Pancreas реагирует на BG level, включая работу Muscles)
+**Примечание по Body Diagram (v0.20.0+):**
+- Layout: absolute positioning (was CSS Grid 6×6)
+- Органы по углам: K (top-left), M (top-right), L (bottom-left), P (bottom-right)
+- BG контейнер в центре, pill-shape, полная высота
+- KC/LC контейнеры наполовину за подложками K/L
+- Подложки: 80×110px, #545F73, pulse при активности
+- Tier circles сверху для всех органов
+- Цвета кругов: жёлтые (ПЖ/мышцы), зелёные (печень/почки)
+- Деградация отображается с правого края (как в Results)
 
 ---
 
@@ -615,8 +620,10 @@ function useGameLoop(engine: SimulationEngine | null) {
 - Speed controls
 
 ### BodyDiagram.tsx
-- SVG схема органов
-- Позиционирование ContainerView и OrganView
+- Absolute-positioned organs layout (corner organs, center BG)
+- K (top-left), M (top-right), L (bottom-left), P (bottom-right)
+- BG pill-shaped container centered, full height
+- KC/LC containers half-hidden behind organ substrates
 
 ### ContainerView.tsx
 - Визуализация уровня
@@ -631,10 +638,10 @@ function useGameLoop(engine: SimulationEngine | null) {
 - Корабли в рядах
 - Progress bar разгрузки
 
-### PlayerControls.tsx
-- Кнопки boost
-- Счётчик зарядов
-- Cooldown indicator
+### BoostButton.tsx
+- Кнопки boost (Fast Insulin)
+- Numeric charge count badge (top-right corner)
+- Cooldown bar and timer
 
 ---
 
