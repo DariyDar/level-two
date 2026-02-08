@@ -67,7 +67,7 @@ export function OrganDegradationDisplay({
 
   return (
     <div className="organ-degradation-display">
-      <h3 className="organ-degradation-display__title">Degradation</h3>
+      <h3 className="organ-degradation-display__title">Degradations</h3>
       <div className="organ-degradation-display__organs">
         {(['liver', 'pancreas'] as const).map((organKey) => {
           const organ = ORGANS[organKey];

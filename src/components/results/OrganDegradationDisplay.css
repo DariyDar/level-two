@@ -11,7 +11,7 @@
 .organ-degradation-display__title {
   font-size: 18px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
+  color: #718096;
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -76,10 +76,10 @@
   box-shadow: 0 0 8px rgba(72, 187, 120, 0.3);
 }
 
-/* Degraded = dashed dark-green circle outline + bright pink cross */
+/* Degraded = dashed green circle outline + bright pink cross */
 .organ-degradation-display__marker--degraded {
   border-radius: 50%;
-  border: 2px dashed #276749;
+  border: 2px dashed #48bb78;
   background: none;
   box-sizing: border-box;
 }
@@ -90,20 +90,20 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  border-radius: 3px;
+  border-radius: 2px;
   background: #ff6b9d;
   box-shadow: 0 0 8px rgba(255, 107, 157, 0.5);
 }
 
 .organ-degradation-display__marker--degraded::before {
-  width: 6px;
-  height: 20px;
+  width: 5px;
+  height: 18px;
   transform: translate(-50%, -50%) rotate(45deg);
 }
 
 .organ-degradation-display__marker--degraded::after {
-  width: 20px;
-  height: 6px;
+  width: 18px;
+  height: 5px;
   transform: translate(-50%, -50%) rotate(45deg);
 }
 

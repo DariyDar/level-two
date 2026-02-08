@@ -7,16 +7,12 @@ import { VERSION } from './version';
 import './App.css';
 
 function App() {
-  const { phase, currentLevel, currentDay, degradation, bgHistory } = useGameStore();
+  const { phase, degradation, bgHistory } = useGameStore();
 
   return (
     <div className="app">
       <header className="app-header">
         <h1>🚢 Port Management</h1>
-        <div className="status-bar">
-          <span>Day {currentDay}</span>
-          {currentLevel && <span>{currentLevel.name}</span>}
-        </div>
       </header>
 
       <main className="app-main">

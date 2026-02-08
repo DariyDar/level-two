@@ -54,7 +54,7 @@ export function ExcessBGIndicator({
         })}
       </div>
       <div className="excess-bg-indicator__subtitle">
-        {defeatThreshold - totalCircles} degradation{defeatThreshold - totalCircles !== 1 ? 's' : ''} till defeat
+        <strong>{defeatThreshold - totalCircles}</strong> degradation{defeatThreshold - totalCircles !== 1 ? 's' : ''} till defeat
       </div>
     </div>
   );

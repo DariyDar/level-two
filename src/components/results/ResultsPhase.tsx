@@ -18,6 +18,7 @@ interface ResultsPhaseProps {
 export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps) {
   const {
     currentDay,
+    currentLevel,
     degradation,
     setResults,
     startNextDay,
@@ -44,7 +45,7 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
 
   return (
     <div className="results-phase">
-      <h2 className="results-phase__title">Day {currentDay} Results</h2>
+      <h2 className="results-phase__title">Day {currentDay}/{currentLevel?.days ?? '?'} Results</h2>
 
       <BGGraph
         bgHistory={bgHistory}
