@@ -39,19 +39,19 @@ const SHIP_PIPES = [
 ];
 
 // Liver → BG: normal pipe (lower horizontal)
-const LIVER_TO_BG_NORMAL = 'M 32,42 L 42,42';
+const LIVER_TO_BG_NORMAL = 'M 35,42 L 47,42';
 
 // Liver → BG: passthrough pipe (upper horizontal, wider)
-const LIVER_TO_BG_PASSTHROUGH = 'M 32,35 L 42,35';
+const LIVER_TO_BG_PASSTHROUGH = 'M 35,35 L 47,35';
 
 // BG → Kidneys: horizontal left from BG to KC
-const BG_TO_KIDNEYS = 'M 42,15 L 30,15';
+const BG_TO_KIDNEYS = 'M 47,15 L 33,15';
 
 // BG → Muscles: horizontal right from BG to muscles
 const BG_TO_MUSCLES = 'M 63,15 L 78,15';
 
 // Pancreas → Muscles: vertical orange pipe (insulin signal, centered on pancreas backdrop)
-const PANCREAS_TO_MUSCLES = 'M 78,39 L 78,18';
+const PANCREAS_TO_MUSCLES = 'M 76,39 L 76,18';
 
 // Stroke widths
 const WALL_WIDTH = 2.5;
