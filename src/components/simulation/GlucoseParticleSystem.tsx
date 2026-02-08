@@ -35,29 +35,30 @@ const GLUCOSE_PER_PARTICLE = 15;
 const VISUAL_MULTIPLIER = 1;
 
 // Container positions (percentages relative to .simulation-phase__main)
-// Based on screenshot v0.2.3 - adjusted to hit actual container boundaries
+// v0.20 layout: K top-left, M top-right, L bottom-left, P bottom-right, BG center
 const POINTS = {
-  // Ship dissolve edge
-  shipY: 73,
+  // Ship dissolve edge (ship queue below body diagram)
+  shipY: 75,
 
-  // Liver bar boundaries
-  liverTop: { x: 50, y: 38 },
-  liverBottom: { x: 50, y: 52 },
+  // Liver container (LC) - bottom-left
+  liverTop: { x: 30, y: 36 },
+  liverBottom: { x: 30, y: 54 },
 
-  // BG bar boundaries (inside the bar, not at the number below)
-  bgTop: { x: 50, y: 8 },
-  bgBottom: { x: 50, y: 28 },
+  // BG bar - center (shifted right by 20px from 50%)
+  bgTop: { x: 55, y: 10 },
+  bgBottom: { x: 55, y: 54 },
 
-  // Muscles bar (left side)
-  musclesRight: { x: 32, y: 18 },
+  // Muscles substrate - top right
+  musclesLeft: { x: 70, y: 19 },
 
-  // Kidneys bar (right side)
-  kidneysLeft: { x: 68, y: 18 },
+  // Kidneys area (KC) - top left
+  kidneysRight: { x: 40, y: 19 },
 };
 
 function getSpawnPosition(flow: FlowType, dissolveProgress: number): { x: number; y: number } {
   switch (flow) {
     case 'ship-liver': {
+      // Ship dissolves across width, particles fly up-left to liver
       const shipXMin = 20;
       const shipXMax = 80;
       const dissolveX = shipXMin + (shipXMax - shipXMin) * dissolveProgress;
@@ -67,21 +68,22 @@ function getSpawnPosition(flow: FlowType, dissolveProgress: number): { x: number
       };
     }
     case 'liver-bg':
+      // Exit from liver container top, heading right toward BG
       return {
         x: POINTS.liverTop.x + (Math.random() - 0.5) * 4,
-        y: POINTS.liverTop.y,
+        y: POINTS.liverTop.y + (Math.random() - 0.5) * 4,
       };
     case 'bg-muscles':
-      // Exit from left side of BG bar
+      // Exit from right side of BG bar, heading right to muscles (top-right)
       return {
-        x: 44 + (Math.random() - 0.5) * 2,
-        y: POINTS.bgBottom.y - 8 + (Math.random() - 0.5) * 4,
+        x: POINTS.bgBottom.x + 7 + (Math.random() - 0.5) * 2,
+        y: POINTS.bgTop.y + 10 + (Math.random() - 0.5) * 4,
       };
     case 'bg-kidneys':
-      // Exit from right side of BG bar
+      // Exit from left side of BG bar, heading left to kidneys (top-left)
       return {
-        x: 56 + (Math.random() - 0.5) * 2,
-        y: POINTS.bgBottom.y - 8 + (Math.random() - 0.5) * 4,
+        x: POINTS.bgBottom.x - 7 + (Math.random() - 0.5) * 2,
+        y: POINTS.bgTop.y + 10 + (Math.random() - 0.5) * 4,
       };
   }
 }
@@ -89,24 +91,28 @@ function getSpawnPosition(flow: FlowType, dissolveProgress: number): { x: number
 function getTargetPosition(flow: FlowType): { x: number; y: number } {
   switch (flow) {
     case 'ship-liver':
+      // Target: liver container bottom
       return {
         x: POINTS.liverBottom.x + (Math.random() - 0.5) * 4,
-        y: POINTS.liverBottom.y,
+        y: POINTS.liverBottom.y + (Math.random() - 0.5) * 2,
       };
     case 'liver-bg':
+      // Target: BG bar lower-left area
       return {
-        x: POINTS.bgBottom.x + (Math.random() - 0.5) * 4,
-        y: POINTS.bgBottom.y,
+        x: POINTS.bgBottom.x - 4 + (Math.random() - 0.5) * 4,
+        y: POINTS.bgBottom.y - 6 + (Math.random() - 0.5) * 4,
       };
     case 'bg-muscles':
+      // Target: muscles substrate (top-right)
       return {
-        x: POINTS.musclesRight.x,
-        y: POINTS.musclesRight.y + (Math.random() - 0.5) * 6,
+        x: POINTS.musclesLeft.x,
+        y: POINTS.musclesLeft.y + (Math.random() - 0.5) * 6,
       };
     case 'bg-kidneys':
+      // Target: kidneys area (top-left)
       return {
-        x: POINTS.kidneysLeft.x,
-        y: POINTS.kidneysLeft.y + (Math.random() - 0.5) * 6,
+        x: POINTS.kidneysRight.x,
+        y: POINTS.kidneysRight.y + (Math.random() - 0.5) * 6,
       };
   }
 }
