@@ -32,10 +32,10 @@ interface PipeSystemProps {
 const SHIP_PIPES = [
   // Slot 0 (left): fully vertical into LC
   'M 18,73 L 18,47',
-  // Slot 1 (center): up from x≈50, bend at y=66 (lowest), turn left into LC
-  'M 50,73 L 50,66 L 23,66 L 23,47',
-  // Slot 2 (right): up from x≈82, bend at y=63 (above middle), turn left into LC
-  'M 82,73 L 82,63 L 28,63 L 28,47',
+  // Slot 1 (center): up from x≈50, rounded bend at y=66, turn left into LC (r≈3 SVG units ≈ 12px)
+  'M 50,73 L 50,69 Q 50,66 47,66 L 26,66 Q 23,66 23,63 L 23,47',
+  // Slot 2 (right): up from x≈82, rounded bend at y=63, turn left into LC (r≈3 SVG units ≈ 12px)
+  'M 82,73 L 82,66 Q 82,63 79,63 L 31,63 Q 28,63 28,60 L 28,47',
 ];
 
 // Liver → BG: normal pipe (lower horizontal)
@@ -97,7 +97,7 @@ function ChevronFlow({
       {Array.from({ length: CHEVRON_COUNT }, (_, i) => (
         <polyline
           key={i}
-          points="-0.8,-0.5 0.8,0 -0.8,0.5"
+          points="-0.3,-1.0 0.3,0 -0.3,1.0"
           className={`pipe-chevron ${isPaused ? 'pipe-chevron--paused' : ''}`}
           style={{
             offsetPath: `path('${path}')`,
