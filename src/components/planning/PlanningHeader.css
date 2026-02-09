@@ -48,6 +48,7 @@
   margin-left: auto;
   display: flex;
   align-items: center;
+  pointer-events: none;
 }
 
 .planning-header__simulate {
