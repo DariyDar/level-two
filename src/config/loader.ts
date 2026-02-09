@@ -54,6 +54,7 @@ interface RawLevelConfig {
       Day?: { min: number; optimal: number; max: number };
       Evening?: { min: number; optimal: number; max: number };
     };
+    pancreasBoostCharges?: number;
   }>;
   initialDegradation?: {
     liver: number;
@@ -166,6 +167,7 @@ function transformLevel(raw: RawLevelConfig): LevelConfig {
       wpBudget: dc.wpBudget,
       carbRequirements: dc.carbRequirements,
       segmentCarbs: dc.segmentCarbs,
+      pancreasBoostCharges: dc.pancreasBoostCharges,
     }));
   }
 
