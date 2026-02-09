@@ -7,19 +7,22 @@
   "dayConfigs": [
     {
       "day": 1,
-      "wpBudget": 12,
+      "wpBudget": 14,
       "availableFoods": [
         { "id": "banana", "count": 1 },
         { "id": "apple", "count": 1 },
-        { "id": "icecream", "count": 1 },
         { "id": "cookie", "count": 1 },
-        { "id": "sandwich", "count": 1 },
-        { "id": "oatmeal", "count": 1 }
+        { "id": "burger", "count": 1 },
+        { "id": "popcorn", "count": 1 },
+        { "id": "berriesmixed", "count": 1 },
+        { "id": "pizza", "count": 1 },
+        { "id": "greekyogurt", "count": 1 }
       ],
       "availableInterventions": [],
       "preOccupiedSlots": [
-        { "slot": 7, "shipId": "chicken" }
+        { "slot": 13, "shipId": "oatmeal" }
       ],
+      "blockedSlots": [5, 11],
       "segmentCarbs": {
         "Morning": { "min": 25, "optimal": 30, "max": 35 },
         "Day": { "min": 30, "optimal": 35, "max": 40 },
@@ -28,21 +31,25 @@
     },
     {
       "day": 2,
-      "wpBudget": 12,
+      "wpBudget": 14,
       "availableFoods": [
         { "id": "banana", "count": 1 },
-        { "id": "apple", "count": 1 },
-        { "id": "icecream", "count": 1 },
-        { "id": "cookie", "count": 1 },
         { "id": "popcorn", "count": 1 },
-        { "id": "sandwich", "count": 1 }
+        { "id": "cookie", "count": 1 },
+        { "id": "nutsmixed", "count": 1 },
+        { "id": "rice", "count": 1 },
+        { "id": "milk", "count": 1 },
+        { "id": "chickpeas", "count": 1 },
+        { "id": "caesarsalad", "count": 1 }
       ],
       "availableInterventions": [
         { "id": "light_exercise", "count": 2 }
       ],
       "preOccupiedSlots": [
+        { "slot": 1, "shipId": "chocolatemuffin" },
         { "slot": 7, "shipId": "chicken" }
       ],
+      "blockedSlots": [6, 14],
       "segmentCarbs": {
         "Morning": { "min": 25, "optimal": 30, "max": 35 },
         "Day": { "min": 30, "optimal": 35, "max": 40 },
@@ -51,21 +58,25 @@
     },
     {
       "day": 3,
-      "wpBudget": 12,
+      "wpBudget": 15,
       "availableFoods": [
-        { "id": "banana", "count": 1 },
         { "id": "apple", "count": 1 },
-        { "id": "cookie", "count": 1 },
-        { "id": "popcorn", "count": 1 }
+        { "id": "popcorn", "count": 1 },
+        { "id": "banana", "count": 1 },
+        { "id": "sandwich", "count": 1 },
+        { "id": "boiledcarrots", "count": 1 },
+        { "id": "milk", "count": 1 },
+        { "id": "cheesewedge", "count": 1 }
       ],
       "availableInterventions": [
         { "id": "light_exercise", "count": 1 },
         { "id": "intense_exercise", "count": 1 }
       ],
       "preOccupiedSlots": [
-        { "slot": 1, "shipId": "icecream" }
+        { "slot": 4, "shipId": "cookie" },
+        { "slot": 13, "shipId": "icecream" }
       ],
-      "blockedSlots": [6, 12],
+      "blockedSlots": [3, 9, 11, 17],
       "segmentCarbs": {
         "Morning": { "min": 25, "optimal": 30, "max": 35 },
         "Day": { "min": 30, "optimal": 35, "max": 40 },
