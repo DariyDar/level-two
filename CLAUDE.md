@@ -116,7 +116,16 @@ This is "Port Planner" — a metabolic simulation game teaching blood glucose ma
   - `levels/*.json` — level configurations (per-day segmentCarbs, wpBudget, blockedSlots)
 - `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.22.9) — TAG: "All Phases - stable feb8"
+### Current State (v0.23.0) — TAG: "feb 8 - all final"
+- **Planning Phase Rebalance (v0.23.0)** ✅
+  - Progressive puzzle design across 3 days:
+    - Day 1: 1 pre-placed food (evening), 2 blocked slots [5,11], WP 14, 8 foods (2L, 2M, 4S)
+    - Day 2: 2 pre-placed foods (morning+day), 2 blocked [6,14], WP 14, 8 foods (1L, 4M, 3S)
+    - Day 3: 2 pre-placed foods (morning+evening), 4 blocked [3,9,11,17], WP 15, 7 foods (0L, 3M, 4S)
+  - 5 unique pre-placed foods: oatmeal, chocolatemuffin, chicken, cookie, icecream
+  - Food inventory overlap ≤43% between any two days
+  - All days verified solvable with multiple valid plans
+  - Days 1-2 allow 2+ optimal segment combos
 - Planning phase: drag-and-drop ships to time slots ✅
 - **SVG Pipe System (v0.21.0-v0.21.23)** ✅
   - SVG overlay with pipes connecting organs (Ship→Liver, Liver→BG, BG→Muscles, BG→Kidneys, Pancreas→Muscles)

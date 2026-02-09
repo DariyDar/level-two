@@ -217,7 +217,7 @@ public/
   },
 
   "winCondition": {
-    "minRank": 2
+    "maxDegradationCircles": 5
   }
 }
 ```
@@ -236,7 +236,7 @@ public/
 | `dayConfigs` | array | ✅ | Конфиги для каждого дня |
 | `initialDegradation` | object | ❌ | Начальная деградация органов |
 | `interventionCharges` | object | ✅ | Заряды boost кнопок |
-| `winCondition.minRank` | 1-5 | ✅ | Минимальный ранг для прохождения дня |
+| `winCondition.maxDegradationCircles` | number | ❌ | Макс. кругов деградации до поражения (default 5) |
 | `initialBG` | number | ❌ | Стартовый уровень глюкозы (по умолчанию 100) |
 
 ### Segment Carb Limits (v0.16.0)
@@ -288,6 +288,21 @@ public/
 | `preOccupiedSlots` | `[{slot, shipId}]` | Предустановленные карточки |
 
 Если `dayConfigs` не указан или для конкретного дня нет записи, используются уровневые значения как fallback.
+
+### Level-01 "First Steps" — Конфигурация (v0.23.0)
+
+| Параметр | День 1 | День 2 | День 3 |
+|----------|--------|--------|--------|
+| WP бюджет | 14 | 14 | 15 |
+| Предустановлено | oatmeal (слот 13) | chocmuffin (1) + chicken (7) | cookie (4) + icecream (13) |
+| Заблокировано | [5, 11] | [6, 14] | [3, 9, 11, 17] |
+| Кол-во продуктов | 8 (2L, 2M, 4S) | 8 (1L, 4M, 3S) | 7 (0L, 3M, 4S) |
+| Интервенции | — | light_exercise ×2 | light ×1 + intense ×1 |
+
+**Инвентарь по дням:**
+- День 1: banana, apple, cookie, burger, popcorn, berriesmixed, pizza, greekyogurt
+- День 2: banana, popcorn, cookie, nutsmixed, rice, milk, chickpeas, caesarsalad
+- День 3: apple, popcorn, banana, sandwich, boiledcarrots, milk, cheesewedge
 
 ### Формат preOccupiedSlots
 
@@ -433,7 +448,7 @@ export interface LevelConfig {
     pancreasBoost: number;
   };
   winCondition: {
-    minRank: 1 | 2 | 3 | 4 | 5;
+    maxDegradationCircles?: number;  // default 5
   };
 }
 ```
@@ -474,14 +489,14 @@ export interface LevelConfig {
 | Обычная еда | M | 15-25 | 150-250 | 2-3 | Стандарт |
 | Полезная еда | L | 10-30 | 100-300 | 3-4 | Дорого, но безопасно |
 
-### Принцип WP-баланса (v0.17.3)
+### Принцип WP-баланса (v0.23.0)
 
 - **WP = 0** — сладкое, соблазн (ice cream, muffin, metformin)
 - **WP = 1** — лёгкие перекусы (banana, apple, popcorn)
 - **WP = 2** — cookie, light_exercise, sandwich, nuts
-- **WP = 3** — обычная еда (chicken, burger, pizza, salad)
-- **WP = 4** — самая полезная (oatmeal, rice) и intense_exercise
-- **Бюджет 12 WP** (level-01) — хватает на ~3-4 полезных продукта
+- **WP = 3** — обычная еда (chicken, burger, pizza, salad, milk, cheese)
+- **WP = 4** — самая полезная (oatmeal, rice, boiledcarrots) и intense_exercise
+- **Бюджет 14-15 WP** (level-01) — даёт пространство для нескольких комбинаций
 
 ### Рекомендации по интервенциям (v0.17.0)
 
