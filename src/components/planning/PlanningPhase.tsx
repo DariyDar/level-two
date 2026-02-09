@@ -342,6 +342,9 @@ export function PlanningPhase() {
       onDragEnd={handleDragEnd}
     >
       <div className="planning-phase">
+        <div className="planning-phase__day-title">
+          Day {currentDay}/{currentLevel.days}
+        </div>
         <PlanningHeader
           currentBG={currentLevel.initialBG ?? 100}
           wpRemaining={wpBudget - wpSpent}

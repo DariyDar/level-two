@@ -1,4 +1,5 @@
 import { BgSparkline } from './BgSparkline';
+import { BoostButton } from '../simulation/BoostButton';
 import './PlanningHeader.css';
 
 interface PlanningHeaderProps {
@@ -37,8 +38,20 @@ export function PlanningHeader({
       <BgSparkline bgHistory={bgPrediction} />
 
       <div className="planning-header__fast-insulin">
-        <span className="planning-header__label">Insulin</span>
-        <span className="planning-header__fi-value">{fastInsulinCharges}</span>
+        <BoostButton
+          label="Fast Insulin"
+          emoji="💧"
+          boost={{
+            charges: fastInsulinCharges,
+            maxCharges: fastInsulinCharges,
+            cooldownTicks: 0,
+            isActive: false,
+            activeTicks: 0,
+          }}
+          cooldownMax={0}
+          onActivate={() => {}}
+          isFastInsulin
+        />
       </div>
 
       <button

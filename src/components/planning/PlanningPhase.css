@@ -7,6 +7,13 @@
   margin: 0 auto;
 }
 
+.planning-phase__day-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #a0aec0;
+  text-align: center;
+}
+
 .planning-phase--loading {
   display: flex;
   align-items: center;
