@@ -26,22 +26,6 @@
   letter-spacing: 0.05em;
 }
 
-.slot-grid__segment-range {
-  color: #a0aec0;
-  font-size: 13px;
-  margin-left: auto;
-}
-
-.slot-grid__segment-current {
-  color: white;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 6px;
-  min-width: 36px;
-  text-align: center;
-}
-
 .slot-grid__row {
   display: flex;
   gap: 8px;

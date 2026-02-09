@@ -11,6 +11,7 @@ interface SlotProps {
   isOccupied: boolean;
   isPreOccupied: boolean;
   isBlocked?: boolean; // Slot is blocked by day config — no cards allowed
+  narrative?: string; // Narrative text for blocked/pre-occupied slots
   groupStartSlot?: number; // The start slot of the valid drop group this slot belongs to
   isHighlighted: boolean;
   isPartOfShip: boolean; // This slot is occupied by a multi-slot ship but not the start
@@ -25,6 +26,7 @@ export function Slot({
   isOccupied,
   isPreOccupied,
   isBlocked = false,
+  narrative,
   groupStartSlot,
   isHighlighted,
   isPartOfShip,
@@ -69,6 +71,12 @@ export function Slot({
         />
       ) : (
         <span className="slot__number">{slotNumber}</span>
+      )}
+
+      {narrative && (isBlocked || isPreOccupied) && (
+        <span className="slot__narrative" title={narrative}>
+          {narrative}
+        </span>
       )}
     </div>
   );

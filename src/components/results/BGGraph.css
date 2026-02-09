@@ -40,6 +40,11 @@
   fill: rgba(229, 62, 62, 0.1);
 }
 
+.bg-graph__excess-fill {
+  fill: rgba(229, 62, 62, 0.15);
+  stroke: none;
+}
+
 .bg-graph__line {
   stroke: #a0aec0;
   stroke-width: 1.5;

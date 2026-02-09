@@ -71,6 +71,15 @@ export function BGGraph({ bgHistory, thresholds }: BGGraphProps) {
           x2="100" y2={getY(thresholds.critical)}
         />
 
+        {/* Excess fill: highlighted area above 200 threshold */}
+        {buildExcessFillPaths(bgHistory, thresholds.high, getY).map((fillD, i) => (
+          <path
+            key={`excess-${i}`}
+            className="bg-graph__excess-fill"
+            d={fillD}
+          />
+        ))}
+
         {/* BG line - base (normal color) */}
         <path className="bg-graph__line" d={pathD} fill="none" />
 
@@ -182,4 +191,82 @@ function buildColoredSegments(
   }
 
   return segments;
+}
+
+/**
+ * Build SVG fill paths for segments where BG exceeds a threshold.
+ * Creates closed polygon paths between the BG line and the threshold line.
+ */
+function buildExcessFillPaths(
+  bgHistory: number[],
+  threshold: number,
+  getY: (bg: number) => number
+): string[] {
+  const paths: string[] = [];
+  const len = bgHistory.length;
+  if (len < 2) return paths;
+
+  const thresholdY = getY(threshold);
+
+  // Find contiguous segments where BG > threshold
+  let inExcess = false;
+  let segPoints: { x: number; y: number }[] = [];
+
+  const flushSegment = () => {
+    if (segPoints.length < 2) {
+      segPoints = [];
+      return;
+    }
+    // Build closed path: line points forward, then threshold line backward
+    const firstX = segPoints[0].x;
+    const lastX = segPoints[segPoints.length - 1].x;
+    let d = `M ${firstX},${thresholdY}`;
+    for (const p of segPoints) {
+      d += ` L ${p.x},${p.y}`;
+    }
+    d += ` L ${lastX},${thresholdY} Z`;
+    paths.push(d);
+    segPoints = [];
+  };
+
+  for (let i = 0; i < len; i++) {
+    const bg = bgHistory[i];
+    const x = (i / (len - 1)) * 100;
+    const y = getY(bg);
+
+    if (bg > threshold) {
+      if (!inExcess && i > 0) {
+        // Interpolate crossing point from previous point
+        const prevBg = bgHistory[i - 1];
+        const prevX = ((i - 1) / (len - 1)) * 100;
+        if (prevBg <= threshold) {
+          const t = (threshold - prevBg) / (bg - prevBg);
+          const crossX = prevX + t * (x - prevX);
+          segPoints.push({ x: crossX, y: thresholdY });
+        }
+      }
+      inExcess = true;
+      segPoints.push({ x, y });
+    } else {
+      if (inExcess) {
+        // Interpolate crossing point
+        const prevBg = bgHistory[i - 1];
+        const prevX = ((i - 1) / (len - 1)) * 100;
+        if (prevBg > threshold) {
+          const t = (prevBg - threshold) / (prevBg - bg);
+          const crossX = prevX + t * (x - prevX);
+          segPoints.push({ x: crossX, y: thresholdY });
+        }
+        flushSegment();
+        inExcess = false;
+      }
+    }
+  }
+
+  // Flush remaining
+  if (inExcess) {
+    flushSegment();
+  }
+
+  return paths;
 }

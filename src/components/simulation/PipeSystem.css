@@ -35,9 +35,9 @@
   stroke-linejoin: round;
 }
 
-/* Active glucose pipe fill */
+/* Active glucose pipe fill (reddish) */
 .pipe-fill--glucose {
-  stroke: #4299e1;
+  stroke: #E85D4A;
 }
 
 /* Active insulin pipe fill */
@@ -71,7 +71,7 @@
 
 /* Suction VFX — funnel particles converging toward pipe intake */
 .pipe-suction {
-  fill: rgba(66, 153, 225, 0.7);
+  fill: rgba(232, 93, 74, 0.7);
   transform-box: fill-box;
   transform-origin: center;
   animation: suctionPull 1.2s ease-in infinite;

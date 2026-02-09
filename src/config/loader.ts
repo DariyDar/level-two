@@ -1,4 +1,4 @@
-import type { Ship, LevelConfig, ShipSize, LoadType, AvailableFood } from '../core/types';
+import type { Ship, LevelConfig, ShipSize, LoadType, AvailableFood, BlockedSlotConfig } from '../core/types';
 
 // Raw JSON types (before transformation)
 interface RawFoodConfig {
@@ -10,7 +10,7 @@ interface RawFoodConfig {
   glucose: number;
   carbs: number; // Carbohydrates in grams (for UI display)
   description?: string;
-  wpCost?: number; // Willpower cost (0-9)
+  mood?: number; // Mood impact (-5 to +5)
   fiber?: boolean;
 }
 
@@ -23,7 +23,7 @@ interface RawInterventionConfig {
   load: number;
   targetContainer: string;
   description?: string;
-  wpCost?: number;
+  mood?: number; // Mood impact (-5 to +5)
   group?: string;
   requiresEmptySlotBefore?: boolean;
 }
@@ -34,26 +34,13 @@ interface RawLevelConfig {
   description?: string;
   days: number;
   initialBG?: number;
-  availableFoods?: AvailableFood[] | string[]; // Optional: can be in dayConfigs instead
   availableInterventions?: AvailableFood[] | string[]; // Legacy: level-wide
-  preOccupiedSlots?: { slot: number; shipId: string }[];
-  carbRequirements?: { // Optional: can be in dayConfigs instead
-    min: number;
-    max: number;
-  };
-  dayConfigs?: Array<{ // Day-specific configurations
+  preOccupiedSlots?: { slot: number; shipId: string; narrative?: string }[];
+  dayConfigs?: Array<{
     day: number;
-    availableFoods: AvailableFood[] | string[];
     availableInterventions?: AvailableFood[] | string[];
-    preOccupiedSlots?: { slot: number; shipId: string }[];
-    blockedSlots?: number[];
-    wpBudget?: number;
-    carbRequirements?: { min: number; max: number };
-    segmentCarbs?: {
-      Morning?: { min: number; optimal: number; max: number };
-      Day?: { min: number; optimal: number; max: number };
-      Evening?: { min: number; optimal: number; max: number };
-    };
+    preOccupiedSlots?: { slot: number; shipId: string; narrative?: string }[];
+    blockedSlots?: Array<number | { slot: number; narrative?: string }>;
     pancreasBoostCharges?: number;
   }>;
   initialDegradation?: {
@@ -81,7 +68,7 @@ function transformFood(raw: RawFoodConfig): Ship {
     loadType: 'Glucose' as LoadType,
     targetContainer: 'liver',
     description: raw.description,
-    wpCost: raw.wpCost ?? 0,
+    mood: raw.mood ?? 0,
     fiber: raw.fiber,
   };
 }
@@ -97,23 +84,10 @@ function transformIntervention(raw: RawInterventionConfig): Ship {
     loadType: 'Treatment' as LoadType,
     targetContainer: raw.targetContainer as 'metforminEffect' | 'exerciseEffect' | 'intenseExerciseEffect',
     description: raw.description,
-    wpCost: raw.wpCost ?? 0,
+    mood: raw.mood ?? 0,
     group: raw.group,
     requiresEmptySlotBefore: raw.requiresEmptySlotBefore,
   };
-}
-
-// Normalize availableFoods to always be AvailableFood[]
-function normalizeAvailableFoods(foods?: AvailableFood[] | string[]): AvailableFood[] | undefined {
-  if (!foods || foods.length === 0) return foods as undefined;
-
-  // Check if it's already in the new format
-  if (typeof foods[0] === 'object') {
-    return foods as AvailableFood[];
-  }
-
-  // Convert old string[] format to new format (unlimited count = 99)
-  return (foods as string[]).map(id => ({ id, count: 99 }));
 }
 
 // Normalize availableInterventions to always be AvailableFood[]
@@ -125,6 +99,12 @@ function normalizeAvailableInterventions(interventions?: AvailableFood[] | strin
   }
 
   return (interventions as string[]).map(id => ({ id, count: 99 }));
+}
+
+// Normalize blockedSlots: convert raw number entries to BlockedSlotConfig objects
+function normalizeBlockedSlots(slots?: Array<number | { slot: number; narrative?: string }>): BlockedSlotConfig[] {
+  if (!slots || slots.length === 0) return [];
+  return slots.map(s => typeof s === 'number' ? { slot: s } : s);
 }
 
 // Transform raw level config
@@ -146,27 +126,13 @@ function transformLevel(raw: RawLevelConfig): LevelConfig {
     transformed.availableInterventions = normalizeAvailableInterventions(raw.availableInterventions);
   }
 
-  // Handle legacy availableFoods (optional now if dayConfigs exists)
-  if (raw.availableFoods) {
-    transformed.availableFoods = normalizeAvailableFoods(raw.availableFoods);
-  }
-
-  // Handle legacy carbRequirements (optional now if dayConfigs exists)
-  if (raw.carbRequirements) {
-    transformed.carbRequirements = raw.carbRequirements;
-  }
-
   // Normalize dayConfigs if present
   if (raw.dayConfigs) {
     transformed.dayConfigs = raw.dayConfigs.map((dc) => ({
       day: dc.day,
-      availableFoods: normalizeAvailableFoods(dc.availableFoods) || [],
       availableInterventions: normalizeAvailableInterventions(dc.availableInterventions),
       preOccupiedSlots: dc.preOccupiedSlots ?? [],
-      blockedSlots: dc.blockedSlots ?? [],
-      wpBudget: dc.wpBudget,
-      carbRequirements: dc.carbRequirements,
-      segmentCarbs: dc.segmentCarbs,
+      blockedSlots: normalizeBlockedSlots(dc.blockedSlots),
       pancreasBoostCharges: dc.pancreasBoostCharges,
     }));
   }

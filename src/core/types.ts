@@ -10,11 +10,13 @@ export type LoadType = 'Glucose' | 'Treatment';
 
 export type DaySegment = 'Morning' | 'Day' | 'Evening';
 
-export type GamePhase = 'Planning' | 'Simulation' | 'Results';
+export type GamePhase = 'PreGame' | 'Planning' | 'Simulation' | 'Results';
 
-// === Willpower Points ===
+// === Mood System ===
 
-export const DEFAULT_WP_BUDGET = 16;
+export const MOOD_MIN = -50;
+export const MOOD_MAX = 50;
+export const MOOD_INITIAL = 0;
 
 // Naming Convention Mapping (Excel v0.6 ↔ Code):
 // Containers (store substances):
@@ -73,7 +75,7 @@ export interface Ship {
   loadType: LoadType;
   targetContainer: ContainerId;
   description?: string;
-  wpCost?: number; // Willpower cost (0-9, 0 = free)
+  mood?: number; // Mood impact (-5 to +5, positive = junk food joy, negative = healthy food stress)
   fiber?: boolean; // Fiber content (displays leaf icon)
   group?: string; // Group for per-segment limits (e.g., "exercise")
   requiresEmptySlotBefore?: boolean; // Previous slot must not contain food
@@ -140,32 +142,19 @@ export interface AvailableFood {
 export interface PreOccupiedSlot {
   slot: number;  // 1-18 (sequential slot number)
   shipId: string;
+  narrative?: string; // Narrative explanation (e.g., "Family dinner")
 }
 
-export interface SegmentCarbLimits {
-  min: number;
-  optimal: number;
-  max: number;
+export interface BlockedSlotConfig {
+  slot: number;
+  narrative?: string; // Narrative explanation (e.g., "Meeting at work")
 }
 
 export interface DayConfig {
   day: number;
-  availableFoods: AvailableFood[];
   availableInterventions: AvailableFood[];
   preOccupiedSlots?: PreOccupiedSlot[];
-  blockedSlots?: number[]; // Slot numbers (1-18) that cannot accept any cards
-  wpBudget?: number; // Override WP budget for this day
-  // Legacy day-level carb requirements
-  carbRequirements?: {
-    min: number;
-    max: number;
-  };
-  // Segment-level carb requirements (preferred)
-  segmentCarbs?: {
-    Morning?: SegmentCarbLimits;
-    Day?: SegmentCarbLimits;
-    Evening?: SegmentCarbLimits;
-  };
+  blockedSlots?: BlockedSlotConfig[];
   pancreasBoostCharges?: number; // Fast Insulin charges for this day
 }
 
@@ -175,13 +164,6 @@ export interface LevelConfig {
   description?: string;
   days: number;
   initialBG?: number; // Starting BG level (default 100)
-  wpBudget?: number; // Level-wide WP budget override
-  // Legacy fields (used if dayConfigs not present)
-  availableFoods?: AvailableFood[];
-  carbRequirements?: {
-    min: number;
-    max: number;
-  };
   // Day-specific configs (overrides legacy fields)
   dayConfigs?: DayConfig[];
   availableInterventions?: AvailableFood[]; // Legacy: level-wide (use dayConfigs instead)
@@ -247,20 +229,8 @@ export type SlotId = `${DaySegment}-${0 | 1}-${0 | 1 | 2}`;
 
 // === Validation ===
 
-export interface SegmentValidation {
-  segment: DaySegment;
-  currentCarbs: number;
-  min: number;
-  optimal: number;
-  max: number;
-}
-
 export interface PlanValidation {
   isValid: boolean;
-  totalCarbs: number;
-  minCarbs: number;
-  maxCarbs: number;
-  segments: SegmentValidation[];
   errors: string[];
   warnings: string[];
 }

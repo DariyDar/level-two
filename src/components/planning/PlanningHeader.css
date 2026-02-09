@@ -17,14 +17,15 @@
   min-width: 70px;
 }
 
-.planning-header__wp {
+.planning-header__mood {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px 16px;
+  justify-content: center;
+  padding: 8px 12px;
   background: #1a202c;
   border-radius: 8px;
-  min-width: 70px;
+  gap: 2px;
 }
 
 .planning-header__label {
@@ -38,10 +39,6 @@
   font-size: 24px;
   font-weight: 700;
   color: #48bb78;
-}
-
-.planning-header__value--depleted {
-  color: #fc8181;
 }
 
 .planning-header__fast-insulin {

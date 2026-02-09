@@ -1,24 +1,20 @@
-import { BgSparkline } from './BgSparkline';
 import { BoostButton } from '../simulation/BoostButton';
+import { MoodScale } from '../ui/MoodScale';
 import './PlanningHeader.css';
 
 interface PlanningHeaderProps {
   currentBG: number;
-  wpRemaining: number;
-  wpBudget: number;
+  mood: number;
   isValid: boolean;
   onSimulate: () => void;
-  bgPrediction: number[];
   fastInsulinCharges: number;
 }
 
 export function PlanningHeader({
   currentBG,
-  wpRemaining,
-  wpBudget,
+  mood,
   isValid,
   onSimulate,
-  bgPrediction,
   fastInsulinCharges,
 }: PlanningHeaderProps) {
   return (
@@ -28,14 +24,10 @@ export function PlanningHeader({
         <span className="planning-header__value">{currentBG}</span>
       </div>
 
-      <div className="planning-header__wp">
-        <span className="planning-header__label">WP</span>
-        <span className={`planning-header__value ${wpRemaining <= 0 ? 'planning-header__value--depleted' : ''}`}>
-          {wpRemaining}/{wpBudget}
-        </span>
+      <div className="planning-header__mood">
+        <span className="planning-header__label">MOOD</span>
+        <MoodScale mood={mood} />
       </div>
-
-      <BgSparkline bgHistory={bgPrediction} />
 
       <div className="planning-header__fast-insulin">
         <BoostButton

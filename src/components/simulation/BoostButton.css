@@ -99,3 +99,51 @@
   font-size: 10px;
   color: #a0aec0;
 }
+
+/* Injection VFX — pulse + glow on activation */
+.boost-button--injecting {
+  animation: injectPulse 0.5s ease-out;
+}
+
+@keyframes injectPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(249, 115, 22, 0);
+  }
+  40% {
+    transform: scale(1.12);
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.8);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(249, 115, 22, 0);
+  }
+}
+
+/* Floating confirmation text */
+.boost-button__inject-text {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  color: #f97316;
+  pointer-events: none;
+  animation: floatUp 1.5s ease-out forwards;
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  70% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-30px);
+  }
+}

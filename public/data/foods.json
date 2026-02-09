@@ -1,24 +1,24 @@
 {
   "foods": [
     {
-      "id": "banana",
-      "name": "Banana",
-      "emoji": "🍌",
-      "size": "S",
-      "glucose": 200,
-      "carbs": 20,
-      "wpCost": 1,
-      "description": "Natural energy, potassium rich."
+      "id": "burger",
+      "name": "Hamburger",
+      "emoji": "🍔",
+      "size": "L",
+      "glucose": 300,
+      "carbs": 30,
+      "mood": 5,
+      "description": "Juicy and satisfying, a real mood booster."
     },
     {
-      "id": "apple",
-      "name": "Apple",
-      "emoji": "🍎",
-      "size": "S",
-      "glucose": 150,
-      "carbs": 15,
-      "wpCost": 1,
-      "description": "Light snack with fiber."
+      "id": "pizza",
+      "name": "Pizza Slice",
+      "emoji": "🍕",
+      "size": "L",
+      "glucose": 300,
+      "carbs": 30,
+      "mood": 4,
+      "description": "Cheesy goodness, hard to resist."
     },
     {
       "id": "icecream",
@@ -27,88 +27,128 @@
       "size": "S",
       "glucose": 150,
       "carbs": 15,
-      "wpCost": 0,
-      "description": "Sweet treat, instant happiness."
-    },
-    {
-      "id": "popcorn",
-      "name": "Popcorn",
-      "emoji": "🍿",
-      "size": "S",
-      "glucose": 150,
-      "carbs": 15,
-      "wpCost": 1,
-      "description": "Light snack, quick energy."
-    },
-    {
-      "id": "cookie",
-      "name": "Cookie",
-      "emoji": "🍪",
-      "size": "M",
-      "glucose": 150,
-      "carbs": 15,
-      "wpCost": 2,
-      "description": "Sweet treat, comforting."
-    },
-    {
-      "id": "caesarsalad",
-      "name": "Caesar Salad",
-      "emoji": "🥗",
-      "size": "M",
-      "glucose": 150,
-      "carbs": 15,
-      "wpCost": 3,
-      "description": "Fresh and healthy, high fiber."
+      "mood": 4,
+      "description": "Sweet frozen treat, instant happiness."
     },
     {
       "id": "chocolatemuffin",
       "name": "Chocolate Muffin",
       "emoji": "🧁",
       "size": "M",
+      "glucose": 200,
+      "carbs": 20,
+      "mood": 3,
+      "description": "Decadent chocolate indulgence."
+    },
+    {
+      "id": "cookie",
+      "name": "Cookie",
+      "emoji": "🍪",
+      "size": "S",
       "glucose": 150,
       "carbs": 15,
-      "wpCost": 0,
-      "description": "Decadent dessert, mood booster."
+      "mood": 3,
+      "description": "Crunchy, sweet comfort."
     },
     {
-      "id": "sandwich",
-      "name": "Sandwich",
-      "emoji": "🥪",
-      "size": "M",
-      "glucose": 250,
-      "carbs": 25,
-      "wpCost": 2,
-      "description": "Balanced meal, steady release."
+      "id": "chips",
+      "name": "Chips",
+      "emoji": "🍟",
+      "size": "S",
+      "glucose": 150,
+      "carbs": 15,
+      "mood": 3,
+      "description": "Salty, crispy snack."
     },
     {
-      "id": "chicken",
-      "name": "Chicken Meal",
-      "emoji": "🍗",
-      "size": "L",
-      "glucose": 100,
-      "carbs": 10,
-      "wpCost": 3,
-      "description": "Protein-rich, slow energy release."
+      "id": "cola",
+      "name": "Cola",
+      "emoji": "🥤",
+      "size": "S",
+      "glucose": 200,
+      "carbs": 20,
+      "mood": 2,
+      "description": "Fizzy sugar rush, fast glucose spike."
+    },
+    {
+      "id": "chocolatebar",
+      "name": "Chocolate Bar",
+      "emoji": "🍫",
+      "size": "S",
+      "glucose": 180,
+      "carbs": 18,
+      "mood": 3,
+      "description": "Rich chocolate, quick energy."
     },
     {
       "id": "rice",
       "name": "Bowl of Rice",
       "emoji": "🍚",
-      "size": "L",
-      "glucose": 300,
-      "carbs": 30,
-      "wpCost": 4,
+      "size": "M",
+      "glucose": 250,
+      "carbs": 25,
+      "mood": 0,
       "description": "Staple food, reliable energy."
     },
     {
-      "id": "burger",
-      "name": "Hamburger",
-      "emoji": "🍔",
-      "size": "L",
-      "glucose": 300,
-      "carbs": 30,
-      "wpCost": 3,
-      "description": "Filling meal, mixed nutrients."
+      "id": "pasta",
+      "name": "Pasta",
+      "emoji": "🍝",
+      "size": "M",
+      "glucose": 250,
+      "carbs": 25,
+      "mood": 1,
+      "description": "Comforting carbs, steady release."
+    },
+    {
+      "id": "banana",
+      "name": "Banana",
+      "emoji": "🍌",
+      "size": "S",
+      "glucose": 200,
+      "carbs": 20,
+      "mood": 1,
+      "description": "Natural energy, potassium rich."
+    },
+    {
+      "id": "milk",
+      "name": "Milk",
+      "emoji": "🥛",
+      "size": "S",
+      "glucose": 100,
+      "carbs": 10,
+      "mood": 0,
+      "description": "Classic dairy drink."
+    },
+    {
+      "id": "bread",
+      "name": "Bread & Butter",
+      "emoji": "🍞",
+      "size": "S",
+      "glucose": 150,
+      "carbs": 15,
+      "mood": 1,
+      "description": "Simple and filling."
+    },
+    {
+      "id": "apple",
+      "name": "Apple",
+      "emoji": "🍎",
+      "size": "S",
+      "glucose": 150,
+      "carbs": 15,
+      "mood": 0,
+      "description": "Light snack with fiber."
+    },
+    {
+      "id": "yogurt",
+      "name": "Yogurt",
+      "emoji": "🥛",
+      "size": "S",
+      "glucose": 100,
+      "carbs": 10,
+      "mood": 1,
+      "description": "Creamy, lightly sweet dairy."
     },
     {
       "id": "oatmeal",
@@ -117,128 +157,68 @@
       "size": "L",
       "glucose": 250,
       "carbs": 25,
-      "wpCost": 4,
+      "mood": -3,
       "description": "Slow release, gentle on system."
     },
     {
-      "id": "pizza",
-      "name": "Pepperoni Pizza Slice",
-      "emoji": "🍕",
-      "size": "L",
-      "glucose": 300,
-      "carbs": 30,
-      "wpCost": 3,
-      "description": "Tasty but carb-heavy."
-    },
-    {
-      "id": "eggsboiled",
-      "name": "Boiled Eggs",
-      "emoji": "🥚",
+      "id": "chicken",
+      "name": "Boiled Chicken",
+      "emoji": "🍗",
       "size": "M",
       "glucose": 50,
       "carbs": 5,
-      "wpCost": 4,
-      "description": "High protein, very low carbs."
+      "mood": -4,
+      "description": "Lean protein, bland but healthy."
     },
     {
-      "id": "berriesmixed",
-      "name": "Mixed Berries",
-      "emoji": "🫐",
+      "id": "broccoli",
+      "name": "Broccoli",
+      "emoji": "🥦",
       "size": "S",
-      "glucose": 100,
-      "carbs": 10,
-      "wpCost": 2,
-      "description": "Antioxidant-rich snack."
+      "glucose": 30,
+      "carbs": 3,
+      "mood": -5,
+      "description": "Super healthy, very low carbs."
     },
     {
-      "id": "greekyogurt",
-      "name": "Greek Yogurt",
-      "emoji": "🥛",
+      "id": "salad",
+      "name": "Salad",
+      "emoji": "🥗",
+      "size": "S",
+      "glucose": 50,
+      "carbs": 5,
+      "mood": -3,
+      "description": "Fresh greens, light and clean."
+    },
+    {
+      "id": "fish",
+      "name": "Boiled Fish",
+      "emoji": "🐟",
       "size": "M",
-      "glucose": 100,
-      "carbs": 10,
-      "wpCost": 3,
-      "description": "Creamy, protein-rich dairy."
-    },
-    {
-      "id": "milk",
-      "name": "Milk 2%",
-      "emoji": "🥛",
-      "size": "S",
-      "glucose": 100,
-      "carbs": 10,
-      "wpCost": 3,
-      "description": "Classic dairy drink."
+      "glucose": 50,
+      "carbs": 5,
+      "mood": -4,
+      "description": "Omega-3 rich, healthy protein."
     },
     {
       "id": "vegetablestew",
       "name": "Vegetable Stew",
       "emoji": "🥘",
-      "size": "L",
+      "size": "M",
       "glucose": 100,
       "carbs": 10,
-      "wpCost": 4,
+      "mood": -2,
       "description": "Hearty and nutritious."
     },
     {
-      "id": "boiledcarrots",
-      "name": "Boiled Carrots",
-      "emoji": "🥕",
-      "size": "M",
-      "glucose": 100,
-      "carbs": 10,
-      "wpCost": 4,
-      "description": "Soft, naturally sweet."
-    },
-    {
-      "id": "chickpeas",
-      "name": "Chickpeas",
-      "emoji": "🫘",
-      "size": "M",
-      "glucose": 100,
-      "carbs": 10,
-      "wpCost": 3,
-      "description": "Plant protein, versatile legume."
-    },
-    {
       "id": "cottagecheese",
-      "name": "Cottage Cheese 5%",
+      "name": "Cottage Cheese",
       "emoji": "🧀",
-      "size": "L",
-      "glucose": 100,
-      "carbs": 10,
-      "wpCost": 4,
+      "size": "S",
+      "glucose": 50,
+      "carbs": 5,
+      "mood": -2,
       "description": "Mild, protein-packed dairy."
-    },
-    {
-      "id": "cheesewedge",
-      "name": "Hard Cheese",
-      "emoji": "🧀",
-      "size": "M",
-      "glucose": 30,
-      "carbs": 3,
-      "wpCost": 3,
-      "description": "Rich flavor, minimal carbs."
-    },
-    {
-      "id": "avocado",
-      "name": "Avocado",
-      "emoji": "🥑",
-      "size": "L",
-      "glucose": 50,
-      "carbs": 5,
-      "wpCost": 3,
-      "description": "Healthy fats, creamy texture."
-    },
-    {
-      "id": "nutsmixed",
-      "name": "Mixed Nuts",
-      "emoji": "🥜",
-      "size": "M",
-      "glucose": 50,
-      "carbs": 5,
-      "wpCost": 2,
-      "description": "Crunchy, energy-dense snack."
     }
   ]
 }

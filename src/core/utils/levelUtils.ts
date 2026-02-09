@@ -1,13 +1,9 @@
-import type { LevelConfig, AvailableFood, PreOccupiedSlot, SegmentCarbLimits, DaySegment } from '../types';
+import type { LevelConfig, AvailableFood, PreOccupiedSlot, BlockedSlotConfig } from '../types';
 
 export interface DayConfigResult {
-  availableFoods: AvailableFood[];
   availableInterventions: AvailableFood[];
-  carbRequirements?: { min: number; max: number };
-  segmentCarbs?: Record<DaySegment, SegmentCarbLimits>;
   preOccupiedSlots: PreOccupiedSlot[];
-  blockedSlots: number[];
-  wpBudget?: number;
+  blockedSlots: BlockedSlotConfig[];
   pancreasBoostCharges: number;
 }
 
@@ -21,13 +17,9 @@ export function getDayConfig(level: LevelConfig, day: number): DayConfigResult {
     const dayConfig = level.dayConfigs.find((dc) => dc.day === day);
     if (dayConfig) {
       return {
-        availableFoods: dayConfig.availableFoods,
         availableInterventions: dayConfig.availableInterventions,
-        carbRequirements: dayConfig.carbRequirements,
-        segmentCarbs: dayConfig.segmentCarbs as Record<DaySegment, SegmentCarbLimits> | undefined,
         preOccupiedSlots: dayConfig.preOccupiedSlots || level.preOccupiedSlots || [],
         blockedSlots: dayConfig.blockedSlots || [],
-        wpBudget: dayConfig.wpBudget,
         pancreasBoostCharges: dayConfig.pancreasBoostCharges ?? level.interventionCharges.pancreasBoost,
       };
     }
@@ -35,9 +27,7 @@ export function getDayConfig(level: LevelConfig, day: number): DayConfigResult {
 
   // Fall back to legacy fields
   return {
-    availableFoods: level.availableFoods || [],
     availableInterventions: level.availableInterventions || [],
-    carbRequirements: level.carbRequirements || { min: 0, max: 999 },
     preOccupiedSlots: level.preOccupiedSlots || [],
     blockedSlots: [],
     pancreasBoostCharges: level.interventionCharges.pancreasBoost,

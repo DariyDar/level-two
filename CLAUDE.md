@@ -74,13 +74,13 @@ This is "Port Planner" — a metabolic simulation game teaching blood glucose ma
 
 ### Key Files
 - `src/version.ts` — version number
-- `src/store/gameStore.ts` — global game state (WP system, eye toggle)
-- `src/core/simulation/SimulationEngine.ts` — simulation engine with pancreas tier logic
-- `src/core/types.ts` — TypeScript type definitions (Ship, SegmentCarbLimits, PlanValidation, etc.)
-- `src/core/utils/levelUtils.ts` — day config resolution (segmentCarbs, wpBudget, pancreasBoostCharges)
+- `src/store/gameStore.ts` — global game state (Mood system, eye toggle)
+- `src/core/simulation/SimulationEngine.ts` — simulation engine with pancreas tier logic + mood tracking
+- `src/core/types.ts` — TypeScript type definitions (Ship, BlockedSlotConfig, PlanValidation, Mood constants, etc.)
+- `src/core/utils/levelUtils.ts` — day config resolution (pancreasBoostCharges, blockedSlots)
 - `src/core/rules/types.ts` — rule system types (includes `ignoresDegradation`, `minBaseTier` modifier)
 - `src/core/results/calculateResults.ts` — results phase: excessBG calculation, degradation pipeline, assessment (Excellent/Decent/Poor/Defeat)
-- `src/config/loader.ts` — loads and transforms JSON configs (foods, interventions with wpCost)
+- `src/config/loader.ts` — loads and transforms JSON configs (foods, interventions with mood)
 - `src/config/organRules.json` — organ behavior rules (pancreas tiers, liver thresholds, muscle rates)
 - `src/config/degradationConfig.json` — degradation system configuration
 - `src/components/simulation/` — simulation UI components
@@ -93,11 +93,10 @@ This is "Port Planner" — a metabolic simulation game teaching blood glucose ma
   - `OrganSprite.tsx` — organ icon with tier circles, substrate pulse animation
   - `BoostButton.tsx` — boost buttons with numeric charge badge (top-right)
 - `src/components/planning/` — planning phase UI
-  - `PlanningHeader.tsx` — header with BG, WP, BG prediction sparkline, Fast Insulin indicator, Simulate
-  - `BgSparkline.tsx` — compact SVG sparkline for BG prediction in planning header
-  - `ShipCard.tsx` — draggable ship cards with WP cost/fiber badges
-  - `ShipInventory.tsx` — unified inventory (food + interventions, no tabs)
-  - `SlotGrid.tsx` — slot grid with segment carb indicators, blocked slots, exercise group limits
+  - `PlanningHeader.tsx` — header with BG, Mood scale, Fast Insulin indicator, Simulate button
+  - `ShipCard.tsx` — draggable ship cards with mood badge and mood-tinted backgrounds
+  - `ShipInventory.tsx` — unified inventory (all foods globally available, mood-blocked filtering, interventions per-day)
+  - `SlotGrid.tsx` — slot grid with blocked slots (narrative), exercise group limits
 - `src/components/results/` — results phase UI
   - `ResultsPhase.tsx` — results orchestrator (assessment, pass/fail logic, day counter)
   - `BGGraph.tsx` — SVG BG history graph with zone coloring (buildColoredSegments)
@@ -107,36 +106,51 @@ This is "Port Planner" — a metabolic simulation game teaching blood glucose ma
   - `OrganDegradationDisplay.tsx` — liver/pancreas degradation with icons and markers
   - `OrganDegradationDisplay.css` — organ icon and marker styles
 - `src/hooks/` — custom React hooks
-  - `useBgPrediction.ts` — debounced BG prediction using SimulationEngine
 - `src/components/ui/` — shared UI components
   - `EyeToggle.tsx` — toggle for detailed indicators visibility
+  - `MoodScale.tsx` — horizontal mood scale (-50..+50) with color zones and marker
+  - `PreGameModal.tsx` — pre-game modal (Day 1 intro, Day 2+ shows remaining days + mood)
+  - `PhaseBanner.tsx` — contextual phase banner with hints
+  - `Tooltip.tsx` — universal tooltip component (hover, position, delay)
 - `public/data/` — JSON configs for ships and levels
-  - `foods.json` — food items with glucose, carbs, wpCost
-  - `interventions.json` — intervention cards with wpCost, group, requiresEmptySlotBefore
-  - `levels/*.json` — level configurations (per-day segmentCarbs, wpBudget, blockedSlots)
+  - `foods.json` — 22 food items with glucose, carbs, mood (-5..+5)
+  - `interventions.json` — intervention cards with mood, group, requiresEmptySlotBefore
+  - `levels/*.json` — level configurations (per-day blockedSlots with narratives, preOccupiedSlots with narratives)
 - `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.24.3) — TAG: "feb9 inner demo"
-- **Fast Insulin in Planning Header (v0.24.0-v0.24.3)** ✅
-  - BoostButton-style Fast Insulin indicator in planning header (visual only, no activation)
-  - Per-day `pancreasBoostCharges` in DayConfig: Day1=1, Day2=1, Day3=2
-  - Charges wired from level config → getDayConfig → SimulationEngine (was hardcoded to 2)
-  - `pointer-events: none` prevents hover/click in planning phase
-  - Loader transform passes `pancreasBoostCharges` through correctly
-- **Day Title in Planning Phase (v0.24.1)** ✅
-  - "Day X/Y" title displayed between header and indicator panel
+### Current State (v0.25.0) — Mood System Overhaul
+- **Mood System (v0.25.0)** ✅ — Replaces WP system
+  - Mood scale: -50..+50, carries between days, resets to day start on retry
+  - Food blocking by mood threshold: mood >= 10 → all food; mood < -20 → only junk food
+  - SimulationEngine tracks mood: ship.mood × 2 multiplier, Fast Insulin -5 per use, hunger penalty (<3 foods)
+  - MoodScale component: horizontal bar with colored zones (red/orange/yellow/green)
+  - Cross-day strategy: healthy food lowers mood → next day healthy food blocked → forced variety
+- **PreGame Phase (v0.25.0)** ✅
+  - Modal window before each day: Day 1 full intro, Day 2+ shows remaining days + current mood
+  - Phase flow: PreGame → Planning → Simulation → Results → PreGame (next day)
+- **Phase Banners (v0.25.0)** ✅
+  - Contextual hint banners for Planning, Simulation, and Results phases
+- **Narrative Slots (v0.25.0)** ✅
+  - Blocked slots and pre-occupied slots show narrative text ("Дорога на работу", "Угощение от коллеги")
+  - BlockedSlotConfig: `{slot, narrative?}` instead of plain numbers
+- **22 Foods with Mood Values (v0.25.0)** ✅
+  - Junk food (mood +2..+5): burger, pizza, icecream, chocolatemuffin, cookie, chips, cola, chocolatebar
+  - Neutral (mood -1..+1): rice, pasta, banana, milk, bread, apple, yogurt
+  - Healthy (mood -5..-2): oatmeal, chicken, broccoli, salad, fish, vegetablestew, cottagecheese
+  - All foods globally available (no per-day limits), infinite placement count
+- **Mood-Tinted Ship Cards (v0.25.0)** ✅
+  - Pink for junk food (mood > 0), green for healthy (mood < 0), yellow for neutral
+  - Mood badge (+N/-N) on each card
+- **Simulation: Default Speed 0.25x (v0.25.0)** ✅
+  - Simulation starts at 0.25x speed for better observation
+  - Glucose pipe color changed to red (#E85D4A)
+  - Fast Insulin + MoodScale in simulation header
+- **Results: Mood Summary (v0.25.0)** ✅
+  - Mood explanation for next day impact
+  - "Идеальная победа возможна!" hint
 - **Kidneys Disabled (v0.23.1)** ✅
   - kidneyRate=0, bgToKidneysRate=0, kidneyFlowDir=undefined
   - All visual assets preserved (pipe, container, icon, tier circles) — just always inactive
-- **Planning Phase Rebalance (v0.23.0)** ✅
-  - Progressive puzzle design across 3 days:
-    - Day 1: 1 pre-placed food (evening), 2 blocked slots [5,11], WP 14, 8 foods (2L, 2M, 4S)
-    - Day 2: 2 pre-placed foods (morning+day), 2 blocked [6,14], WP 14, 8 foods (1L, 4M, 3S)
-    - Day 3: 2 pre-placed foods (morning+evening), 4 blocked [3,9,11,17], WP 15, 7 foods (0L, 3M, 4S)
-  - 5 unique pre-placed foods: oatmeal, chocolatemuffin, chicken, cookie, icecream
-  - Food inventory overlap ≤43% between any two days
-  - All days verified solvable with multiple valid plans
-  - Days 1-2 allow 2+ optimal segment combos
 - Planning phase: drag-and-drop ships to time slots ✅
 - **SVG Pipe System (v0.21.0-v0.21.23)** ✅
   - SVG overlay with pipes connecting organs (Ship→Liver, Liver→BG, BG→Muscles, BG→Kidneys, Pancreas→Muscles)
@@ -180,12 +194,6 @@ This is "Port Planner" — a metabolic simulation game teaching blood glucose ma
   - Numeric usage count badge (top-right corner of button substrate)
   - Replaced charge circles with single count number
   - Orange badge with remaining charges
-- **BG Prediction Graph (v0.19.0)** ✅
-  - SVG sparkline in planning header, shows predicted BG curve
-  - Reuses SimulationEngine synchronously (debounce 300ms)
-  - Zone backgrounds: green (70-150), yellow (150-200), red (200-300)
-  - Threshold lines at BG 200 and 300, segment dividers at hours 6 and 12
-  - Updates on every plan change (card placed/removed)
 - **Layout Swap (v0.19.0)** ✅
   - Desktop: Inventory LEFT, SlotGrid RIGHT (swapped)
   - Mobile: SlotGrid on top via CSS order
@@ -230,17 +238,17 @@ This is "Port Planner" — a metabolic simulation game teaching blood glucose ma
     - Exercise only adds +1 tier when muscles already activated by pancreas
     - Prevents BG dropping below 70 due to exercise at low BG
 - **Exercise Interventions (v0.17.0)** ✅
-  - **light_exercise**: size S, wpCost 2, exerciseEffect, group "exercise"
-  - **intense_exercise**: size S, wpCost 4, intenseExerciseEffect, permanent +1 tier muscles
+  - **light_exercise**: size S, mood +3, exerciseEffect, group "exercise"
+  - **intense_exercise**: size S, mood -3, intenseExerciseEffect, permanent +1 tier muscles
     - `requiresEmptySlotBefore`: slot N-1 must not contain food
     - Slot 1 forbidden (no previous slot)
     - Red highlight on invalid slot + blocking food slot during drag
   - Group limit: max 1 exercise card per segment
   - Inventory limits: per-day count via `availableInterventions: [{id, count}]`
-- **Blocked Slots (v0.17.1)** ✅
-  - `blockedSlots: number[]` in DayConfig — slots where cards cannot be placed
-  - Visual styling: gray background, lock icon, disabled state
-  - Metformin card: wpCost 0
+- **Blocked Slots (v0.17.1, updated v0.25.0)** ✅
+  - `blockedSlots: BlockedSlotConfig[]` in DayConfig — slots where cards cannot be placed
+  - Each slot has optional narrative text shown in the UI
+  - Visual styling: striped background, narrative text, disabled state
 - **Per-Day Interventions (v0.17.2)** ✅
   - `availableInterventions` moved from LevelConfig to DayConfig
   - Each day specifies its own intervention inventory `[{id, count}]`
@@ -248,26 +256,8 @@ This is "Port Planner" — a metabolic simulation game teaching blood glucose ma
   - Food and interventions in single list (no tabs)
   - Intervention cards hide load/volume display
 - **Pre-placed Cards (v0.16.3)** ✅
-  - `preOccupiedSlots` in DayConfig — cards placed at level start
-  - WP deducted automatically, cards cannot be removed
-- **Willpower Points System (v0.16.0)** ✅
-  - WP budget per day (default: 16, configurable per level/day)
-  - Each card has a WP cost (0-9), including interventions
-  - Free cards (WP=0): Ice Cream, Chocolate Muffin (temptation mechanic)
-  - Cookie: WP=2 (changed from 0 in v0.17.3)
-  - Healthy foods cost more WP (Oatmeal: 4, Rice: 4, Chicken: 3)
-  - WP spent on placement, refunded on removal
-  - Cannot place card if insufficient WP
-  - WP indicator in planning header: `WP: X/16`
-  - WP cost badge on cards (yellow number, top-right)
-- **Segment Carb Limits (v0.16.0)** ✅
-  - Carb limits per segment (Morning/Day/Evening) instead of per day
-  - Three parameters: min, optimal, max
-  - Segment header shows: `MORNING  25 - 35g  [32g]`
-  - Color-coded current indicator:
-    - Green: close to optimal
-    - Yellow: approaching min/max boundary
-    - Red: outside min/max range
+  - `preOccupiedSlots` in DayConfig — cards placed at level start with narrative text
+  - Cards cannot be removed
 - **Eye Toggle (v0.16.0)** ✅
   - Toggle button (bottom-right corner, eye icon)
   - Default: off (semi-transparent closed eye)
@@ -304,13 +294,19 @@ This is "Port Planner" — a metabolic simulation game teaching blood glucose ma
 - Organ UI System ✅ (OrganSprite, substrates, tier circles)
 - Layout: Absolute positioning with corner organs ✅ (was 6×6 CSS Grid before v0.20.0)
 - Food Tags System ✅
-  - WP cost badge (top-right, yellow number) for foods with wpCost > 0
+  - Mood badge (top-right, +N green / -N red) for foods with mood != 0
 - Sugar Cube Particle System (v0.8.0) — SUPERSEDED by SVG Pipe System in v0.21.0
 
-### Removed Features (v0.16.0)
-- **Mood System**: Fully removed (types, store, components, CSS, food data)
-  - Was: MoodLevel 1-5, MoodIndicator, mood badges on cards
-  - Replaced by: WP system for strategic resource management
+### Removed Features (v0.25.0)
+- **WP System**: Fully removed (types, store, components, CSS, food data)
+  - Was: WP budget per day, wpCost on cards, WP indicator in header
+  - Replaced by: Mood system for cross-day strategic constraint
+- **Segment Carb Limits**: Removed (was min/optimal/max per segment)
+  - Mood is now the sole strategic constraint
+- **BG Prediction Sparkline**: Removed (BgSparkline.tsx, useBgPrediction.ts)
+  - Was: SVG preview of BG curve in planning header
+- **Per-Day Food Limits**: Removed (availableFoods per DayConfig)
+  - All 22 foods globally available, filtered only by mood threshold
 
 ### Disabled Features (v0.19.6+)
 Features preserved in code but hidden from UI:

@@ -1,3 +1,4 @@
+import { useState, useEffect, useCallback } from 'react';
 import type { BoostState } from '../../core/simulation';
 import './BoostButton.css';
 
@@ -19,11 +20,24 @@ export function BoostButton({
   isFastInsulin = false,
 }: BoostButtonProps) {
   const { charges, cooldownTicks, isActive } = boost;
+  const [justActivated, setJustActivated] = useState(false);
 
   const canActivate = charges > 0 && cooldownTicks === 0 && !isActive;
   const cooldownPercent = cooldownMax > 0
     ? ((cooldownMax - cooldownTicks) / cooldownMax) * 100
     : 100;
+
+  // Reset justActivated after 1.5s
+  useEffect(() => {
+    if (!justActivated) return;
+    const timer = setTimeout(() => setJustActivated(false), 1500);
+    return () => clearTimeout(timer);
+  }, [justActivated]);
+
+  const handleClick = useCallback(() => {
+    onActivate();
+    setJustActivated(true);
+  }, [onActivate]);
 
   return (
     <button
@@ -32,10 +46,11 @@ export function BoostButton({
         isActive && 'boost-button--active',
         !canActivate && 'boost-button--disabled',
         isFastInsulin && 'boost-button--fast-insulin',
+        justActivated && 'boost-button--injecting',
       ]
         .filter(Boolean)
         .join(' ')}
-      onClick={onActivate}
+      onClick={handleClick}
       disabled={!canActivate}
     >
       {/* Usage count badge - top right */}
@@ -53,6 +68,11 @@ export function BoostButton({
 
       {cooldownTicks > 0 && (
         <span className="boost-button__cooldown-text">{cooldownTicks}h</span>
+      )}
+
+      {/* Floating injection confirmation text */}
+      {justActivated && (
+        <span className="boost-button__inject-text">Инсулин введён!</span>
       )}
     </button>
   );

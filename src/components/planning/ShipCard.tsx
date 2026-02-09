@@ -13,6 +13,14 @@ interface ShipCardProps {
   showDetails?: boolean;
 }
 
+function getMoodTintClass(ship: Ship): string {
+  const mood = ship.mood ?? 0;
+  if (ship.loadType !== 'Glucose') return '';
+  if (mood > 0) return 'ship-card--mood-junk'; // Pink tint for junk food (positive mood = joy)
+  if (mood < 0) return 'ship-card--mood-healthy'; // Green tint for healthy food (negative mood = stress)
+  return 'ship-card--mood-neutral'; // Yellow tint for neutral
+}
+
 export function ShipCard({
   ship,
   instanceId,
@@ -38,7 +46,7 @@ export function ShipCard({
     transform: CSS.Transform.toString(transform),
   };
 
-  const wpCost = ship.wpCost ?? 0;
+  const moodValue = ship.mood ?? 0;
 
   return (
     <div
@@ -48,6 +56,7 @@ export function ShipCard({
         'ship-card',
         `ship-card--size-${ship.size.toLowerCase()}`,
         `ship-card--type-${ship.loadType.toLowerCase()}`,
+        getMoodTintClass(ship),
         isPlaced && 'ship-card--placed',
         isPreOccupied && 'ship-card--locked',
         isDragging && 'ship-card--dragging',
@@ -59,9 +68,15 @@ export function ShipCard({
     >
       <span className="ship-card__emoji">{ship.emoji}</span>
 
-      {/* WP cost badge - top right */}
-      {wpCost > 0 && (
-        <span className="ship-card__badge ship-card__badge--wp">{wpCost}</span>
+      {/* Mood badge - top right */}
+      {moodValue !== 0 && (
+        <span
+          className={`ship-card__badge ship-card__badge--mood ${
+            moodValue > 0 ? 'ship-card__badge--mood-positive' : 'ship-card__badge--mood-negative'
+          }`}
+        >
+          {moodValue > 0 ? '+' : ''}{moodValue}
+        </span>
       )}
 
       {showDetails && (
@@ -84,7 +99,7 @@ export function ShipCard({
 // Drag overlay version (no drag handlers)
 export function ShipCardOverlay({ ship }: { ship: Ship }) {
   const showDetailedIndicators = useGameStore((s) => s.showDetailedIndicators);
-  const wpCost = ship.wpCost ?? 0;
+  const moodValue = ship.mood ?? 0;
 
   return (
     <div
@@ -93,13 +108,20 @@ export function ShipCardOverlay({ ship }: { ship: Ship }) {
         'ship-card--overlay',
         `ship-card--size-${ship.size.toLowerCase()}`,
         `ship-card--type-${ship.loadType.toLowerCase()}`,
+        getMoodTintClass(ship),
       ].join(' ')}
     >
       <span className="ship-card__emoji">{ship.emoji}</span>
 
-      {/* WP cost badge - top right */}
-      {wpCost > 0 && (
-        <span className="ship-card__badge ship-card__badge--wp">{wpCost}</span>
+      {/* Mood badge - top right */}
+      {moodValue !== 0 && (
+        <span
+          className={`ship-card__badge ship-card__badge--mood ${
+            moodValue > 0 ? 'ship-card__badge--mood-positive' : 'ship-card__badge--mood-negative'
+          }`}
+        >
+          {moodValue > 0 ? '+' : ''}{moodValue}
+        </span>
       )}
 
       <div className="ship-card__details">

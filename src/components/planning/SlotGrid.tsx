@@ -1,4 +1,4 @@
-import type { Ship, PlacedShip, DaySegment, SegmentValidation } from '../../core/types';
+import type { Ship, PlacedShip, DaySegment, BlockedSlotConfig } from '../../core/types';
 import {
   DAY_SEGMENTS,
   SLOTS_PER_ROW,
@@ -17,20 +17,7 @@ interface SlotGridProps {
   highlightedSlots: Set<number>;
   activeShip?: Ship | null;
   hoveredSlot?: number | null;
-  segmentValidation?: SegmentValidation[];
-  blockedSlots?: number[];
-}
-
-function getSegmentCarbColor(validation: SegmentValidation): string {
-  const { currentCarbs, min, optimal, max } = validation;
-  if (currentCarbs === 0) return '#4a5568'; // Gray - empty
-  if (currentCarbs < min || currentCarbs > max) return '#fc8181'; // Red - out of range
-  // Distance from optimal (0 = at optimal, 1 = at boundary)
-  const distFromOptimal = Math.abs(currentCarbs - optimal);
-  const maxDist = Math.max(optimal - min, max - optimal);
-  const ratio = distFromOptimal / maxDist;
-  if (ratio <= 0.4) return '#48bb78'; // Green - close to optimal
-  return '#ecc94b'; // Yellow - near boundary
+  blockedSlots?: BlockedSlotConfig[];
 }
 
 export function SlotGrid({
@@ -40,11 +27,11 @@ export function SlotGrid({
   highlightedSlots,
   activeShip,
   hoveredSlot,
-  segmentValidation,
   blockedSlots = [],
 }: SlotGridProps) {
   const activeShipSize = activeShip ? SHIP_SIZE_TO_SLOTS[activeShip.size] : 1;
-  const blockedSlotsSet = new Set(blockedSlots);
+  const blockedSlotsSet = new Set(blockedSlots.map((b) => b.slot));
+  const blockedNarrativeMap = new Map(blockedSlots.filter((b) => b.narrative).map((b) => [b.slot, b.narrative!]));
 
   // Build a map of slot number -> placed ship info
   const slotToShip = new Map<number, { placedShip: PlacedShip; isStart: boolean }>();
@@ -68,14 +55,11 @@ export function SlotGrid({
     }
   }
 
-  // Build expanded valid slots - for multi-slot ships, all slots in valid groups should highlight
   // Map each slot to its group's start slot for drop handling
-  const expandedValidSlots = new Set<number>();
   const slotToGroupStart = new Map<number, number>();
 
   for (const startSlot of validDropSlots) {
     for (let i = 0; i < activeShipSize; i++) {
-      expandedValidSlots.add(startSlot + i);
       slotToGroupStart.set(startSlot + i, startSlot);
     }
   }
@@ -132,7 +116,6 @@ export function SlotGrid({
   }
 
   const renderSegment = (segment: DaySegment, segmentIndex: number) => {
-    const segVal = segmentValidation?.find((s) => s.segment === segment);
     const rows = [];
 
     for (let row = 0; row < ROWS_PER_SEGMENT; row++) {
@@ -159,6 +142,7 @@ export function SlotGrid({
             isOccupied={!!shipInfo?.isStart}
             isPreOccupied={!!shipInfo?.placedShip.isPreOccupied}
             isBlocked={blockedSlotsSet.has(slotNumber)}
+            narrative={blockedNarrativeMap.get(slotNumber)}
             groupStartSlot={groupStartSlot}
             isHighlighted={highlightedSlots.has(slotNumber)}
             isPartOfShip={!!shipInfo && !shipInfo.isStart}
@@ -179,19 +163,6 @@ export function SlotGrid({
       <div key={segment} className="slot-grid__segment">
         <div className="slot-grid__segment-header">
           <h3 className="slot-grid__segment-title">{segment.toUpperCase()}</h3>
-          {segVal && (
-            <>
-              <span className="slot-grid__segment-range">
-                {segVal.min} - {segVal.max}g
-              </span>
-              <span
-                className="slot-grid__segment-current"
-                style={{ backgroundColor: getSegmentCarbColor(segVal) }}
-              >
-                {segVal.currentCarbs}g
-              </span>
-            </>
-          )}
         </div>
         {rows}
       </div>

@@ -48,6 +48,19 @@
   background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
 }
 
+/* Mood tint variants (glucose cards only) */
+.ship-card--mood-junk {
+  background: linear-gradient(135deg, #c53a6e 0%, #9b2c5f 100%);
+}
+
+.ship-card--mood-healthy {
+  background: linear-gradient(135deg, #2f855a 0%, #276749 100%);
+}
+
+.ship-card--mood-neutral {
+  background: linear-gradient(135deg, #b7791f 0%, #975a16 100%);
+}
+
 /* States */
 .ship-card--placed {
   width: 100%;
@@ -159,7 +172,7 @@
   background: rgba(0, 0, 0, 0.3);
 }
 
-/* WP and Fiber badges */
+/* Mood and Fiber badges */
 .ship-card__badge {
   position: absolute;
   font-size: 16px;
@@ -168,17 +181,24 @@
   z-index: 1;
 }
 
-.ship-card__badge--wp {
+.ship-card__badge--mood {
   top: 2px;
   right: 2px;
   font-size: 11px;
   font-weight: 700;
   background: rgba(0, 0, 0, 0.4);
-  color: #fbbf24;
   padding: 1px 4px;
   border-radius: 4px;
   min-width: 16px;
   text-align: center;
+}
+
+.ship-card__badge--mood-positive {
+  color: #48bb78;
+}
+
+.ship-card__badge--mood-negative {
+  color: #fc8181;
 }
 
 .ship-card__badge--fiber {

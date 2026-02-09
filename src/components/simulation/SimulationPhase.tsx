@@ -11,6 +11,7 @@ import { BodyDiagram } from './BodyDiagram';
 import { BoostButton } from './BoostButton';
 import { ShipQueue } from './ShipQueue';
 import { PipeSystem } from './PipeSystem';
+import { MoodScale } from '../ui/MoodScale';
 import './SimulationPhase.css';
 
 // Available simulation speeds
@@ -25,12 +26,14 @@ export function SimulationPhase() {
     degradation,
     setPhase,
     setBgHistory,
+    mood,
+    applyMoodDelta,
   } = useGameStore();
 
   const [allShips, setAllShips] = useState<Ship[]>([]);
   const [engine, setEngine] = useState<SimulationEngine | null>(null);
   const [simState, setSimState] = useState<SimulationState | null>(null);
-  const [speed, setSpeed] = useState<SimSpeed>(0.5); // Default speed
+  const [speed, setSpeed] = useState<SimSpeed>(0.25); // Default speed
   const [isPaused, setIsPaused] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -49,6 +52,7 @@ export function SimulationPhase() {
           {
             initialBG: currentLevel.initialBG ?? 100,
             pancreasBoostCharges: dayConfig.pancreasBoostCharges,
+            initialMood: mood,
           }
         );
         setEngine(eng);
@@ -78,16 +82,20 @@ export function SimulationPhase() {
       bgHistory: [...state.bgHistory],
       liverBoost: { ...state.liverBoost },
       pancreasBoost: { ...state.pancreasBoost },
+      currentMood: state.currentMood,
+      moodHistory: [...state.moodHistory],
     });
   }, []);
 
   const handleComplete = useCallback(() => {
-    // Save BG history before transitioning
+    // Save BG history and mood before transitioning
     if (engine) {
-      setBgHistory(engine.getState().bgHistory);
+      const finalState = engine.getState();
+      setBgHistory(finalState.bgHistory);
+      applyMoodDelta(finalState.currentMood - mood);
     }
     setPhase('Results');
-  }, [setPhase, setBgHistory, engine]);
+  }, [setPhase, setBgHistory, engine, mood, applyMoodDelta]);
 
   // Use game loop hook
   useGameLoop({
@@ -186,6 +194,19 @@ export function SimulationPhase() {
             </button>
           ))}
         </div>
+
+        {/* Fast Insulin button in header */}
+        <BoostButton
+          label="Fast Insulin"
+          emoji="💧"
+          boost={simState.pancreasBoost}
+          cooldownMax={3}
+          onActivate={handlePancreasBoost}
+          isFastInsulin={true}
+        />
+
+        {/* Mood indicator */}
+        <MoodScale mood={simState?.currentMood ?? mood} />
       </div>
 
       {/* Main simulation area with pipe system */}
@@ -220,9 +241,8 @@ export function SimulationPhase() {
         />
       </div>
 
-      {/* Boost Buttons */}
+      {/* DISABLED: Liver Boost - functionality preserved but UI hidden
       <div className="simulation-phase__boosts">
-        {/* DISABLED: Liver Boost - functionality preserved but UI hidden
         <BoostButton
           label="Liver Boost"
           emoji="🔥"
@@ -230,16 +250,8 @@ export function SimulationPhase() {
           cooldownMax={1}
           onActivate={handleLiverBoost}
         />
-        */}
-        <BoostButton
-          label="Fast Insulin"
-          emoji="💧"
-          boost={simState.pancreasBoost}
-          cooldownMax={3}
-          onActivate={handlePancreasBoost}
-          isFastInsulin={true}
-        />
       </div>
+      */}
     </div>
   );
 }

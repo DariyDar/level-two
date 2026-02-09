@@ -20,10 +20,11 @@
 .simulation-phase__header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
+  gap: 8px;
+  padding: 10px 12px;
   background: #2d3748;
   border-radius: 12px;
+  flex-wrap: wrap;
 }
 
 .simulation-phase__time {
@@ -109,11 +110,30 @@
   gap: 16px;
 }
 
-/* Boosts */
+/* Boosts — now inline in header */
 .simulation-phase__boosts {
   display: flex;
   gap: 12px;
   justify-content: center;
+}
+
+/* Compact boost button when inside header */
+.simulation-phase__header .boost-button {
+  min-width: auto;
+  padding: 6px 10px;
+  gap: 3px;
+}
+
+.simulation-phase__header .boost-button__emoji {
+  font-size: 18px;
+}
+
+.simulation-phase__header .boost-button__label {
+  font-size: 9px;
+}
+
+.simulation-phase__header .boost-button__cooldown-bar {
+  height: 3px;
 }
 
 /* Responsive */

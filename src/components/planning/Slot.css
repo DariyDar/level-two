@@ -49,6 +49,21 @@
   opacity: 0.6;
 }
 
+.slot__narrative {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  right: 2px;
+  color: #a0aec0;
+  font-size: 9px;
+  text-align: center;
+  line-height: 1.1;
+  cursor: help;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .slot--drop-valid {
   border-color: #48bb78;
   border-style: dashed;

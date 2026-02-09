@@ -1,90 +1,54 @@
 {
   "id": "level-01",
   "name": "First Steps",
-  "description": "Learn the basics of meal planning across three days.",
+  "description": "Learn to balance mood and blood sugar across three days.",
   "days": 3,
   "initialBG": 100,
   "dayConfigs": [
     {
       "day": 1,
-      "wpBudget": 14,
-      "availableFoods": [
-        { "id": "banana", "count": 1 },
-        { "id": "apple", "count": 1 },
-        { "id": "cookie", "count": 1 },
-        { "id": "burger", "count": 1 },
-        { "id": "popcorn", "count": 1 },
-        { "id": "berriesmixed", "count": 1 },
-        { "id": "pizza", "count": 1 },
-        { "id": "greekyogurt", "count": 1 }
-      ],
       "availableInterventions": [],
       "preOccupiedSlots": [
-        { "slot": 13, "shipId": "oatmeal" }
+        { "slot": 13, "shipId": "oatmeal", "narrative": "Привычный завтрак" }
       ],
-      "blockedSlots": [5, 11],
-      "pancreasBoostCharges": 1,
-      "segmentCarbs": {
-        "Morning": { "min": 25, "optimal": 30, "max": 35 },
-        "Day": { "min": 30, "optimal": 35, "max": 40 },
-        "Evening": { "min": 20, "optimal": 25, "max": 30 }
-      }
+      "blockedSlots": [
+        { "slot": 5, "narrative": "Дорога на работу" },
+        { "slot": 11, "narrative": "Совещание" }
+      ],
+      "pancreasBoostCharges": 1
     },
     {
       "day": 2,
-      "wpBudget": 14,
-      "availableFoods": [
-        { "id": "banana", "count": 1 },
-        { "id": "popcorn", "count": 1 },
-        { "id": "cookie", "count": 1 },
-        { "id": "nutsmixed", "count": 1 },
-        { "id": "rice", "count": 1 },
-        { "id": "milk", "count": 1 },
-        { "id": "chickpeas", "count": 1 },
-        { "id": "caesarsalad", "count": 1 }
-      ],
       "availableInterventions": [
         { "id": "light_exercise", "count": 2 }
       ],
       "preOccupiedSlots": [
-        { "slot": 1, "shipId": "chocolatemuffin" },
-        { "slot": 7, "shipId": "chicken" }
+        { "slot": 1, "shipId": "chocolatemuffin", "narrative": "Угощение от коллеги" },
+        { "slot": 7, "shipId": "chicken", "narrative": "Обед с семьёй" }
       ],
-      "blockedSlots": [6, 14],
-      "pancreasBoostCharges": 1,
-      "segmentCarbs": {
-        "Morning": { "min": 25, "optimal": 30, "max": 35 },
-        "Day": { "min": 30, "optimal": 35, "max": 40 },
-        "Evening": { "min": 20, "optimal": 25, "max": 30 }
-      }
+      "blockedSlots": [
+        { "slot": 6, "narrative": "Планёрка" },
+        { "slot": 14, "narrative": "Поездка в магазин" }
+      ],
+      "pancreasBoostCharges": 1
     },
     {
       "day": 3,
-      "wpBudget": 15,
-      "availableFoods": [
-        { "id": "apple", "count": 1 },
-        { "id": "popcorn", "count": 1 },
-        { "id": "banana", "count": 1 },
-        { "id": "sandwich", "count": 1 },
-        { "id": "boiledcarrots", "count": 1 },
-        { "id": "milk", "count": 1 },
-        { "id": "cheesewedge", "count": 1 }
-      ],
       "availableInterventions": [
         { "id": "light_exercise", "count": 1 },
         { "id": "intense_exercise", "count": 1 }
       ],
       "preOccupiedSlots": [
-        { "slot": 4, "shipId": "cookie" },
-        { "slot": 13, "shipId": "icecream" }
+        { "slot": 4, "shipId": "cookie", "narrative": "Перекус на ходу" },
+        { "slot": 13, "shipId": "icecream", "narrative": "Десерт после ужина" }
       ],
-      "blockedSlots": [3, 9, 11, 17],
-      "pancreasBoostCharges": 2,
-      "segmentCarbs": {
-        "Morning": { "min": 25, "optimal": 30, "max": 35 },
-        "Day": { "min": 30, "optimal": 35, "max": 40 },
-        "Evening": { "min": 20, "optimal": 25, "max": 30 }
-      }
+      "blockedSlots": [
+        { "slot": 3, "narrative": "Утренние сборы" },
+        { "slot": 9, "narrative": "Визит к врачу" },
+        { "slot": 11, "narrative": "Дорога домой" },
+        { "slot": 17, "narrative": "Душ и отдых" }
+      ],
+      "pancreasBoostCharges": 2
     }
   ],
   "interventionCharges": {

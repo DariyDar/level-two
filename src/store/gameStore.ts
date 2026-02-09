@@ -8,8 +8,7 @@ import type {
   DayResults,
   PlanValidation,
 } from '../core/types';
-import { DEFAULT_WP_BUDGET } from '../core/types';
-import { getDayConfig } from '../core/utils/levelUtils';
+import { MOOD_INITIAL, MOOD_MIN, MOOD_MAX } from '../core/types';
 
 interface GameState {
   // Current state
@@ -30,9 +29,9 @@ interface GameState {
   // Persistent (between days/levels)
   degradation: SimpleDegradation;
 
-  // Willpower Points
-  wpBudget: number;
-  wpSpent: number;
+  // Mood System (replaces WP)
+  mood: number;           // Current mood (-50..+50), carries between days
+  moodAtDayStart: number; // Saved for retry
 
   // UI toggles
   showDetailedIndicators: boolean;
@@ -48,9 +47,8 @@ interface GameState {
   startNextDay: () => void;
   retryDay: () => void;
   updateValidation: (validation: PlanValidation) => void;
-  setWpBudget: (budget: number) => void;
-  spendWp: (amount: number) => void;
-  refundWp: (amount: number) => void;
+  setMood: (mood: number) => void;
+  applyMoodDelta: (delta: number) => void;
   toggleDetailedIndicators: () => void;
 }
 
@@ -61,10 +59,6 @@ const initialDegradation: SimpleDegradation = {
 
 const initialValidation: PlanValidation = {
   isValid: false,
-  totalCarbs: 0,
-  minCarbs: 0,
-  maxCarbs: 0,
-  segments: [],
   errors: [],
   warnings: [],
 };
@@ -73,7 +67,7 @@ export const useGameStore = create<GameState>()(
   persist(
     (set) => ({
       // Initial state
-      phase: 'Planning',
+      phase: 'PreGame',
       currentLevel: null,
       currentDay: 1,
       placedShips: [],
@@ -81,29 +75,24 @@ export const useGameStore = create<GameState>()(
       bgHistory: [],
       results: null,
       degradation: initialDegradation,
-      wpBudget: DEFAULT_WP_BUDGET,
-      wpSpent: 0,
+      mood: MOOD_INITIAL,
+      moodAtDayStart: MOOD_INITIAL,
       showDetailedIndicators: false,
 
       // Actions
       setPhase: (phase) => set({ phase }),
 
       setLevel: (level) => {
-        const dayConfig = getDayConfig(level, 1); // Day 1 config
-        const wpBudget = dayConfig.wpBudget ?? level.wpBudget ?? DEFAULT_WP_BUDGET;
         return set({
           currentLevel: level,
           currentDay: 1,
+          phase: 'PreGame',
           placedShips: [],
-          planValidation: {
-            ...initialValidation,
-            minCarbs: dayConfig.carbRequirements?.min ?? 0,
-            maxCarbs: dayConfig.carbRequirements?.max ?? 999,
-          },
+          planValidation: initialValidation,
           results: null,
           degradation: level.initialDegradation ?? initialDegradation,
-          wpBudget,
-          wpSpent: 0,
+          mood: MOOD_INITIAL,
+          moodAtDayStart: MOOD_INITIAL,
         });
       },
 
@@ -124,7 +113,6 @@ export const useGameStore = create<GameState>()(
         set((state) => ({
           // Keep pre-occupied ships when clearing
           placedShips: state.placedShips.filter((s) => s.isPreOccupied),
-          wpSpent: 0, // Reset WP; PlanningPhase effect will re-add pre-occupied WP cost
         })),
 
       setBgHistory: (history) => set({ bgHistory: history }),
@@ -139,22 +127,14 @@ export const useGameStore = create<GameState>()(
         })),
 
       startNextDay: () =>
-        set((state) => {
-          let wpBudget = DEFAULT_WP_BUDGET;
-          if (state.currentLevel) {
-            const dayConfig = getDayConfig(state.currentLevel, state.currentDay + 1);
-            wpBudget = dayConfig.wpBudget ?? state.currentLevel.wpBudget ?? DEFAULT_WP_BUDGET;
-          }
-          return {
-            currentDay: state.currentDay + 1,
-            phase: 'Planning',
-            placedShips: [],
-            bgHistory: [],
-            results: null,
-            wpBudget,
-            wpSpent: 0,
-          };
-        }),
+        set((state) => ({
+          currentDay: state.currentDay + 1,
+          phase: 'PreGame',
+          placedShips: [],
+          bgHistory: [],
+          results: null,
+          moodAtDayStart: state.mood, // Snapshot mood for retry
+        })),
 
       retryDay: () =>
         set((state) => ({
@@ -162,28 +142,29 @@ export const useGameStore = create<GameState>()(
           placedShips: state.placedShips.filter((s) => s.isPreOccupied),
           bgHistory: [],
           results: null,
-          wpSpent: 0,
+          mood: state.moodAtDayStart, // Reset to start-of-day value
         })),
 
       updateValidation: (validation) => set({ planValidation: validation }),
 
-      setWpBudget: (budget) => set({ wpBudget: budget }),
+      setMood: (mood) => set({ mood: Math.max(MOOD_MIN, Math.min(MOOD_MAX, mood)) }),
 
-      spendWp: (amount) =>
-        set((state) => ({ wpSpent: state.wpSpent + amount })),
-
-      refundWp: (amount) =>
-        set((state) => ({ wpSpent: Math.max(0, state.wpSpent - amount) })),
+      applyMoodDelta: (delta) =>
+        set((state) => ({
+          mood: Math.max(MOOD_MIN, Math.min(MOOD_MAX, state.mood + delta)),
+        })),
 
       toggleDetailedIndicators: () =>
         set((state) => ({ showDetailedIndicators: !state.showDetailedIndicators })),
     }),
     {
       name: 'port-management-save',
-      version: 1, // Increment to reset saved state
+      version: 2, // Incremented to reset saved state from v1
       partialize: (state) => ({
         degradation: state.degradation,
         currentDay: state.currentDay,
+        mood: state.mood,
+        moodAtDayStart: state.moodAtDayStart,
       }),
     }
   )
