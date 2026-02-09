@@ -1,5 +1,34 @@
 # Changelog
 
+## 9 февраля (v0.23.1 → v0.24.3) — Fast Insulin Planning + Kidneys Disabled
+
+### v0.24.3 — Loader Transform Fix
+- Исправлен `transformLevel()` — `pancreasBoostCharges` теперь проходит через трансформацию dayConfigs
+- Без фикса `getDayConfig()` всегда fallback на уровневое значение (2)
+
+### v0.24.2 — Fast Insulin Button Polish
+- `pointer-events: none` на обёртке Fast Insulin в PlanningPhase
+- Предотвращает hover/click интеракции (индикатор только визуальный)
+
+### v0.24.1 — Day Title + BoostButton-style Indicator
+- **"Day X/Y"** заголовок между хедером Port Planner и панелью индикаторов
+- Кастомный индикатор Fast Insulin заменён на реальный компонент `BoostButton` (visual only)
+- Заряды берутся из per-day конфига
+
+### v0.24.0 — Fast Insulin in Planning Header
+- **Индикатор Fast Insulin** в planning header (оранжевый, слева от Simulate)
+- Per-day `pancreasBoostCharges` в DayConfig: День 1=1, День 2=1, День 3=2
+- Заряды из level config → `getDayConfig()` → `SimulationEngine` (было захардкожено на 2)
+- `DayConfigResult` расширен полем `pancreasBoostCharges`
+- Loader transform пробрасывает `pancreasBoostCharges` из JSON
+
+### v0.23.1 — Kidneys Disabled
+- **Почки отключены**: `kidneyRate=0`, `bgToKidneysRate=0`, `kidneyFlowDir=undefined`
+- Все визуальные компоненты сохранены (pipe, container, icon, tier circles) — просто всегда неактивны
+- Нет изменений CSS или позиционирования
+
+---
+
 ## 9 февраля (v0.23.0) — Planning Phase Rebalance
 
 ### v0.23.0 — Planning Config Rebalance

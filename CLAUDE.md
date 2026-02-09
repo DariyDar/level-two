@@ -77,7 +77,7 @@ This is "Port Planner" — a metabolic simulation game teaching blood glucose ma
 - `src/store/gameStore.ts` — global game state (WP system, eye toggle)
 - `src/core/simulation/SimulationEngine.ts` — simulation engine with pancreas tier logic
 - `src/core/types.ts` — TypeScript type definitions (Ship, SegmentCarbLimits, PlanValidation, etc.)
-- `src/core/utils/levelUtils.ts` — day config resolution (segmentCarbs, wpBudget)
+- `src/core/utils/levelUtils.ts` — day config resolution (segmentCarbs, wpBudget, pancreasBoostCharges)
 - `src/core/rules/types.ts` — rule system types (includes `ignoresDegradation`, `minBaseTier` modifier)
 - `src/core/results/calculateResults.ts` — results phase: excessBG calculation, degradation pipeline, assessment (Excellent/Decent/Poor/Defeat)
 - `src/config/loader.ts` — loads and transforms JSON configs (foods, interventions with wpCost)
@@ -93,7 +93,7 @@ This is "Port Planner" — a metabolic simulation game teaching blood glucose ma
   - `OrganSprite.tsx` — organ icon with tier circles, substrate pulse animation
   - `BoostButton.tsx` — boost buttons with numeric charge badge (top-right)
 - `src/components/planning/` — planning phase UI
-  - `PlanningHeader.tsx` — header with BG, WP, BG prediction sparkline, Simulate
+  - `PlanningHeader.tsx` — header with BG, WP, BG prediction sparkline, Fast Insulin indicator, Simulate
   - `BgSparkline.tsx` — compact SVG sparkline for BG prediction in planning header
   - `ShipCard.tsx` — draggable ship cards with WP cost/fiber badges
   - `ShipInventory.tsx` — unified inventory (food + interventions, no tabs)
@@ -116,7 +116,18 @@ This is "Port Planner" — a metabolic simulation game teaching blood glucose ma
   - `levels/*.json` — level configurations (per-day segmentCarbs, wpBudget, blockedSlots)
 - `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.23.0) — TAG: "feb 8 - all final"
+### Current State (v0.24.3) — TAG: "feb9 inner demo"
+- **Fast Insulin in Planning Header (v0.24.0-v0.24.3)** ✅
+  - BoostButton-style Fast Insulin indicator in planning header (visual only, no activation)
+  - Per-day `pancreasBoostCharges` in DayConfig: Day1=1, Day2=1, Day3=2
+  - Charges wired from level config → getDayConfig → SimulationEngine (was hardcoded to 2)
+  - `pointer-events: none` prevents hover/click in planning phase
+  - Loader transform passes `pancreasBoostCharges` through correctly
+- **Day Title in Planning Phase (v0.24.1)** ✅
+  - "Day X/Y" title displayed between header and indicator panel
+- **Kidneys Disabled (v0.23.1)** ✅
+  - kidneyRate=0, bgToKidneysRate=0, kidneyFlowDir=undefined
+  - All visual assets preserved (pipe, container, icon, tier circles) — just always inactive
 - **Planning Phase Rebalance (v0.23.0)** ✅
   - Progressive puzzle design across 3 days:
     - Day 1: 1 pre-placed food (evening), 2 blocked slots [5,11], WP 14, 8 foods (2L, 2M, 4S)
@@ -303,6 +314,7 @@ This is "Port Planner" — a metabolic simulation game teaching blood glucose ma
 
 ### Disabled Features (v0.19.6+)
 Features preserved in code but hidden from UI:
+- **Kidneys**: Disabled in v0.23.1 — kidneyRate=0, all visuals preserved but always inactive
 - **Liver Boost**: Button hidden in SimulationPhase.tsx (functionality preserved)
 - **Metformin**: Not implemented
 - **Fiber System**: Disabled in v0.19.6 (backlog for future)
@@ -314,7 +326,6 @@ Features preserved in code but hidden from UI:
 
 ### Known Issues
 - Effect Containers: No threshold-based activation (planned for future)
-- Kidneys: Not fully implemented (basic excretion only)
+- Kidneys: Disabled (v0.23.1) — visuals present but all rates zeroed out
 - Metformin: Card exists but full effect system not implemented
-- interventionCharges from level config not connected to SimulationEngine (hardcoded to 2)
 - GlucoseParticleSystem files still in codebase (unused since v0.21.0, can be cleaned up)
