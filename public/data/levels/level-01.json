@@ -1,19 +1,19 @@
 {
   "id": "level-01",
   "name": "First Steps",
-  "description": "Learn to balance mood and blood sugar across three days.",
-  "days": 3,
+  "description": "Survive 5 days balancing mood and blood sugar.",
+  "days": 5,
   "initialBG": 100,
   "dayConfigs": [
     {
       "day": 1,
       "availableInterventions": [],
       "preOccupiedSlots": [
-        { "slot": 13, "shipId": "oatmeal", "narrative": "Привычный завтрак" }
+        { "slot": 13, "shipId": "oatmeal", "narrative": "Usual breakfast" }
       ],
       "blockedSlots": [
-        { "slot": 5, "narrative": "Дорога на работу" },
-        { "slot": 11, "narrative": "Совещание" }
+        { "slot": 5, "narrative": "Commute to work" },
+        { "slot": 11, "narrative": "Meeting" }
       ],
       "pancreasBoostCharges": 1
     },
@@ -23,12 +23,12 @@
         { "id": "light_exercise", "count": 2 }
       ],
       "preOccupiedSlots": [
-        { "slot": 1, "shipId": "chocolatemuffin", "narrative": "Угощение от коллеги" },
-        { "slot": 7, "shipId": "chicken", "narrative": "Обед с семьёй" }
+        { "slot": 1, "shipId": "chocolatemuffin", "narrative": "Treat from a colleague" },
+        { "slot": 7, "shipId": "chicken", "narrative": "Family lunch" }
       ],
       "blockedSlots": [
-        { "slot": 6, "narrative": "Планёрка" },
-        { "slot": 14, "narrative": "Поездка в магазин" }
+        { "slot": 6, "narrative": "Planning meeting" },
+        { "slot": 14, "narrative": "Grocery run" }
       ],
       "pancreasBoostCharges": 1
     },
@@ -39,14 +39,53 @@
         { "id": "intense_exercise", "count": 1 }
       ],
       "preOccupiedSlots": [
-        { "slot": 4, "shipId": "cookie", "narrative": "Перекус на ходу" },
-        { "slot": 13, "shipId": "icecream", "narrative": "Десерт после ужина" }
+        { "slot": 4, "shipId": "cookie", "narrative": "Snack on the go" },
+        { "slot": 13, "shipId": "icecream", "narrative": "After-dinner dessert" }
       ],
       "blockedSlots": [
-        { "slot": 3, "narrative": "Утренние сборы" },
-        { "slot": 9, "narrative": "Визит к врачу" },
-        { "slot": 11, "narrative": "Дорога домой" },
-        { "slot": 17, "narrative": "Душ и отдых" }
+        { "slot": 3, "narrative": "Morning routine" },
+        { "slot": 9, "narrative": "Doctor visit" },
+        { "slot": 11, "narrative": "Commute home" },
+        { "slot": 17, "narrative": "Shower and rest" }
+      ],
+      "pancreasBoostCharges": 2
+    },
+    {
+      "day": 4,
+      "availableInterventions": [
+        { "id": "light_exercise", "count": 1 },
+        { "id": "intense_exercise", "count": 1 }
+      ],
+      "preOccupiedSlots": [
+        { "slot": 1, "shipId": "pizza", "narrative": "Birthday party leftovers" },
+        { "slot": 10, "shipId": "broccoli", "narrative": "Packed lunch from partner" }
+      ],
+      "blockedSlots": [
+        { "slot": 4, "narrative": "Doctor appointment" },
+        { "slot": 8, "narrative": "Conference call" },
+        { "slot": 12, "narrative": "Commute" },
+        { "slot": 16, "narrative": "Evening class" }
+      ],
+      "pancreasBoostCharges": 2
+    },
+    {
+      "day": 5,
+      "availableInterventions": [
+        { "id": "light_exercise", "count": 2 },
+        { "id": "intense_exercise", "count": 1 }
+      ],
+      "preOccupiedSlots": [
+        { "slot": 3, "shipId": "icecream", "narrative": "Stress eating" },
+        { "slot": 7, "shipId": "chicken", "narrative": "Meal prep from Sunday" },
+        { "slot": 15, "shipId": "cookie", "narrative": "Office snack" }
+      ],
+      "blockedSlots": [
+        { "slot": 2, "narrative": "Morning jog" },
+        { "slot": 5, "narrative": "Deadline crunch" },
+        { "slot": 9, "narrative": "Team meeting" },
+        { "slot": 11, "narrative": "Grocery shopping" },
+        { "slot": 14, "narrative": "Nap" },
+        { "slot": 17, "narrative": "Gym" }
       ],
       "pancreasBoostCharges": 2
     }
@@ -56,6 +95,6 @@
     "pancreasBoost": 2
   },
   "winCondition": {
-    "maxDegradationCircles": 5
+    "maxDegradationCircles": 8
   }
 }

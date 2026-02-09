@@ -118,10 +118,10 @@ export function PlanningPhase() {
 
   // Calculate blockedMoodThreshold based on current mood
   const blockedMoodThreshold = useMemo(() => {
-    if (mood >= 10) return -Infinity; // All food available
-    if (mood >= 0) return -4; // Block food with mood <= -4
-    if (mood >= -20) return -2; // Block food with mood <= -2
-    return 0; // Only positive/neutral mood food available (block mood < 0)
+    if (mood > -2) return -Infinity;  // mood >= -1: all food available
+    if (mood > -5) return -4;         // mood -2..-4: block super-healthy (mood <= -4)
+    if (mood > -8) return -2;         // mood -5..-7: block medium-healthy (mood <= -2)
+    return 0;                          // mood <= -8: only junk food (mood > 0)
   }, [mood]);
 
   // Extract slot numbers from BlockedSlotConfig[] for calculateValidDropSlots

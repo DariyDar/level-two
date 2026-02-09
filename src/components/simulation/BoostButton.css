@@ -147,3 +147,14 @@
     transform: translateX(-50%) translateY(-30px);
   }
 }
+
+/* Continuous blue glow while Fast Insulin is active */
+.boost-button--insulin-active {
+  box-shadow: 0 0 12px 4px rgba(0, 191, 255, 0.5);
+  animation: insulinGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes insulinGlow {
+  0%, 100% { box-shadow: 0 0 12px 4px rgba(0, 191, 255, 0.5); }
+  50% { box-shadow: 0 0 20px 8px rgba(0, 191, 255, 0.3); }
+}

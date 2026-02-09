@@ -46,6 +46,7 @@ export function BoostButton({
         isActive && 'boost-button--active',
         !canActivate && 'boost-button--disabled',
         isFastInsulin && 'boost-button--fast-insulin',
+        isActive && isFastInsulin && 'boost-button--insulin-active',
         justActivated && 'boost-button--injecting',
       ]
         .filter(Boolean)
@@ -72,7 +73,7 @@ export function BoostButton({
 
       {/* Floating injection confirmation text */}
       {justActivated && (
-        <span className="boost-button__inject-text">Инсулин введён!</span>
+        <span className="boost-button__inject-text">Insulin injected!</span>
       )}
     </button>
   );

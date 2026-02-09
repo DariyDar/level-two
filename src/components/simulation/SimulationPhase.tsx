@@ -84,6 +84,9 @@ export function SimulationPhase() {
       pancreasBoost: { ...state.pancreasBoost },
       currentMood: state.currentMood,
       moodHistory: [...state.moodHistory],
+      isStarving: state.isStarving,
+      lastMoodDelta: state.lastMoodDelta,
+      lastMoodDeltaTick: state.lastMoodDeltaTick,
     });
   }, []);
 
@@ -206,7 +209,14 @@ export function SimulationPhase() {
         />
 
         {/* Mood indicator */}
-        <MoodScale mood={simState?.currentMood ?? mood} />
+        {simState?.isStarving && (
+          <span className="simulation-phase__starving">Starving!</span>
+        )}
+        <MoodScale
+          mood={simState?.currentMood ?? mood}
+          moodDelta={simState?.lastMoodDelta ?? null}
+          moodDeltaKey={simState?.lastMoodDeltaTick ?? null}
+        />
       </div>
 
       {/* Main simulation area with pipe system */}

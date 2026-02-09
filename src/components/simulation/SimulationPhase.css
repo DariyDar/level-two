@@ -62,7 +62,7 @@
 
 .simulation-phase__progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #4299e1 0%, #48bb78 100%);
+  background: linear-gradient(90deg, #E85D4A 0%, #48bb78 100%);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -98,7 +98,7 @@
 }
 
 .simulation-phase__control--active {
-  background: #4299e1;
+  background: #E85D4A;
   color: white;
 }
 
@@ -134,6 +134,19 @@
 
 .simulation-phase__header .boost-button__cooldown-bar {
   height: 3px;
+}
+
+/* Starving indicator */
+.simulation-phase__starving {
+  color: #fc8181;
+  font-size: 14px;
+  font-weight: 700;
+  animation: starvingBlink 0.6s ease-in-out infinite;
+}
+
+@keyframes starvingBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
 /* Responsive */

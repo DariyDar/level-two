@@ -14,8 +14,8 @@ export type GamePhase = 'PreGame' | 'Planning' | 'Simulation' | 'Results';
 
 // === Mood System ===
 
-export const MOOD_MIN = -50;
-export const MOOD_MAX = 50;
+export const MOOD_MIN = -10;
+export const MOOD_MAX = 10;
 export const MOOD_INITIAL = 0;
 
 // Naming Convention Mapping (Excel v0.6 ↔ Code):

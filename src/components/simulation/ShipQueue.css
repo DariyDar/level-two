@@ -61,7 +61,7 @@
 /* Ship in queue */
 .ship-queue__ship {
   height: 36px;
-  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  background: linear-gradient(135deg, #E85D4A 0%, #D94F3D 100%);
   border-radius: 4px;
   display: flex;
   align-items: center;

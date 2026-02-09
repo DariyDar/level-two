@@ -108,20 +108,36 @@ This is "Port Planner" — a metabolic simulation game teaching blood glucose ma
 - `src/hooks/` — custom React hooks
 - `src/components/ui/` — shared UI components
   - `EyeToggle.tsx` — toggle for detailed indicators visibility
-  - `MoodScale.tsx` — horizontal mood scale (-50..+50) with color zones and marker
+  - `MoodScale.tsx` — horizontal mood scale (-10..+10) with color zones, marker, floating delta VFX
   - `PreGameModal.tsx` — pre-game modal (Day 1 intro, Day 2+ shows remaining days + mood)
   - `PhaseBanner.tsx` — contextual phase banner with hints
   - `Tooltip.tsx` — universal tooltip component (hover, position, delay)
 - `public/data/` — JSON configs for ships and levels
-  - `foods.json` — 22 food items with glucose, carbs, mood (-5..+5)
+  - `foods.json` — 30 food items with glucose, carbs, mood (-5..+5)
   - `interventions.json` — intervention cards with mood, group, requiresEmptySlotBefore
   - `levels/*.json` — level configurations (per-day blockedSlots with narratives, preOccupiedSlots with narratives)
 - `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.25.0) — Mood System Overhaul
+### Current State (v0.25.1) — Balance, Hunger, VFX, Content
+- **Balance: Mood scale narrowed (v0.25.1)** ✅
+  - Mood range: -10..+10 (was -50..+50), food mood applied 1:1 (removed ×2 multiplier)
+  - Fast Insulin penalty: -2 (was -5)
+  - Food blocking thresholds: mood > -2 → all food; -2..-4 → block super-healthy; -5..-7 → block medium-healthy; ≤ -8 → only junk
+- **Per-hour hunger (v0.25.1)** ✅ — replaces end-of-day penalty
+  - -1 mood per hour without food unloading
+  - "Starving!" red blink indicator during simulation
+- **Mood VFX (v0.25.1)** ✅
+  - Floating +N/-N delta on MoodScale when mood changes
+  - MoodScale green/red flash on change
+  - Fast Insulin cyan glow (#00BFFF) while active
+- **All text in English (v0.25.1)** ✅
+  - PhaseBanner, PreGameModal, ResultsPhase, BoostButton, level narratives
+- **30 foods (v0.25.1)** ✅ — 10 junk / 10 neutral / 10 healthy
+- **5-day level (v0.25.1)** ✅ — Days 4-5 added with narratives, maxDegradationCircles=8
+- **Restart Level button (v0.25.1)** ✅ — on defeat, resets mood + degradation to 0
+- **Glucose color: red everywhere (v0.25.1)** ✅ — #E85D4A in pipes, containers, progress bars
 - **Mood System (v0.25.0)** ✅ — Replaces WP system
-  - Mood scale: -50..+50, carries between days, resets to day start on retry
-  - Food blocking by mood threshold: mood >= 10 → all food; mood < -20 → only junk food
+  - Mood scale: -10..+10, carries between days, resets to day start on retry
   - SimulationEngine tracks mood: ship.mood × 2 multiplier, Fast Insulin -5 per use, hunger penalty (<3 foods)
   - MoodScale component: horizontal bar with colored zones (red/orange/yellow/green)
   - Cross-day strategy: healthy food lowers mood → next day healthy food blocked → forced variety

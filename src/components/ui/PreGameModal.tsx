@@ -16,18 +16,17 @@ export function PreGameModal({ currentDay, totalDays, mood, onStart }: PreGameMo
     <div className="pregame-overlay">
       <div className="pregame-card">
         <h2 className="pregame-card__title">
-          {isFirstDay ? 'День 1' : `День ${currentDay}`}
+          {isFirstDay ? 'Day 1' : `Day ${currentDay}`}
         </h2>
 
         {isFirstDay ? (
           <p className="pregame-card__body">
-            Постарайтесь за {totalDays} дн. не навредить здоровью персонажа.
-            Следите за уровнем сахара в крови и настроением —
-            нельзя всё время есть только полезное!
+            Try to keep your character healthy over {totalDays} days.
+            Watch blood sugar and mood — you can't eat healthy all the time!
           </p>
         ) : (
           <div className="pregame-card__body">
-            <p>Осталось {remaining} дн. Текущее настроение:</p>
+            <p>{remaining > 0 ? `${remaining} day${remaining > 1 ? 's' : ''} remaining.` : 'Last day!'} Current mood:</p>
             <div className="pregame-card__mood">
               <MoodScale mood={mood} />
             </div>
@@ -35,7 +34,7 @@ export function PreGameModal({ currentDay, totalDays, mood, onStart }: PreGameMo
         )}
 
         <button className="pregame-card__button" onClick={onStart}>
-          {isFirstDay ? 'Начать' : 'Продолжить'}
+          {isFirstDay ? 'Start' : 'Continue'}
         </button>
       </div>
     </div>

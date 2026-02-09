@@ -79,6 +79,11 @@ export interface SimulationState {
   // Mood tracking
   currentMood: number; // Current mood value, clamped to [MOOD_MIN, MOOD_MAX]
   moodHistory: number[]; // Mood recorded at each hour boundary (parallel to bgHistory)
+
+  // Hunger tracking
+  isStarving: boolean;
+  lastMoodDelta: number | null;
+  lastMoodDeltaTick: number | null;
 }
 
 interface QueuedShip {
@@ -209,7 +214,7 @@ export class SimulationEngine {
   private config: SimulationConfig;
   private ships: Map<string, Ship>;
   private rulesConfig: RulesConfig;
-  private originalFoodShipCount: number;
+  private wasFeedingLastHour: boolean = false;
 
   constructor(
     placedShips: PlacedShip[],
@@ -233,12 +238,6 @@ export class SimulationEngine {
         }),
       }))
       .sort((a, b) => a.slotNumber - b.slotNumber);
-
-    // Count food ships (Glucose loadType) for hunger penalty calculation
-    this.originalFoodShipCount = queue.filter((q) => {
-      const ship = this.ships.get(q.shipId);
-      return ship?.loadType === 'Glucose';
-    }).length;
 
     this.state = {
       currentTick: 0,
@@ -282,6 +281,9 @@ export class SimulationEngine {
       isLiverPassthrough: false,
       currentMood: this.config.initialMood,
       moodHistory: [this.config.initialMood],
+      isStarving: false,
+      lastMoodDelta: null,
+      lastMoodDeltaTick: null,
     };
   }
 
@@ -309,6 +311,18 @@ export class SimulationEngine {
     if (isHourBoundary) {
       // 1. Check if we need to start unloading a new ship
       this.checkShipQueue();
+
+      // 1.5. Hunger check: if no food ship is currently unloading and none was unloading last hour
+      if (this.state.currentTick > 0) {
+        const isCurrentlyFeeding = this.state.unloadingShip !== null &&
+          this.ships.get(this.state.unloadingShip.shipId)?.loadType === 'Glucose';
+        if (!isCurrentlyFeeding && !this.wasFeedingLastHour) {
+          this.state.isStarving = true;
+          this.applyMoodChange(-1, 'hunger');
+        } else {
+          this.state.isStarving = false;
+        }
+      }
     }
 
     // === CONTINUOUS PROCESSES (every substep) ===
@@ -333,6 +347,12 @@ export class SimulationEngine {
 
     // === SUBSTEP ADVANCEMENT ===
     this.state.currentSubstep++;
+
+    // === END OF HOUR: track feeding state for hunger check ===
+    if (this.state.currentSubstep >= this.config.substepsPerHour) {
+      this.wasFeedingLastHour = this.state.unloadingShip !== null &&
+        this.ships.get(this.state.unloadingShip.shipId)?.loadType === 'Glucose';
+    }
 
     // === HOUR BOUNDARY EVENTS ===
     if (this.state.currentSubstep >= this.config.substepsPerHour) {
@@ -388,8 +408,8 @@ export class SimulationEngine {
     boost.activeTicks = this.config.pancreasBoostDuration;
     boost.cooldownTicks = this.config.pancreasBoostCooldown;
 
-    // Fast Insulin mood penalty: -5 per injection
-    this.state.currentMood = Math.max(MOOD_MIN, this.state.currentMood - 5);
+    // Fast Insulin mood penalty: -2 per injection
+    this.applyMoodChange(-2, 'insulin');
 
     return true;
   }
@@ -441,6 +461,14 @@ export class SimulationEngine {
         bgCritical: this.config.bgCritical,
       },
     };
+  }
+
+  private applyMoodChange(delta: number, _source: string): void {
+    if (delta === 0) return;
+    this.state.currentMood += delta;
+    this.state.currentMood = Math.max(MOOD_MIN, Math.min(MOOD_MAX, this.state.currentMood));
+    this.state.lastMoodDelta = delta;
+    this.state.lastMoodDeltaTick = this.state.currentTick * this.config.substepsPerHour + this.state.currentSubstep;
   }
 
   private checkShipQueue(): void {
@@ -501,11 +529,10 @@ export class SimulationEngine {
 
     // Check if done
     if (unloading.remainingTicks <= 0) {
-      // Apply mood from consumed ship (×2 multiplier for gameplay balance)
+      // Apply mood from consumed ship
       const shipDef = this.ships.get(unloading.shipId);
       if (shipDef) {
-        this.state.currentMood += (shipDef.mood ?? 0) * 2;
-        this.state.currentMood = Math.max(MOOD_MIN, Math.min(MOOD_MAX, this.state.currentMood));
+        this.applyMoodChange(shipDef.mood ?? 0, 'food');
       }
       this.state.unloadingShip = null;
     }
@@ -692,17 +719,10 @@ export class SimulationEngine {
   }
 
   /**
-   * Apply hunger penalty at end of day if too few food ships were consumed.
-   * Uses originalFoodShipCount (Glucose loadType ships) set during construction.
+   * End-of-day hunger penalty — replaced by per-hour hunger in tick().
+   * Kept as empty shell since it's called from tick completion.
    */
   private applyHungerPenalty(): void {
-    const foodCount = this.originalFoodShipCount;
-    if (foodCount < 3) {
-      let penalty = 0;
-      if (foodCount === 0) penalty = -15;
-      else if (foodCount === 1) penalty = -12;
-      else if (foodCount === 2) penalty = -10;
-      this.state.currentMood = Math.max(MOOD_MIN, Math.min(MOOD_MAX, this.state.currentMood + penalty));
-    }
+    // Per-hour hunger now handles mood penalties during simulation
   }
 }

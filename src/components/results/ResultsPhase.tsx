@@ -19,14 +19,14 @@ interface ResultsPhaseProps {
 function getMoodExplanation(mood: number, isLastDay: boolean): string | null {
   if (isLastDay) return null;
 
-  if (mood >= 10) {
-    return 'Хорошее настроение! Завтра будет доступна вся еда.';
-  } else if (mood >= 0) {
-    return 'Нормальное настроение. Некоторая полезная еда потребует усилий.';
-  } else if (mood >= -20) {
-    return 'Плохое настроение. Выбор полезной еды будет ограничен.';
+  if (mood >= 0) {
+    return 'Good mood! All food will be available tomorrow.';
+  } else if (mood >= -2) {
+    return 'Decent mood. Some healthy food may require effort.';
+  } else if (mood >= -5) {
+    return 'Low mood. Healthy food choices will be limited.';
   } else {
-    return 'Очень плохое настроение. Завтра доступна только вкусная еда.';
+    return 'Very low mood. Only comfort food available tomorrow.';
   }
 }
 
@@ -39,6 +39,7 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
     setResults,
     startNextDay,
     retryDay,
+    setLevel,
   } = useGameStore();
 
   // Calculate results
@@ -61,6 +62,10 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
     retryDay();
   };
 
+  const handleRestartLevel = () => {
+    if (currentLevel) setLevel(currentLevel);
+  };
+
   const moodExplanation = getMoodExplanation(mood, isLastDay);
 
   return (
@@ -78,7 +83,7 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
 
       <ExcessBGIndicator
         totalCircles={results.degradationBuffer.totalCircles}
-        defeatThreshold={5}
+        defeatThreshold={currentLevel?.winCondition?.maxDegradationCircles ?? 5}
       />
 
       <OrganDegradationDisplay
@@ -89,7 +94,7 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
 
       {!defeated && (
         <p className="results-phase__perfect-hint">
-          Идеальная победа возможна!
+          A perfect victory is possible!
         </p>
       )}
 
@@ -97,7 +102,7 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
       <div className="results-phase__mood-summary">
         <div className="results-phase__mood-row">
           <span className="results-phase__mood-label">
-            {isLastDay ? 'Итоговое настроение:' : 'Настроение к концу дня:'}
+            {isLastDay ? 'Final mood:' : 'End-of-day mood:'}
           </span>
           <MoodScale mood={mood} />
         </div>
@@ -108,9 +113,17 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
 
       <div className="results-phase__actions">
         {defeated ? (
-          <p className="results-phase__fail-message">
-            Too much damage! Try a different approach.
-          </p>
+          <>
+            <p className="results-phase__fail-message">
+              Too much damage! Try a different approach.
+            </p>
+            <button className="results-phase__button results-phase__button--secondary" onClick={handleRetry}>
+              Retry Day
+            </button>
+            <button className="results-phase__button results-phase__button--secondary" onClick={handleRestartLevel}>
+              Restart Level
+            </button>
+          </>
         ) : (
           !isLastDay && (
             <button className="results-phase__button results-phase__button--primary" onClick={handleContinue}>
@@ -118,7 +131,7 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
             </button>
           )
         )}
-        {!excellent && (
+        {!defeated && !excellent && (
           <button className="results-phase__button results-phase__button--secondary" onClick={handleRetry}>
             Retry Day
           </button>

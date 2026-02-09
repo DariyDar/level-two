@@ -45,8 +45,8 @@ export function ContainerView({
   const fillPercent = Math.min(100, (value / capacity) * 100);
 
   // Determine fill color based on thresholds
-  // For BG (floatingValue mode): fill stays static blue, color goes to floating badge
-  let fillColor = '#4299e1'; // Default blue
+  // For BG (floatingValue mode): fill stays static red, color goes to floating badge
+  let fillColor = '#E85D4A'; // Default red (glucose)
 
   if (thresholds && !floatingValue) {
     if (thresholds.critical && value >= thresholds.critical) {

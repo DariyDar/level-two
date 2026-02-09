@@ -1,4 +1,5 @@
 .mood-scale {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -67,4 +68,39 @@
 
 .mood-scale__value--neutral {
   color: #ecc94b;
+}
+
+/* Floating mood delta */
+.mood-scale__delta {
+  position: absolute;
+  top: -20px;
+  right: 0;
+  font-size: 14px;
+  font-weight: 700;
+  animation: floatUpFade 1.5s ease-out forwards;
+  pointer-events: none;
+}
+
+.mood-scale__delta--positive {
+  color: #48bb78;
+}
+
+.mood-scale__delta--negative {
+  color: #fc8181;
+}
+
+@keyframes floatUpFade {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
+
+/* Flash on mood change */
+.mood-scale--flash-positive .mood-scale__bar {
+  box-shadow: 0 0 8px 2px rgba(72, 187, 120, 0.6);
+  transition: box-shadow 0.2s ease;
+}
+
+.mood-scale--flash-negative .mood-scale__bar {
+  box-shadow: 0 0 8px 2px rgba(252, 129, 129, 0.6);
+  transition: box-shadow 0.2s ease;
 }
