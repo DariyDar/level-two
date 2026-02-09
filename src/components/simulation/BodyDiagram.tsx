@@ -35,8 +35,8 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
   const displayLiverRate = interpolated?.liverRate ?? currentLiverRate;
   const displayMuscleRate = interpolated?.muscleRate ?? currentMuscleRate;
 
-  // Kidney excretion rate (when BG > 180, kidneys start working)
-  const kidneyRate = bgValue > 180 ? Math.min((bgValue - 180) * 0.1, 20) : 0;
+  // Kidneys disabled — no simulation logic yet
+  const kidneyRate = 0;
 
   // Calculate degraded tiers for pancreas (tier 1 = 0 degraded, tier 5 = 4 degraded)
   const pancreasDegradedTiers = degradation.pancreas.tier - 1;
@@ -51,11 +51,10 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
   const kidneyTier = kidneyRate > 15 ? 4 : kidneyRate > 10 ? 3 : kidneyRate > 5 ? 2 : kidneyRate > 0 ? 1 : 0;
 
   // Flow directions use raw engine rates (no interpolation lag)
-  const rawKidneyRate = containers.bg > 180 ? Math.min((containers.bg - 180) * 0.1, 20) : 0;
-  const bgNetRate = currentLiverRate - currentMuscleRate - rawKidneyRate;
+  const bgNetRate = currentLiverRate - currentMuscleRate;
   const bgFlowDir: 'up' | 'down' | undefined = bgNetRate > 1 ? 'up' : bgNetRate < -1 ? 'down' : undefined;
   const liverFlowDir: 'up' | 'down' | undefined = currentLiverRate > 0 ? 'down' : undefined;
-  const kidneyFlowDir: 'up' | 'down' | undefined = rawKidneyRate > 0 ? 'up' : undefined;
+  const kidneyFlowDir: 'up' | 'down' | undefined = undefined;
 
   return (
     <div className="body-diagram">

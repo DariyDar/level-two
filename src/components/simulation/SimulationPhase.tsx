@@ -197,7 +197,7 @@ export function SimulationPhase() {
           liverToBgRate={interpolated.liverRate}
           isLiverPassthrough={simState.isLiverPassthrough}
           bgToMusclesRate={interpolated.muscleRate}
-          bgToKidneysRate={interpolated.bg > 180 ? Math.min((interpolated.bg - 180) * 0.1, 20) : 0}
+          bgToKidneysRate={0}
           pancreasTier={simState.currentPancreasTier}
           speed={speed}
           isPaused={isPaused}
