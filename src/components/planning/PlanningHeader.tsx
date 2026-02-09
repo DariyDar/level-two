@@ -8,6 +8,7 @@ interface PlanningHeaderProps {
   isValid: boolean;
   onSimulate: () => void;
   bgPrediction: number[];
+  fastInsulinCharges: number;
 }
 
 export function PlanningHeader({
@@ -17,6 +18,7 @@ export function PlanningHeader({
   isValid,
   onSimulate,
   bgPrediction,
+  fastInsulinCharges,
 }: PlanningHeaderProps) {
   return (
     <div className="planning-header">
@@ -33,6 +35,11 @@ export function PlanningHeader({
       </div>
 
       <BgSparkline bgHistory={bgPrediction} />
+
+      <div className="planning-header__fast-insulin">
+        <span className="planning-header__label">Insulin</span>
+        <span className="planning-header__fi-value">{fastInsulinCharges}</span>
+      </div>
 
       <button
         className="planning-header__simulate"

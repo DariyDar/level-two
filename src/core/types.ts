@@ -166,6 +166,7 @@ export interface DayConfig {
     Day?: SegmentCarbLimits;
     Evening?: SegmentCarbLimits;
   };
+  pancreasBoostCharges?: number; // Fast Insulin charges for this day
 }
 
 export interface LevelConfig {

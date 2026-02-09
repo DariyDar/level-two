@@ -116,6 +116,9 @@ export interface SimulationConfig {
   // Timing (Substep Simulation)
   substepsPerHour: number; // Number of substeps per interpreted hour
 
+  // Charges
+  pancreasBoostCharges: number;
+
   // Initial
   initialBG: number;
   initialLiver: number;
@@ -142,6 +145,7 @@ const DEFAULT_CONFIG: SimulationConfig = {
   pancreasBoostDuration: 1,
   pancreasBoostTierBonus: 1,
   substepsPerHour: 10, // Substep simulation: 10 substeps per interpreted hour for smooth animation
+  pancreasBoostCharges: 2,
   initialBG: 100,
   initialLiver: 0,
 };
@@ -246,8 +250,8 @@ export class SimulationEngine {
         activeTicks: 0,
       },
       pancreasBoost: {
-        charges: 2,
-        maxCharges: 2,
+        charges: this.config.pancreasBoostCharges,
+        maxCharges: this.config.pancreasBoostCharges,
         cooldownTicks: 0,
         isActive: false,
         activeTicks: 0,

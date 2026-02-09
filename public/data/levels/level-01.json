@@ -23,6 +23,7 @@
         { "slot": 13, "shipId": "oatmeal" }
       ],
       "blockedSlots": [5, 11],
+      "pancreasBoostCharges": 1,
       "segmentCarbs": {
         "Morning": { "min": 25, "optimal": 30, "max": 35 },
         "Day": { "min": 30, "optimal": 35, "max": 40 },
@@ -50,6 +51,7 @@
         { "slot": 7, "shipId": "chicken" }
       ],
       "blockedSlots": [6, 14],
+      "pancreasBoostCharges": 1,
       "segmentCarbs": {
         "Morning": { "min": 25, "optimal": 30, "max": 35 },
         "Day": { "min": 30, "optimal": 35, "max": 40 },
@@ -77,6 +79,7 @@
         { "slot": 13, "shipId": "icecream" }
       ],
       "blockedSlots": [3, 9, 11, 17],
+      "pancreasBoostCharges": 2,
       "segmentCarbs": {
         "Morning": { "min": 25, "optimal": 30, "max": 35 },
         "Day": { "min": 30, "optimal": 35, "max": 40 },

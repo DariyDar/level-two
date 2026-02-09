@@ -349,6 +349,7 @@ export function PlanningPhase() {
           isValid={planValidation.isValid}
           onSimulate={handleSimulate}
           bgPrediction={bgPrediction.bgHistory}
+          fastInsulinCharges={dayConfig?.pancreasBoostCharges ?? 0}
         />
 
         <div className="planning-phase__content">

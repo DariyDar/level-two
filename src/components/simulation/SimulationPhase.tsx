@@ -6,6 +6,7 @@ import { useGameStore } from '../../store/gameStore';
 import { useGameLoop } from '../../hooks/useGameLoop';
 import { useInterpolatedValues } from '../../hooks/useInterpolatedValue';
 import { loadAllShips } from '../../config/loader';
+import { getDayConfig } from '../../core/utils/levelUtils';
 import { BodyDiagram } from './BodyDiagram';
 import { BoostButton } from './BoostButton';
 import { ShipQueue } from './ShipQueue';
@@ -20,6 +21,7 @@ export function SimulationPhase() {
   const {
     placedShips,
     currentLevel,
+    currentDay,
     degradation,
     setPhase,
     setBgHistory,
@@ -39,12 +41,14 @@ export function SimulationPhase() {
       setAllShips(ships);
 
       if (currentLevel) {
+        const dayConfig = getDayConfig(currentLevel, currentDay);
         const eng = new SimulationEngine(
           placedShips,
           ships,
           degradation,
           {
             initialBG: currentLevel.initialBG ?? 100,
+            pancreasBoostCharges: dayConfig.pancreasBoostCharges,
           }
         );
         setEngine(eng);

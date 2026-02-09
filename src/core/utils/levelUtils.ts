@@ -8,6 +8,7 @@ export interface DayConfigResult {
   preOccupiedSlots: PreOccupiedSlot[];
   blockedSlots: number[];
   wpBudget?: number;
+  pancreasBoostCharges: number;
 }
 
 /**
@@ -27,6 +28,7 @@ export function getDayConfig(level: LevelConfig, day: number): DayConfigResult {
         preOccupiedSlots: dayConfig.preOccupiedSlots || level.preOccupiedSlots || [],
         blockedSlots: dayConfig.blockedSlots || [],
         wpBudget: dayConfig.wpBudget,
+        pancreasBoostCharges: dayConfig.pancreasBoostCharges ?? level.interventionCharges.pancreasBoost,
       };
     }
   }
@@ -38,5 +40,6 @@ export function getDayConfig(level: LevelConfig, day: number): DayConfigResult {
     carbRequirements: level.carbRequirements || { min: 0, max: 999 },
     preOccupiedSlots: level.preOccupiedSlots || [],
     blockedSlots: [],
+    pancreasBoostCharges: level.interventionCharges.pancreasBoost,
   };
 }
