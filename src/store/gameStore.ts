@@ -21,12 +21,14 @@ interface OfferFlowState {
   offeredCardIds: string[]       // all card IDs offered this segment (for no-repeat)
 }
 
+// Max total degradation circles before defeat
+const MAX_DEGRADATION_CIRCLES = 12
+
 interface GameState {
   // Navigation
   phase: GamePhase
   currentLevel: LevelConfig | null
-  currentDay: number       // 0-indexed
-  currentSegment: number   // 0, 1, 2
+  segmentCount: number   // running segment counter (1-based)
 
   // Planning
   mealSlots: (FoodCard | null)[]  // [slot0, slot1, slot2]
@@ -37,7 +39,7 @@ interface GameState {
   // Results
   lastSegmentResult: SegmentResult | null
 
-  // Persistent across segments/days
+  // Persistent across segments
   degradation: DegradationState
 
   // Actions
@@ -48,8 +50,7 @@ interface GameState {
   useCardFromInventory: (cardId: string, slotIndex: number) => void
   startSimulation: () => void
   completeSimulation: (excessGlucose: number) => void
-  nextSegment: () => void
-  retrySegment: () => void
+  continueGame: () => void
   resetLevel: () => void
 }
 
@@ -106,6 +107,18 @@ function advanceOffer(offerFlow: OfferFlowState): OfferFlowState {
   }
 }
 
+// Generate offer templates based on segment number (progressive difficulty)
+function getOfferTemplates(segmentCount: number): OfferTemplate[] {
+  if (segmentCount <= 3) {
+    return [[1, 1, 2], [1, 2, 2], [1, 2, 3]]
+  }
+  if (segmentCount <= 6) {
+    return [[1, 2, 3], [1, 2, 3], [2, 2, 3]]
+  }
+  // 7+: harder
+  return [[1, 2, 3], [2, 2, 3], [2, 3, 3]]
+}
+
 const INITIAL_DEGRADATION: DegradationState = {
   totalCircles: 0,
   liverCircles: 0,
@@ -118,8 +131,7 @@ export const useGameStore = create<GameState>()(
     (set, get) => ({
       phase: 'Planning',
       currentLevel: null,
-      currentDay: 0,
-      currentSegment: 0,
+      segmentCount: 1,
       mealSlots: [null, null, null],
       inventory: [],
       offerFlow: null,
@@ -140,8 +152,7 @@ export const useGameStore = create<GameState>()(
 
         set({
           currentLevel: level,
-          currentDay: 0,
-          currentSegment: 0,
+          segmentCount: 1,
           allFoods: foods,
           inventory: initialInventory,
           degradation: { ...INITIAL_DEGRADATION },
@@ -153,15 +164,10 @@ export const useGameStore = create<GameState>()(
       },
 
       startSegmentPlanning: () => {
-        const { currentLevel, currentDay, currentSegment, allFoods } = get()
-        if (!currentLevel) return
+        const { allFoods, segmentCount } = get()
+        if (allFoods.length === 0) return
 
-        const dayConfig = currentLevel.days[currentDay]
-        if (!dayConfig) return
-        const segmentConfig = dayConfig.segments[currentSegment]
-        if (!segmentConfig) return
-
-        const templates: OfferTemplate[] = segmentConfig.offerTemplates
+        const templates: OfferTemplate[] = getOfferTemplates(segmentCount)
         const constraints: OfferConstraints = {
           noRepeatCardIds: [],
           maxSameTag: 3,
@@ -242,7 +248,9 @@ export const useGameStore = create<GameState>()(
           currentLevel.degradationThresholds,
         )
         const newDegradation = applyDegradation(degradation, newCircles)
-        const isDefeat = excessGlucose >= currentLevel.defeatThreshold
+
+        // Defeat if total degradation reaches max
+        const isDefeat = newDegradation.totalCircles >= MAX_DEGRADATION_CIRCLES
 
         const assessment = isDefeat ? 'Defeat' as const : computeAssessment(newCircles)
 
@@ -257,26 +265,21 @@ export const useGameStore = create<GameState>()(
         })
       },
 
-      nextSegment: () => {
-        const { currentLevel, currentDay, currentSegment } = get()
-        if (!currentLevel) return
+      continueGame: () => {
+        const { segmentCount, allFoods, inventory } = get()
 
-        const dayConfig = currentLevel.days[currentDay]
-        if (!dayConfig) return
-
-        if (currentSegment + 1 < dayConfig.segments.length) {
-          // Next segment in same day
-          set({ currentSegment: currentSegment + 1, lastSegmentResult: null })
-          get().startSegmentPlanning()
-        } else if (currentDay + 1 < currentLevel.days.length) {
-          // Next day
-          set({ currentDay: currentDay + 1, currentSegment: 0, lastSegmentResult: null })
-          get().startSegmentPlanning()
+        // Reward: add a random food card to inventory
+        const newInventory = [...inventory]
+        if (allFoods.length > 0) {
+          const randomCard = allFoods[Math.floor(Math.random() * allFoods.length)]
+          newInventory.push(randomCard)
         }
-        // else: level complete (handled in UI)
-      },
 
-      retrySegment: () => {
+        set({
+          segmentCount: segmentCount + 1,
+          inventory: newInventory,
+          lastSegmentResult: null,
+        })
         get().startSegmentPlanning()
       },
 
@@ -288,10 +291,11 @@ export const useGameStore = create<GameState>()(
     }),
     {
       name: 'glucose-td-save',
-      version: 1,
+      version: 2,
       partialize: (state) => ({
         inventory: state.inventory,
         degradation: state.degradation,
+        segmentCount: state.segmentCount,
       }),
     },
   ),

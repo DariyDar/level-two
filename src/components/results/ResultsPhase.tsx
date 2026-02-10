@@ -1,34 +1,25 @@
 import { useGameStore } from '../../store/gameStore'
-import { MEAL_SEGMENTS } from '../../types'
 import './ResultsPhase.css'
 
 export function ResultsPhase() {
   const {
     lastSegmentResult,
-    currentLevel,
-    currentDay,
-    currentSegment,
+    segmentCount,
     degradation,
-    nextSegment,
-    retrySegment,
+    continueGame,
     resetLevel,
   } = useGameStore()
 
-  if (!lastSegmentResult || !currentLevel) return null
+  if (!lastSegmentResult) return null
 
   const { excessGlucose, newDegradationCircles, assessment } = lastSegmentResult
-  const segmentName = MEAL_SEGMENTS[currentSegment] ?? 'Meal'
-  const dayConfig = currentLevel.days[currentDay]
-  const isLastSegment = currentSegment + 1 >= (dayConfig?.segments.length ?? 3)
-  const isLastDay = currentDay + 1 >= currentLevel.days.length
-  const isLevelComplete = isLastSegment && isLastDay && assessment !== 'Defeat'
   const isDefeat = assessment === 'Defeat'
 
   return (
     <div className="results-phase">
       <div className="results-header">
         <span className="results-header__title">
-          {segmentName} — Day {currentDay + 1}/{currentLevel.days.length}
+          Meal {segmentCount} Results
         </span>
       </div>
 
@@ -57,24 +48,13 @@ export function ResultsPhase() {
       </div>
 
       <div className="results-actions">
-        {isDefeat && (
-          <>
-            <button className="results-btn results-btn--retry" onClick={retrySegment}>
-              Retry
-            </button>
-            <button className="results-btn results-btn--reset" onClick={resetLevel}>
-              Restart Level
-            </button>
-          </>
-        )}
-        {isLevelComplete && (
-          <div className="results-victory">
-            Level Complete!
-          </div>
-        )}
-        {!isDefeat && !isLevelComplete && (
-          <button className="results-btn results-btn--next" onClick={nextSegment}>
-            {isLastSegment ? 'Next Day' : 'Next Meal'}
+        {isDefeat ? (
+          <button className="results-btn results-btn--reset" onClick={resetLevel}>
+            Restart
+          </button>
+        ) : (
+          <button className="results-btn results-btn--next" onClick={continueGame}>
+            Continue
           </button>
         )}
       </div>

@@ -4,7 +4,7 @@ import { TDSimulation } from '../../core/simulation/TDSimulation'
 import { useSimulationLoop } from '../../hooks/useSimulationLoop'
 import { Battlefield } from './Battlefield'
 import { OrganStatus } from './OrganStatus'
-import { MEAL_SEGMENTS } from '../../types'
+import { SIM_CONSTANTS } from '../../types'
 import type { FoodCard, SimulationState } from '../../types'
 import './SimulationPhase.css'
 
@@ -13,9 +13,7 @@ const INITIAL_SPEED = 1
 export function SimulationPhase() {
   const {
     mealSlots,
-    currentDay,
-    currentSegment,
-    currentLevel,
+    segmentCount,
     degradation,
     completeSimulation,
   } = useGameStore()
@@ -25,7 +23,7 @@ export function SimulationPhase() {
   const [simState, setSimState] = useState<SimulationState | null>(null)
 
   const cards = mealSlots.filter((c): c is FoodCard => c !== null)
-  const segmentDelay = currentLevel?.days[currentDay]?.segments[currentSegment]?.segmentDelay ?? 3
+  const segmentDelay = SIM_CONSTANTS.SEGMENT_DELAY
 
   const engine = useMemo(() => {
     if (cards.length !== 3) return null
@@ -50,7 +48,7 @@ export function SimulationPhase() {
     onComplete: handleComplete,
   })
 
-  const segmentName = MEAL_SEGMENTS[currentSegment] ?? 'Meal'
+  const segmentName = `Meal ${segmentCount}`
 
   if (!simState) {
     return <div className="sim-phase">Initializing simulation...</div>

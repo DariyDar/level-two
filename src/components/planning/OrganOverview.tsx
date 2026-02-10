@@ -50,16 +50,16 @@ export function OrganOverview({ degradation, slots }: OrganOverviewProps) {
       <div className="organ-overview__title">Defense</div>
 
       <div className="organ-overview__grid">
-        <OrganRow icon="⚡" degraded={degradation.pancreasCircles} colorScheme="orange" />
-        <OrganRow icon="💪" degraded={0} colorScheme="orange" />
-        <OrganRow icon="🫘" degraded={degradation.liverCircles} colorScheme="green" />
-        <OrganRow icon="🫘" degraded={degradation.kidneysCircles} colorScheme="green" />
+        <OrganRow icon="⚡" degraded={degradation.pancreasCircles} />
+        <OrganRow icon="💪" degraded={0} />
+        <OrganRow icon="🫘" degraded={degradation.liverCircles} />
+        <OrganRow icon="🫘" degraded={degradation.kidneysCircles} />
       </div>
 
       {cards.length > 0 && (
         <div className="organ-overview__versus">
           <span className="organ-overview__vs-label organ-overview__vs-label--def">
-            {Math.round(defenseDps)} dps
+            Defense
           </span>
           <div className="organ-overview__vs-track">
             <div
@@ -72,7 +72,7 @@ export function OrganOverview({ degradation, slots }: OrganOverviewProps) {
             />
           </div>
           <span className="organ-overview__vs-label organ-overview__vs-label--atk">
-            {totalGlucose} mg
+            Attack
           </span>
         </div>
       )}
@@ -80,10 +80,9 @@ export function OrganOverview({ degradation, slots }: OrganOverviewProps) {
   )
 }
 
-function OrganRow({ icon, degraded, colorScheme }: {
+function OrganRow({ icon, degraded }: {
   icon: string
   degraded: number
-  colorScheme: 'orange' | 'green'
 }) {
   return (
     <div className="organ-overview__organ">
@@ -91,7 +90,7 @@ function OrganRow({ icon, degraded, colorScheme }: {
       <OrganTierCircles
         maxCircles={MAX_ORGAN_CIRCLES}
         degradedCircles={degraded}
-        colorScheme={colorScheme}
+        colorScheme="green"
       />
     </div>
   )

@@ -10,7 +10,6 @@ import {
   type DragEndEvent,
 } from '@dnd-kit/core'
 import { useGameStore } from '../../store/gameStore'
-import { MEAL_SEGMENTS } from '../../types'
 import type { FoodCard } from '../../types'
 import { MealSlots } from './MealSlots'
 import { OfferCards } from './OfferCards'
@@ -23,8 +22,7 @@ import './PlanningPhase.css'
 export function PlanningPhase() {
   const {
     currentLevel,
-    currentDay,
-    currentSegment,
+    segmentCount,
     mealSlots,
     inventory,
     offerFlow,
@@ -45,8 +43,6 @@ export function PlanningPhase() {
 
   if (!currentLevel || !offerFlow) return null
 
-  const segmentName = MEAL_SEGMENTS[currentSegment] ?? 'Meal'
-  const totalDays = currentLevel.days.length
   const allSlotsFilled = mealSlots.every(s => s !== null)
   const hasEmptySlot = mealSlots.some(s => s === null)
 
@@ -93,8 +89,7 @@ export function PlanningPhase() {
     >
       <div className="planning-phase">
         <div className="planning-header">
-          <span className="planning-header__segment">{segmentName}</span>
-          <span className="planning-header__day">Day {currentDay + 1}/{totalDays}</span>
+          <span className="planning-header__segment">Meal {segmentCount}</span>
         </div>
 
         <MealSlots slots={mealSlots} />
