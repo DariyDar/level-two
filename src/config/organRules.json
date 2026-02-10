@@ -208,11 +208,11 @@
           "type": "effect",
           "container": "exerciseEffect",
           "operator": ">",
-          "value": 50
+          "value": 0
         },
         "effect": {
           "type": "addTier",
-          "amount": 1
+          "amount": 2
         }
       },
       {

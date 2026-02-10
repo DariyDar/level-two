@@ -3,6 +3,7 @@ import {
   DAY_SEGMENTS,
   SLOTS_PER_ROW,
   ROWS_PER_SEGMENT,
+  SLOTS_PER_SEGMENT,
   SHIP_SIZE_TO_SLOTS,
   slotNumberToPosition,
   positionToSlotNumber,
@@ -85,7 +86,6 @@ export function SlotGrid({
       row: placed.row,
       index: placed.startSlot as 0 | 1 | 2,
     });
-    const shipSlots = SHIP_SIZE_TO_SLOTS[ship.size];
 
     if (isIntenseExercise) {
       // Permanent effect: from exercise slot to end of day
@@ -93,8 +93,9 @@ export function SlotGrid({
         exerciseEffectSlots.set(slot, 'intense');
       }
     } else {
-      // Temporary effect: ship's slots + 1 additional hour
-      const endSlot = Math.min(startSlot + shipSlots, 18);
+      // Temporary effect: 3 slots, but capped at segment boundary
+      const segmentEnd = Math.ceil(startSlot / SLOTS_PER_SEGMENT) * SLOTS_PER_SEGMENT;
+      const endSlot = Math.min(startSlot + 2, segmentEnd);
       for (let slot = startSlot; slot <= endSlot; slot++) {
         if (!exerciseEffectSlots.has(slot)) {
           exerciseEffectSlots.set(slot, 'light');

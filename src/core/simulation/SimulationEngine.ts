@@ -136,7 +136,7 @@ const DEFAULT_CONFIG: SimulationConfig = {
   liverTransferRates: [0, 50, 75], // Excel v0.6: Tier 0=0, Tier 1=50, Tier 2=75 mg/dL/hour
   muscleDrainRates: [0, 30, 35, 40, 45, 50], // Excel v0.6: Linear 30→50 progression
   metforminDecayRate: 7, // TODO: Excel v0.6 specifies 10/hour (to be updated in v0.4.0)
-  exerciseDecayRate: 100, // Excel v0.6: 100/hour (1 hour to full decay)
+  exerciseDecayRate: 20, // 20/hour (load 60 decays over 3 hours)
   intenseExerciseDecayRate: 0, // Intense exercise never decays (persists all day)
   liverBoostCooldown: 3, // Excel v0.6: 3 hours
   liverBoostDuration: 1,
