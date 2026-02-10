@@ -13,7 +13,7 @@ export function ExcessBGIndicator({
   defeatThreshold = 5,
   onAnimationComplete,
 }: ExcessBGIndicatorProps) {
-  const maxCircles = 5;
+  const maxCircles = defeatThreshold;
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export function ExcessBGIndicator({
 
   return (
     <div className="excess-bg-indicator">
-      <Tooltip text="Circles track excess glucose damage. Filled circles = organ degradation. 5 = defeat." position="bottom">
+      <Tooltip text={`Circles track excess glucose damage. Filled = organ degradation. ${defeatThreshold} = defeat.`} position="bottom">
         <h3 className="excess-bg-indicator__title">Excess BG</h3>
       </Tooltip>
       <div className="excess-bg-indicator__markers">

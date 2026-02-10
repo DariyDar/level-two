@@ -1,8 +1,21 @@
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import type { Ship } from '../../core/types';
+import { isGlucoseShip } from '../../core/types';
 import { useGameStore } from '../../store/gameStore';
 import './ShipCard.css';
+
+const SIZE_TO_SPEED: Record<string, string> = { S: 'Fast', M: 'Medium', L: 'Slow' };
+
+function getCardTooltip(ship: Ship): string {
+  if (isGlucoseShip(ship)) {
+    const speed = SIZE_TO_SPEED[ship.size] ?? 'Medium';
+    const cost = ship.wpCost ?? 0;
+    const costText = cost > 0 ? `Cost ${cost}☀️ to place` : 'Free to place';
+    return `${speed} · ${costText}`;
+  }
+  return ship.description ?? ship.name;
+}
 
 interface ShipCardProps {
   ship: Ship;
@@ -54,6 +67,7 @@ export function ShipCard({
       ]
         .filter(Boolean)
         .join(' ')}
+      title={getCardTooltip(ship)}
       {...listeners}
       {...attributes}
     >
@@ -94,6 +108,7 @@ export function ShipCardOverlay({ ship }: { ship: Ship }) {
         `ship-card--size-${ship.size.toLowerCase()}`,
         `ship-card--type-${ship.loadType.toLowerCase()}`,
       ].join(' ')}
+      title={getCardTooltip(ship)}
     >
       <span className="ship-card__emoji">{ship.emoji}</span>
 

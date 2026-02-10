@@ -33,7 +33,7 @@ export function PlanningHeader({
 
       <Tooltip text="Willpower — spend to place food cards. Each card's ☀️ cost is shown on its badge.">
         <div className="planning-header__wp">
-          <span className="planning-header__label">☀️</span>
+          <span className="planning-header__wp-emoji">☀️</span>
           <span className={`planning-header__value ${wpRemaining <= 0 ? 'planning-header__value--depleted' : ''}`}>
             {wpRemaining}/{wpBudget}
           </span>
@@ -42,7 +42,7 @@ export function PlanningHeader({
 
       <BgSparkline bgHistory={bgPrediction} />
 
-      <Tooltip text="Fast Insulin charges for simulation. Boosts muscle glucose absorption by +1 tier.">
+      <Tooltip text="Boosts muscle's glucose absorption">
         <div className="planning-header__fast-insulin">
           <BoostButton
             label="Fast Insulin"

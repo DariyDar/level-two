@@ -169,15 +169,15 @@
 }
 
 .ship-card__badge--wp {
-  top: 3px;
-  right: 3px;
-  font-size: 16px;
+  top: 2px;
+  right: 2px;
+  font-size: 13px;
   font-weight: 700;
   background: rgba(0, 0, 0, 0.4);
   color: #fbbf24;
-  padding: 2px 6px;
+  padding: 1px 5px;
   border-radius: 4px;
-  min-width: 24px;
+  min-width: 20px;
   text-align: center;
 }
 

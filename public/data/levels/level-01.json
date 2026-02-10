@@ -7,7 +7,7 @@
   "dayConfigs": [
     {
       "day": 1,
-      "wpBudget": 14,
+      "wpBudget": 16,
       "availableFoods": [
         { "id": "banana", "count": 1 },
         { "id": "apple", "count": 1 },
@@ -18,7 +18,9 @@
         { "id": "pizza", "count": 1 },
         { "id": "greekyogurt", "count": 1 }
       ],
-      "availableInterventions": [],
+      "availableInterventions": [
+        { "id": "light_exercise", "count": 1 }
+      ],
       "preOccupiedSlots": [
         { "slot": 13, "shipId": "oatmeal" }
       ],
@@ -92,6 +94,6 @@
     "pancreasBoost": 2
   },
   "winCondition": {
-    "maxDegradationCircles": 5
+    "maxDegradationCircles": 3
   }
 }

@@ -58,7 +58,7 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
 
       <ExcessBGIndicator
         totalCircles={results.degradationBuffer.totalCircles}
-        defeatThreshold={5}
+        defeatThreshold={currentLevel?.winCondition?.maxDegradationCircles ?? 5}
       />
 
       <OrganDegradationDisplay

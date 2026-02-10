@@ -232,7 +232,7 @@ export function SimulationPhase() {
           onActivate={handleLiverBoost}
         />
         */}
-        <Tooltip text="Boosts muscle absorption by +1 tier. Ignores degradation limits.">
+        <Tooltip text="Boosts muscle's glucose absorption">
           <BoostButton
             label="Fast Insulin"
             emoji="💧"
