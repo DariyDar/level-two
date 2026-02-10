@@ -16,6 +16,12 @@
   font-size: 16px;
 }
 
+.simulation-phase__hint {
+  font-size: 13px;
+  color: #a0aec0;
+  text-align: center;
+}
+
 /* Header */
 .simulation-phase__header {
   display: flex;

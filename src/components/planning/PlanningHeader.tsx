@@ -31,7 +31,7 @@ export function PlanningHeader({
         </div>
       </Tooltip>
 
-      <Tooltip text="Willpower — spend to place food cards. Each card's ☀️ cost is shown on its badge.">
+      <Tooltip text="Willpower — spend to place food cards. Each card's ☀️ cost is shown on its badge">
         <div className="planning-header__wp">
           <span className="planning-header__wp-emoji">☀️</span>
           <span className={`planning-header__value ${wpRemaining <= 0 ? 'planning-header__value--depleted' : ''}`}>

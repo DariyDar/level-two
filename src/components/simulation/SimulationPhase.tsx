@@ -148,6 +148,10 @@ export function SimulationPhase() {
 
   return (
     <div className="simulation-phase">
+      <div className="simulation-phase__hint">
+        Watch the glucose flow — use Fast Insulin if blood sugar spikes
+      </div>
+
       {/* Header */}
       <div className="simulation-phase__header">
         <div className="simulation-phase__time">

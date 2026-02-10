@@ -216,7 +216,7 @@ export function SlotGrid({
         <div className="slot-grid__segment-header">
           <h3 className="slot-grid__segment-title">{segment.toUpperCase()}</h3>
           {segVal && (
-            <Tooltip text="Carb target for this meal. Place food cards to reach the minimum. Green = on target, Yellow = close, Red = out of range." position="bottom">
+            <Tooltip text="Carb target for this meal. Place food cards to reach the minimum. Green = on target, Yellow = close, Red = out of range" position="bottom">
               <div className="slot-grid__segment-carbs">
                 <span className="slot-grid__segment-range">
                   {segVal.min} - {segVal.max}g

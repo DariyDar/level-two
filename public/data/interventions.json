@@ -8,7 +8,7 @@
       "load": 100,
       "targetContainer": "metforminEffect",
       "wpCost": 0,
-      "description": "Reduces liver glucose output. Long-lasting effect."
+      "description": "Reduces liver glucose output. Long-lasting effect"
     },
     {
       "id": "light_exercise",
@@ -19,7 +19,7 @@
       "targetContainer": "exerciseEffect",
       "wpCost": 2,
       "group": "exercise",
-      "description": "Moderate boost to glucose utilization."
+      "description": "Moderate boost to glucose utilization"
     },
     {
       "id": "intense_exercise",
@@ -31,7 +31,7 @@
       "wpCost": 4,
       "group": "exercise",
       "requiresEmptySlotBefore": true,
-      "description": "Intense training — permanent +1 muscle tier for the rest of the day."
+      "description": "Intense training — permanent +1 muscle tier for the rest of the day"
     },
     {
       "id": "exercise",
@@ -41,7 +41,7 @@
       "load": 100,
       "targetContainer": "exerciseEffect",
       "group": "exercise",
-      "description": "Strong boost to muscle glucose uptake."
+      "description": "Strong boost to muscle glucose uptake"
     }
   ]
 }

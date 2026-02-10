@@ -206,6 +206,6 @@
   transition: opacity 0.15s ease 133ms;
 }
 
-.ship-card:not(.ship-card--dragging):not(.ship-card--placed):hover[data-tooltip]::after {
+.ship-card:not(.ship-card--dragging):hover[data-tooltip]::after {
   opacity: 1;
 }

@@ -38,7 +38,7 @@ export function ExcessBGIndicator({
 
   return (
     <div className="excess-bg-indicator">
-      <Tooltip text={`Circles track excess glucose damage. Filled = organ degradation. ${defeatThreshold} = defeat.`} position="bottom">
+      <Tooltip text={`Circles track excess glucose damage. Filled = organ degradation. ${defeatThreshold} = defeat`} position="bottom">
         <h3 className="excess-bg-indicator__title">Excess BG</h3>
       </Tooltip>
       <div className="excess-bg-indicator__markers">
