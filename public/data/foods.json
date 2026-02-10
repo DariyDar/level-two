@@ -18,6 +18,7 @@
       "glucose": 150,
       "carbs": 15,
       "wpCost": 1,
+      "tags": ["sugary"],
       "description": "Light snack with fiber."
     },
     {
@@ -28,6 +29,7 @@
       "glucose": 150,
       "carbs": 15,
       "wpCost": 0,
+      "tags": ["sugary"],
       "description": "Sweet treat, instant happiness."
     },
     {
@@ -48,6 +50,7 @@
       "glucose": 150,
       "carbs": 15,
       "wpCost": 2,
+      "tags": ["sugary"],
       "description": "Sweet treat, comforting."
     },
     {
@@ -68,6 +71,7 @@
       "glucose": 150,
       "carbs": 15,
       "wpCost": 0,
+      "tags": ["sugary"],
       "description": "Decadent dessert, mood booster."
     },
     {

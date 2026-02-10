@@ -12,7 +12,8 @@ function getCardTooltip(ship: Ship): string {
     const speed = SIZE_TO_SPEED[ship.size] ?? 'Medium';
     const cost = ship.wpCost ?? 0;
     const costText = cost > 0 ? `Cost ${cost}☀️ to place` : 'Free to place';
-    return `${speed} · ${costText}`;
+    const sugary = ship.tags?.includes('sugary') ? 'Sugary · Rapid glucose spike\n' : '';
+    return `${sugary}${speed} · ${costText}`;
   }
   return ship.description ?? ship.name;
 }
@@ -78,6 +79,11 @@ export function ShipCard({
         <span className="ship-card__badge ship-card__badge--wp">{wpCost}☀️</span>
       )}
 
+      {/* Sugary badge - bottom left */}
+      {ship.tags?.includes('sugary') && (
+        <span className="ship-card__badge ship-card__badge--sugary">🧊</span>
+      )}
+
       {showDetails && (
         <div className="ship-card__details">
           <span className="ship-card__name">{ship.name}</span>
@@ -114,6 +120,11 @@ export function ShipCardOverlay({ ship }: { ship: Ship }) {
       {/* WP cost badge - top right */}
       {wpCost > 0 && (
         <span className="ship-card__badge ship-card__badge--wp">{wpCost}☀️</span>
+      )}
+
+      {/* Sugary badge - bottom left */}
+      {ship.tags?.includes('sugary') && (
+        <span className="ship-card__badge ship-card__badge--sugary">🧊</span>
       )}
 
       <div className="ship-card__details">

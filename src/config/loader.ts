@@ -12,6 +12,7 @@ interface RawFoodConfig {
   description?: string;
   wpCost?: number; // Willpower cost (0-9)
   fiber?: boolean;
+  tags?: string[];
 }
 
 interface RawInterventionConfig {
@@ -83,6 +84,7 @@ function transformFood(raw: RawFoodConfig): Ship {
     description: raw.description,
     wpCost: raw.wpCost ?? 0,
     fiber: raw.fiber,
+    tags: raw.tags,
   };
 }
 

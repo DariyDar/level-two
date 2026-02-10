@@ -77,6 +77,7 @@ export interface Ship {
   fiber?: boolean; // Fiber content (displays leaf icon)
   group?: string; // Group for per-segment limits (e.g., "exercise")
   requiresEmptySlotBefore?: boolean; // Previous slot must not contain food
+  tags?: string[]; // Tags affecting behavior (e.g., "sugary" = 2x unload speed)
 }
 
 export interface PlacedShip {

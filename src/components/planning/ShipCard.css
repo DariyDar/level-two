@@ -186,6 +186,12 @@
   right: 2px;
 }
 
+.ship-card__badge--sugary {
+  bottom: 2px;
+  left: 2px;
+  font-size: 14px;
+}
+
 /* CSS Tooltip (replaces native title for controllable delay) */
 .ship-card[data-tooltip]::after {
   content: attr(data-tooltip);

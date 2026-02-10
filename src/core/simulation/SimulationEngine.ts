@@ -432,7 +432,9 @@ export class SimulationEngine {
     if (nextShip && nextShip.slotNumber - 1 <= this.state.currentTick) {
       const ship = this.ships.get(nextShip.shipId);
       if (ship) {
-        const totalTicks = SHIP_SIZE_TO_HOURS[ship.size];
+        const baseTicks = SHIP_SIZE_TO_HOURS[ship.size];
+        const isSugary = ship.tags?.includes('sugary');
+        const totalTicks = isSugary ? baseTicks / 2 : baseTicks;
         const targetContainer = ship.loadType === 'Glucose' ? 'liver' :
           (ship.targetContainer as keyof ContainerLevel);
 
