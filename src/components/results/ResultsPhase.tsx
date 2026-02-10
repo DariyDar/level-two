@@ -113,10 +113,10 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
                   className="results-phase__button results-phase__button--difficulty"
                   onClick={() => restartWithDifficulty(difficultyLevel + 1)}
                 >
-                  Increase Difficulty
+                  Next Challenge
                 </button>
                 <p className="results-phase__difficulty-hint">
-                  Restart with organ damage {difficultyLevel + 1}
+                  Start with +{difficultyLevel + 1} organ wear
                 </p>
               </div>
             ) : (
@@ -124,7 +124,7 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
                 className="results-phase__button results-phase__button--difficulty"
                 onClick={() => restartWithDifficulty(4)}
               >
-                Restart Max Difficulty
+                Max Challenge
               </button>
             )}
           </div>
