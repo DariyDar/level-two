@@ -18,7 +18,6 @@ function computeOrganHealth(degradation: DegradationState) {
   )
   const pancreasHealth = clamp01(maxPancreasTier / SIM_CONSTANTS.PANCREAS_MAX_TIER)
 
-  // Liver: base slowFactor means (1 - factor) effectiveness. At 1.0 → 0% health
   const baseSlow = SIM_CONSTANTS.LIVER_SLOW_FACTOR
   const currentSlow = baseSlow + degradation.liverCircles * SIM_CONSTANTS.LIVER_SLOW_PENALTY
   const liverHealth = clamp01((1 - currentSlow) / (1 - baseSlow))
@@ -51,69 +50,62 @@ export function OrganOverview({ degradation, slots }: OrganOverviewProps) {
   const hasProteinTag = cards.some(c => c.tag === 'protein')
   const defenseDps = computeDefenseDps(maxPancreasTier, currentDps, hasProteinTag)
 
-  // Scale bars: use 1500mg as reference max for glucose, 80 DPS as reference max for defense
-  const attackPct = clamp01(totalGlucose / 1500)
-  const defensePctBar = clamp01(defenseDps / 80)
+  // Single combined bar: defense (green) left, attack (red) right
+  // Normalize both to the same scale so they're comparable
+  const maxRef = 80 // reference DPS for full defense bar
+  const attackNorm = clamp01(totalGlucose / 1500) // 1500mg = full attack
+  const defenseNorm = clamp01(defenseDps / maxRef)
+  const total = attackNorm + defenseNorm || 1
+  const defenseFraction = defenseNorm / total
+  const attackFraction = attackNorm / total
 
   return (
     <div className="organ-overview">
-      <div className="organ-overview__title">Organs</div>
-      <div className="organ-overview__organs">
-        <OrganRow icon="⚡" name="Pancreas" pct={pancreasHealth} label={`T${maxPancreasTier}`} />
-        <OrganRow icon="💪" name="Muscles" pct={1} label={`${SIM_CONSTANTS.MUSCLE_DPS_PER_TIER}/tier`} />
-        <OrganRow icon="🫘" name="Liver" pct={liverHealth} label={`${Math.round(liverHealth * 100)}%`} />
-        <OrganRow icon="🫘" name="Kidneys" pct={kidneyHealth} label={`${currentDps} dps`} />
+      <div className="organ-overview__title">Defense</div>
+      <div className="organ-overview__grid">
+        <OrganBar icon="⚡" pct={pancreasHealth} />
+        <OrganBar icon="💪" pct={1} />
+        <OrganBar icon="🫘" pct={liverHealth} />
+        <OrganBar icon="🫘" pct={kidneyHealth} />
       </div>
 
       {cards.length > 0 && (
-        <div className="organ-overview__comparison">
-          <div className="organ-overview__bar-row">
-            <span className="organ-overview__bar-label">Attack</span>
-            <div className="organ-overview__bar-track">
-              <div
-                className="organ-overview__bar-fill organ-overview__bar-fill--attack"
-                style={{ width: `${attackPct * 100}%` }}
-              />
-            </div>
-            <span className="organ-overview__bar-value organ-overview__bar-value--attack">
-              {totalGlucose} mg
-            </span>
+        <div className="organ-overview__versus">
+          <span className="organ-overview__vs-label organ-overview__vs-label--def">
+            {Math.round(defenseDps)} dps
+          </span>
+          <div className="organ-overview__vs-track">
+            <div
+              className="organ-overview__vs-fill organ-overview__vs-fill--def"
+              style={{ width: `${defenseFraction * 100}%` }}
+            />
+            <div
+              className="organ-overview__vs-fill organ-overview__vs-fill--atk"
+              style={{ width: `${attackFraction * 100}%` }}
+            />
           </div>
-          <div className="organ-overview__bar-row">
-            <span className="organ-overview__bar-label">Defense</span>
-            <div className="organ-overview__bar-track">
-              <div
-                className="organ-overview__bar-fill organ-overview__bar-fill--defense"
-                style={{ width: `${defensePctBar * 100}%` }}
-              />
-            </div>
-            <span className="organ-overview__bar-value organ-overview__bar-value--defense">
-              {Math.round(defenseDps)} dps
-            </span>
-          </div>
+          <span className="organ-overview__vs-label organ-overview__vs-label--atk">
+            {totalGlucose} mg
+          </span>
         </div>
       )}
     </div>
   )
 }
 
-function OrganRow({ icon, name, pct, label }: { icon: string; name: string; pct: number; label: string }) {
+function OrganBar({ icon, pct }: { icon: string; pct: number }) {
   const color = healthColor(pct)
   const widthPct = Math.round(pct * 100)
 
   return (
     <div className="organ-overview__organ">
       <span className="organ-overview__icon">{icon}</span>
-      <span className="organ-overview__name">{name}</span>
       <div className="organ-overview__health-track">
         <div
           className="organ-overview__health-fill"
           style={{ width: `${widthPct}%`, background: color }}
         />
       </div>
-      <span className="organ-overview__val" style={{ color }}>
-        {label}
-      </span>
     </div>
   )
 }
