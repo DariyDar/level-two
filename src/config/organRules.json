@@ -247,7 +247,7 @@
         "ignoresDegradation": true
       }
     ],
-    "rates": [0, 25, 50, 85, 120, 150, 175],
+    "rates": [0, 25, 50, 75, 110, 140, 165],
     "minTier": 0,
     "maxTier": 5,
     "boostedMaxTier": 6
