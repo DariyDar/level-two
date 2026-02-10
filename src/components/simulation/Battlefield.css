@@ -46,3 +46,25 @@
 .spawn-emoji--done {
   opacity: 0.3;
 }
+
+/* Base impact explosion VFX */
+.impact-boom {
+  font-size: 28px;
+  animation: boomFlash 0.4s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes boomFlash {
+  0% {
+    opacity: 0;
+    font-size: 14px;
+  }
+  20% {
+    opacity: 1;
+    font-size: 32px;
+  }
+  100% {
+    opacity: 0;
+    font-size: 20px;
+  }
+}

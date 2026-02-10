@@ -15,7 +15,7 @@ import { MealSlots } from './MealSlots'
 import { OfferCards } from './OfferCards'
 import { Inventory } from './Inventory'
 import { MealSummary } from './MealSummary'
-import { OrganOverview } from './OrganOverview'
+import { VersusBar } from './VersusBar'
 import { FoodCardComponent } from './FoodCardComponent'
 import './PlanningPhase.css'
 
@@ -93,6 +93,7 @@ export function PlanningPhase() {
         </div>
 
         <MealSlots slots={mealSlots} />
+        <VersusBar degradation={degradation} slots={mealSlots} />
         <MealSummary slots={mealSlots} />
 
         {!allSlotsFilled && offerFlow.currentOfferCards.length > 0 && (
@@ -108,8 +109,6 @@ export function PlanningPhase() {
             Simulate
           </button>
         )}
-
-        <OrganOverview degradation={degradation} slots={mealSlots} />
 
         <Inventory
           cards={inventory}

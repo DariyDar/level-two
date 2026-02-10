@@ -93,6 +93,14 @@ export interface SlotSpawnState {
   baseSpeed: number         // speed for spawned projectiles
 }
 
+// === Impact VFX ===
+
+export interface ImpactVFX {
+  id: string
+  sourceSlot: number
+  time: number   // simulation time when impact happened
+}
+
 // === Simulation State ===
 
 export interface SimulationState {
@@ -100,6 +108,7 @@ export interface SimulationState {
   projectiles: Projectile[]
   organs: OrganState
   excessGlucose: number
+  impacts: ImpactVFX[]               // recent base impacts for VFX
   slotSpawnStates: SlotSpawnState[]  // one per active slot
   nextSlotToActivate: number         // 0, 1, 2 or 3 (done)
   nextSlotActivationTime: number     // when the next slot starts

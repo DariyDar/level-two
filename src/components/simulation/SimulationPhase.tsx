@@ -31,7 +31,7 @@ export function SimulationPhase() {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleTick = useCallback((state: SimulationState) => {
-    setSimState({ ...state, projectiles: [...state.projectiles] })
+    setSimState({ ...state, projectiles: [...state.projectiles], impacts: [...state.impacts] })
   }, [])
 
   const handleComplete = useCallback(() => {

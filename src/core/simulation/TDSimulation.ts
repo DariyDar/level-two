@@ -116,6 +116,7 @@ export class TDSimulation {
       projectiles: [],
       organs: createInitialOrganState(degradation),
       excessGlucose: 0,
+      impacts: [],
       slotSpawnStates: [],
       nextSlotToActivate: 0,
       nextSlotActivationTime: 0,
@@ -299,14 +300,24 @@ export class TDSimulation {
         continue
       }
       if (p.position >= 1.0) {
-        // Reached base — damage
+        // Reached base — damage + VFX
         this.state.excessGlucose += p.glucose
+        this.state.impacts.push({
+          id: p.id,
+          sourceSlot: p.sourceSlot,
+          time: this.state.time,
+        })
         continue
       }
       surviving.push(p)
     }
 
     this.state.projectiles = surviving
+
+    // Clean up old impacts (older than 0.6s)
+    this.state.impacts = this.state.impacts.filter(
+      imp => this.state.time - imp.time < 0.6,
+    )
   }
 
   private checkCompletion(): void {

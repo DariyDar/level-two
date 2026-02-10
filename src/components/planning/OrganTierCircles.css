@@ -23,6 +23,18 @@
   box-shadow: 0 0 4px rgba(34, 197, 94, 0.5);
 }
 
+/* Active — flashing orange */
+.otc--active {
+  background-color: #FF5900;
+  box-shadow: 0 0 6px rgba(255, 89, 0, 0.7);
+  animation: otcFlash 0.8s ease-in-out infinite;
+}
+
+@keyframes otcFlash {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.9); }
+}
+
 /* Degraded — pink */
 .otc--degraded {
   background-color: #ec4899;

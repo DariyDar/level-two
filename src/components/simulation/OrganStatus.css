@@ -10,60 +10,45 @@
   margin: 0 auto;
 }
 
-.organ-status__row {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
+.organ-status__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
 }
 
 .organ-status__item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex: 1;
+  gap: 5px;
 }
 
 .organ-status__icon {
-  font-size: 16px;
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
-.organ-status__label {
-  font-size: 11px;
+.organ-status__name {
+  font-size: 10px;
   color: #718096;
-  flex: 1;
+  min-width: 48px;
 }
 
-.organ-status__value {
-  font-size: 13px;
-  font-weight: 700;
-  color: #eee;
-  font-variant-numeric: tabular-nums;
-}
-
-.organ-status__row--stats {
+.organ-status__stats {
+  display: flex;
+  justify-content: space-between;
   border-top: 1px solid #333;
-  padding-top: 8px;
+  padding-top: 6px;
 }
 
 .organ-status__stat {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-}
-
-.organ-status__stat-label {
-  font-size: 11px;
-  color: #718096;
-}
-
-.organ-status__stat-value {
-  font-size: 14px;
-  font-weight: 700;
-  color: #eee;
+  font-size: 12px;
+  font-weight: 600;
+  color: #aaa;
   font-variant-numeric: tabular-nums;
 }
 
-.organ-status__stat-value--danger {
+.organ-status__stat--danger {
   color: #ef4444;
 }

@@ -206,6 +206,24 @@ export function Battlefield({ state, mealCards }: BattlefieldProps) {
             </g>
           )
         })}
+
+        {/* Base impact explosions */}
+        {state.impacts.map(imp => {
+          const x = 60 + (imp.sourceSlot * 120) + Math.sin(parseInt(imp.id.slice(1)) * 1.7) * 30
+          const y = posToY(1.0)
+          return (
+            <text
+              key={`boom-${imp.id}`}
+              x={x}
+              y={y}
+              textAnchor="middle"
+              dominantBaseline="central"
+              className="impact-boom"
+            >
+              💥
+            </text>
+          )
+        })}
       </svg>
     </div>
   )
