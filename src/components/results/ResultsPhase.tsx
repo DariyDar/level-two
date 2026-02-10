@@ -102,9 +102,6 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
         <div className="results-phase__victory-overlay">
           <div className="results-phase__victory-popup">
             <h2 className="results-phase__victory-title">Level Passed!</h2>
-            <p className="results-phase__victory-text">
-              You survived all {totalDays} days
-            </p>
             <button className="results-phase__button results-phase__button--primary" onClick={restartLevel}>
               Restart
             </button>
