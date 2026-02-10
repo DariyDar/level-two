@@ -177,14 +177,14 @@ export const useGameStore = create<GameState>()(
             const dayConfig = getDayConfig(level, 1);
             wpBudget = dayConfig.wpBudget ?? level.wpBudget ?? DEFAULT_WP_BUDGET;
           }
-          const d = state.difficultyLevel;
+          const points = state.difficultyLevel * 25;
           return {
             currentDay: 1,
             phase: 'Planning',
             placedShips: [],
             bgHistory: [],
             results: null,
-            degradation: d > 0 ? { liver: d, pancreas: d } : (level?.initialDegradation ?? initialDegradation),
+            degradation: points > 0 ? { liver: points, pancreas: points } : (level?.initialDegradation ?? initialDegradation),
             wpBudget,
             wpSpent: 0,
           };
@@ -199,6 +199,7 @@ export const useGameStore = create<GameState>()(
             wpBudget = dayConfig.wpBudget ?? config.wpBudget ?? DEFAULT_WP_BUDGET;
           }
           const d = Math.min(level, 4);
+          const points = d * 25;
           return {
             currentDay: 1,
             phase: 'Planning',
@@ -206,7 +207,7 @@ export const useGameStore = create<GameState>()(
             bgHistory: [],
             results: null,
             difficultyLevel: d,
-            degradation: { liver: d, pancreas: d },
+            degradation: { liver: points, pancreas: points },
             wpBudget,
             wpSpent: 0,
           };
