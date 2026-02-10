@@ -164,76 +164,63 @@ export const useGameStore = create<GameState>()(
       },
 
       placeCardInSlot: (card, slotIndex) => {
-        const { mealSlots, offerFlow } = get()
+        const { mealSlots, inventory, offerFlow } = get()
         if (!offerFlow) return
-        if (mealSlots[slotIndex] !== null) return // slot occupied
+        if (mealSlots[slotIndex] !== null) return
 
         const newSlots = [...mealSlots]
         newSlots[slotIndex] = card
 
-        // Remove card from current offer
-        const newOfferCards = offerFlow.currentOfferCards.filter(c => c.id !== card.id)
+        // Remaining offer cards go to inventory automatically
+        const remainingCards = offerFlow.currentOfferCards.filter(c => c.id !== card.id)
+        const newInventory = [...inventory, ...remainingCards]
 
-        // Check if current offer is fully resolved
+        // Advance to next offer
+        const nextIndex = offerFlow.currentOfferIndex + 1
         let newOfferFlow: OfferFlowState
-        if (newOfferCards.length === 0) {
-          // Advance to next offer
-          const nextIndex = offerFlow.currentOfferIndex + 1
-          if (nextIndex < offerFlow.allOffers.length) {
-            const nextOffer = offerFlow.allOffers[nextIndex]
-            newOfferFlow = {
-              ...offerFlow,
-              currentOfferIndex: nextIndex,
-              currentOfferCards: [...nextOffer],
-              offeredCardIds: [...offerFlow.offeredCardIds, ...nextOffer.map(c => c.id)],
-            }
-          } else {
-            // All offers consumed
-            newOfferFlow = {
-              ...offerFlow,
-              currentOfferIndex: nextIndex,
-              currentOfferCards: [],
-            }
+        if (nextIndex < offerFlow.allOffers.length) {
+          const nextOffer = offerFlow.allOffers[nextIndex]
+          newOfferFlow = {
+            ...offerFlow,
+            currentOfferIndex: nextIndex,
+            currentOfferCards: [...nextOffer],
+            offeredCardIds: [...offerFlow.offeredCardIds, ...nextOffer.map(c => c.id)],
           }
         } else {
           newOfferFlow = {
             ...offerFlow,
-            currentOfferCards: newOfferCards,
+            currentOfferIndex: nextIndex,
+            currentOfferCards: [],
           }
         }
 
-        set({ mealSlots: newSlots, offerFlow: newOfferFlow })
+        set({ mealSlots: newSlots, inventory: newInventory, offerFlow: newOfferFlow })
       },
 
-      sendCardToInventory: (card) => {
+      sendCardToInventory: (_card) => {
         const { inventory, offerFlow } = get()
         if (!offerFlow) return
 
-        const newInventory = [...inventory, card]
-        const newOfferCards = offerFlow.currentOfferCards.filter(c => c.id !== card.id)
+        // Chosen card + remaining offer cards all go to inventory
+        const allToInventory = offerFlow.currentOfferCards
+        const newInventory = [...inventory, ...allToInventory]
 
+        // Advance to next offer
+        const nextIndex = offerFlow.currentOfferIndex + 1
         let newOfferFlow: OfferFlowState
-        if (newOfferCards.length === 0) {
-          const nextIndex = offerFlow.currentOfferIndex + 1
-          if (nextIndex < offerFlow.allOffers.length) {
-            const nextOffer = offerFlow.allOffers[nextIndex]
-            newOfferFlow = {
-              ...offerFlow,
-              currentOfferIndex: nextIndex,
-              currentOfferCards: [...nextOffer],
-              offeredCardIds: [...offerFlow.offeredCardIds, ...nextOffer.map(c => c.id)],
-            }
-          } else {
-            newOfferFlow = {
-              ...offerFlow,
-              currentOfferIndex: nextIndex,
-              currentOfferCards: [],
-            }
+        if (nextIndex < offerFlow.allOffers.length) {
+          const nextOffer = offerFlow.allOffers[nextIndex]
+          newOfferFlow = {
+            ...offerFlow,
+            currentOfferIndex: nextIndex,
+            currentOfferCards: [...nextOffer],
+            offeredCardIds: [...offerFlow.offeredCardIds, ...nextOffer.map(c => c.id)],
           }
         } else {
           newOfferFlow = {
             ...offerFlow,
-            currentOfferCards: newOfferCards,
+            currentOfferIndex: nextIndex,
+            currentOfferCards: [],
           }
         }
 
