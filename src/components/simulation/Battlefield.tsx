@@ -1,21 +1,37 @@
-import type { SimulationState } from '../../types'
+import type { SimulationState, FoodCard } from '../../types'
 import { SIM_CONSTANTS } from '../../types'
 import './Battlefield.css'
 
 interface BattlefieldProps {
   state: SimulationState
+  mealCards: FoodCard[]
 }
-
-const SLOT_COLORS = ['#f97316', '#3b82f6', '#a855f7'] // orange, blue, purple
 
 const SVG_WIDTH = 400
 const SVG_HEIGHT = 700
+
+// Trail: length in position-units = speed × TRAIL_SECONDS
+const TRAIL_SECONDS = 2.5
 
 function posToY(position: number): number {
   return 40 + position * (SVG_HEIGHT - 80)
 }
 
-export function Battlefield({ state }: BattlefieldProps) {
+function Trail({ x, y, speed }: { x: number; y: number; speed: number }) {
+  const trailLen = speed * TRAIL_SECONDS * (SVG_HEIGHT - 80)
+  if (trailLen < 2) return null
+
+  const seg = trailLen / 3
+  return (
+    <>
+      <line x1={x} y1={y} x2={x} y2={y - seg} stroke="#fff" strokeWidth={2} opacity={0.35} strokeLinecap="round" />
+      <line x1={x} y1={y - seg} x2={x} y2={y - seg * 2} stroke="#fff" strokeWidth={1.5} opacity={0.15} strokeLinecap="round" />
+      <line x1={x} y1={y - seg * 2} x2={x} y2={y - seg * 3} stroke="#fff" strokeWidth={1} opacity={0.06} strokeLinecap="round" />
+    </>
+  )
+}
+
+export function Battlefield({ state, mealCards }: BattlefieldProps) {
   const { projectiles, organs } = state
 
   const muscleTargetSet = new Set(organs.muscles.targets)
@@ -98,7 +114,7 @@ export function Battlefield({ state }: BattlefieldProps) {
               key={`mt-${targetId}`}
               x1={muscleX}
               y1={muscleY}
-              x2={60 + (p.sourceSlot * 100)}
+              x2={60 + (p.sourceSlot * 120) + Math.sin(parseInt(p.id.slice(1)) * 1.7) * 30}
               y2={posToY(p.position)}
               stroke="rgba(34, 197, 94, 0.4)"
               strokeWidth={1}
@@ -117,7 +133,7 @@ export function Battlefield({ state }: BattlefieldProps) {
               key={`kt-${targetId}`}
               x1={kidneyX}
               y1={kidneyY}
-              x2={60 + (p.sourceSlot * 100)}
+              x2={60 + (p.sourceSlot * 120) + Math.sin(parseInt(p.id.slice(1)) * 1.7) * 30}
               y2={posToY(p.position)}
               stroke="rgba(234, 179, 8, 0.4)"
               strokeWidth={1}
@@ -126,11 +142,17 @@ export function Battlefield({ state }: BattlefieldProps) {
           )
         })}
 
-        {/* Projectiles */}
+        {/* Projectile trails */}
         {projectiles.map(p => {
           const x = 60 + (p.sourceSlot * 120) + Math.sin(parseInt(p.id.slice(1)) * 1.7) * 30
           const y = posToY(p.position)
-          const color = SLOT_COLORS[p.sourceSlot] ?? '#fff'
+          return <Trail key={`trail-${p.id}`} x={x} y={y} speed={p.speed} />
+        })}
+
+        {/* Projectiles — white */}
+        {projectiles.map(p => {
+          const x = 60 + (p.sourceSlot * 120) + Math.sin(parseInt(p.id.slice(1)) * 1.7) * 30
+          const y = posToY(p.position)
           const isTargeted = muscleTargetSet.has(p.id) || kidneyTargetSet.has(p.id)
           const radius = Math.max(3, Math.min(6, p.glucose / SIM_CONSTANTS.PROJECTILE_SIZE * 1.5))
 
@@ -140,26 +162,50 @@ export function Battlefield({ state }: BattlefieldProps) {
               cx={x}
               cy={y}
               r={radius}
-              fill={color}
-              opacity={isTargeted ? 1 : 0.8}
+              fill="#fff"
+              opacity={isTargeted ? 1 : 0.85}
               className={isTargeted ? 'projectile projectile--targeted' : 'projectile'}
             />
           )
         })}
 
-        {/* Spawn indicators */}
-        {state.slotSpawnStates.map(ss => (
-          <rect
-            key={`spawn-${ss.slotIndex}`}
-            x={40 + ss.slotIndex * 120}
-            y={20}
-            width={40}
-            height={8}
-            rx={4}
-            fill={SLOT_COLORS[ss.slotIndex]}
-            opacity={0.6}
-          />
-        ))}
+        {/* Spawn platforms — white with food emoji above */}
+        {state.slotSpawnStates.map(ss => {
+          const px = 40 + ss.slotIndex * 120
+          const emoji = mealCards[ss.slotIndex]?.emoji ?? '🍽'
+          return (
+            <g key={`spawn-${ss.slotIndex}`}>
+              <rect
+                x={px}
+                y={22}
+                width={40}
+                height={8}
+                rx={4}
+                fill="#fff"
+                opacity={0.7}
+              />
+              <text x={px + 20} y={16} textAnchor="middle" className="spawn-emoji">
+                {emoji}
+              </text>
+            </g>
+          )
+        })}
+
+        {/* Inactive platform labels (slots activated but done spawning) */}
+        {mealCards.map((card, i) => {
+          const isSpawning = state.slotSpawnStates.some(ss => ss.slotIndex === i)
+          const isActivated = i < state.nextSlotToActivate
+          if (isSpawning || !isActivated) return null
+          const px = 40 + i * 120
+          return (
+            <g key={`done-${i}`}>
+              <rect x={px} y={22} width={40} height={8} rx={4} fill="#fff" opacity={0.2} />
+              <text x={px + 20} y={16} textAnchor="middle" className="spawn-emoji spawn-emoji--done">
+                {card.emoji}
+              </text>
+            </g>
+          )
+        })}
       </svg>
     </div>
   )

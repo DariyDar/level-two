@@ -80,7 +80,7 @@ export function SimulationPhase() {
         </div>
       </div>
 
-      <Battlefield state={simState} />
+      <Battlefield state={simState} mealCards={cards} />
       <OrganStatus state={simState} />
     </div>
   )

@@ -36,5 +36,13 @@
 }
 
 .projectile--targeted {
-  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+}
+
+.spawn-emoji {
+  font-size: 20px;
+}
+
+.spawn-emoji--done {
+  opacity: 0.3;
 }

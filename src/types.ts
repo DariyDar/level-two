@@ -162,27 +162,27 @@ export const SIM_CONSTANTS = {
   PROJECTILE_SIZE: 10,        // mg per projectile
   SEGMENT_DELAY: 3,           // seconds between slot activations
 
-  // Liver
-  LIVER_SLOW_FACTOR: 0.5,
+  // Liver (slowdown ~25% weaker: factor 0.5→0.6 means less slowdown)
+  LIVER_SLOW_FACTOR: 0.6,
   LIVER_ZONE_START: 0.15,
   LIVER_ZONE_END: 0.35,
-  LIVER_CAPACITY: 5,
+  LIVER_CAPACITY: 4,
 
   // Pancreas tier thresholds (by active projectile count)
   PANCREAS_TIER_THRESHOLDS: [0, 1, 4, 7, 11] as readonly number[],
   PANCREAS_MAX_TIER: 4,
 
-  // Muscles
+  // Muscles (~25% weaker DPS: 25→19)
   MUSCLE_RANGE_START: 0.3,
   MUSCLE_RANGE_END: 0.75,
   MUSCLE_MAX_TARGETS: 2,
-  MUSCLE_DPS_PER_TIER: 25,    // mg/sec per tier
+  MUSCLE_DPS_PER_TIER: 19,    // mg/sec per tier (was 25)
 
-  // Kidneys
+  // Kidneys (~25% weaker: 15→11)
   KIDNEY_RANGE_START: 0.8,
   KIDNEY_RANGE_END: 0.95,
   KIDNEY_MAX_TARGETS: 1,
-  KIDNEY_DPS: 15,              // mg/sec
+  KIDNEY_DPS: 11,              // mg/sec (was 15)
 
   // Modifiers
   FIBER_SPEED_MULTIPLIER: 0.7,
