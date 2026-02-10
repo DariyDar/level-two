@@ -1,0 +1,42 @@
+.organ-damage {
+  width: 100%;
+  padding: 10px 16px;
+  background: #1e1e32;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+.organ-damage__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.organ-damage__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+}
+
+.organ-damage__item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.organ-damage__icon {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.organ-damage__name {
+  font-size: 10px;
+  color: #718096;
+  min-width: 48px;
+}

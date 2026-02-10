@@ -16,6 +16,7 @@ import { OfferCards } from './OfferCards'
 import { Inventory } from './Inventory'
 import { MealSummary } from './MealSummary'
 import { VersusBar } from './VersusBar'
+import { OrganDamageGrid } from '../shared/OrganDamageGrid'
 import { FoodCardComponent } from './FoodCardComponent'
 import './PlanningPhase.css'
 
@@ -114,6 +115,8 @@ export function PlanningPhase() {
           cards={inventory}
           hasEmptySlot={hasEmptySlot}
         />
+
+        <OrganDamageGrid degradation={degradation} />
       </div>
 
       <DragOverlay dropAnimation={null}>

@@ -1,4 +1,5 @@
 import { useGameStore } from '../../store/gameStore'
+import { OrganDamageGrid } from '../shared/OrganDamageGrid'
 import './ResultsPhase.css'
 
 export function ResultsPhase() {
@@ -38,14 +39,7 @@ export function ResultsPhase() {
         </div>
       </div>
 
-      <div className="results-degradation">
-        <div className="results-degradation__title">Organ Damage</div>
-        <div className="results-degradation__row">
-          <span>Liver: {degradation.liverCircles}</span>
-          <span>Pancreas: {degradation.pancreasCircles}</span>
-          <span>Kidneys: {degradation.kidneysCircles}</span>
-        </div>
-      </div>
+      <OrganDamageGrid degradation={degradation} title="Organ Damage" />
 
       <div className="results-actions">
         {isDefeat ? (
