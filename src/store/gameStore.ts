@@ -47,6 +47,7 @@ interface GameState {
   setResults: (results: DayResults) => void;
   startNextDay: () => void;
   retryDay: () => void;
+  restartLevel: () => void;
   updateValidation: (validation: PlanValidation) => void;
   setWpBudget: (budget: number) => void;
   spendWp: (amount: number) => void;
@@ -164,6 +165,26 @@ export const useGameStore = create<GameState>()(
           results: null,
           wpSpent: 0,
         })),
+
+      restartLevel: () =>
+        set((state) => {
+          const level = state.currentLevel;
+          let wpBudget = DEFAULT_WP_BUDGET;
+          if (level) {
+            const dayConfig = getDayConfig(level, 1);
+            wpBudget = dayConfig.wpBudget ?? level.wpBudget ?? DEFAULT_WP_BUDGET;
+          }
+          return {
+            currentDay: 1,
+            phase: 'Planning',
+            placedShips: [],
+            bgHistory: [],
+            results: null,
+            degradation: level?.initialDegradation ?? initialDegradation,
+            wpBudget,
+            wpSpent: 0,
+          };
+        }),
 
       updateValidation: (validation) => set({ planValidation: validation }),
 

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useGameStore } from '../../store/gameStore';
 import { calculateDayResults } from '../../core/results';
 import { BGGraph } from './BGGraph';
@@ -23,7 +23,10 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
     setResults,
     startNextDay,
     retryDay,
+    restartLevel,
   } = useGameStore();
+
+  const [showVictory, setShowVictory] = useState(false);
 
   // Calculate results
   const results = useMemo(() => {
@@ -33,10 +36,16 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
   const { assessment } = results;
   const defeated = assessment === 'Defeat';
   const excellent = assessment === 'Excellent';
+  const totalDays = currentLevel?.days ?? 3;
+  const isLastDay = currentDay >= totalDays;
 
   const handleContinue = () => {
     setResults(results);
-    startNextDay();
+    if (isLastDay) {
+      setShowVictory(true);
+    } else {
+      startNextDay();
+    }
   };
 
   const handleRetry = () => {
@@ -45,7 +54,7 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
 
   return (
     <div className="results-phase">
-      <h2 className="results-phase__title">Day {currentDay}/{currentLevel?.days ?? '?'} Results</h2>
+      <h2 className="results-phase__title">Day {currentDay}/{totalDays} Results</h2>
 
       <BGGraph
         bgHistory={bgHistory}
@@ -69,20 +78,39 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
 
       <div className="results-phase__actions">
         {defeated ? (
-          <p className="results-phase__fail-message">
-            Too much damage! Try a different approach.
-          </p>
+          <>
+            <p className="results-phase__fail-message">
+              Too much damage! Try a different approach.
+            </p>
+            <button className="results-phase__button results-phase__button--secondary" onClick={restartLevel}>
+              Restart Level
+            </button>
+          </>
         ) : (
           <button className="results-phase__button results-phase__button--primary" onClick={handleContinue}>
-            Continue →
+            {isLastDay ? 'Finish' : 'Continue →'}
           </button>
         )}
-        {!excellent && (
+        {!excellent && !defeated && (
           <button className="results-phase__button results-phase__button--secondary" onClick={handleRetry}>
             Retry Day
           </button>
         )}
       </div>
+
+      {showVictory && (
+        <div className="results-phase__victory-overlay">
+          <div className="results-phase__victory-popup">
+            <h2 className="results-phase__victory-title">Level Passed!</h2>
+            <p className="results-phase__victory-text">
+              You survived all {totalDays} days
+            </p>
+            <button className="results-phase__button results-phase__button--primary" onClick={restartLevel}>
+              Restart
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
