@@ -32,7 +32,7 @@
     "glucoseSpeed": 1,
     "releaseDuration": 7,
     "tier": 1,
-    "tag": "vegetable",
+    "tag": "fiber",
     "modifiers": { "fiber": true }
   },
   {
@@ -56,7 +56,7 @@
     "glucoseSpeed": 1,
     "releaseDuration": 5,
     "tier": 1,
-    "tag": "dairy",
+    "tag": "protein",
     "modifiers": { "protein": true }
   },
   {
@@ -92,7 +92,7 @@
     "glucoseSpeed": 2,
     "releaseDuration": 5,
     "tier": 2,
-    "tag": "fruit",
+    "tag": "fiber",
     "modifiers": {}
   },
   {
@@ -116,7 +116,7 @@
     "glucoseSpeed": 2,
     "releaseDuration": 5,
     "tier": 2,
-    "tag": "fruit",
+    "tag": "fiber",
     "modifiers": { "fiber": true }
   },
   {

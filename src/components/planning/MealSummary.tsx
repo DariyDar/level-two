@@ -9,9 +9,6 @@ interface MealSummaryProps {
 const TAG_LABELS: Record<string, string> = {
   fiber: '🌾 Fiber',
   protein: '🥩 Protein',
-  dairy: '🥛 Dairy',
-  vegetable: '🥬 Vegetable',
-  fruit: '🍎 Fruit',
   sweet: '🍬 Sweet',
 }
 
