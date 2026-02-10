@@ -26,10 +26,17 @@
   letter-spacing: 0.05em;
 }
 
+.slot-grid__segment-carbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  cursor: help;
+}
+
 .slot-grid__segment-range {
   color: #a0aec0;
   font-size: 13px;
-  margin-left: auto;
 }
 
 .slot-grid__segment-current {

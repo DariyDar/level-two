@@ -1,0 +1,62 @@
+.tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.tooltip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a202c;
+  color: #e2e8f0;
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: normal;
+  max-width: 220px;
+  width: max-content;
+  z-index: 1000;
+  pointer-events: none;
+  animation: tooltip-fade-in 0.15s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.tooltip--top {
+  bottom: calc(100% + 8px);
+}
+
+.tooltip--bottom {
+  top: calc(100% + 8px);
+}
+
+.tooltip__arrow {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+}
+
+.tooltip__arrow--top {
+  bottom: -5px;
+  border-top: 6px solid #1a202c;
+}
+
+.tooltip__arrow--bottom {
+  top: -5px;
+  border-bottom: 6px solid #1a202c;
+}
+
+@keyframes tooltip-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}

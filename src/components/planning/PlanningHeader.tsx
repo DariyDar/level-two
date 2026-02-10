@@ -1,5 +1,6 @@
 import { BgSparkline } from './BgSparkline';
 import { BoostButton } from '../simulation/BoostButton';
+import { Tooltip } from '../ui/Tooltip';
 import './PlanningHeader.css';
 
 interface PlanningHeaderProps {
@@ -23,36 +24,42 @@ export function PlanningHeader({
 }: PlanningHeaderProps) {
   return (
     <div className="planning-header">
-      <div className="planning-header__bg">
-        <span className="planning-header__label">BG</span>
-        <span className="planning-header__value">{currentBG}</span>
-      </div>
+      <Tooltip text="Starting blood glucose level for this day">
+        <div className="planning-header__bg">
+          <span className="planning-header__label">BG</span>
+          <span className="planning-header__value">{currentBG}</span>
+        </div>
+      </Tooltip>
 
-      <div className="planning-header__wp">
-        <span className="planning-header__label">WP</span>
-        <span className={`planning-header__value ${wpRemaining <= 0 ? 'planning-header__value--depleted' : ''}`}>
-          {wpRemaining}/{wpBudget}
-        </span>
-      </div>
+      <Tooltip text="Willpower — spend to place food cards. Each card's ☀️ cost is shown on its badge.">
+        <div className="planning-header__wp">
+          <span className="planning-header__label">☀️</span>
+          <span className={`planning-header__value ${wpRemaining <= 0 ? 'planning-header__value--depleted' : ''}`}>
+            {wpRemaining}/{wpBudget}
+          </span>
+        </div>
+      </Tooltip>
 
       <BgSparkline bgHistory={bgPrediction} />
 
-      <div className="planning-header__fast-insulin">
-        <BoostButton
-          label="Fast Insulin"
-          emoji="💧"
-          boost={{
-            charges: fastInsulinCharges,
-            maxCharges: fastInsulinCharges,
-            cooldownTicks: 0,
-            isActive: false,
-            activeTicks: 0,
-          }}
-          cooldownMax={0}
-          onActivate={() => {}}
-          isFastInsulin
-        />
-      </div>
+      <Tooltip text="Fast Insulin charges for simulation. Boosts muscle glucose absorption by +1 tier.">
+        <div className="planning-header__fast-insulin">
+          <BoostButton
+            label="Fast Insulin"
+            emoji="💧"
+            boost={{
+              charges: fastInsulinCharges,
+              maxCharges: fastInsulinCharges,
+              cooldownTicks: 0,
+              isActive: false,
+              activeTicks: 0,
+            }}
+            cooldownMax={0}
+            onActivate={() => {}}
+            isFastInsulin
+          />
+        </div>
+      </Tooltip>
 
       <button
         className="planning-header__simulate"

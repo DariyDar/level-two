@@ -61,7 +61,7 @@ export function ShipCard({
 
       {/* WP cost badge - top right */}
       {wpCost > 0 && (
-        <span className="ship-card__badge ship-card__badge--wp">{wpCost}</span>
+        <span className="ship-card__badge ship-card__badge--wp">{wpCost}☀️</span>
       )}
 
       {showDetails && (
@@ -99,7 +99,7 @@ export function ShipCardOverlay({ ship }: { ship: Ship }) {
 
       {/* WP cost badge - top right */}
       {wpCost > 0 && (
-        <span className="ship-card__badge ship-card__badge--wp">{wpCost}</span>
+        <span className="ship-card__badge ship-card__badge--wp">{wpCost}☀️</span>
       )}
 
       <div className="ship-card__details">

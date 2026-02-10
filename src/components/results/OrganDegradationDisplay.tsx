@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { convertPointsToTier } from '../../core/results';
 import type { SimpleDegradation } from '../../core/types';
+import { Tooltip } from '../ui/Tooltip';
 import './OrganDegradationDisplay.css';
 
 interface OrganDegradationDisplayProps {
@@ -21,14 +22,19 @@ const ORGANS: Record<'liver' | 'pancreas', OrganConfig> = {
     name: 'liver',
     label: 'Liver',
     iconPath: '/assets/organs/liver_icon.png',
-    maxTier: 4, // 4 burnable tiers (2-5), tier 1 is non-burnable
+    maxTier: 4,
   },
   pancreas: {
     name: 'pancreas',
     label: 'Pancreas',
     iconPath: '/assets/organs/pancreas_icon.png',
-    maxTier: 4, // 4 burnable tiers (2-5), tier 1 is non-burnable
+    maxTier: 4,
   },
+};
+
+const ORGAN_TOOLTIPS: Record<'liver' | 'pancreas', string> = {
+  liver: "Degradation reduces liver's glucose regulation capacity",
+  pancreas: 'Degradation limits maximum insulin tier, weakening glucose control',
 };
 
 export function OrganDegradationDisplay({
@@ -78,16 +84,18 @@ export function OrganDegradationDisplay({
 
           return (
             <div key={organKey} className="organ-degradation-display__organ">
-              <div className="organ-degradation-display__organ-icon">
-                <img
-                  src={organ.iconPath}
-                  alt={organ.label}
-                  className="organ-degradation-display__icon"
-                />
-                <div className="organ-degradation-display__label">
-                  {organ.label}
+              <Tooltip text={ORGAN_TOOLTIPS[organKey]}>
+                <div className="organ-degradation-display__organ-icon">
+                  <img
+                    src={organ.iconPath}
+                    alt={organ.label}
+                    className="organ-degradation-display__icon"
+                  />
+                  <div className="organ-degradation-display__label">
+                    {organ.label}
+                  </div>
                 </div>
-              </div>
+              </Tooltip>
 
               <div className="organ-degradation-display__markers">
                 {Array.from({ length: maxCircles }, (_, i) => {

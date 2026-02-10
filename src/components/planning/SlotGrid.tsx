@@ -8,6 +8,7 @@ import {
   positionToSlotNumber,
 } from '../../core/types';
 import { Slot } from './Slot';
+import { Tooltip } from '../ui/Tooltip';
 import './SlotGrid.css';
 
 interface SlotGridProps {
@@ -180,17 +181,19 @@ export function SlotGrid({
         <div className="slot-grid__segment-header">
           <h3 className="slot-grid__segment-title">{segment.toUpperCase()}</h3>
           {segVal && (
-            <>
-              <span className="slot-grid__segment-range">
-                {segVal.min} - {segVal.max}g
-              </span>
-              <span
-                className="slot-grid__segment-current"
-                style={{ backgroundColor: getSegmentCarbColor(segVal) }}
-              >
-                {segVal.currentCarbs}g
-              </span>
-            </>
+            <Tooltip text="Carb target for this meal. Place food cards to reach the minimum. Green = on target, Yellow = close, Red = out of range." position="bottom">
+              <div className="slot-grid__segment-carbs">
+                <span className="slot-grid__segment-range">
+                  {segVal.min} - {segVal.max}g
+                </span>
+                <span
+                  className="slot-grid__segment-current"
+                  style={{ backgroundColor: getSegmentCarbColor(segVal) }}
+                >
+                  {segVal.currentCarbs}g
+                </span>
+              </div>
+            </Tooltip>
           )}
         </div>
         {rows}

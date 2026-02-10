@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Tooltip } from '../ui/Tooltip';
 import './ExcessBGIndicator.css';
 
 interface ExcessBGIndicatorProps {
@@ -37,7 +38,9 @@ export function ExcessBGIndicator({
 
   return (
     <div className="excess-bg-indicator">
-      <h3 className="excess-bg-indicator__title">Excess BG</h3>
+      <Tooltip text="Circles track excess glucose damage. Filled circles = organ degradation. 5 = defeat." position="bottom">
+        <h3 className="excess-bg-indicator__title">Excess BG</h3>
+      </Tooltip>
       <div className="excess-bg-indicator__markers">
         {Array.from({ length: maxCircles }, (_, i) => {
           const damaged = isDamaged(i);

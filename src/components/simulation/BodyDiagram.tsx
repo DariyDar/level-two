@@ -3,6 +3,7 @@ import type { DegradationState } from '../../core/types';
 import { useGameStore } from '../../store/gameStore';
 import { ContainerView } from './ContainerView';
 import { OrganSprite } from './OrganSprite';
+import { Tooltip } from '../ui/Tooltip';
 import './BodyDiagram.css';
 
 interface InterpolatedValues {
@@ -60,19 +61,21 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
     <div className="body-diagram">
       {/* Kidneys icon - top left */}
       <div className="body-diagram__kidneys-icon">
-        <OrganSprite
-          label="Kidney"
-          iconPath="/assets/organs/kidney_icon.png"
-          isActive={kidneyRate > 0}
-          tierConfig={{
-            maxTier: 4,
-            activeTier: kidneyTier,
-            degradedTiers: 0,
-            colorScheme: 'green',
-            position: 'top'
-          }}
-          size="normal"
-        />
+        <Tooltip text="Kidneys — filter excess glucose from blood (currently inactive)" position="bottom">
+          <OrganSprite
+            label="Kidney"
+            iconPath="/assets/organs/kidney_icon.png"
+            isActive={kidneyRate > 0}
+            tierConfig={{
+              maxTier: 4,
+              activeTier: kidneyTier,
+              degradedTiers: 0,
+              colorScheme: 'green',
+              position: 'top'
+            }}
+            size="normal"
+          />
+        </Tooltip>
         {showDetailedIndicators && (
           <div className="body-diagram__value-label">
             {Math.round(kidneyRate)}/h
@@ -95,20 +98,22 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
 
       {/* Muscles - top right */}
       <div className="body-diagram__muscles">
-        <OrganSprite
-          label="Muscle"
-          iconPath="/assets/organs/muscle_icon.png"
-          isActive={displayMuscleRate > 0}
-          tierConfig={{
-            maxTier: 5,
-            activeTier: muscleTier,
-            degradedTiers: pancreasDegradedTiers,
-            isBoosted: isFastInsulinActive,
-            showBoostedTier: showBoostedMuscleTier,
-            position: 'top'
-          }}
-          size="normal"
-        />
+        <Tooltip text="Muscles — burn blood glucose using insulin from pancreas" position="bottom">
+          <OrganSprite
+            label="Muscle"
+            iconPath="/assets/organs/muscle_icon.png"
+            isActive={displayMuscleRate > 0}
+            tierConfig={{
+              maxTier: 5,
+              activeTier: muscleTier,
+              degradedTiers: pancreasDegradedTiers,
+              isBoosted: isFastInsulinActive,
+              showBoostedTier: showBoostedMuscleTier,
+              position: 'top'
+            }}
+            size="normal"
+          />
+        </Tooltip>
         {showDetailedIndicators && (
           <div className="body-diagram__value-label">
             {Math.round(displayMuscleRate)}/h
@@ -118,7 +123,9 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
 
       {/* Blood Glucose - center, full height */}
       <div className="body-diagram__bg">
-        <div className="body-diagram__bg-label">Blood Glucose</div>
+        <Tooltip text="Blood Glucose — keep between 70–200 mg/dL to prevent organ damage" position="bottom">
+          <div className="body-diagram__bg-label">Blood Glucose</div>
+        </Tooltip>
         <ContainerView
           label="Blood Glucose"
           emoji=""
@@ -137,19 +144,21 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
 
       {/* Liver icon - bottom left */}
       <div className="body-diagram__liver-icon">
-        <OrganSprite
-          label="Liver"
-          iconPath="/assets/organs/liver_icon.png"
-          isActive={displayLiverRate > 0}
-          tierConfig={{
-            maxTier: 4,
-            activeTier: 0,
-            degradedTiers: degradation.liver.tier - 1,
-            colorScheme: 'green',
-            position: 'top'
-          }}
-          size="normal"
-        />
+        <Tooltip text="Liver — stores and releases glucose to stabilize blood sugar">
+          <OrganSprite
+            label="Liver"
+            iconPath="/assets/organs/liver_icon.png"
+            isActive={displayLiverRate > 0}
+            tierConfig={{
+              maxTier: 4,
+              activeTier: 0,
+              degradedTiers: degradation.liver.tier - 1,
+              colorScheme: 'green',
+              position: 'top'
+            }}
+            size="normal"
+          />
+        </Tooltip>
         {showDetailedIndicators && (
           <div className="body-diagram__value-label">
             {Math.round(displayLiverRate)}/h
@@ -172,19 +181,21 @@ export function BodyDiagram({ state, degradation, interpolated }: BodyDiagramPro
 
       {/* Pancreas - bottom right */}
       <div className="body-diagram__pancreas">
-        <OrganSprite
-          label="Pancreas"
-          iconPath="/assets/organs/pancreas_icon.png"
-          isActive={currentPancreasTier > 0}
-          tierConfig={{
-            maxTier: 5,
-            activeTier: currentPancreasTier,
-            degradedTiers: pancreasDegradedTiers,
-            isBoosted: isFastInsulinActive,
-            position: 'top'
-          }}
-          size="normal"
-        />
+        <Tooltip text="Pancreas — senses blood glucose level and produces insulin">
+          <OrganSprite
+            label="Pancreas"
+            iconPath="/assets/organs/pancreas_icon.png"
+            isActive={currentPancreasTier > 0}
+            tierConfig={{
+              maxTier: 5,
+              activeTier: currentPancreasTier,
+              degradedTiers: pancreasDegradedTiers,
+              isBoosted: isFastInsulinActive,
+              position: 'top'
+            }}
+            size="normal"
+          />
+        </Tooltip>
         {showDetailedIndicators && (
           <div className="body-diagram__value-label">
             T{currentPancreasTier}

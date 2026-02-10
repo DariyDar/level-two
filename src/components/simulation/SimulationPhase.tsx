@@ -11,6 +11,7 @@ import { BodyDiagram } from './BodyDiagram';
 import { BoostButton } from './BoostButton';
 import { ShipQueue } from './ShipQueue';
 import { PipeSystem } from './PipeSystem';
+import { Tooltip } from '../ui/Tooltip';
 import './SimulationPhase.css';
 
 // Available simulation speeds
@@ -231,14 +232,16 @@ export function SimulationPhase() {
           onActivate={handleLiverBoost}
         />
         */}
-        <BoostButton
-          label="Fast Insulin"
-          emoji="💧"
-          boost={simState.pancreasBoost}
-          cooldownMax={3}
-          onActivate={handlePancreasBoost}
-          isFastInsulin={true}
-        />
+        <Tooltip text="Boosts muscle absorption by +1 tier. Ignores degradation limits.">
+          <BoostButton
+            label="Fast Insulin"
+            emoji="💧"
+            boost={simState.pancreasBoost}
+            cooldownMax={3}
+            onActivate={handlePancreasBoost}
+            isFastInsulin={true}
+          />
+        </Tooltip>
       </div>
     </div>
   );
