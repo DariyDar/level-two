@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'framer-motion'
 import type { FoodCard } from '../../types'
 import { FoodCardComponent } from './FoodCardComponent'
 import './OfferCards.css'
@@ -6,39 +7,32 @@ interface OfferCardsProps {
   cards: FoodCard[]
   currentOfferIndex: number
   totalOffers: number
-  onPlaceCard: (card: FoodCard) => void
-  onSaveCard: (card: FoodCard) => void
 }
 
-export function OfferCards({ cards, currentOfferIndex, totalOffers, onPlaceCard, onSaveCard }: OfferCardsProps) {
-  if (cards.length === 0) return null
-
+export function OfferCards({ cards, currentOfferIndex, totalOffers }: OfferCardsProps) {
   return (
     <div className="offer-cards">
       <div className="offer-cards__label">
         Offer {currentOfferIndex + 1}/{totalOffers}
       </div>
-      <div className="offer-cards__grid">
-        {cards.map(card => (
-          <div key={card.id} className="offer-card-wrapper">
-            <FoodCardComponent card={card} />
-            <div className="offer-card-actions">
-              <button
-                className="offer-card-btn offer-card-btn--place"
-                onClick={() => onPlaceCard(card)}
-              >
-                Place
-              </button>
-              <button
-                className="offer-card-btn offer-card-btn--save"
-                onClick={() => onSaveCard(card)}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`offer-${currentOfferIndex}-${cards.length}`}
+          className="offer-cards__grid"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.2 }}
+        >
+          {cards.map((card, i) => (
+            <FoodCardComponent
+              key={card.id}
+              card={card}
+              dragId={`offer-${card.id}-${i}`}
+            />
+          ))}
+        </motion.div>
+      </AnimatePresence>
     </div>
   )
 }

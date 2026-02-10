@@ -1,32 +1,42 @@
+import { useDroppable } from '@dnd-kit/core'
 import type { FoodCard } from '../../types'
 import { FoodCardComponent } from './FoodCardComponent'
 import './MealSlots.css'
 
 interface MealSlotsProps {
   slots: (FoodCard | null)[]
-  onSlotClick: (index: number) => void
-  activeSlotIndex: number | null
 }
 
-export function MealSlots({ slots, onSlotClick, activeSlotIndex }: MealSlotsProps) {
+function MealSlot({ card, index }: { card: FoodCard | null; index: number }) {
+  const { isOver, setNodeRef } = useDroppable({
+    id: `slot-${index}`,
+    data: { type: 'slot', index },
+    disabled: card !== null,
+  })
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`meal-slot ${!card ? 'meal-slot--empty' : ''} ${isOver && !card ? 'meal-slot--over' : ''}`}
+    >
+      {card ? (
+        <FoodCardComponent card={card} size="small" />
+      ) : (
+        <div className="meal-slot__placeholder">
+          Slot {index + 1}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export function MealSlots({ slots }: MealSlotsProps) {
   return (
     <div className="meal-slots">
       <div className="meal-slots__label">Meal</div>
       <div className="meal-slots__grid">
         {slots.map((card, i) => (
-          <div
-            key={i}
-            className={`meal-slot ${!card ? 'meal-slot--empty' : ''} ${activeSlotIndex === i ? 'meal-slot--active' : ''}`}
-            onClick={() => !card && onSlotClick(i)}
-          >
-            {card ? (
-              <FoodCardComponent card={card} size="small" />
-            ) : (
-              <div className="meal-slot__placeholder">
-                Slot {i + 1}
-              </div>
-            )}
-          </div>
+          <MealSlot key={i} card={card} index={i} />
         ))}
       </div>
     </div>

@@ -30,17 +30,12 @@
 
 .meal-slot--empty {
   border: 2px dashed #4a5568;
-  cursor: pointer;
 }
 
-.meal-slot--empty:hover {
+.meal-slot--over {
   border-color: #4a90d9;
-  background: rgba(74, 144, 217, 0.05);
-}
-
-.meal-slot--active {
-  box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.5);
-  border-color: #4a90d9;
+  background: rgba(74, 144, 217, 0.1);
+  box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.3);
 }
 
 .meal-slot__placeholder {

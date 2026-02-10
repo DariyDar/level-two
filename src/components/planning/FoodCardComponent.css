@@ -3,14 +3,15 @@
   border: 2px solid #555;
   border-radius: 10px;
   padding: 10px;
-  cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  cursor: grab;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
   width: 110px;
   user-select: none;
+  touch-action: none;
 }
 
 .food-card:hover {
@@ -18,9 +19,15 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-.food-card--selected {
-  box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.7);
-  transform: translateY(-3px);
+.food-card--dragging {
+  opacity: 0.3;
+}
+
+.food-card--overlay {
+  cursor: grabbing;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  transform: scale(1.05) rotate(2deg);
+  opacity: 1;
 }
 
 .food-card--small {

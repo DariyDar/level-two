@@ -113,6 +113,12 @@ export const useGameStore = create<GameState>()(
           .map(id => foods.find(f => f.id === id))
           .filter((f): f is FoodCard => f !== undefined)
 
+        // Add 1 random food card to starting inventory
+        if (foods.length > 0) {
+          const randomCard = foods[Math.floor(Math.random() * foods.length)]
+          initialInventory.push(randomCard)
+        }
+
         set({
           currentLevel: level,
           currentDay: 0,

@@ -1,10 +1,21 @@
 import { useState } from 'react'
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragStartEvent,
+  type DragEndEvent,
+} from '@dnd-kit/core'
 import { useGameStore } from '../../store/gameStore'
 import { MEAL_SEGMENTS } from '../../types'
 import type { FoodCard } from '../../types'
 import { MealSlots } from './MealSlots'
 import { OfferCards } from './OfferCards'
 import { Inventory } from './Inventory'
+import { FoodCardComponent } from './FoodCardComponent'
 import './PlanningPhase.css'
 
 export function PlanningPhase() {
@@ -21,7 +32,13 @@ export function PlanningPhase() {
     startSimulation,
   } = useGameStore()
 
-  const [pendingPlaceCard, setPendingPlaceCard] = useState<FoodCard | null>(null)
+  const [activeCard, setActiveCard] = useState<FoodCard | null>(null)
+  const [dragSource, setDragSource] = useState<'offer' | 'inventory' | null>(null)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 100, tolerance: 5 } }),
+  )
 
   if (!currentLevel || !offerFlow) return null
 
@@ -30,87 +47,80 @@ export function PlanningPhase() {
   const allSlotsFilled = mealSlots.every(s => s !== null)
   const hasEmptySlot = mealSlots.some(s => s === null)
 
-  const handlePlaceCard = (card: FoodCard) => {
-    // If only one empty slot, place directly
-    const emptySlots = mealSlots
-      .map((s, i) => (s === null ? i : -1))
-      .filter(i => i !== -1)
+  function handleDragStart(event: DragStartEvent) {
+    const card = event.active.data.current?.card as FoodCard | undefined
+    if (!card) return
+    setActiveCard(card)
 
-    if (emptySlots.length === 1) {
-      placeCardInSlot(card, emptySlots[0])
-      setPendingPlaceCard(null)
-    } else if (emptySlots.length > 1) {
-      // Let player pick a slot
-      setPendingPlaceCard(card)
-    }
+    const id = String(event.active.id)
+    setDragSource(id.startsWith('inv-') ? 'inventory' : 'offer')
   }
 
-  const handleSlotClick = (index: number) => {
-    if (pendingPlaceCard) {
-      placeCardInSlot(pendingPlaceCard, index)
-      setPendingPlaceCard(null)
-    }
-  }
+  function handleDragEnd(event: DragEndEvent) {
+    const { over } = event
+    const card = activeCard
+    const source = dragSource
 
-  const handleSaveCard = (card: FoodCard) => {
-    sendCardToInventory(card)
-    setPendingPlaceCard(null)
-  }
+    setActiveCard(null)
+    setDragSource(null)
 
-  const handleUseFromInventory = (card: FoodCard) => {
-    const emptySlots = mealSlots
-      .map((s, i) => (s === null ? i : -1))
-      .filter(i => i !== -1)
+    if (!card || !over) return
 
-    if (emptySlots.length === 1) {
-      useCardFromInventory(card.id, emptySlots[0])
-    } else if (emptySlots.length > 1) {
-      // Store card reference, let player pick slot
-      // For MVP: place in first empty slot
-      useCardFromInventory(card.id, emptySlots[0])
+    const overData = over.data.current as { type: string; index?: number } | undefined
+    if (!overData) return
+
+    if (overData.type === 'slot' && typeof overData.index === 'number') {
+      if (mealSlots[overData.index] !== null) return
+
+      if (source === 'offer') {
+        placeCardInSlot(card, overData.index)
+      } else if (source === 'inventory') {
+        useCardFromInventory(card.id, overData.index)
+      }
+    } else if (overData.type === 'inventory' && source === 'offer') {
+      sendCardToInventory(card)
     }
   }
 
   return (
-    <div className="planning-phase">
-      <div className="planning-header">
-        <span className="planning-header__segment">{segmentName}</span>
-        <span className="planning-header__day">Day {currentDay + 1}/{totalDays}</span>
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="planning-phase">
+        <div className="planning-header">
+          <span className="planning-header__segment">{segmentName}</span>
+          <span className="planning-header__day">Day {currentDay + 1}/{totalDays}</span>
+        </div>
+
+        <MealSlots slots={mealSlots} />
+
+        {!allSlotsFilled && offerFlow.currentOfferCards.length > 0 && (
+          <OfferCards
+            cards={offerFlow.currentOfferCards}
+            currentOfferIndex={offerFlow.currentOfferIndex}
+            totalOffers={offerFlow.allOffers.length}
+          />
+        )}
+
+        {allSlotsFilled && (
+          <button className="simulate-btn" onClick={startSimulation}>
+            Simulate
+          </button>
+        )}
+
+        <Inventory
+          cards={inventory}
+          hasEmptySlot={hasEmptySlot}
+        />
       </div>
 
-      <MealSlots
-        slots={mealSlots}
-        onSlotClick={handleSlotClick}
-        activeSlotIndex={pendingPlaceCard ? mealSlots.findIndex(s => s === null) : null}
-      />
-
-      {pendingPlaceCard && (
-        <div className="planning-hint">
-          Click an empty slot to place <strong>{pendingPlaceCard.name}</strong>
-        </div>
-      )}
-
-      {!allSlotsFilled && (
-        <OfferCards
-          cards={offerFlow.currentOfferCards}
-          currentOfferIndex={offerFlow.currentOfferIndex}
-          totalOffers={offerFlow.allOffers.length}
-          onPlaceCard={handlePlaceCard}
-          onSaveCard={handleSaveCard}
-        />
-      )}
-
-      {allSlotsFilled && (
-        <button className="simulate-btn" onClick={startSimulation}>
-          Simulate
-        </button>
-      )}
-
-      <Inventory
-        cards={inventory}
-        onUseCard={handleUseFromInventory}
-        hasEmptySlot={hasEmptySlot}
-      />
-    </div>
+      <DragOverlay dropAnimation={null}>
+        {activeCard && (
+          <FoodCardComponent card={activeCard} isDragOverlay />
+        )}
+      </DragOverlay>
+    </DndContext>
   )
 }

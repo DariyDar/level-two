@@ -1,29 +1,37 @@
+import { useDraggable } from '@dnd-kit/core'
 import type { FoodCard } from '../../types'
 import { SPEED_LABELS } from '../../types'
 import './FoodCardComponent.css'
 
 interface FoodCardComponentProps {
   card: FoodCard
-  onClick?: () => void
+  dragId?: string
   size?: 'normal' | 'small'
-  selected?: boolean
+  isDragOverlay?: boolean
 }
 
 const TIER_COLORS: Record<number, string> = {
-  1: '#22c55e', // green - healthy
-  2: '#eab308', // yellow - neutral
-  3: '#ef4444', // red - junk
+  1: '#22c55e',
+  2: '#eab308',
+  3: '#ef4444',
 }
 
-export function FoodCardComponent({ card, onClick, size = 'normal', selected = false }: FoodCardComponentProps) {
+export function FoodCardComponent({ card, dragId, size = 'normal', isDragOverlay = false }: FoodCardComponentProps) {
   const tierColor = TIER_COLORS[card.tier] ?? '#666'
   const speedLabel = SPEED_LABELS[card.glucoseSpeed] ?? 'Unknown'
 
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: dragId ?? `static-${card.id}`,
+    data: { card },
+    disabled: !dragId,
+  })
+
   return (
     <div
-      className={`food-card food-card--${size} ${selected ? 'food-card--selected' : ''}`}
+      ref={dragId ? setNodeRef : undefined}
+      className={`food-card food-card--${size} ${isDragging && !isDragOverlay ? 'food-card--dragging' : ''} ${isDragOverlay ? 'food-card--overlay' : ''}`}
       style={{ borderColor: tierColor }}
-      onClick={onClick}
+      {...(dragId ? { ...listeners, ...attributes } : {})}
     >
       <div className="food-card__emoji">{card.emoji}</div>
       <div className="food-card__name">{card.name}</div>
