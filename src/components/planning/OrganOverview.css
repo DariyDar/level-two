@@ -6,7 +6,7 @@
   border: 1px solid #333;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .organ-overview__title {
@@ -17,48 +17,109 @@
   letter-spacing: 1px;
 }
 
-.organ-overview__grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px 16px;
+/* Organ rows */
+.organ-overview__organs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .organ-overview__organ {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 
 .organ-overview__icon {
   font-size: 14px;
+  width: 18px;
+  text-align: center;
 }
 
 .organ-overview__name {
   font-size: 11px;
   color: #a0aec0;
+  width: 60px;
+}
+
+.organ-overview__health-track {
   flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.organ-overview__health-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
 }
 
 .organ-overview__val {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  color: #cbd5e0;
+  width: 42px;
+  text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-.organ-overview__val--degraded {
-  color: #f87171;
-}
-
-.organ-overview__degradation {
+/* Attack vs Defense comparison */
+.organ-overview__comparison {
   display: flex;
-  gap: 10px;
-  padding-top: 4px;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 6px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.organ-overview__dmg {
+.organ-overview__bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.organ-overview__bar-label {
   font-size: 11px;
-  color: #f87171;
+  color: #718096;
+  width: 52px;
   font-weight: 600;
+}
+
+.organ-overview__bar-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.organ-overview__bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.organ-overview__bar-fill--attack {
+  background: #ef4444;
+}
+
+.organ-overview__bar-fill--defense {
+  background: #22c55e;
+}
+
+.organ-overview__bar-value {
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 60px;
+  text-align: right;
+}
+
+.organ-overview__bar-value--attack {
+  color: #f87171;
+}
+
+.organ-overview__bar-value--defense {
+  color: #4ade80;
 }

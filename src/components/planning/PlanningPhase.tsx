@@ -114,7 +114,7 @@ export function PlanningPhase() {
           </button>
         )}
 
-        <OrganOverview degradation={degradation} />
+        <OrganOverview degradation={degradation} slots={mealSlots} />
 
         <Inventory
           cards={inventory}
