@@ -170,8 +170,14 @@ export const useGameStore = create<GameState>()(
         const allOffers = generateOffers(templates, allFoods, constraints)
         const firstOffer = allOffers[0] || []
 
+        // Pre-place a random Fast/VeryFast food in slot 0
+        const fastFoods = allFoods.filter(f => f.glucoseSpeed >= 3)
+        const preplacedCard = fastFoods.length > 0
+          ? fastFoods[Math.floor(Math.random() * fastFoods.length)]
+          : null
+
         set({
-          mealSlots: [null, null, null],
+          mealSlots: [preplacedCard, null, null],
           offerFlow: {
             allOffers,
             currentOfferIndex: 0,

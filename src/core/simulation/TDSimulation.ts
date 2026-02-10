@@ -90,6 +90,7 @@ export class TDSimulation {
   private state: SimulationState
   private mealCards: FoodCard[]
   private mealSpeedMultiplier: number
+  private muscleBoost: number
   private segmentDelay: number
 
   constructor(
@@ -102,6 +103,11 @@ export class TDSimulation {
 
     const { speedMultiplier } = computeMealModifiers(mealCards)
     this.mealSpeedMultiplier = speedMultiplier
+
+    // Protein tag boosts muscles
+    this.muscleBoost = mealCards.some(c => c.tag === 'protein')
+      ? SIM_CONSTANTS.PROTEIN_TAG_MUSCLE_BOOST
+      : 1.0
 
     nextProjectileId = 0
 
@@ -248,8 +254,8 @@ export class TDSimulation {
     const pancreas = this.state.organs.pancreas
     pancreas.currentTier = computePancreasTier(activeCount, pancreas.maxTier)
 
-    // Update muscle DPS based on pancreas tier
-    this.state.organs.muscles.dps = pancreas.currentTier * SIM_CONSTANTS.MUSCLE_DPS_PER_TIER
+    // Update muscle DPS based on pancreas tier (with protein tag boost)
+    this.state.organs.muscles.dps = pancreas.currentTier * SIM_CONSTANTS.MUSCLE_DPS_PER_TIER * this.muscleBoost
   }
 
   private processMuscleFire(dt: number): void {

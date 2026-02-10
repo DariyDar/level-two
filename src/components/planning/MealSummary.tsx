@@ -7,12 +7,11 @@ interface MealSummaryProps {
 }
 
 const TAG_LABELS: Record<string, string> = {
-  grain: '🌾 Grain',
-  meat: '🥩 Meat',
+  fiber: '🌾 Fiber',
+  protein: '🥩 Protein',
   dairy: '🥛 Dairy',
   vegetable: '🥬 Vegetable',
   fruit: '🍎 Fruit',
-  junk: '🍔 Junk',
   sweet: '🍬 Sweet',
 }
 
@@ -61,11 +60,15 @@ export function MealSummary({ slots }: MealSummaryProps) {
   const proteinCount = cards.filter(c => c.modifiers.protein).length
   const fatCount = cards.filter(c => c.modifiers.fat).length
 
+  // Tag-based effects
+  const hasProteinTag = cards.some(c => c.tag === 'protein')
+
   const activeModifiers: { info: ModifierInfo; count?: number }[] = []
   if (hasFiber) activeModifiers.push({ info: MODIFIER_INFO.fiber })
   if (hasSugar) activeModifiers.push({ info: MODIFIER_INFO.sugar })
   if (proteinCount > 0) activeModifiers.push({ info: MODIFIER_INFO.protein, count: proteinCount })
   if (fatCount > 0) activeModifiers.push({ info: MODIFIER_INFO.fat, count: fatCount })
+  if (hasProteinTag) activeModifiers.push({ info: { emoji: '💪', label: 'MuscleBoost', effect: `Muscles ×${SIM_CONSTANTS.PROTEIN_TAG_MUSCLE_BOOST}` } })
 
   const totalCarbs = cards.reduce((sum, c) => sum + c.carbs, 0)
 

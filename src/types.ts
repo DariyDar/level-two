@@ -172,11 +172,11 @@ export const SIM_CONSTANTS = {
   PANCREAS_TIER_THRESHOLDS: [0, 1, 4, 7, 11] as readonly number[],
   PANCREAS_MAX_TIER: 4,
 
-  // Muscles (~25% weaker DPS: 25→19)
+  // Muscles (~50% weaker total from original: 25→14)
   MUSCLE_RANGE_START: 0.3,
   MUSCLE_RANGE_END: 0.75,
   MUSCLE_MAX_TARGETS: 2,
-  MUSCLE_DPS_PER_TIER: 19,    // mg/sec per tier (was 25)
+  MUSCLE_DPS_PER_TIER: 14,    // mg/sec per tier (was 19)
 
   // Kidneys (~25% weaker: 15→11)
   KIDNEY_RANGE_START: 0.8,
@@ -190,6 +190,9 @@ export const SIM_CONSTANTS = {
   PROTEIN_DURATION_MULTIPLIER: 1.5,
   FAT_SPEED_MULTIPLIER: 0.85,
   FAT_DURATION_MULTIPLIER: 1.3,
+
+  // Tag-based effects
+  PROTEIN_TAG_MUSCLE_BOOST: 1.25,  // muscle DPS ×1.25 if any card has "protein" tag
 
   // Degradation per circle
   LIVER_SLOW_PENALTY: 0.1,    // slowFactor increases by 0.1 per circle
