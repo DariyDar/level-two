@@ -1,57 +1,57 @@
 .planning-phase {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  gap: 20px;
   padding: 16px;
-  max-width: 400px;
+  max-width: 600px;
   margin: 0 auto;
 }
 
-.planning-phase__day-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #a0aec0;
-  text-align: center;
+.planning-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 16px;
+  background: #2a2a40;
+  border-radius: 8px;
 }
 
-.planning-phase--loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  color: #a0aec0;
+.planning-header__segment {
   font-size: 16px;
+  font-weight: 700;
+  color: #eee;
 }
 
-.planning-phase__content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.planning-header__day {
+  font-size: 14px;
+  color: #718096;
 }
 
-/* Mobile: SlotGrid (last-child) appears on top despite DOM order */
-.planning-phase__content > *:last-child {
-  order: -1;
+.planning-hint {
+  color: #4a90d9;
+  font-size: 13px;
+  text-align: center;
+  padding: 6px 12px;
+  background: rgba(74, 144, 217, 0.1);
+  border-radius: 6px;
 }
 
-/* Responsive - tablet and up */
-@media (min-width: 768px) {
-  .planning-phase {
-    max-width: 800px;
-  }
+.simulate-btn {
+  padding: 12px 48px;
+  font-size: 16px;
+  font-weight: 700;
+  background: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
 
-  .planning-phase__content {
-    flex-direction: row;
-    align-items: flex-start;
-  }
-
-  /* Desktop: ShipInventory (first) fills, SlotGrid (last) fixed */
-  .planning-phase__content > *:first-child {
-    flex: 1;
-  }
-
-  .planning-phase__content > *:last-child {
-    flex: 0 0 auto;
-    order: 0;
-  }
+.simulate-btn:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
 }

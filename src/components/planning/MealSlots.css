@@ -1,0 +1,50 @@
+.meal-slots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.meal-slots__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.meal-slots__grid {
+  display: flex;
+  gap: 12px;
+}
+
+.meal-slot {
+  width: 110px;
+  min-height: 140px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.15s;
+}
+
+.meal-slot--empty {
+  border: 2px dashed #4a5568;
+  cursor: pointer;
+}
+
+.meal-slot--empty:hover {
+  border-color: #4a90d9;
+  background: rgba(74, 144, 217, 0.05);
+}
+
+.meal-slot--active {
+  box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.5);
+  border-color: #4a90d9;
+}
+
+.meal-slot__placeholder {
+  color: #4a5568;
+  font-size: 13px;
+  font-weight: 500;
+}

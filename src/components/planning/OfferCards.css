@@ -1,0 +1,55 @@
+.offer-cards {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.offer-cards__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4a90d9;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.offer-cards__grid {
+  display: flex;
+  gap: 16px;
+}
+
+.offer-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.offer-card-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.offer-card-btn {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.offer-card-btn:hover {
+  opacity: 0.85;
+}
+
+.offer-card-btn--place {
+  background: #4a90d9;
+  color: white;
+}
+
+.offer-card-btn--save {
+  background: #4a5568;
+  color: #ddd;
+}

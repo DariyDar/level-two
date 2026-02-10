@@ -1,0 +1,86 @@
+.food-card {
+  background: #2a2a40;
+  border: 2px solid #555;
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 110px;
+  user-select: none;
+}
+
+.food-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.food-card--selected {
+  box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.7);
+  transform: translateY(-3px);
+}
+
+.food-card--small {
+  width: 90px;
+  padding: 6px;
+}
+
+.food-card__emoji {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.food-card--small .food-card__emoji {
+  font-size: 24px;
+}
+
+.food-card__name {
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  color: #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.food-card__stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+  color: #999;
+}
+
+.food-card__speed {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+}
+
+.food-card__speed--1 { color: #22c55e; }
+.food-card__speed--2 { color: #eab308; }
+.food-card__speed--3 { color: #f97316; }
+.food-card__speed--4 { color: #ef4444; }
+
+.food-card__modifiers {
+  display: flex;
+  gap: 4px;
+  font-size: 14px;
+  min-height: 20px;
+}
+
+.food-card__mod {
+  cursor: help;
+}
+
+.food-card--small .food-card__stats,
+.food-card--small .food-card__modifiers {
+  font-size: 9px;
+}

@@ -1,0 +1,40 @@
+.battlefield {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.battlefield__svg {
+  width: 100%;
+  height: auto;
+  background: #12122a;
+  border-radius: 10px;
+  border: 1px solid #333;
+}
+
+.zone-label {
+  fill: #4a5568;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.base-label {
+  fill: #ef4444;
+  font-size: 12px;
+  font-weight: 700;
+  text-anchor: middle;
+  letter-spacing: 2px;
+}
+
+.organ-icon {
+  font-size: 24px;
+}
+
+.projectile {
+  transition: opacity 0.1s;
+}
+
+.projectile--targeted {
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
+}

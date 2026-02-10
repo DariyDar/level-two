@@ -1,142 +1,83 @@
-import { useMemo } from 'react';
-import { useGameStore } from '../../store/gameStore';
-import { calculateDayResults } from '../../core/results';
-import { BGGraph } from './BGGraph';
-import { ExcessBGIndicator } from './ExcessBGIndicator';
-import { OrganDegradationDisplay } from './OrganDegradationDisplay';
-import { MoodScale } from '../ui/MoodScale';
-import './ResultsPhase.css';
+import { useGameStore } from '../../store/gameStore'
+import { MEAL_SEGMENTS } from '../../types'
+import './ResultsPhase.css'
 
-// Mock BG history for testing - in real app this comes from simulation
-const MOCK_BG_HISTORY = [
-  100, 95, 120, 150, 180, 160, 140, 130, 145, 170, 190, 175, 160, 145, 130, 115, 105, 100
-];
-
-interface ResultsPhaseProps {
-  bgHistory?: number[];
-}
-
-function getMoodExplanation(mood: number, isLastDay: boolean): string | null {
-  if (isLastDay) return null;
-
-  if (mood >= 0) {
-    return 'Good mood! All food will be available tomorrow.';
-  } else if (mood >= -2) {
-    return 'Decent mood. Some healthy food may require effort.';
-  } else if (mood >= -5) {
-    return 'Low mood. Healthy food choices will be limited.';
-  } else {
-    return 'Very low mood. Only comfort food available tomorrow.';
-  }
-}
-
-export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps) {
+export function ResultsPhase() {
   const {
-    currentDay,
+    lastSegmentResult,
     currentLevel,
+    currentDay,
+    currentSegment,
     degradation,
-    mood,
-    setResults,
-    startNextDay,
-    retryDay,
-    setLevel,
-  } = useGameStore();
+    nextSegment,
+    retrySegment,
+    resetLevel,
+  } = useGameStore()
 
-  // Calculate results
-  const results = useMemo(() => {
-    return calculateDayResults(currentDay, bgHistory);
-  }, [currentDay, bgHistory]);
+  if (!lastSegmentResult || !currentLevel) return null
 
-  const { assessment } = results;
-  const defeated = assessment === 'Defeat';
-  const excellent = assessment === 'Excellent';
-  const totalDays = currentLevel?.days ?? 3;
-  const isLastDay = currentDay >= totalDays;
-
-  const handleContinue = () => {
-    setResults(results);
-    startNextDay();
-  };
-
-  const handleRetry = () => {
-    retryDay();
-  };
-
-  const handleRestartLevel = () => {
-    if (currentLevel) setLevel(currentLevel);
-  };
-
-  const moodExplanation = getMoodExplanation(mood, isLastDay);
+  const { excessGlucose, newDegradationCircles, assessment } = lastSegmentResult
+  const segmentName = MEAL_SEGMENTS[currentSegment] ?? 'Meal'
+  const dayConfig = currentLevel.days[currentDay]
+  const isLastSegment = currentSegment + 1 >= (dayConfig?.segments.length ?? 3)
+  const isLastDay = currentDay + 1 >= currentLevel.days.length
+  const isLevelComplete = isLastSegment && isLastDay && assessment !== 'Defeat'
+  const isDefeat = assessment === 'Defeat'
 
   return (
     <div className="results-phase">
-      <h2 className="results-phase__title">Day {currentDay}/{totalDays} Results</h2>
-
-      <BGGraph
-        bgHistory={bgHistory}
-        thresholds={{
-          low: 70,
-          high: 200,
-          critical: 300,
-        }}
-      />
-
-      <ExcessBGIndicator
-        totalCircles={results.degradationBuffer.totalCircles}
-        defeatThreshold={currentLevel?.winCondition?.maxDegradationCircles ?? 5}
-      />
-
-      <OrganDegradationDisplay
-        currentDegradation={degradation}
-        addedDegradation={results.degradation}
-        animationDelay={2500}
-      />
-
-      {!defeated && (
-        <p className="results-phase__perfect-hint">
-          A perfect victory is possible!
-        </p>
-      )}
-
-      {/* Mood summary */}
-      <div className="results-phase__mood-summary">
-        <div className="results-phase__mood-row">
-          <span className="results-phase__mood-label">
-            {isLastDay ? 'Final mood:' : 'End-of-day mood:'}
-          </span>
-          <MoodScale mood={mood} />
-        </div>
-        {moodExplanation && (
-          <p className="results-phase__mood-explanation">{moodExplanation}</p>
-        )}
+      <div className="results-header">
+        <span className="results-header__title">
+          {segmentName} — Day {currentDay + 1}/{currentLevel.days.length}
+        </span>
       </div>
 
-      <div className="results-phase__actions">
-        {defeated ? (
+      <div className={`results-assessment results-assessment--${assessment.toLowerCase()}`}>
+        {assessment}
+      </div>
+
+      <div className="results-stats">
+        <div className="results-stat">
+          <span className="results-stat__label">Excess Glucose</span>
+          <span className="results-stat__value">{Math.round(excessGlucose)} mg</span>
+        </div>
+        <div className="results-stat">
+          <span className="results-stat__label">New Degradations</span>
+          <span className="results-stat__value">{newDegradationCircles}</span>
+        </div>
+      </div>
+
+      <div className="results-degradation">
+        <div className="results-degradation__title">Organ Damage</div>
+        <div className="results-degradation__row">
+          <span>Liver: {degradation.liverCircles}</span>
+          <span>Pancreas: {degradation.pancreasCircles}</span>
+          <span>Kidneys: {degradation.kidneysCircles}</span>
+        </div>
+      </div>
+
+      <div className="results-actions">
+        {isDefeat && (
           <>
-            <p className="results-phase__fail-message">
-              Too much damage! Try a different approach.
-            </p>
-            <button className="results-phase__button results-phase__button--secondary" onClick={handleRetry}>
-              Retry Day
+            <button className="results-btn results-btn--retry" onClick={retrySegment}>
+              Retry
             </button>
-            <button className="results-phase__button results-phase__button--secondary" onClick={handleRestartLevel}>
+            <button className="results-btn results-btn--reset" onClick={resetLevel}>
               Restart Level
             </button>
           </>
-        ) : (
-          !isLastDay && (
-            <button className="results-phase__button results-phase__button--primary" onClick={handleContinue}>
-              Continue →
-            </button>
-          )
         )}
-        {!defeated && !excellent && (
-          <button className="results-phase__button results-phase__button--secondary" onClick={handleRetry}>
-            Retry Day
+        {isLevelComplete && (
+          <div className="results-victory">
+            Level Complete!
+          </div>
+        )}
+        {!isDefeat && !isLevelComplete && (
+          <button className="results-btn results-btn--next" onClick={nextSegment}>
+            {isLastSegment ? 'Next Day' : 'Next Meal'}
           </button>
         )}
       </div>
     </div>
-  );
+  )
 }
