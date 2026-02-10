@@ -98,3 +98,25 @@
   width: 256px; /* 80px * 3 + 8px * 2 gaps */
 }
 
+/* Exercise effect zone indicator */
+.slot__exercise-indicator {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  font-size: 14px;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 6;
+  opacity: 0.8;
+}
+
+.slot__exercise-indicator--light {
+  filter: brightness(1.2) saturate(1.5);
+  color: #ed8936;
+}
+
+.slot__exercise-indicator--intense {
+  filter: brightness(1.2) saturate(1.5);
+  color: #48bb78;
+}
+

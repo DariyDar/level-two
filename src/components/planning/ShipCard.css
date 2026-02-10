@@ -185,3 +185,27 @@
   bottom: 2px;
   right: 2px;
 }
+
+/* CSS Tooltip (replaces native title for controllable delay) */
+.ship-card[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a202c;
+  color: #e2e8f0;
+  font-size: 12px;
+  font-weight: 400;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease 133ms;
+}
+
+.ship-card:not(.ship-card--dragging):not(.ship-card--placed):hover[data-tooltip]::after {
+  opacity: 1;
+}

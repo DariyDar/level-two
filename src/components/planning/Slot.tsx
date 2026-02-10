@@ -16,6 +16,7 @@ interface SlotProps {
   isPartOfShip: boolean; // This slot is occupied by a multi-slot ship but not the start
   isHoveredValid?: boolean; // This slot is part of a valid hovered drop group (green)
   isHoveredInvalid?: boolean; // This slot is part of an invalid hovered drop group (red)
+  exerciseEffect?: 'light' | 'intense'; // Exercise effect zone indicator
 }
 
 export function Slot({
@@ -30,6 +31,7 @@ export function Slot({
   isPartOfShip,
   isHoveredValid = false,
   isHoveredInvalid = false,
+  exerciseEffect,
 }: SlotProps) {
   const { setNodeRef } = useDroppable({
     id: `slot-${slotNumber}`,
@@ -69,6 +71,11 @@ export function Slot({
         />
       ) : (
         <span className="slot__number">{slotNumber}</span>
+      )}
+      {exerciseEffect && !isBlocked && !isPartOfShip && (
+        <span className={`slot__exercise-indicator slot__exercise-indicator--${exerciseEffect}`}>
+          ⚡
+        </span>
       )}
     </div>
   );

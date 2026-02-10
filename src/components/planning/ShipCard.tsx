@@ -67,7 +67,7 @@ export function ShipCard({
       ]
         .filter(Boolean)
         .join(' ')}
-      title={getCardTooltip(ship)}
+      data-tooltip={getCardTooltip(ship)}
       {...listeners}
       {...attributes}
     >
@@ -108,7 +108,6 @@ export function ShipCardOverlay({ ship }: { ship: Ship }) {
         `ship-card--size-${ship.size.toLowerCase()}`,
         `ship-card--type-${ship.loadType.toLowerCase()}`,
       ].join(' ')}
-      title={getCardTooltip(ship)}
     >
       <span className="ship-card__emoji">{ship.emoji}</span>
 

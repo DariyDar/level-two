@@ -69,6 +69,40 @@ export function SlotGrid({
     }
   }
 
+  // Compute exercise effect zones for visual indicators
+  const exerciseEffectSlots = new Map<number, 'light' | 'intense'>();
+
+  for (const placed of placedShips) {
+    const ship = ships.find((s) => s.id === placed.shipId);
+    if (!ship) continue;
+
+    const isIntenseExercise = ship.targetContainer === 'intenseExerciseEffect';
+    const isLightExercise = ship.targetContainer === 'exerciseEffect' && ship.loadType === 'Treatment';
+    if (!isLightExercise && !isIntenseExercise) continue;
+
+    const startSlot = positionToSlotNumber({
+      segment: placed.segment,
+      row: placed.row,
+      index: placed.startSlot as 0 | 1 | 2,
+    });
+    const shipSlots = SHIP_SIZE_TO_SLOTS[ship.size];
+
+    if (isIntenseExercise) {
+      // Permanent effect: from exercise slot to end of day
+      for (let slot = startSlot; slot <= 18; slot++) {
+        exerciseEffectSlots.set(slot, 'intense');
+      }
+    } else {
+      // Temporary effect: ship's slots + 1 additional hour
+      const endSlot = Math.min(startSlot + shipSlots, 18);
+      for (let slot = startSlot; slot <= endSlot; slot++) {
+        if (!exerciseEffectSlots.has(slot)) {
+          exerciseEffectSlots.set(slot, 'light');
+        }
+      }
+    }
+  }
+
   // Build expanded valid slots - for multi-slot ships, all slots in valid groups should highlight
   // Map each slot to its group's start slot for drop handling
   const expandedValidSlots = new Set<number>();
@@ -165,6 +199,7 @@ export function SlotGrid({
             isPartOfShip={!!shipInfo && !shipInfo.isStart}
             isHoveredValid={isInHoveredGroup && isHoveredGroupValid}
             isHoveredInvalid={isInHoveredGroup && !isHoveredGroupValid}
+            exerciseEffect={exerciseEffectSlots.get(slotNumber)}
           />
         );
       }

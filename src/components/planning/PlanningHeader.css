@@ -32,6 +32,7 @@
   color: #718096;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  line-height: 24px; /* Match ☀️ emoji height so values align */
 }
 
 .planning-header__wp-emoji {
