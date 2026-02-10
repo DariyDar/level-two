@@ -20,10 +20,12 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
     currentDay,
     currentLevel,
     degradation,
+    difficultyLevel,
     setResults,
     startNextDay,
     retryDay,
     restartLevel,
+    restartWithDifficulty,
   } = useGameStore();
 
   const [showVictory, setShowVictory] = useState(false);
@@ -105,6 +107,26 @@ export function ResultsPhase({ bgHistory = MOCK_BG_HISTORY }: ResultsPhaseProps)
             <button className="results-phase__button results-phase__button--primary" onClick={restartLevel}>
               Restart
             </button>
+            {difficultyLevel < 4 ? (
+              <div className="results-phase__difficulty">
+                <button
+                  className="results-phase__button results-phase__button--difficulty"
+                  onClick={() => restartWithDifficulty(difficultyLevel + 1)}
+                >
+                  Increase Difficulty
+                </button>
+                <p className="results-phase__difficulty-hint">
+                  Restart with organ damage {difficultyLevel + 1}
+                </p>
+              </div>
+            ) : (
+              <button
+                className="results-phase__button results-phase__button--difficulty"
+                onClick={() => restartWithDifficulty(4)}
+              >
+                Restart Max Difficulty
+              </button>
+            )}
           </div>
         </div>
       )}

@@ -97,6 +97,28 @@
   margin: 0;
 }
 
+.results-phase__button--difficulty {
+  background: #ed8936;
+  color: white;
+}
+
+.results-phase__button--difficulty:hover {
+  background: #dd6b20;
+}
+
+.results-phase__difficulty {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.results-phase__difficulty-hint {
+  font-size: 13px;
+  color: #a0aec0;
+  margin: 0;
+  text-align: center;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

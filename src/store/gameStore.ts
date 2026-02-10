@@ -29,6 +29,7 @@ interface GameState {
 
   // Persistent (between days/levels)
   degradation: SimpleDegradation;
+  difficultyLevel: number; // Starting organ damage (0-4)
 
   // Willpower Points
   wpBudget: number;
@@ -48,6 +49,7 @@ interface GameState {
   startNextDay: () => void;
   retryDay: () => void;
   restartLevel: () => void;
+  restartWithDifficulty: (level: number) => void;
   updateValidation: (validation: PlanValidation) => void;
   setWpBudget: (budget: number) => void;
   spendWp: (amount: number) => void;
@@ -82,6 +84,7 @@ export const useGameStore = create<GameState>()(
       bgHistory: [],
       results: null,
       degradation: initialDegradation,
+      difficultyLevel: 0,
       wpBudget: DEFAULT_WP_BUDGET,
       wpSpent: 0,
       showDetailedIndicators: false,
@@ -174,13 +177,36 @@ export const useGameStore = create<GameState>()(
             const dayConfig = getDayConfig(level, 1);
             wpBudget = dayConfig.wpBudget ?? level.wpBudget ?? DEFAULT_WP_BUDGET;
           }
+          const d = state.difficultyLevel;
           return {
             currentDay: 1,
             phase: 'Planning',
             placedShips: [],
             bgHistory: [],
             results: null,
-            degradation: level?.initialDegradation ?? initialDegradation,
+            degradation: d > 0 ? { liver: d, pancreas: d } : (level?.initialDegradation ?? initialDegradation),
+            wpBudget,
+            wpSpent: 0,
+          };
+        }),
+
+      restartWithDifficulty: (level: number) =>
+        set((state) => {
+          const config = state.currentLevel;
+          let wpBudget = DEFAULT_WP_BUDGET;
+          if (config) {
+            const dayConfig = getDayConfig(config, 1);
+            wpBudget = dayConfig.wpBudget ?? config.wpBudget ?? DEFAULT_WP_BUDGET;
+          }
+          const d = Math.min(level, 4);
+          return {
+            currentDay: 1,
+            phase: 'Planning',
+            placedShips: [],
+            bgHistory: [],
+            results: null,
+            difficultyLevel: d,
+            degradation: { liver: d, pancreas: d },
             wpBudget,
             wpSpent: 0,
           };
@@ -201,9 +227,10 @@ export const useGameStore = create<GameState>()(
     }),
     {
       name: 'port-management-save',
-      version: 1, // Increment to reset saved state
+      version: 2, // Increment to reset saved state
       partialize: (state) => ({
         degradation: state.degradation,
+        difficultyLevel: state.difficultyLevel,
         currentDay: state.currentDay,
       }),
     }
