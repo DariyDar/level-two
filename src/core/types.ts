@@ -204,8 +204,8 @@ export type DayAssessment = 'Excellent' | 'Decent' | 'Poor' | 'Defeat';
 export const DEFAULT_ASSESSMENT_THRESHOLDS = {
   excellent: 0,  // 0 circles
   decent: 1,     // 1 circle
-  poor: 2,       // 2-3 circles
-  defeat: 4,     // 4-5 circles
+  poor: 2,       // 2-4 circles
+  defeat: 5,     // 5 circles = defeat
 } as const;
 
 export interface DayMetrics {
