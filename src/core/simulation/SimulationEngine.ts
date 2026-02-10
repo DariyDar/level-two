@@ -425,11 +425,11 @@ export class SimulationEngine {
     // If already unloading, skip
     if (this.state.unloadingShip) return;
 
-    // Find next ship in queue (they're already sorted by slot number)
-    // Ships unload sequentially - when one finishes, next one starts
+    // Find next ship in queue (sorted by slot number)
+    // Ship only starts unloading when simulation reaches its scheduled slot time
     const nextShip = this.state.remainingShips[0];
 
-    if (nextShip) {
+    if (nextShip && nextShip.slotNumber - 1 <= this.state.currentTick) {
       const ship = this.ships.get(nextShip.shipId);
       if (ship) {
         const totalTicks = SHIP_SIZE_TO_HOURS[ship.size];
