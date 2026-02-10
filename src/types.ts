@@ -172,11 +172,11 @@ export const SIM_CONSTANTS = {
   PANCREAS_TIER_THRESHOLDS: [0, 1, 4, 7, 11] as readonly number[],
   PANCREAS_MAX_TIER: 4,
 
-  // Muscles (~50% weaker total from original: 25→14)
+  // Muscles (halved: 14→7)
   MUSCLE_RANGE_START: 0.3,
   MUSCLE_RANGE_END: 0.75,
   MUSCLE_MAX_TARGETS: 2,
-  MUSCLE_DPS_PER_TIER: 14,    // mg/sec per tier (was 19)
+  MUSCLE_DPS_PER_TIER: 7,     // mg/sec per tier (was 14)
 
   // Kidneys (~25% weaker: 15→11)
   KIDNEY_RANGE_START: 0.8,
