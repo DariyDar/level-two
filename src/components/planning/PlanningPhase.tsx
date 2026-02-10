@@ -15,6 +15,7 @@ import type { FoodCard } from '../../types'
 import { MealSlots } from './MealSlots'
 import { OfferCards } from './OfferCards'
 import { Inventory } from './Inventory'
+import { MealSummary } from './MealSummary'
 import { FoodCardComponent } from './FoodCardComponent'
 import './PlanningPhase.css'
 
@@ -95,6 +96,7 @@ export function PlanningPhase() {
         </div>
 
         <MealSlots slots={mealSlots} />
+        <MealSummary slots={mealSlots} />
 
         {!allSlotsFilled && offerFlow.currentOfferCards.length > 0 && (
           <OfferCards

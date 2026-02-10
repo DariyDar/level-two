@@ -33,14 +33,12 @@ export function FoodCardComponent({ card, dragId, size = 'normal', isDragOverlay
       style={{ borderColor: tierColor }}
       {...(dragId ? { ...listeners, ...attributes } : {})}
     >
+      <div className="food-card__carbs-badge">{card.carbs}g</div>
       <div className="food-card__emoji">{card.emoji}</div>
       <div className="food-card__name">{card.name}</div>
-      <div className="food-card__stats">
-        <span className="food-card__carbs">{card.carbs}g carbs</span>
-        <span className={`food-card__speed food-card__speed--${card.glucoseSpeed}`}>
-          {speedLabel}
-        </span>
-      </div>
+      <span className={`food-card__speed food-card__speed--${card.glucoseSpeed}`}>
+        {speedLabel}
+      </span>
       <div className="food-card__modifiers">
         {card.modifiers.fiber && <span className="food-card__mod" title="Fiber: slows all food">🌾</span>}
         {card.modifiers.protein && <span className="food-card__mod" title="Protein: extends release">🥩</span>}

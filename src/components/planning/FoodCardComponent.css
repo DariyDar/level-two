@@ -1,4 +1,5 @@
 .food-card {
+  position: relative;
   background: #2a2a40;
   border: 2px solid #555;
   border-radius: 10px;
@@ -35,6 +36,23 @@
   padding: 6px;
 }
 
+/* Carbs badge — top-right corner */
+.food-card__carbs-badge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #e2e8f0;
+  line-height: 1;
+}
+
+.food-card--small .food-card__carbs-badge {
+  font-size: 11px;
+  top: 3px;
+  right: 4px;
+}
+
 .food-card__emoji {
   font-size: 32px;
   line-height: 1;
@@ -45,30 +63,26 @@
 }
 
 .food-card__name {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   text-align: center;
-  color: #ddd;
+  color: #e2e8f0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
 }
 
-.food-card__stats {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  font-size: 10px;
-  color: #999;
+.food-card--small .food-card__name {
+  font-size: 11px;
 }
 
 .food-card__speed {
   font-weight: 600;
   text-transform: uppercase;
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.5px;
+  color: #a0aec0;
 }
 
 .food-card__speed--1 { color: #22c55e; }
@@ -79,7 +93,7 @@
 .food-card__modifiers {
   display: flex;
   gap: 4px;
-  font-size: 14px;
+  font-size: 16px;
   min-height: 20px;
 }
 
@@ -87,7 +101,10 @@
   cursor: help;
 }
 
-.food-card--small .food-card__stats,
-.food-card--small .food-card__modifiers {
+.food-card--small .food-card__speed {
   font-size: 9px;
+}
+
+.food-card--small .food-card__modifiers {
+  font-size: 13px;
 }

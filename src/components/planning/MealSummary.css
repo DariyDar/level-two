@@ -1,0 +1,42 @@
+.meal-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  background: rgba(30, 30, 50, 0.6);
+  border-radius: 8px;
+  width: 100%;
+}
+
+.meal-summary__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.meal-summary__tag {
+  font-size: 12px;
+  color: #cbd5e0;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.meal-summary__total {
+  font-size: 12px;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin-left: auto;
+}
+
+.meal-summary__modifiers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.meal-summary__modifier {
+  font-size: 11px;
+  color: #a0aec0;
+}

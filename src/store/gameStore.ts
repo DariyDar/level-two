@@ -87,6 +87,25 @@ function applyDegradation(
   return result
 }
 
+function advanceOffer(offerFlow: OfferFlowState): OfferFlowState {
+  const nextIndex = offerFlow.currentOfferIndex + 1
+  if (nextIndex < offerFlow.allOffers.length) {
+    const nextOffer = offerFlow.allOffers[nextIndex]
+    return {
+      ...offerFlow,
+      currentOfferIndex: nextIndex,
+      currentOfferCards: [...nextOffer],
+      offeredCardIds: [...offerFlow.offeredCardIds, ...nextOffer.map(c => c.id)],
+    }
+  }
+  // All offers exhausted
+  return {
+    ...offerFlow,
+    currentOfferIndex: nextIndex,
+    currentOfferCards: [],
+  }
+}
+
 const INITIAL_DEGRADATION: DegradationState = {
   totalCircles: 0,
   liverCircles: 0,
@@ -164,67 +183,25 @@ export const useGameStore = create<GameState>()(
       },
 
       placeCardInSlot: (card, slotIndex) => {
-        const { mealSlots, inventory, offerFlow } = get()
+        const { mealSlots, offerFlow } = get()
         if (!offerFlow) return
         if (mealSlots[slotIndex] !== null) return
 
         const newSlots = [...mealSlots]
         newSlots[slotIndex] = card
 
-        // Remaining offer cards go to inventory automatically
-        const remainingCards = offerFlow.currentOfferCards.filter(c => c.id !== card.id)
-        const newInventory = [...inventory, ...remainingCards]
-
-        // Advance to next offer
-        const nextIndex = offerFlow.currentOfferIndex + 1
-        let newOfferFlow: OfferFlowState
-        if (nextIndex < offerFlow.allOffers.length) {
-          const nextOffer = offerFlow.allOffers[nextIndex]
-          newOfferFlow = {
-            ...offerFlow,
-            currentOfferIndex: nextIndex,
-            currentOfferCards: [...nextOffer],
-            offeredCardIds: [...offerFlow.offeredCardIds, ...nextOffer.map(c => c.id)],
-          }
-        } else {
-          newOfferFlow = {
-            ...offerFlow,
-            currentOfferIndex: nextIndex,
-            currentOfferCards: [],
-          }
-        }
-
-        set({ mealSlots: newSlots, inventory: newInventory, offerFlow: newOfferFlow })
+        // Remaining offer cards are discarded
+        set({ mealSlots: newSlots, offerFlow: advanceOffer(offerFlow) })
       },
 
-      sendCardToInventory: (_card) => {
+      sendCardToInventory: (card) => {
         const { inventory, offerFlow } = get()
         if (!offerFlow) return
 
-        // Chosen card + remaining offer cards all go to inventory
-        const allToInventory = offerFlow.currentOfferCards
-        const newInventory = [...inventory, ...allToInventory]
+        // Only the chosen card goes to inventory; rest are discarded
+        const newInventory = [...inventory, card]
 
-        // Advance to next offer
-        const nextIndex = offerFlow.currentOfferIndex + 1
-        let newOfferFlow: OfferFlowState
-        if (nextIndex < offerFlow.allOffers.length) {
-          const nextOffer = offerFlow.allOffers[nextIndex]
-          newOfferFlow = {
-            ...offerFlow,
-            currentOfferIndex: nextIndex,
-            currentOfferCards: [...nextOffer],
-            offeredCardIds: [...offerFlow.offeredCardIds, ...nextOffer.map(c => c.id)],
-          }
-        } else {
-          newOfferFlow = {
-            ...offerFlow,
-            currentOfferIndex: nextIndex,
-            currentOfferCards: [],
-          }
-        }
-
-        set({ inventory: newInventory, offerFlow: newOfferFlow })
+        set({ inventory: newInventory, offerFlow: advanceOffer(offerFlow) })
       },
 
       useCardFromInventory: (cardId, slotIndex) => {
