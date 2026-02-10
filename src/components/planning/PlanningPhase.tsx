@@ -342,11 +342,11 @@ export function PlanningPhase() {
       onDragEnd={handleDragEnd}
     >
       <div className="planning-phase">
-        <div className="planning-phase__hint">
-          Drag &amp; drop food cards into time slots to plan your meals. Meet each segment's carb target to simulate!
-        </div>
         <div className="planning-phase__day-title">
           Day {currentDay}/{currentLevel.days}
+        </div>
+        <div className="planning-phase__hint">
+          Drag &amp; drop food cards into time slots to plan your meals. Meet each segment's carb target to simulate!
         </div>
         <PlanningHeader
           currentBG={currentLevel.initialBG ?? 100}
