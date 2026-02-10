@@ -169,7 +169,7 @@ export const SIM_CONSTANTS = {
   LIVER_CAPACITY: 4,
 
   // Pancreas tier thresholds (by active projectile count)
-  PANCREAS_TIER_THRESHOLDS: [0, 1, 4, 7, 11] as readonly number[],
+  PANCREAS_TIER_THRESHOLDS: [0, 1, 3, 5, 8] as readonly number[],
   PANCREAS_MAX_TIER: 4,
 
   // Muscles (halved: 14→7)

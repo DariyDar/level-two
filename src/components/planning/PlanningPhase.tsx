@@ -16,6 +16,7 @@ import { MealSlots } from './MealSlots'
 import { OfferCards } from './OfferCards'
 import { Inventory } from './Inventory'
 import { MealSummary } from './MealSummary'
+import { OrganOverview } from './OrganOverview'
 import { FoodCardComponent } from './FoodCardComponent'
 import './PlanningPhase.css'
 
@@ -27,6 +28,7 @@ export function PlanningPhase() {
     mealSlots,
     inventory,
     offerFlow,
+    degradation,
     placeCardInSlot,
     sendCardToInventory,
     useCardFromInventory,
@@ -111,6 +113,8 @@ export function PlanningPhase() {
             Simulate
           </button>
         )}
+
+        <OrganOverview degradation={degradation} />
 
         <Inventory
           cards={inventory}

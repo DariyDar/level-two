@@ -1,0 +1,64 @@
+.organ-overview {
+  width: 100%;
+  padding: 10px 12px;
+  background: #1e1e32;
+  border-radius: 8px;
+  border: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.organ-overview__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.organ-overview__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+}
+
+.organ-overview__organ {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.organ-overview__icon {
+  font-size: 14px;
+}
+
+.organ-overview__name {
+  font-size: 11px;
+  color: #a0aec0;
+  flex: 1;
+}
+
+.organ-overview__val {
+  font-size: 12px;
+  font-weight: 700;
+  color: #cbd5e0;
+  font-variant-numeric: tabular-nums;
+}
+
+.organ-overview__val--degraded {
+  color: #f87171;
+}
+
+.organ-overview__degradation {
+  display: flex;
+  gap: 10px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.organ-overview__dmg {
+  font-size: 11px;
+  color: #f87171;
+  font-weight: 600;
+}
