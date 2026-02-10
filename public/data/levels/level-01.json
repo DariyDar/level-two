@@ -7,7 +7,7 @@
   "dayConfigs": [
     {
       "day": 1,
-      "wpBudget": 15,
+      "wpBudget": 12,
       "availableFoods": [
         { "id": "banana", "count": 1 },
         { "id": "apple", "count": 1 },
