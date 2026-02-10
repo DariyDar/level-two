@@ -17,7 +17,7 @@
   letter-spacing: 1px;
 }
 
-/* 2×2 grid of organ bars */
+/* 2×2 grid of organ rows */
 .organ-overview__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -27,7 +27,7 @@
 .organ-overview__organ {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 
 .organ-overview__icon {
@@ -35,20 +35,6 @@
   width: 16px;
   text-align: center;
   flex-shrink: 0;
-}
-
-.organ-overview__health-track {
-  flex: 1;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.organ-overview__health-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.3s ease;
 }
 
 /* Single combined Attack vs Defense bar */

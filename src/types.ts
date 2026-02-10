@@ -182,7 +182,7 @@ export const SIM_CONSTANTS = {
   KIDNEY_RANGE_START: 0.8,
   KIDNEY_RANGE_END: 0.95,
   KIDNEY_MAX_TARGETS: 1,
-  KIDNEY_DPS: 11,              // mg/sec (was 15)
+  KIDNEY_DPS: 8,               // mg/sec (was 11)
 
   // Modifiers
   FIBER_SPEED_MULTIPLIER: 0.7,

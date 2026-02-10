@@ -1,5 +1,6 @@
 import type { DegradationState, FoodCard } from '../../types'
 import { SIM_CONSTANTS } from '../../types'
+import { OrganTierCircles } from './OrganTierCircles'
 import './OrganOverview.css'
 
 interface OrganOverviewProps {
@@ -11,50 +12,35 @@ function clamp01(v: number): number {
   return Math.max(0, Math.min(1, v))
 }
 
-function computeOrganHealth(degradation: DegradationState) {
+function computeDefenseInfo(degradation: DegradationState, slots: (FoodCard | null)[]) {
   const maxPancreasTier = Math.max(
     0,
     SIM_CONSTANTS.PANCREAS_MAX_TIER - degradation.pancreasCircles * SIM_CONSTANTS.PANCREAS_TIER_PENALTY,
   )
-  const pancreasHealth = clamp01(maxPancreasTier / SIM_CONSTANTS.PANCREAS_MAX_TIER)
-
-  const baseSlow = SIM_CONSTANTS.LIVER_SLOW_FACTOR
-  const currentSlow = baseSlow + degradation.liverCircles * SIM_CONSTANTS.LIVER_SLOW_PENALTY
-  const liverHealth = clamp01((1 - currentSlow) / (1 - baseSlow))
-
-  const baseDps = SIM_CONSTANTS.KIDNEY_DPS
-  const currentDps = Math.max(0, baseDps - degradation.kidneysCircles * SIM_CONSTANTS.KIDNEYS_DPS_PENALTY)
-  const kidneyHealth = clamp01(currentDps / baseDps)
-
-  return { pancreasHealth, liverHealth, kidneyHealth, maxPancreasTier, currentDps }
-}
-
-function computeDefenseDps(maxPancreasTier: number, kidneyDps: number, hasProteinTag: boolean) {
-  const muscleBoost = hasProteinTag ? SIM_CONSTANTS.PROTEIN_TAG_MUSCLE_BOOST : 1.0
-  const muscleDps = maxPancreasTier * SIM_CONSTANTS.MUSCLE_DPS_PER_TIER * SIM_CONSTANTS.MUSCLE_MAX_TARGETS * muscleBoost
-  return muscleDps + kidneyDps
-}
-
-function healthColor(pct: number): string {
-  if (pct >= 0.75) return '#22c55e'
-  if (pct >= 0.5) return '#eab308'
-  if (pct >= 0.25) return '#f97316'
-  return '#ef4444'
-}
-
-export function OrganOverview({ degradation, slots }: OrganOverviewProps) {
-  const { pancreasHealth, liverHealth, kidneyHealth, maxPancreasTier, currentDps } = computeOrganHealth(degradation)
 
   const cards = slots.filter((s): s is FoodCard => s !== null)
-  const totalGlucose = cards.reduce((sum, c) => sum + c.glucose, 0)
   const hasProteinTag = cards.some(c => c.tag === 'protein')
-  const defenseDps = computeDefenseDps(maxPancreasTier, currentDps, hasProteinTag)
+  const muscleBoost = hasProteinTag ? SIM_CONSTANTS.PROTEIN_TAG_MUSCLE_BOOST : 1.0
 
-  // Single combined bar: defense (green) left, attack (red) right
-  // Normalize both to the same scale so they're comparable
-  const maxRef = 80 // reference DPS for full defense bar
-  const attackNorm = clamp01(totalGlucose / 1500) // 1500mg = full attack
-  const defenseNorm = clamp01(defenseDps / maxRef)
+  const kidneyDps = Math.max(0, SIM_CONSTANTS.KIDNEY_DPS - degradation.kidneysCircles * SIM_CONSTANTS.KIDNEYS_DPS_PENALTY)
+  const muscleDps = maxPancreasTier * SIM_CONSTANTS.MUSCLE_DPS_PER_TIER * SIM_CONSTANTS.MUSCLE_MAX_TARGETS * muscleBoost
+  const defenseDps = muscleDps + kidneyDps
+
+  const totalGlucose = cards.reduce((sum, c) => sum + c.glucose, 0)
+
+  return { defenseDps, totalGlucose }
+}
+
+// Max circles per organ for degradation display
+const MAX_ORGAN_CIRCLES = 4
+
+export function OrganOverview({ degradation, slots }: OrganOverviewProps) {
+  const { defenseDps, totalGlucose } = computeDefenseInfo(degradation, slots)
+  const cards = slots.filter((s): s is FoodCard => s !== null)
+
+  // Versus bar fractions
+  const attackNorm = clamp01(totalGlucose / 1500)
+  const defenseNorm = clamp01(defenseDps / 80)
   const total = attackNorm + defenseNorm || 1
   const defenseFraction = defenseNorm / total
   const attackFraction = attackNorm / total
@@ -62,11 +48,12 @@ export function OrganOverview({ degradation, slots }: OrganOverviewProps) {
   return (
     <div className="organ-overview">
       <div className="organ-overview__title">Defense</div>
+
       <div className="organ-overview__grid">
-        <OrganBar icon="⚡" pct={pancreasHealth} />
-        <OrganBar icon="💪" pct={1} />
-        <OrganBar icon="🫘" pct={liverHealth} />
-        <OrganBar icon="🫘" pct={kidneyHealth} />
+        <OrganRow icon="⚡" degraded={degradation.pancreasCircles} colorScheme="orange" />
+        <OrganRow icon="💪" degraded={0} colorScheme="orange" />
+        <OrganRow icon="🫘" degraded={degradation.liverCircles} colorScheme="green" />
+        <OrganRow icon="🫘" degraded={degradation.kidneysCircles} colorScheme="green" />
       </div>
 
       {cards.length > 0 && (
@@ -93,19 +80,19 @@ export function OrganOverview({ degradation, slots }: OrganOverviewProps) {
   )
 }
 
-function OrganBar({ icon, pct }: { icon: string; pct: number }) {
-  const color = healthColor(pct)
-  const widthPct = Math.round(pct * 100)
-
+function OrganRow({ icon, degraded, colorScheme }: {
+  icon: string
+  degraded: number
+  colorScheme: 'orange' | 'green'
+}) {
   return (
     <div className="organ-overview__organ">
       <span className="organ-overview__icon">{icon}</span>
-      <div className="organ-overview__health-track">
-        <div
-          className="organ-overview__health-fill"
-          style={{ width: `${widthPct}%`, background: color }}
-        />
-      </div>
+      <OrganTierCircles
+        maxCircles={MAX_ORGAN_CIRCLES}
+        degradedCircles={degraded}
+        colorScheme={colorScheme}
+      />
     </div>
   )
 }
