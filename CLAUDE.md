@@ -14,6 +14,18 @@ git pull
 git add ... && git commit ... && git push
 ```
 
+## Repository Structure
+
+This repository contains **two independent projects** on separate branches:
+
+| Branch | Project | Version | Description |
+|--------|---------|---------|-------------|
+| `main` | Port Planner | v0.24.11 | Metabolic simulation (WP system, drag-and-drop meal planning, SVG pipes) |
+| `tower-defense` | Glucose TD | v0.4.1 | Tower defense reimagining (projectiles, organ zones, survival mode) |
+| `Dariy` | Port Planner | v0.25.1 | Archived — Mood system branch (superseded by main) |
+
+**Production deploy** (Vercel): `main` branch → https://level-two-eight.vercel.app/
+
 ## Version Number
 
 **Always increment version after changes** — Update `src/version.ts` after every change and tell user which version to test.
@@ -63,281 +75,199 @@ What counts as "significant":
 - Fixed or discovered issues
 - Changed file structure
 
-## Project Context
+---
 
-This is "Port Planner" — a metabolic simulation game teaching blood glucose management through a port/ship metaphor.
+## Project: Glucose TD (branch: `tower-defense`)
+
+**Glucose TD** — a tower defense game teaching blood glucose management. Food generates glucose "projectiles" that fall from top to bottom. Body organs act as defensive towers: liver slows projectiles, muscles and kidneys destroy them. Glucose that reaches the base counts as "excess" and causes organ degradation.
+
+### Tech Stack
+- React 19 + TypeScript + Vite 7
+- @dnd-kit for drag-and-drop (meal slot placement)
+- Zustand for state management (with persist middleware)
+
+### Game Flow
+
+```
+Planning → Simulation → Results → (Continue) → Planning → ...
+                                  (Defeat)   → Restart
+```
+
+**Survival Mode** — endless progression, segments (meals) increase in difficulty.
+
+### Key Files
+- `src/version.ts` — version number (v0.4.1)
+- `src/types.ts` — all TypeScript types and simulation constants
+- `src/App.tsx` — app shell, phase routing
+- `src/store/gameStore.ts` — Zustand store (game state, offer flow, degradation, actions)
+- `src/config/loader.ts` — JSON data loading
+- `src/core/simulation/TDSimulation.ts` — simulation engine (projectile tick loop, organ zones, targeting)
+- `src/core/offerAlgorithm.ts` — offer generation with tier/tag constraints
+- `src/hooks/useSimulationLoop.ts` — requestAnimationFrame loop
+- `src/components/planning/` — planning phase UI
+  - `PlanningPhase.tsx` — planning orchestrator with DnD context
+  - `FoodCardComponent.tsx` — food card display (emoji, carbs, glucose, speed, tier badge)
+  - `MealSlots.tsx` — 3 drag-and-drop meal slots
+  - `MealSummary.tsx` — summary of placed cards
+  - `OfferCards.tsx` — current offer (3 cards to choose from)
+  - `Inventory.tsx` — saved cards from previous segments
+  - `VersusBar.tsx` — attack vs defense comparison labels
+  - `OrganTierCircles.tsx` — circle indicators for organ health
+  - `OrganOverview.tsx` — organ overview with defense calculation (disabled)
+- `src/components/simulation/` — simulation phase UI
+  - `SimulationPhase.tsx` — simulation orchestrator (speed controls, pause)
+  - `Battlefield.tsx` — SVG battlefield (colored organ zones, animated projectiles, targeting lines, impact VFX)
+  - `OrganStatus.tsx` — 2×2 organ status grid with tier circles
+- `src/components/results/` — results phase UI
+  - `ResultsPhase.tsx` — assessment, stats, continue/restart actions
+- `src/components/shared/` — shared components
+  - `OrganDamageGrid.tsx` — organ damage visualization (emoji + circles)
+- `public/data/foods.json` — 13 food cards (5 healthy + 5 neutral + 3 junk)
+- `public/data/levels/level-01.json` — level config (degradation thresholds)
+- `docs/td-concept/README.md` — comprehensive concept documentation
+
+### Current State (v0.4.1)
+
+- **Organ Circle Indicators (v0.4.1)** ✅
+  - Circle indicators in results and planning phases
+  - Green circles = healthy, pink circles = degraded
+
+- **Simulation VFX (v0.4.0)** ✅
+  - Circle indicators in simulation phase (OrganStatus)
+  - Explosion VFX (💥) at base when projectiles impact
+  - Versus bar repositioned
+
+- **Survival Mode (v0.3.0)** ✅
+  - Endless segment progression (Meal 1, 2, 3, ...)
+  - Slot 0 pre-placed with random fast/junk food each segment
+  - Random food card reward after each segment
+  - Progressive difficulty: offer tiers increase with segment count
+  - Defeat at 12 total degradation circles
+  - Attack/Defense labels on versus bar
+  - Green circle indicators for healthy organs
+
+- **Circle Indicators (v0.2.1)** ✅
+  - Replaced organ bars with circle indicators
+  - Kidneys nerfed 25% (DPS: 8 → base)
+
+- **Compact Defense Panel (v0.2.0)** ✅
+  - 2×2 organ layout with bars
+  - Combined versus bar (attack vs defense)
+
+- **Organ Health & Comparison (v0.1.9)** ✅
+  - Organ health percentages
+  - Attack vs Defense numerical comparison
+
+### Organ System
+
+**Battlefield Layout:**
+```
+Position 0.0 ─── TOP (projectiles spawn)
+  │
+  ├── 0.15 ─ Liver zone start
+  ├── 0.30 ─ Muscle zone start
+  ├── 0.35 ─ Liver zone end
+  │
+  ├── 0.75 ─ Muscle zone end
+  ├── 0.80 ─ Kidney zone start
+  ├── 0.95 ─ Kidney zone end
+  │
+Position 1.0 ─── BASE (excess glucose → damage)
+```
+
+| Organ | Role | Zone | Key Stat |
+|-------|------|------|----------|
+| Liver | Slowdown tower | 0.15–0.35 | Slow factor 0.6, capacity 4 |
+| Pancreas | Command center | — | Tier from projectile count (0/1/3/5/8 → tier 0-4) |
+| Muscles | Primary DPS | 0.30–0.75 | 7 DPS/tier, max 2 targets |
+| Kidneys | Last defense | 0.80–0.95 | 8 DPS base, max 1 target |
+
+### Food System
+
+| Tier | Type | Speed | Cards | Modifiers |
+|------|------|-------|-------|-----------|
+| 1 | Healthy | 1 (slow) | oatmeal, chicken, broccoli, salmon, yogurt | fiber, protein, fat |
+| 2 | Neutral | 2 (medium) | rice, pasta, banana, bread, apple | fiber |
+| 3 | Junk | 3-4 (fast) | cola, chocolate_bar, ice_cream | sugar, fat |
+
+**Modifiers:** fiber (×0.7 speed), sugar (×1.4 speed), protein (×1.5 duration), fat (×0.85 speed)
+**Tag boost:** protein tag → muscle DPS ×1.25
+
+### Degradation System
+
+- **Thresholds:** 100, 250, 500, 800, 1200 mg excess → 1-5 circles
+- **Distribution cycle:** Liver → Pancreas → Kidneys → repeat
+- **Penalties:** Liver +0.1 slow factor, Pancreas -1 max tier, Kidneys -5 DPS per circle
+- **Defeat:** 12 total circles
+- **Assessment:** Excellent (0) / Decent (1) / Poor (2-3) / Defeat (4+)
+
+### Offer System
+
+3 sequential offers per segment, each with 3 cards:
+- Pick 1 card → place in meal slot or send to inventory
+- Remaining 2 cards discarded
+- Progressive templates: segments 1-3 (easy) → 4-6 (medium) → 7+ (hard)
+- Constraints: no repeat cards, max 3 same tag per segment
+
+### Key Constants
+
+```
+SPEED_SCALE = 0.04          PROJECTILE_SIZE = 10 mg
+SEGMENT_DELAY = 3 sec       MAX_DEGRADATION_CIRCLES = 12
+LIVER_SLOW_FACTOR = 0.6     LIVER_CAPACITY = 4
+MUSCLE_DPS_PER_TIER = 7     MUSCLE_MAX_TARGETS = 2
+KIDNEY_DPS = 8              KIDNEY_MAX_TARGETS = 1
+PANCREAS_THRESHOLDS = [0, 1, 3, 5, 8]
+```
+
+### Known Issues
+- OrganOverview component disabled (code preserved)
+- No metformin/exercise interventions (Port Planner features, not ported)
+- Framer-motion available but not utilized yet
+- No level selection — single level with survival mode
+
+---
+
+## Project: Port Planner (branch: `main`)
+
+**Port Planner** — a metabolic simulation game teaching blood glucose management through a port/ship metaphor. Drag-and-drop food cards into time slots, simulate a day of glucose dynamics with SVG pipe visualizations, review results.
 
 ### Tech Stack
 - React 19 + TypeScript + Vite
 - @dnd-kit for drag-and-drop
 - Zustand for state management
 
-### Key Files
-- `src/version.ts` — version number
-- `src/store/gameStore.ts` — global game state (Mood system, eye toggle)
-- `src/core/simulation/SimulationEngine.ts` — simulation engine with pancreas tier logic + mood tracking
-- `src/core/types.ts` — TypeScript type definitions (Ship, BlockedSlotConfig, PlanValidation, Mood constants, etc.)
-- `src/core/utils/levelUtils.ts` — day config resolution (pancreasBoostCharges, blockedSlots)
-- `src/core/rules/types.ts` — rule system types (includes `ignoresDegradation`, `minBaseTier` modifier)
-- `src/core/results/calculateResults.ts` — results phase: excessBG calculation, degradation pipeline, assessment (Excellent/Decent/Poor/Defeat)
-- `src/config/loader.ts` — loads and transforms JSON configs (foods, interventions with mood)
-- `src/config/organRules.json` — organ behavior rules (pancreas tiers, liver thresholds, muscle rates)
-- `src/config/degradationConfig.json` — degradation system configuration
-- `src/components/simulation/` — simulation UI components
-  - `PipeSystem.tsx` — SVG pipe overlay with chevron flow indicators (v0.21.0+)
-  - `PipeSystem.css` — pipe styles (wall/fill/chevron, non-scaling-stroke)
-  - `GlucoseParticleSystem.tsx` — sugar cube particles (SUPERSEDED by PipeSystem in v0.21.0, code preserved)
-  - `FiberIndicator.tsx` — fiber activity indicator (disabled)
-  - `BodyDiagram.tsx` — absolute-positioned organs layout (corner organs, center BG)
-  - `OrganTierCircles.tsx` — unified tier/degradation indicator (degradation from right)
-  - `OrganSprite.tsx` — organ icon with tier circles, substrate pulse animation
-  - `BoostButton.tsx` — boost buttons with numeric charge badge (top-right)
-- `src/components/planning/` — planning phase UI
-  - `PlanningHeader.tsx` — header with BG, Mood scale, Fast Insulin indicator, Simulate button
-  - `ShipCard.tsx` — draggable ship cards with mood badge and mood-tinted backgrounds
-  - `ShipInventory.tsx` — unified inventory (all foods globally available, mood-blocked filtering, interventions per-day)
-  - `SlotGrid.tsx` — slot grid with blocked slots (narrative), exercise group limits
-- `src/components/results/` — results phase UI
-  - `ResultsPhase.tsx` — results orchestrator (assessment, pass/fail logic, day counter)
-  - `BGGraph.tsx` — SVG BG history graph with zone coloring (buildColoredSegments)
-  - `BGGraph.css` — graph styles (zones, lines, points, labels)
-  - `ExcessBGIndicator.tsx` — excess BG circles/crosses with subtitle
-  - `ExcessBGIndicator.css` — marker styles (green circles, pink crosses, dashed circles)
-  - `OrganDegradationDisplay.tsx` — liver/pancreas degradation with icons and markers
-  - `OrganDegradationDisplay.css` — organ icon and marker styles
-- `src/hooks/` — custom React hooks
-- `src/components/ui/` — shared UI components
-  - `EyeToggle.tsx` — toggle for detailed indicators visibility
-  - `MoodScale.tsx` — horizontal mood scale (-10..+10) with color zones, marker, floating delta VFX
-  - `PreGameModal.tsx` — pre-game modal (Day 1 intro, Day 2+ shows remaining days + mood)
-  - `PhaseBanner.tsx` — contextual phase banner with hints
-  - `Tooltip.tsx` — universal tooltip component (hover, position, delay)
-- `public/data/` — JSON configs for ships and levels
-  - `foods.json` — 30 food items with glucose, carbs, mood (-5..+5)
-  - `interventions.json` — intervention cards with mood, group, requiresEmptySlotBefore
-  - `levels/*.json` — level configurations (per-day blockedSlots with narratives, preOccupiedSlots with narratives)
-- `docs/organ-parameters.csv` — organ parameters documentation
+### Current State (v0.24.11) — WP System, Tooltips, Hints
 
-### Current State (v0.25.1) — Balance, Hunger, VFX, Content
-- **Balance: Mood scale narrowed (v0.25.1)** ✅
-  - Mood range: -10..+10 (was -50..+50), food mood applied 1:1 (removed ×2 multiplier)
-  - Fast Insulin penalty: -2 (was -5)
-  - Food blocking thresholds: mood > -2 → all food; -2..-4 → block super-healthy; -5..-7 → block medium-healthy; ≤ -8 → only junk
-- **Per-hour hunger (v0.25.1)** ✅ — replaces end-of-day penalty
-  - -1 mood per hour without food unloading
-  - "Starving!" red blink indicator during simulation
-- **Mood VFX (v0.25.1)** ✅
-  - Floating +N/-N delta on MoodScale when mood changes
-  - MoodScale green/red flash on change
-  - Fast Insulin cyan glow (#00BFFF) while active
-- **All text in English (v0.25.1)** ✅
-  - PhaseBanner, PreGameModal, ResultsPhase, BoostButton, level narratives
-- **30 foods (v0.25.1)** ✅ — 10 junk / 10 neutral / 10 healthy
-- **5-day level (v0.25.1)** ✅ — Days 4-5 added with narratives, maxDegradationCircles=8
-- **Restart Level button (v0.25.1)** ✅ — on defeat, resets mood + degradation to 0
-- **Glucose color: red everywhere (v0.25.1)** ✅ — #E85D4A in pipes, containers, progress bars
-- **Mood System (v0.25.0)** ✅ — Replaces WP system
-  - Mood scale: -10..+10, carries between days, resets to day start on retry
-  - SimulationEngine tracks mood: ship.mood × 2 multiplier, Fast Insulin -5 per use, hunger penalty (<3 foods)
-  - MoodScale component: horizontal bar with colored zones (red/orange/yellow/green)
-  - Cross-day strategy: healthy food lowers mood → next day healthy food blocked → forced variety
-- **PreGame Phase (v0.25.0)** ✅
-  - Modal window before each day: Day 1 full intro, Day 2+ shows remaining days + current mood
-  - Phase flow: PreGame → Planning → Simulation → Results → PreGame (next day)
-- **Phase Banners (v0.25.0)** ✅
-  - Contextual hint banners for Planning, Simulation, and Results phases
-- **Narrative Slots (v0.25.0)** ✅
-  - Blocked slots and pre-occupied slots show narrative text ("Дорога на работу", "Угощение от коллеги")
-  - BlockedSlotConfig: `{slot, narrative?}` instead of plain numbers
-- **22 Foods with Mood Values (v0.25.0)** ✅
-  - Junk food (mood +2..+5): burger, pizza, icecream, chocolatemuffin, cookie, chips, cola, chocolatebar
-  - Neutral (mood -1..+1): rice, pasta, banana, milk, bread, apple, yogurt
-  - Healthy (mood -5..-2): oatmeal, chicken, broccoli, salad, fish, vegetablestew, cottagecheese
-  - All foods globally available (no per-day limits), infinite placement count
-- **Mood-Tinted Ship Cards (v0.25.0)** ✅
-  - Pink for junk food (mood > 0), green for healthy (mood < 0), yellow for neutral
-  - Mood badge (+N/-N) on each card
-- **Simulation: Default Speed 0.25x (v0.25.0)** ✅
-  - Simulation starts at 0.25x speed for better observation
-  - Glucose pipe color changed to red (#E85D4A)
-  - Fast Insulin + MoodScale in simulation header
-- **Results: Mood Summary (v0.25.0)** ✅
-  - Mood explanation for next day impact
-  - "Идеальная победа возможна!" hint
-- **Kidneys Disabled (v0.23.1)** ✅
-  - kidneyRate=0, bgToKidneysRate=0, kidneyFlowDir=undefined
-  - All visual assets preserved (pipe, container, icon, tier circles) — just always inactive
-- Planning phase: drag-and-drop ships to time slots ✅
-- **SVG Pipe System (v0.21.0-v0.21.23)** ✅
-  - SVG overlay with pipes connecting organs (Ship→Liver, Liver→BG, BG→Muscles, BG→Kidneys, Pancreas→Muscles)
-  - Pipe wall (#4a5568) + inner fill (blue for glucose, orange for insulin)
-  - `vector-effect: non-scaling-stroke` for uniform pixel-width pipes in stretched SVG
-  - Chevron flow indicators (v0.21.17): V-shaped `>` polylines animated via CSS `offset-path`
-  - 3 chevrons per active pipe, speed proportional to flow rate
-  - Rounded pipe bends with quadratic Bézier curves (v0.21.23)
-  - Flattened chevron angle: ±0.7 SVG units (v0.21.24)
-  - Passthrough pipe: wider (wall 20px, fill 16px) vs normal (wall 12px, fill 8px)
-  - Z-index layering: pipe-system(1) < containers(2) < organ backdrops(3) < BG(10)
-  - Ship slot pipes: 3 routes from ship queue to liver, staggered horizontal routing
-  - Suction VFX (v0.21.18): funnel particles at active ship pipe intake
-  - Replaces GlucoseParticleSystem (sugar cube particles)
-- **Container Fill Patterns (v0.21.25-v0.21.30)** ✅
-  - CSS `::before` pseudo-element with SVG `background-image` tile overlay
-  - 80×120px tile with 7 pseudo-random scattered elements, white stroke, opacity 0.2
-  - Three states: flow-up (^ chevrons scrolling up), flow-down (v chevrons scrolling down), flow-static (horizontal dashes, no animation)
-  - Flow direction computed from raw engine rates (no interpolation lag, v0.21.30)
-  - BG: net rate = liverRate - muscleRate - kidneyRate (±1 threshold)
-  - Liver: down when liverRate > 0; Kidneys: up when kidneyRate > 0
-  - Animation: 120px/4s scroll via `background-position-y`
-- **BG Indicator Redesign (v0.21.22)** ✅
-  - Floating value badge on top of BG fill (replaces separate value display)
-  - Color-coded: normal (dark), low (<70, yellow), high (200-300, orange), critical (300+, red blink)
-  - Green target threshold removed from BG container (v0.21.24)
-  - BG label font-size increased to 14px (v0.21.24)
-- **Body Diagram Layout (v0.20.0)** ✅
-  - Absolute positioning instead of 6×6 CSS Grid
-  - 4 organs at corners: K (top-left), M (top-right), L (bottom-left), P (bottom-right)
-  - BG container centered, full height, pill-shaped (semicircle ends)
-  - KC/LC containers half-hidden behind organ substrates, peeking right
-  - Organ substrates: 80×110px, default color #545F73, pulse animation when active
-  - Tier circles position: 'top' for all organs
-  - BG centered between left containers and right substrates (`left: calc(50% + 20px)`)
-- **Tier Circle Colors (v0.20.9-v0.20.10)** ✅
-  - Muscles/Pancreas: yellow (#E2BC28) default, red-orange (#FF5900) active
-  - Liver/Kidneys: green (#22c55e) default
-  - Degradation circles (pink) display from RIGHT side (matching results phase)
-- **Fast Insulin Button (v0.20.11)** ✅
-  - Numeric usage count badge (top-right corner of button substrate)
-  - Replaced charge circles with single count number
-  - Orange badge with remaining charges
-- **Layout Swap (v0.19.0)** ✅
-  - Desktop: Inventory LEFT, SlotGrid RIGHT (swapped)
-  - Mobile: SlotGrid on top via CSS order
-- Simulation phase: glucose flow visualization with SVG pipes ✅
-- **Results Phase (v0.22.0-v0.22.9)** ✅
-  - **Assessment System** (replaced star rating):
-    - Based on total degradation circles: Excellent (0), Decent (1), Poor (2-3), Defeat (4-5)
-    - Defeat = level failed (only Retry), Excellent = no Retry shown
-    - Win condition: `maxDegradationCircles` in level config (default 5)
-    - Star rating system removed (see BACKLOG.md)
-  - **BG History Graph** with zone coloring:
-    - Green zone (70-200), orange zone (200-300), red zone (300+)
-    - Line and points colored by zone (green/orange/red)
-    - Threshold lines at 200 (high) and 300 (critical), labels (#718096)
-    - X-axis time labels: 06:00, 12:00, 18:00, 00:00
-  - **ExcessBG Indicator** (v0.22.2-v0.22.9):
-    - 5 markers: healthy = green circles, damaged = pink crosses (45deg) in dashed pink circle
-    - Damaged markers fill from RIGHT side
-    - Subtitle: "{N} degradation(s) till defeat" — 19px white, count in bold
-    - Title "EXCESS BG" in graph label color (#718096)
-  - **Organ Degradation Display** (v0.22.3-v0.22.9):
-    - Liver + Pancreas with icons (56×56px in 110px container)
-    - 4 markers each: healthy = green circles, degraded = pink crosses in dashed pink circle
-    - Title "DEGRADATIONS" in graph label color (#718096)
-  - **Layout**: title "Day X/Y Results" with total days from level config
-  - **Header**: "Port Planner" (renamed from Port Management in v0.22.7)
-- Substep simulation: smooth container updates (10 substeps/hour) ✅
-- **Simulation Rebalancing (v0.18.0-v0.18.1)** ✅
-  - **Gradual pancreas response** — softer insulin tiers for realistic BG dynamics
-    - BG ≤80: Tier 0 (no insulin)
-    - BG 80-150: Tier 1 (basal, 50/h drain)
-    - BG ≥150: Tier 2 (elevated, 100/h drain)
-    - BG ≥200: Tier 3 (moderate, 125/h drain)
-    - BG ≥300: Tier 4 (strong, 150/h drain)
-  - **Raised liver stop threshold** — liver stops release at BG ≥300 (was 200)
-    - BG ≥250: reduced release rate 75 mg/dL/h
-    - BG ≥300: full stop (tier 0)
-  - **Increased degradation rates** — excessBG coefficients ×3
-    - Zone 200-300: coefficient 1.5 (was 0.5)
-    - Zone 300+: coefficient 3.0 (was 1.0)
-  - **Exercise hypoglycemia fix** — exercise modifiers require `minBaseTier: 1`
-    - Exercise only adds +1 tier when muscles already activated by pancreas
-    - Prevents BG dropping below 70 due to exercise at low BG
-- **Exercise Interventions (v0.17.0)** ✅
-  - **light_exercise**: size S, mood +3, exerciseEffect, group "exercise"
-  - **intense_exercise**: size S, mood -3, intenseExerciseEffect, permanent +1 tier muscles
-    - `requiresEmptySlotBefore`: slot N-1 must not contain food
-    - Slot 1 forbidden (no previous slot)
-    - Red highlight on invalid slot + blocking food slot during drag
-  - Group limit: max 1 exercise card per segment
-  - Inventory limits: per-day count via `availableInterventions: [{id, count}]`
-- **Blocked Slots (v0.17.1, updated v0.25.0)** ✅
-  - `blockedSlots: BlockedSlotConfig[]` in DayConfig — slots where cards cannot be placed
-  - Each slot has optional narrative text shown in the UI
-  - Visual styling: striped background, narrative text, disabled state
-- **Per-Day Interventions (v0.17.2)** ✅
-  - `availableInterventions` moved from LevelConfig to DayConfig
-  - Each day specifies its own intervention inventory `[{id, count}]`
-- **Unified Inventory (v0.17.5)** ✅
-  - Food and interventions in single list (no tabs)
-  - Intervention cards hide load/volume display
-- **Pre-placed Cards (v0.16.3)** ✅
-  - `preOccupiedSlots` in DayConfig — cards placed at level start with narrative text
-  - Cards cannot be removed
-- **Eye Toggle (v0.16.0)** ✅
-  - Toggle button (bottom-right corner, eye icon)
-  - Default: off (semi-transparent closed eye)
-  - Controls visibility of:
-    - Ship card hours (1h, 2h, 3h) — hidden by default
-    - Simulation numeric organ indicators — hidden by default
-  - Always visible: BG numeric value, tier circles
-- **Liver System (v0.19.5)** ✅
-  - BG ≤100: release 100/h (gluconeogenesis)
-  - BG 101-150: 0/h (normal range, liver silent)
-  - BG >150: release 50/h (elevated BG response)
-  - BG ≥250: release 75/h (strong response)
-  - BG ≥300: 0/h (critical stop)
-  - PassThrough mode: when liver ≥95% AND ship unloading → output = input rate
-  - Liver Boost: DISABLED (code preserved)
-- **Pancreas Tier System (v0.18.0)** ✅
-  - Gradual insulin response (softened from v0.15.0)
-  - BG thresholds → pancreas tiers: 0/1/2/3/4 (was 0/1/4/5)
-  - Pancreas tier determines base muscle tier
-  - Degradation limits max pancreas tier (not directly muscle tier)
-- **Muscle Drain Rates (v0.18.3)** ✅
-  - Tier 0: 0, Tier 1: 25, Tier 2: 50, Tier 3: 85
-  - Tier 4: 120, Tier 5: 150, Tier 6: 175 mg/dL/h
-- **Fast Insulin Boost (v0.15.0)** ✅
-  - Orange drop icon, +1 tier bonus when active
-  - **Ignores degradation limits**
-  - Enables hidden 6th muscle tier (rate: 175 mg/dL/h)
-  - Numeric charge count badge (top-right of button)
-- Configuration-driven rules system ✅
-- Carbs vs Glucose separation ✅ (strict: glucose = carbs × 10)
-- Tier-based Degradation System (v0.14.0) ✅
-  - Unified tiers 1-5, Liver: capacity reduction, Pancreas: max tier reduction
-- Unified Tier Circles (v0.15.0) ✅
-- Organ UI System ✅ (OrganSprite, substrates, tier circles)
-- Layout: Absolute positioning with corner organs ✅ (was 6×6 CSS Grid before v0.20.0)
-- Food Tags System ✅
-  - Mood badge (top-right, +N green / -N red) for foods with mood != 0
-- Sugar Cube Particle System (v0.8.0) — SUPERSEDED by SVG Pipe System in v0.21.0
+- **Victory Popup (v0.24.10-v0.24.11)** ✅
+  - "Level Passed!" popup after completing all days without defeat
+  - "Restart Level" button on defeat, "Restart" on victory
+- **Tooltips & Hints (v0.24.4-v0.24.8)** ✅
+  - CSS `data-tooltip` tooltips on food/intervention cards (133ms delay)
+  - Tooltip component wrappers for BG, WP, Fast Insulin indicators
+  - Planning hint text: "Drag & drop food cards into time slots..."
+  - Simulation hint text: "Watch the glucose flow — use Fast Insulin if blood sugar spikes"
+  - Tooltips on carb range indicators
+- **WP Badge Enhancement (v0.24.4)** ✅
+  - ☀️ emoji (24px) as WP icon in header
+  - WP badge on cards: 1.5x bigger with ☀️
+- **Exercise Effect Zones (v0.24.7)** ✅
+  - ⚡ indicators on slots affected by exercise duration
+  - Orange for light exercise, green for intense
+- **WP System** ✅ — Willpower budget per day, wpCost on cards
+- **SVG Pipe System** ✅ — animated glucose flow with chevrons
+- **Body Diagram** ✅ — absolute-positioned organs at corners, center BG
+- **Results Phase** ✅ — BG graph, excess BG circles, organ degradation display
+- **3-day level** with per-day WP budgets, blocked slots, narratives
 
-### Removed Features (v0.25.0)
-- **WP System**: Fully removed (types, store, components, CSS, food data)
-  - Was: WP budget per day, wpCost on cards, WP indicator in header
-  - Replaced by: Mood system for cross-day strategic constraint
-- **Segment Carb Limits**: Removed (was min/optimal/max per segment)
-  - Mood is now the sole strategic constraint
-- **BG Prediction Sparkline**: Removed (BgSparkline.tsx, useBgPrediction.ts)
-  - Was: SVG preview of BG curve in planning header
-- **Per-Day Food Limits**: Removed (availableFoods per DayConfig)
-  - All 22 foods globally available, filtered only by mood threshold
-
-### Disabled Features (v0.19.6+)
-Features preserved in code but hidden from UI:
-- **Kidneys**: Disabled in v0.23.1 — kidneyRate=0, all visuals preserved but always inactive
-- **Liver Boost**: Button hidden in SimulationPhase.tsx (functionality preserved)
-- **Metformin**: Not implemented
-- **Fiber System**: Disabled in v0.19.6 (backlog for future)
-  - Was: fiber badge on cards, FiberIndicator component, particle slowdown (0.7x speed)
-  - Code preserved: FiberIndicator.tsx/css, Ship.fiber type
-  - Data removed: `fiber: true` removed from foods.json
-- **Glucose Particle System**: Superseded by SVG Pipe System in v0.21.0
-  - Code preserved: GlucoseParticleSystem.tsx/css (not rendered in SimulationPhase)
-
-### Known Issues
-- Effect Containers: No threshold-based activation (planned for future)
-- Kidneys: Disabled (v0.23.1) — visuals present but all rates zeroed out
-- Metformin: Card exists but full effect system not implemented
-- GlucoseParticleSystem files still in codebase (unused since v0.21.0, can be cleaned up)
+### Key Files (main branch)
+- `src/store/gameStore.ts` — global game state (WP system)
+- `src/core/simulation/SimulationEngine.ts` — simulation engine
+- `src/core/types.ts` — TypeScript types
+- `src/components/planning/` — PlanningHeader, ShipCard, SlotGrid, ShipInventory
+- `src/components/simulation/` — BodyDiagram, PipeSystem, OrganSprite
+- `src/components/results/` — ResultsPhase, BGGraph, ExcessBGIndicator, OrganDegradationDisplay
+- `src/components/ui/` — Tooltip, EyeToggle
+- `public/data/foods.json` — food cards with WP costs
+- `public/data/interventions.json` — exercise interventions
+- `public/data/levels/level-01.json` — 3-day level config
