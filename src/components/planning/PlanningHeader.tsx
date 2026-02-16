@@ -5,8 +5,8 @@ import './PlanningHeader.css';
 
 interface PlanningHeaderProps {
   currentBG: number;
-  wpRemaining: number;
-  wpBudget: number;
+  movesRemaining: number;
+  moveBudget: number;
   isValid: boolean;
   onSimulate: () => void;
   bgPrediction: number[];
@@ -15,8 +15,8 @@ interface PlanningHeaderProps {
 
 export function PlanningHeader({
   currentBG,
-  wpRemaining,
-  wpBudget,
+  movesRemaining,
+  moveBudget,
   isValid,
   onSimulate,
   bgPrediction,
@@ -31,11 +31,11 @@ export function PlanningHeader({
         </div>
       </Tooltip>
 
-      <Tooltip text="Willpower — spend to place food cards. Each card's ☀️ cost is shown on its badge">
-        <div className="planning-header__wp">
-          <span className="planning-header__wp-emoji">☀️</span>
-          <span className={`planning-header__value ${wpRemaining <= 0 ? 'planning-header__value--depleted' : ''}`}>
-            {wpRemaining}/{wpBudget}
+      <Tooltip text="Match-3 moves remaining. Swap tiles to unlock food cards!">
+        <div className="planning-header__moves">
+          <span className="planning-header__moves-emoji">🎯</span>
+          <span className={`planning-header__value ${movesRemaining <= 0 ? 'planning-header__value--depleted' : ''}`}>
+            {movesRemaining}/{moveBudget}
           </span>
         </div>
       </Tooltip>

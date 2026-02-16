@@ -7,17 +7,24 @@
   "dayConfigs": [
     {
       "day": 1,
-      "wpBudget": 12,
-      "availableFoods": [
-        { "id": "banana", "count": 1 },
-        { "id": "apple", "count": 1 },
-        { "id": "cookie", "count": 1 },
-        { "id": "burger", "count": 1 },
-        { "id": "popcorn", "count": 1 },
-        { "id": "berriesmixed", "count": 1 },
-        { "id": "pizza", "count": 1 },
-        { "id": "greekyogurt", "count": 1 }
-      ],
+      "moveBudget": 15,
+      "match3Config": {
+        "columns": 7,
+        "rows": 5,
+        "tileTypes": 5,
+        "foodSpawnChance": 0.1,
+        "initialFoodTiles": [
+          { "shipId": "banana", "col": 1, "row": 0 },
+          { "shipId": "apple", "col": 4, "row": 0 },
+          { "shipId": "cookie", "col": 2, "row": 1 },
+          { "shipId": "burger", "col": 5, "row": 1 },
+          { "shipId": "popcorn", "col": 3, "row": 0 },
+          { "shipId": "berriesmixed", "col": 6, "row": 1 },
+          { "shipId": "pizza", "col": 0, "row": 0 },
+          { "shipId": "greekyogurt", "col": 3, "row": 1 }
+        ]
+      },
+      "availableFoods": [],
       "availableInterventions": [
         { "id": "light_exercise", "count": 1 }
       ],
@@ -34,17 +41,24 @@
     },
     {
       "day": 2,
-      "wpBudget": 14,
-      "availableFoods": [
-        { "id": "banana", "count": 1 },
-        { "id": "popcorn", "count": 1 },
-        { "id": "cookie", "count": 1 },
-        { "id": "nutsmixed", "count": 1 },
-        { "id": "rice", "count": 1 },
-        { "id": "milk", "count": 1 },
-        { "id": "chickpeas", "count": 1 },
-        { "id": "caesarsalad", "count": 1 }
-      ],
+      "moveBudget": 18,
+      "match3Config": {
+        "columns": 7,
+        "rows": 5,
+        "tileTypes": 5,
+        "foodSpawnChance": 0.1,
+        "initialFoodTiles": [
+          { "shipId": "banana", "col": 0, "row": 0 },
+          { "shipId": "popcorn", "col": 2, "row": 0 },
+          { "shipId": "cookie", "col": 4, "row": 0 },
+          { "shipId": "nutsmixed", "col": 6, "row": 0 },
+          { "shipId": "rice", "col": 1, "row": 1 },
+          { "shipId": "milk", "col": 3, "row": 1 },
+          { "shipId": "chickpeas", "col": 5, "row": 1 },
+          { "shipId": "caesarsalad", "col": 2, "row": 1 }
+        ]
+      },
+      "availableFoods": [],
       "availableInterventions": [
         { "id": "light_exercise", "count": 2 }
       ],
@@ -62,16 +76,23 @@
     },
     {
       "day": 3,
-      "wpBudget": 15,
-      "availableFoods": [
-        { "id": "apple", "count": 1 },
-        { "id": "popcorn", "count": 1 },
-        { "id": "banana", "count": 1 },
-        { "id": "sandwich", "count": 1 },
-        { "id": "boiledcarrots", "count": 1 },
-        { "id": "milk", "count": 1 },
-        { "id": "cheesewedge", "count": 1 }
-      ],
+      "moveBudget": 20,
+      "match3Config": {
+        "columns": 7,
+        "rows": 5,
+        "tileTypes": 5,
+        "foodSpawnChance": 0.12,
+        "initialFoodTiles": [
+          { "shipId": "apple", "col": 1, "row": 0 },
+          { "shipId": "popcorn", "col": 3, "row": 0 },
+          { "shipId": "banana", "col": 5, "row": 0 },
+          { "shipId": "sandwich", "col": 0, "row": 1 },
+          { "shipId": "boiledcarrots", "col": 2, "row": 1 },
+          { "shipId": "milk", "col": 4, "row": 1 },
+          { "shipId": "cheesewedge", "col": 6, "row": 1 }
+        ]
+      },
+      "availableFoods": [],
       "availableInterventions": [
         { "id": "light_exercise", "count": 1 },
         { "id": "intense_exercise", "count": 1 }

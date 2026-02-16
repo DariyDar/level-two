@@ -59,3 +59,46 @@
 .slot-grid__row:last-child {
   margin-bottom: 0;
 }
+
+/* === Compact Mode: 3 segments in a row === */
+
+.slot-grid--compact {
+  flex-direction: row;
+  gap: 8px;
+}
+
+.slot-grid--compact .slot-grid__segment {
+  flex: 1;
+  padding: 8px;
+}
+
+.slot-grid--compact .slot-grid__segment-header {
+  margin-bottom: 4px;
+}
+
+.slot-grid--compact .slot-grid__segment-title {
+  font-size: 11px;
+}
+
+.slot-grid--compact .slot-grid__segment-range {
+  font-size: 11px;
+}
+
+.slot-grid--compact .slot-grid__segment-current {
+  font-size: 11px;
+  padding: 1px 4px;
+  min-width: 28px;
+}
+
+.slot-grid--compact .slot-grid__row {
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+/* On narrow screens, fall back to stacked layout */
+@media (max-width: 500px) {
+  .slot-grid--compact {
+    flex-direction: column;
+    gap: 12px;
+  }
+}

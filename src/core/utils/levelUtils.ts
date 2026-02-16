@@ -1,4 +1,4 @@
-import type { LevelConfig, AvailableFood, PreOccupiedSlot, SegmentCarbLimits, DaySegment } from '../types';
+import type { LevelConfig, AvailableFood, PreOccupiedSlot, SegmentCarbLimits, DaySegment, Match3DayConfig } from '../types';
 
 export interface DayConfigResult {
   availableFoods: AvailableFood[];
@@ -7,7 +7,8 @@ export interface DayConfigResult {
   segmentCarbs?: Record<DaySegment, SegmentCarbLimits>;
   preOccupiedSlots: PreOccupiedSlot[];
   blockedSlots: number[];
-  wpBudget?: number;
+  moveBudget?: number;
+  match3Config?: Match3DayConfig;
   pancreasBoostCharges: number;
 }
 
@@ -27,7 +28,8 @@ export function getDayConfig(level: LevelConfig, day: number): DayConfigResult {
         segmentCarbs: dayConfig.segmentCarbs as Record<DaySegment, SegmentCarbLimits> | undefined,
         preOccupiedSlots: dayConfig.preOccupiedSlots || level.preOccupiedSlots || [],
         blockedSlots: dayConfig.blockedSlots || [],
-        wpBudget: dayConfig.wpBudget,
+        moveBudget: dayConfig.moveBudget,
+        match3Config: dayConfig.match3Config,
         pancreasBoostCharges: dayConfig.pancreasBoostCharges ?? level.interventionCharges.pancreasBoost,
       };
     }

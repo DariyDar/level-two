@@ -10,14 +10,17 @@ import {
 } from '@dnd-kit/core';
 import { v4 as uuidv4 } from 'uuid';
 import type { Ship, PlacedShip, SegmentValidation } from '../../core/types';
-import { slotNumberToPosition, isGlucoseShip, DAY_SEGMENTS } from '../../core/types';
+import { slotNumberToPosition, isGlucoseShip, DAY_SEGMENTS, DEFAULT_MOVE_BUDGET } from '../../core/types';
+import type { Match3Config } from '../../core/match3';
 import { useGameStore } from '../../store/gameStore';
 import { loadAllShips, loadLevel } from '../../config/loader';
 import { getDayConfig } from '../../core/utils/levelUtils';
 import { useBgPrediction } from '../../hooks/useBgPrediction';
+import { useMatch3 } from '../../hooks/useMatch3';
 import { PlanningHeader } from './PlanningHeader';
 import { SlotGrid, calculateValidDropSlots } from './SlotGrid';
 import { ShipInventory } from './ShipInventory';
+import { Match3Board } from './match3/Match3Board';
 import { ShipCardOverlay } from './ShipCard';
 import './PlanningPhase.css';
 
@@ -32,10 +35,9 @@ export function PlanningPhase() {
     currentLevel,
     currentDay,
     setLevel,
-    wpBudget,
-    wpSpent,
-    spendWp,
-    refundWp,
+    moveBudget,
+    match3Inventory,
+    addToMatch3Inventory,
     degradation,
   } = useGameStore();
 
@@ -74,19 +76,52 @@ export function PlanningPhase() {
     return getDayConfig(currentLevel, currentDay);
   }, [currentLevel, currentDay]);
 
+  // Match-3 config from day config
+  const match3Config = useMemo<Match3Config | null>(() => {
+    if (!dayConfig?.match3Config) return null;
+    return dayConfig.match3Config as Match3Config;
+  }, [dayConfig]);
+
+  // Available food ship IDs for match-3 board refill
+  const availableFoodShipIds = useMemo(() => {
+    return allShips
+      .filter(s => s.loadType === 'Glucose')
+      .map(s => s.id);
+  }, [allShips]);
+
+  // Effective move budget
+  const effectiveMoveBudget = dayConfig?.moveBudget ?? currentLevel?.moveBudget ?? moveBudget ?? DEFAULT_MOVE_BUDGET;
+
+  // Match-3 hook
+  const match3 = useMatch3(
+    match3Config,
+    allShips,
+    availableFoodShipIds,
+    effectiveMoveBudget,
+  );
+
+  // When match-3 drops food tiles, add them to store inventory
+  useEffect(() => {
+    if (match3.droppedFoodTiles.length === 0) return;
+
+    // Compare with current match3Inventory to find new drops
+    const currentCount = match3Inventory.length;
+    const newDrops = match3.droppedFoodTiles.slice(currentCount);
+
+    for (const foodTile of newDrops) {
+      const ship = allShips.find(s => s.id === foodTile.shipId);
+      if (ship) {
+        addToMatch3Inventory(ship);
+      }
+    }
+  }, [match3.droppedFoodTiles, match3Inventory.length, allShips, addToMatch3Inventory]);
+
   // Initialize pre-occupied ships from day config
   useEffect(() => {
     if (!dayConfig || allShips.length === 0) return;
 
     const preOccSlots = dayConfig.preOccupiedSlots;
     if (!preOccSlots || preOccSlots.length === 0) return;
-
-    // Calculate total WP cost of pre-occupied ships
-    let preOccWpCost = 0;
-    for (const po of preOccSlots) {
-      const ship = allShips.find((s) => s.id === po.shipId);
-      if (ship) preOccWpCost += ship.wpCost ?? 0;
-    }
 
     // Place pre-occupied ships if not already placed
     const alreadyPlaced = placedShips.some((s) => s.isPreOccupied);
@@ -103,12 +138,7 @@ export function PlanningPhase() {
         });
       }
     }
-
-    // Ensure WP accounts for pre-occupied ships (handles retry where wpSpent resets to 0)
-    if (wpSpent < preOccWpCost) {
-      spendWp(preOccWpCost - wpSpent);
-    }
-  }, [dayConfig, allShips, currentDay, placedShips, wpSpent, placeShip, spendWp]);
+  }, [dayConfig, allShips, currentDay, placedShips, placeShip]);
 
   // Validate plan whenever placed ships change
   useEffect(() => {
@@ -146,7 +176,6 @@ export function PlanningPhase() {
           max: limits.max,
         });
 
-        // Every segment must meet its minimum carbs
         if (current < limits.min) {
           errors.push(`${seg}: need at least ${limits.min}g carbs`);
         }
@@ -155,7 +184,6 @@ export function PlanningPhase() {
         }
       }
     } else if (dayConfig.carbRequirements) {
-      // Legacy day-level validation
       const { min, max } = dayConfig.carbRequirements;
       if (totalCarbs < min) {
         errors.push(`Need at least ${min}g carbs`);
@@ -206,7 +234,6 @@ export function PlanningPhase() {
 
       setActiveShip(ship);
 
-      // Calculate valid drop slots, excluding the currently dragged ship if it's placed
       const isPlaced = event.active.data.current?.isPlaced;
       const instanceId = event.active.data.current?.instanceId;
 
@@ -247,38 +274,30 @@ export function PlanningPhase() {
       setHoveredSlot(null);
 
       if (!over) {
-        // Dropped outside - if was placed, remove it (return to inventory)
         const wasPlaced = active.data.current?.isPlaced;
         const instanceId = active.data.current?.instanceId;
         const isPreOccupied = placedShips.find(s => s.instanceId === instanceId)?.isPreOccupied;
 
         if (wasPlaced && instanceId && !isPreOccupied) {
-          const ship = active.data.current?.ship as Ship;
-          refundWp(ship.wpCost ?? 0);
           removeShip(instanceId);
         }
         return;
       }
 
-      // Check if dropped on inventory (return to inventory)
       if (String(over.id).startsWith('inventory')) {
         const wasPlaced = active.data.current?.isPlaced;
         const instanceId = active.data.current?.instanceId;
         const isPreOccupied = placedShips.find(s => s.instanceId === instanceId)?.isPreOccupied;
 
         if (wasPlaced && instanceId && !isPreOccupied) {
-          const ship = active.data.current?.ship as Ship;
-          refundWp(ship.wpCost ?? 0);
           removeShip(instanceId);
         }
         return;
       }
 
-      // Parse slot number from droppable id
       const slotMatch = String(over.id).match(/^slot-(\d+)$/);
       if (!slotMatch) return;
 
-      // Use groupStartSlot if available (for multi-slot ships dropped on non-start slots)
       const groupStartSlot = over.data.current?.groupStartSlot as number | undefined;
       const targetSlot = groupStartSlot ?? parseInt(slotMatch[1], 10);
 
@@ -288,22 +307,12 @@ export function PlanningPhase() {
       const wasPlaced = active.data.current?.isPlaced;
       const oldInstanceId = active.data.current?.instanceId;
 
-      // Check WP budget (only if placing from inventory, not moving)
-      const wpCost = ship.wpCost ?? 0;
-      if (!wasPlaced && wpCost > 0) {
-        const wpRemaining = wpBudget - wpSpent;
-        if (wpRemaining < wpCost) return; // Not enough WP
-      }
-
-      // Remove old placement if moving
       if (wasPlaced && oldInstanceId) {
         removeShip(oldInstanceId);
       }
 
-      // Convert slot number to position
       const pos = slotNumberToPosition(targetSlot);
 
-      // Create new placement
       const newPlacement: PlacedShip = {
         instanceId: uuidv4(),
         shipId: ship.id,
@@ -313,13 +322,8 @@ export function PlanningPhase() {
       };
 
       placeShip(newPlacement);
-
-      // Spend WP when placing from inventory (not when moving)
-      if (!wasPlaced && wpCost > 0) {
-        spendWp(wpCost);
-      }
     },
-    [validDropSlots, placedShips, placeShip, removeShip, wpBudget, wpSpent, spendWp]
+    [validDropSlots, placedShips, placeShip, removeShip]
   );
 
   const handleSimulate = useCallback(() => {
@@ -346,37 +350,43 @@ export function PlanningPhase() {
           Day {currentDay}/{currentLevel.days}
         </div>
         <div className="planning-phase__hint">
-          Drag &amp; drop food cards into time slots to plan your meals. Meet each segment's carb target to simulate!
+          Match tiles to unlock food cards, then drag them into time slots!
         </div>
         <PlanningHeader
           currentBG={currentLevel.initialBG ?? 100}
-          wpRemaining={wpBudget - wpSpent}
-          wpBudget={wpBudget}
+          movesRemaining={match3.movesRemaining}
+          moveBudget={effectiveMoveBudget}
           isValid={planValidation.isValid}
           onSimulate={handleSimulate}
           bgPrediction={bgPrediction.bgHistory}
           fastInsulinCharges={dayConfig?.pancreasBoostCharges ?? 0}
         />
 
-        <div className="planning-phase__content">
-          <ShipInventory
-            allShips={allShips}
-            availableFoods={dayConfig?.availableFoods || []}
-            availableInterventions={dayConfig?.availableInterventions || []}
-            placedShips={placedShips}
-          />
+        <SlotGrid
+          placedShips={placedShips}
+          ships={allShips}
+          validDropSlots={validDropSlots}
+          highlightedSlots={new Set()}
+          activeShip={activeShip}
+          hoveredSlot={hoveredSlot}
+          segmentValidation={planValidation.segments}
+          blockedSlots={dayConfig?.blockedSlots}
+          compact={true}
+        />
 
-          <SlotGrid
-            placedShips={placedShips}
-            ships={allShips}
-            validDropSlots={validDropSlots}
-            highlightedSlots={new Set()}
-            activeShip={activeShip}
-            hoveredSlot={hoveredSlot}
-            segmentValidation={planValidation.segments}
-            blockedSlots={dayConfig?.blockedSlots}
+        {match3Config && (
+          <Match3Board
+            match3={match3}
+            allShips={allShips}
           />
-        </div>
+        )}
+
+        <ShipInventory
+          allShips={allShips}
+          match3Inventory={match3Inventory}
+          availableInterventions={dayConfig?.availableInterventions || []}
+          placedShips={placedShips}
+        />
       </div>
 
       <DragOverlay dropAnimation={null}>

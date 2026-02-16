@@ -21,6 +21,7 @@ interface SlotGridProps {
   hoveredSlot?: number | null;
   segmentValidation?: SegmentValidation[];
   blockedSlots?: number[];
+  compact?: boolean;
 }
 
 function getSegmentCarbColor(validation: SegmentValidation): string {
@@ -44,6 +45,7 @@ export function SlotGrid({
   hoveredSlot,
   segmentValidation,
   blockedSlots = [],
+  compact = false,
 }: SlotGridProps) {
   const activeShipSize = activeShip ? SHIP_SIZE_TO_SLOTS[activeShip.size] : 1;
   const blockedSlotsSet = new Set(blockedSlots);
@@ -238,7 +240,7 @@ export function SlotGrid({
   };
 
   return (
-    <div className="slot-grid">
+    <div className={`slot-grid ${compact ? 'slot-grid--compact' : ''}`}>
       {DAY_SEGMENTS.map((segment, index) => renderSegment(segment, index))}
     </div>
   );

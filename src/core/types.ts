@@ -12,9 +12,9 @@ export type DaySegment = 'Morning' | 'Day' | 'Evening';
 
 export type GamePhase = 'Planning' | 'Simulation' | 'Results';
 
-// === Willpower Points ===
+// === Move Budget (Match-3) ===
 
-export const DEFAULT_WP_BUDGET = 16;
+export const DEFAULT_MOVE_BUDGET = 15;
 
 // Naming Convention Mapping (Excel v0.6 ↔ Code):
 // Containers (store substances):
@@ -149,13 +149,22 @@ export interface SegmentCarbLimits {
   max: number;
 }
 
+export interface Match3DayConfig {
+  columns: number;
+  rows: number;
+  tileTypes: number;       // 3-5 SimpleTileShape variants
+  foodSpawnChance: number;  // 0.0 - 1.0
+  initialFoodTiles?: { shipId: string; col: number; row: number }[];
+}
+
 export interface DayConfig {
   day: number;
   availableFoods: AvailableFood[];
   availableInterventions: AvailableFood[];
   preOccupiedSlots?: PreOccupiedSlot[];
   blockedSlots?: number[]; // Slot numbers (1-18) that cannot accept any cards
-  wpBudget?: number; // Override WP budget for this day
+  moveBudget?: number; // Move budget for Match-3 phase
+  match3Config?: Match3DayConfig; // Match-3 board configuration
   // Legacy day-level carb requirements
   carbRequirements?: {
     min: number;
@@ -176,7 +185,7 @@ export interface LevelConfig {
   description?: string;
   days: number;
   initialBG?: number; // Starting BG level (default 100)
-  wpBudget?: number; // Level-wide WP budget override
+  moveBudget?: number; // Level-wide move budget override
   // Legacy fields (used if dayConfigs not present)
   availableFoods?: AvailableFood[];
   carbRequirements?: {

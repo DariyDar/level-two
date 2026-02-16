@@ -7,8 +7,9 @@ import type {
   LevelConfig,
   DayResults,
   PlanValidation,
+  Ship,
 } from '../core/types';
-import { DEFAULT_WP_BUDGET } from '../core/types';
+import { DEFAULT_MOVE_BUDGET } from '../core/types';
 import { getDayConfig } from '../core/utils/levelUtils';
 
 interface GameState {
@@ -31,9 +32,12 @@ interface GameState {
   degradation: SimpleDegradation;
   difficultyLevel: number; // Starting organ damage (0-4)
 
-  // Willpower Points
-  wpBudget: number;
-  wpSpent: number;
+  // Match-3 move system (replaces WP)
+  moveBudget: number;
+  movesUsed: number;
+
+  // Match-3 inventory (food tiles that dropped from board)
+  match3Inventory: Ship[];
 
   // UI toggles
   showDetailedIndicators: boolean;
@@ -51,9 +55,10 @@ interface GameState {
   restartLevel: () => void;
   restartWithDifficulty: (level: number) => void;
   updateValidation: (validation: PlanValidation) => void;
-  setWpBudget: (budget: number) => void;
-  spendWp: (amount: number) => void;
-  refundWp: (amount: number) => void;
+  setMoveBudget: (budget: number) => void;
+  useMove: () => void;
+  addToMatch3Inventory: (ship: Ship) => void;
+  clearMatch3Inventory: () => void;
   toggleDetailedIndicators: () => void;
 }
 
@@ -85,8 +90,9 @@ export const useGameStore = create<GameState>()(
       results: null,
       degradation: initialDegradation,
       difficultyLevel: 0,
-      wpBudget: DEFAULT_WP_BUDGET,
-      wpSpent: 0,
+      moveBudget: DEFAULT_MOVE_BUDGET,
+      movesUsed: 0,
+      match3Inventory: [],
       showDetailedIndicators: false,
 
       // Actions
@@ -94,7 +100,7 @@ export const useGameStore = create<GameState>()(
 
       setLevel: (level) => {
         const dayConfig = getDayConfig(level, 1); // Day 1 config
-        const wpBudget = dayConfig.wpBudget ?? level.wpBudget ?? DEFAULT_WP_BUDGET;
+        const moveBudget = dayConfig.moveBudget ?? level.moveBudget ?? DEFAULT_MOVE_BUDGET;
         return set({
           currentLevel: level,
           currentDay: 1,
@@ -106,8 +112,9 @@ export const useGameStore = create<GameState>()(
           },
           results: null,
           degradation: level.initialDegradation ?? initialDegradation,
-          wpBudget,
-          wpSpent: 0,
+          moveBudget,
+          movesUsed: 0,
+          match3Inventory: [],
         });
       },
 
@@ -125,10 +132,9 @@ export const useGameStore = create<GameState>()(
         })),
 
       clearPlan: () =>
-        set((state) => ({
+        set((_state) => ({
           // Keep pre-occupied ships when clearing
-          placedShips: state.placedShips.filter((s) => s.isPreOccupied),
-          wpSpent: 0, // Reset WP; PlanningPhase effect will re-add pre-occupied WP cost
+          placedShips: _state.placedShips.filter((s) => s.isPreOccupied),
         })),
 
       setBgHistory: (history) => set({ bgHistory: history }),
@@ -144,10 +150,10 @@ export const useGameStore = create<GameState>()(
 
       startNextDay: () =>
         set((state) => {
-          let wpBudget = DEFAULT_WP_BUDGET;
+          let moveBudget = DEFAULT_MOVE_BUDGET;
           if (state.currentLevel) {
             const dayConfig = getDayConfig(state.currentLevel, state.currentDay + 1);
-            wpBudget = dayConfig.wpBudget ?? state.currentLevel.wpBudget ?? DEFAULT_WP_BUDGET;
+            moveBudget = dayConfig.moveBudget ?? state.currentLevel.moveBudget ?? DEFAULT_MOVE_BUDGET;
           }
           return {
             currentDay: state.currentDay + 1,
@@ -155,8 +161,9 @@ export const useGameStore = create<GameState>()(
             placedShips: [],
             bgHistory: [],
             results: null,
-            wpBudget,
-            wpSpent: 0,
+            moveBudget,
+            movesUsed: 0,
+            match3Inventory: [],
           };
         }),
 
@@ -166,16 +173,17 @@ export const useGameStore = create<GameState>()(
           placedShips: state.placedShips.filter((s) => s.isPreOccupied),
           bgHistory: [],
           results: null,
-          wpSpent: 0,
+          movesUsed: 0,
+          match3Inventory: [],
         })),
 
       restartLevel: () =>
         set((state) => {
           const level = state.currentLevel;
-          let wpBudget = DEFAULT_WP_BUDGET;
+          let moveBudget = DEFAULT_MOVE_BUDGET;
           if (level) {
             const dayConfig = getDayConfig(level, 1);
-            wpBudget = dayConfig.wpBudget ?? level.wpBudget ?? DEFAULT_WP_BUDGET;
+            moveBudget = dayConfig.moveBudget ?? level.moveBudget ?? DEFAULT_MOVE_BUDGET;
           }
           const points = state.difficultyLevel * 25;
           return {
@@ -185,18 +193,19 @@ export const useGameStore = create<GameState>()(
             bgHistory: [],
             results: null,
             degradation: points > 0 ? { liver: points, pancreas: points } : (level?.initialDegradation ?? initialDegradation),
-            wpBudget,
-            wpSpent: 0,
+            moveBudget,
+            movesUsed: 0,
+            match3Inventory: [],
           };
         }),
 
       restartWithDifficulty: (level: number) =>
         set((state) => {
           const config = state.currentLevel;
-          let wpBudget = DEFAULT_WP_BUDGET;
+          let moveBudget = DEFAULT_MOVE_BUDGET;
           if (config) {
             const dayConfig = getDayConfig(config, 1);
-            wpBudget = dayConfig.wpBudget ?? config.wpBudget ?? DEFAULT_WP_BUDGET;
+            moveBudget = dayConfig.moveBudget ?? config.moveBudget ?? DEFAULT_MOVE_BUDGET;
           }
           const d = Math.min(level, 4);
           const points = d * 25;
@@ -208,27 +217,30 @@ export const useGameStore = create<GameState>()(
             results: null,
             difficultyLevel: d,
             degradation: { liver: points, pancreas: points },
-            wpBudget,
-            wpSpent: 0,
+            moveBudget,
+            movesUsed: 0,
+            match3Inventory: [],
           };
         }),
 
       updateValidation: (validation) => set({ planValidation: validation }),
 
-      setWpBudget: (budget) => set({ wpBudget: budget }),
+      setMoveBudget: (budget) => set({ moveBudget: budget }),
 
-      spendWp: (amount) =>
-        set((state) => ({ wpSpent: state.wpSpent + amount })),
+      useMove: () =>
+        set((state) => ({ movesUsed: state.movesUsed + 1 })),
 
-      refundWp: (amount) =>
-        set((state) => ({ wpSpent: Math.max(0, state.wpSpent - amount) })),
+      addToMatch3Inventory: (ship) =>
+        set((state) => ({ match3Inventory: [...state.match3Inventory, ship] })),
+
+      clearMatch3Inventory: () => set({ match3Inventory: [] }),
 
       toggleDetailedIndicators: () =>
         set((state) => ({ showDetailedIndicators: !state.showDetailedIndicators })),
     }),
     {
       name: 'port-management-save',
-      version: 2, // Increment to reset saved state
+      version: 3, // Increment to reset saved state (WP → moves migration)
       partialize: (state) => ({
         degradation: state.degradation,
         difficultyLevel: state.difficultyLevel,

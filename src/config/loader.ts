@@ -48,7 +48,14 @@ interface RawLevelConfig {
     availableInterventions?: AvailableFood[] | string[];
     preOccupiedSlots?: { slot: number; shipId: string }[];
     blockedSlots?: number[];
-    wpBudget?: number;
+    moveBudget?: number;
+    match3Config?: {
+      columns: number;
+      rows: number;
+      tileTypes: number;
+      foodSpawnChance: number;
+      initialFoodTiles?: { shipId: string; col: number; row: number }[];
+    };
     carbRequirements?: { min: number; max: number };
     segmentCarbs?: {
       Morning?: { min: number; optimal: number; max: number };
@@ -166,7 +173,8 @@ function transformLevel(raw: RawLevelConfig): LevelConfig {
       availableInterventions: normalizeAvailableInterventions(dc.availableInterventions),
       preOccupiedSlots: dc.preOccupiedSlots ?? [],
       blockedSlots: dc.blockedSlots ?? [],
-      wpBudget: dc.wpBudget,
+      moveBudget: dc.moveBudget,
+      match3Config: dc.match3Config,
       carbRequirements: dc.carbRequirements,
       segmentCarbs: dc.segmentCarbs,
       pancreasBoostCharges: dc.pancreasBoostCharges,

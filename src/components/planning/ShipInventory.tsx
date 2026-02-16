@@ -5,8 +5,8 @@ import './ShipInventory.css';
 
 interface ShipInventoryProps {
   allShips: Ship[];
-  availableFoods: AvailableFood[];
-  availableInterventions: AvailableFood[];
+  match3Inventory: Ship[];                // Food tiles dropped from Match-3 board
+  availableInterventions: AvailableFood[]; // Interventions from level config (bypass match-3)
   placedShips: PlacedShip[];
 }
 
@@ -17,7 +17,7 @@ interface InventoryItem {
 
 export function ShipInventory({
   allShips,
-  availableFoods,
+  match3Inventory,
   availableInterventions,
   placedShips,
 }: ShipInventoryProps) {
@@ -31,14 +31,29 @@ export function ShipInventory({
 
   const inventoryItems = useMemo(() => {
     const items: InventoryItem[] = [];
-    const allAvailable = [...availableFoods, ...availableInterventions];
 
-    for (const af of allAvailable) {
-      const ship = allShips.find((s) => s.id === af.id);
+    // Food items from match-3 drops (each drop = 1 card instance)
+    // Count how many of each food are already placed
+    const foodPlacedCounts = new Map<string, number>(placedCounts);
+
+    for (let i = 0; i < match3Inventory.length; i++) {
+      const ship = match3Inventory[i];
+      const placed = foodPlacedCounts.get(ship.id) || 0;
+      if (placed > 0) {
+        // This instance is already placed on the grid
+        foodPlacedCounts.set(ship.id, placed - 1);
+        continue;
+      }
+      items.push({ ship, index: i });
+    }
+
+    // Intervention items from level config
+    for (const ai of availableInterventions) {
+      const ship = allShips.find((s) => s.id === ai.id);
       if (!ship) continue;
 
-      const placed = placedCounts.get(af.id) || 0;
-      const remaining = af.count - placed;
+      const placed = placedCounts.get(ai.id) || 0;
+      const remaining = ai.count - placed;
 
       for (let i = 0; i < remaining; i++) {
         items.push({ ship, index: i });
@@ -46,13 +61,17 @@ export function ShipInventory({
     }
 
     return items;
-  }, [allShips, availableFoods, availableInterventions, placedCounts]);
+  }, [allShips, match3Inventory, availableInterventions, placedCounts]);
 
   return (
     <div className="ship-inventory">
       <div className="ship-inventory__grid">
         {inventoryItems.length === 0 ? (
-          <div className="ship-inventory__empty">All cards placed!</div>
+          <div className="ship-inventory__empty">
+            {match3Inventory.length === 0
+              ? 'Match tiles to unlock food cards!'
+              : 'All cards placed!'}
+          </div>
         ) : (
           inventoryItems.map(({ ship, index }) => (
             <ShipCard

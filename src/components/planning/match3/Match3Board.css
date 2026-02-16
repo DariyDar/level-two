@@ -1,0 +1,215 @@
+/* === Match-3 Section === */
+
+.match3-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.match3-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.match3-section__label {
+  font-size: 13px;
+  color: #a0aec0;
+}
+
+.match3-section__moves {
+  font-size: 18px;
+  font-weight: 700;
+  color: #48bb78;
+  padding: 2px 10px;
+  background: #1a202c;
+  border-radius: 8px;
+}
+
+.match3-section__moves--low {
+  color: #fc8181;
+  animation: moves-pulse 1s ease-in-out infinite;
+}
+
+.match3-section__status {
+  font-size: 13px;
+  color: #a0aec0;
+  text-align: center;
+  padding: 4px;
+}
+
+.match3-section__status--warning {
+  color: #ecc94b;
+}
+
+/* === Match-3 Board === */
+
+.match3-board {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  background: #1a202c;
+  border-radius: 12px;
+  border: 2px solid #2d3748;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.match3-board--animating {
+  pointer-events: none;
+}
+
+.match3-board--disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.match3-board--deadlock {
+  border-color: #ecc94b;
+}
+
+/* === Tile Base === */
+
+.match3-tile {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  position: relative;
+  min-width: 0;
+}
+
+.match3-tile:active {
+  transform: scale(0.92);
+}
+
+/* Empty tile */
+.match3-tile--empty {
+  background: transparent;
+  cursor: default;
+}
+
+/* === Simple Tiles === */
+
+.match3-tile--simple {
+  background: var(--tile-color, #4a5568);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.match3-tile__symbol {
+  font-size: clamp(16px, 4vw, 24px);
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  line-height: 1;
+}
+
+/* === Food Tiles === */
+
+.match3-tile--food {
+  background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  cursor: not-allowed;
+  border: 2px solid rgba(49, 130, 206, 0.6);
+}
+
+.match3-tile__emoji {
+  font-size: clamp(14px, 3.5vw, 20px);
+  line-height: 1;
+}
+
+/* === Selected State === */
+
+.match3-tile--selected {
+  outline: 3px solid #fbbf24;
+  outline-offset: -1px;
+  transform: scale(1.08);
+  z-index: 2;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.5);
+}
+
+/* === Matching Animation === */
+
+.match3-tile--matching {
+  animation: tile-match 300ms ease-out forwards;
+  z-index: 1;
+}
+
+@keyframes tile-match {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+/* === Gravity / Fall Animation === */
+
+@keyframes tile-fall {
+  from {
+    transform: translateY(calc(var(--fall-distance, 0) * -1));
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* === Spawn Animation (new tiles from top) === */
+
+@keyframes tile-spawn {
+  from {
+    transform: translateY(-60px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* === Food Drop Animation === */
+
+@keyframes tile-food-drop {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  60% {
+    transform: translateY(20px) scale(0.8);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(60px) scale(0.4);
+    opacity: 0;
+  }
+}
+
+/* === Moves pulse === */
+
+@keyframes moves-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* === Responsive === */
+
+@media (max-width: 360px) {
+  .match3-board {
+    gap: 3px;
+    padding: 6px;
+  }
+
+  .match3-tile {
+    border-radius: 6px;
+  }
+}

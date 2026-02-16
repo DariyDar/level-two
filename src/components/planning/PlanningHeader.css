@@ -17,7 +17,7 @@
   min-width: 70px;
 }
 
-.planning-header__wp {
+.planning-header__moves {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -32,10 +32,10 @@
   color: #718096;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  line-height: 24px; /* Match ☀️ emoji height so values align */
+  line-height: 24px;
 }
 
-.planning-header__wp-emoji {
+.planning-header__moves-emoji {
   font-size: 24px;
   line-height: 1;
 }

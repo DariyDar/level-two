@@ -1,9 +1,9 @@
 .planning-phase {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
-  max-width: 400px;
+  gap: 12px;
+  padding: 12px;
+  max-width: 420px;
   margin: 0 auto;
 }
 
@@ -31,35 +31,9 @@
   font-size: 16px;
 }
 
-.planning-phase__content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-/* Mobile: SlotGrid (last-child) appears on top despite DOM order */
-.planning-phase__content > *:last-child {
-  order: -1;
-}
-
 /* Responsive - tablet and up */
 @media (min-width: 768px) {
   .planning-phase {
-    max-width: 800px;
-  }
-
-  .planning-phase__content {
-    flex-direction: row;
-    align-items: flex-start;
-  }
-
-  /* Desktop: ShipInventory (first) fills, SlotGrid (last) fixed */
-  .planning-phase__content > *:first-child {
-    flex: 1;
-  }
-
-  .planning-phase__content > *:last-child {
-    flex: 0 0 auto;
-    order: 0;
+    max-width: 600px;
   }
 }

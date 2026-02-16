@@ -10,10 +10,8 @@ const SIZE_TO_SPEED: Record<string, string> = { S: 'Fast', M: 'Medium', L: 'Slow
 function getCardTooltip(ship: Ship): string {
   if (isGlucoseShip(ship)) {
     const speed = SIZE_TO_SPEED[ship.size] ?? 'Medium';
-    const cost = ship.wpCost ?? 0;
-    const costText = cost > 0 ? `Cost ${cost}☀️ to place` : 'Free to place';
     const sugary = ship.tags?.includes('sugary') ? 'Sugary · Rapid glucose spike\n' : '';
-    return `${sugary}${speed} · ${costText}`;
+    return `${sugary}${speed}`;
   }
   return ship.description ?? ship.name;
 }
@@ -52,8 +50,6 @@ export function ShipCard({
     transform: CSS.Transform.toString(transform),
   };
 
-  const wpCost = ship.wpCost ?? 0;
-
   return (
     <div
       ref={setNodeRef}
@@ -73,11 +69,6 @@ export function ShipCard({
       {...attributes}
     >
       <span className="ship-card__emoji">{ship.emoji}</span>
-
-      {/* WP cost badge - top right */}
-      {wpCost > 0 && (
-        <span className="ship-card__badge ship-card__badge--wp">{wpCost}☀️</span>
-      )}
 
       {/* Sugary badge - bottom left */}
       {ship.tags?.includes('sugary') && (
@@ -104,7 +95,6 @@ export function ShipCard({
 // Drag overlay version (no drag handlers)
 export function ShipCardOverlay({ ship }: { ship: Ship }) {
   const showDetailedIndicators = useGameStore((s) => s.showDetailedIndicators);
-  const wpCost = ship.wpCost ?? 0;
 
   return (
     <div
@@ -116,11 +106,6 @@ export function ShipCardOverlay({ ship }: { ship: Ship }) {
       ].join(' ')}
     >
       <span className="ship-card__emoji">{ship.emoji}</span>
-
-      {/* WP cost badge - top right */}
-      {wpCost > 0 && (
-        <span className="ship-card__badge ship-card__badge--wp">{wpCost}☀️</span>
-      )}
 
       {/* Sugary badge - bottom left */}
       {ship.tags?.includes('sugary') && (
