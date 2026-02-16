@@ -77,7 +77,7 @@ export function Match3Board({ match3, allShips }: Match3BoardProps) {
       <div className="match3-section__header">
         <span className="match3-section__label">Match tiles to unlock food!</span>
         <span className={`match3-section__moves ${movesRemaining <= 3 ? 'match3-section__moves--low' : ''}`}>
-          {movesRemaining}/{moveBudget}
+          <span className="match3-section__moves-icon">⏳</span> {movesRemaining}/{moveBudget}
         </span>
       </div>
 

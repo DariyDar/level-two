@@ -27,6 +27,10 @@
   border-radius: 8px;
 }
 
+.match3-section__moves-icon {
+  font-size: 14px;
+}
+
 .match3-section__moves--low {
   color: #fc8181;
   animation: moves-pulse 1s ease-in-out infinite;
