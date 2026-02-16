@@ -358,7 +358,7 @@ export function PlanningPhase() {
         />
 
         <div className="planning-phase__slot-hint">
-          Match tiles to drop food cards, then drag them into time slots!
+          Drag food into slots to meet carb goals!
         </div>
         <SlotGrid
           placedShips={placedShips}
