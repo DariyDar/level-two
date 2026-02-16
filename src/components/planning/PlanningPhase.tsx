@@ -349,9 +349,6 @@ export function PlanningPhase() {
         <div className="planning-phase__day-title">
           Day {currentDay}/{currentLevel.days}
         </div>
-        <div className="planning-phase__hint">
-          Drop food into the schedule to meet the carb requirements!
-        </div>
         <PlanningHeader
           isValid={planValidation.isValid}
           onSimulate={handleSimulate}
