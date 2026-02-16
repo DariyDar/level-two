@@ -8,6 +8,7 @@ interface PlanningHeaderProps {
   onSimulate: () => void;
   bgPrediction: number[];
   fastInsulinCharges: number;
+  validationErrors: string[];
 }
 
 export function PlanningHeader({
@@ -15,6 +16,7 @@ export function PlanningHeader({
   onSimulate,
   bgPrediction,
   fastInsulinCharges,
+  validationErrors,
 }: PlanningHeaderProps) {
   return (
     <div className="planning-header">
@@ -39,13 +41,24 @@ export function PlanningHeader({
         </div>
       </Tooltip>
 
-      <button
-        className="planning-header__simulate"
-        onClick={onSimulate}
-        disabled={!isValid}
-      >
-        Simulate
-      </button>
+      {!isValid && validationErrors.length > 0 ? (
+        <Tooltip text={`Fulfill segment carb requirements: ${validationErrors[0]}`} position="bottom">
+          <button
+            className="planning-header__simulate"
+            disabled
+          >
+            Simulate
+          </button>
+        </Tooltip>
+      ) : (
+        <button
+          className="planning-header__simulate"
+          onClick={onSimulate}
+          disabled={!isValid}
+        >
+          Simulate
+        </button>
+      )}
     </div>
   );
 }

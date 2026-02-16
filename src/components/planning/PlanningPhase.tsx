@@ -180,7 +180,7 @@ export function PlanningPhase() {
           errors.push(`${seg}: need at least ${limits.min}g carbs`);
         }
         if (current > limits.max) {
-          warnings.push(`${seg}: too many carbs (max ${limits.max}g)`);
+          errors.push(`${seg}: too many carbs (max ${limits.max}g)`);
         }
       }
     } else if (dayConfig.carbRequirements) {
@@ -350,13 +350,14 @@ export function PlanningPhase() {
           Day {currentDay}/{currentLevel.days}
         </div>
         <div className="planning-phase__hint">
-          Match tiles to unlock food cards, then drag them into time slots!
+          Match tiles to drop food cards, then drag them into time slots!
         </div>
         <PlanningHeader
           isValid={planValidation.isValid}
           onSimulate={handleSimulate}
           bgPrediction={bgPrediction.bgHistory}
           fastInsulinCharges={dayConfig?.pancreasBoostCharges ?? 0}
+          validationErrors={planValidation.errors}
         />
 
         <SlotGrid

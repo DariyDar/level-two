@@ -69,7 +69,7 @@ export function ShipInventory({
         {inventoryItems.length === 0 ? (
           <div className="ship-inventory__empty">
             {match3Inventory.length === 0
-              ? 'Match tiles to unlock food cards!'
+              ? 'Match tiles to drop food cards!'
               : 'All cards placed!'}
           </div>
         ) : (
