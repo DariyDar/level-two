@@ -141,7 +141,7 @@ export function calculateDegradation(
 
 /**
  * Calculate assessment based on degradation circles earned this day
- * @param totalCircles - Number of degradation circles (0-5)
+ * @param totalCircles - Number of degradation circles (0-3)
  * @returns Assessment label
  */
 export function calculateAssessment(totalCircles: number): DayAssessment {
@@ -155,13 +155,13 @@ export function calculateAssessment(totalCircles: number): DayAssessment {
  * Calculate Degradation Buffer from excess BG
  * @param excessBG - Total weighted excess BG (progressive zones: 200-300 × 0.5, 300+ × 1.0)
  * @param thresholdPerCircle - How much excessBG needed for one circle (default: 100)
- * @param maxCircles - Maximum number of circles (default: 5)
- * @returns Number of activated circles (0-5)
+ * @param maxCircles - Maximum number of circles (default: 3)
+ * @returns Number of activated circles (0-3)
  */
 export function calculateDegradationBuffer(
   excessBG: number,
   thresholdPerCircle: number = 100,
-  maxCircles: number = 5
+  maxCircles: number = 3
 ): number {
   const circles = Math.floor(excessBG / thresholdPerCircle);
   return Math.min(circles, maxCircles);

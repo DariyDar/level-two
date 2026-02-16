@@ -202,7 +202,7 @@ export interface LevelConfig {
     pancreasBoost: number;
   };
   winCondition: {
-    maxDegradationCircles?: number; // Default: 5. Defeat if circles >= this value
+    maxDegradationCircles?: number; // Default: 3. Defeat if circles >= this value
   };
 }
 
@@ -213,8 +213,8 @@ export type DayAssessment = 'Excellent' | 'Decent' | 'Poor' | 'Defeat';
 export const DEFAULT_ASSESSMENT_THRESHOLDS = {
   excellent: 0,  // 0 circles
   decent: 1,     // 1 circle
-  poor: 2,       // 2-4 circles
-  defeat: 5,     // 5 circles = defeat
+  poor: 2,       // 2 circles
+  defeat: 3,     // 3 circles = defeat
 } as const;
 
 export interface DayMetrics {

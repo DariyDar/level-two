@@ -3,14 +3,14 @@ import { Tooltip } from '../ui/Tooltip';
 import './ExcessBGIndicator.css';
 
 interface ExcessBGIndicatorProps {
-  totalCircles: number; // 0-5
-  defeatThreshold?: number; // Max circles before defeat (default 5)
+  totalCircles: number; // 0-3
+  defeatThreshold?: number; // Max circles before defeat (default 3)
   onAnimationComplete?: () => void; // Callback when animation completes
 }
 
 export function ExcessBGIndicator({
   totalCircles,
-  defeatThreshold = 5,
+  defeatThreshold = 3,
   onAnimationComplete,
 }: ExcessBGIndicatorProps) {
   const maxCircles = defeatThreshold;

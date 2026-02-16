@@ -115,6 +115,6 @@
     "pancreasBoost": 2
   },
   "winCondition": {
-    "maxDegradationCircles": 5
+    "maxDegradationCircles": 3
   }
 }
