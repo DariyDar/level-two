@@ -350,7 +350,7 @@ export function PlanningPhase() {
           Day {currentDay}/{currentLevel.days}
         </div>
         <div className="planning-phase__hint">
-          Match tiles to drop food cards, then drag them into time slots!
+          Drop food into the schedule to meet the carb requirements!
         </div>
         <PlanningHeader
           isValid={planValidation.isValid}
@@ -360,6 +360,9 @@ export function PlanningPhase() {
           validationErrors={planValidation.errors}
         />
 
+        <div className="planning-phase__slot-hint">
+          Match tiles to drop food cards, then drag them into time slots!
+        </div>
         <SlotGrid
           placedShips={placedShips}
           ships={allShips}

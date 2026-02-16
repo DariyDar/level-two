@@ -15,6 +15,13 @@
   line-height: 1.4;
 }
 
+.planning-phase__slot-hint {
+  font-size: 12px;
+  color: #718096;
+  text-align: center;
+  margin-bottom: -8px;
+}
+
 .planning-phase__day-title {
   font-size: 18px;
   font-weight: 600;
