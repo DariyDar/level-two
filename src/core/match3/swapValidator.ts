@@ -15,8 +15,8 @@ export function isAdjacent(pos1: Position, pos2: Position): boolean {
  * Check if a swap between two positions would produce at least one match.
  * Rules:
  * - Positions must be adjacent
- * - Both tiles must be SimpleTile (food tiles cannot be swapped)
- * - After swapping, at least one match of 3+ must exist
+ * - At least one tile must be SimpleTile (food↔food swap not allowed)
+ * - After swapping, at least one match of 3+ simple tiles must exist
  */
 export function isValidSwap(board: Board, pos1: Position, pos2: Position): boolean {
   if (!isAdjacent(pos1, pos2)) return false;
@@ -32,11 +32,14 @@ export function isValidSwap(board: Board, pos1: Position, pos2: Position): boole
   const tile1 = board[pos1.row][pos1.col];
   const tile2 = board[pos2.row][pos2.col];
 
-  // Both must be simple tiles
-  if (!isSimpleTile(tile1) || !isSimpleTile(tile2)) return false;
+  // Both must exist
+  if (!tile1 || !tile2) return false;
 
-  // Same shape swap is pointless
-  if (tile1.shape === tile2.shape) return false;
+  // At least one must be a simple tile
+  if (!isSimpleTile(tile1) && !isSimpleTile(tile2)) return false;
+
+  // If both simple, same shape swap is pointless
+  if (isSimpleTile(tile1) && isSimpleTile(tile2) && tile1.shape === tile2.shape) return false;
 
   // Try the swap on a copy
   const testBoard = board.map(row => [...row]);

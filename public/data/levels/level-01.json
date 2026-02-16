@@ -11,7 +11,7 @@
       "match3Config": {
         "columns": 7,
         "rows": 5,
-        "tileTypes": 5,
+        "tileTypes": 4,
         "foodSpawnChance": 0.1,
         "initialFoodTiles": [
           { "shipId": "banana", "col": 1, "row": 0 },
@@ -45,7 +45,7 @@
       "match3Config": {
         "columns": 7,
         "rows": 5,
-        "tileTypes": 5,
+        "tileTypes": 4,
         "foodSpawnChance": 0.1,
         "initialFoodTiles": [
           { "shipId": "banana", "col": 0, "row": 0 },
@@ -80,7 +80,7 @@
       "match3Config": {
         "columns": 7,
         "rows": 5,
-        "tileTypes": 5,
+        "tileTypes": 4,
         "foodSpawnChance": 0.12,
         "initialFoodTiles": [
           { "shipId": "apple", "col": 1, "row": 0 },

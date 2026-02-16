@@ -1,5 +1,5 @@
+import { useRef, useState, useCallback } from 'react';
 import type { Position } from '../../../core/match3';
-import { isSimpleTile, isFoodTile, isAdjacent } from '../../../core/match3';
 import type { Ship } from '../../../core/types';
 import type { UseMatch3Return } from '../../../hooks/useMatch3';
 import { Tile } from './Tile';
@@ -10,57 +10,65 @@ interface Match3BoardProps {
   allShips: Ship[];
 }
 
+const DRAG_THRESHOLD = 15; // pixels to trigger swap
+
 export function Match3Board({ match3, allShips }: Match3BoardProps) {
   const {
     board,
     movesRemaining,
     moveBudget,
-    selectedPosition,
     isAnimating,
     matchingPositions,
     isOutOfMoves,
     noValidMoves,
-    selectPosition,
     attemptSwap,
   } = match3;
 
   const rows = board.length;
   const cols = rows > 0 ? board[0].length : 0;
 
-  const handleTileClick = (pos: Position) => {
-    if (isAnimating || isOutOfMoves) return;
+  const [draggingPos, setDraggingPos] = useState<Position | null>(null);
+  const dragRef = useRef<{ pos: Position; startX: number; startY: number } | null>(null);
 
+  const handlePointerDown = useCallback((pos: Position, e: React.PointerEvent) => {
+    if (isAnimating || isOutOfMoves) return;
     const tile = board[pos.row]?.[pos.col];
     if (!tile) return;
 
-    // Food tiles cannot be selected for swapping
-    if (isFoodTile(tile)) return;
+    e.preventDefault();
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    dragRef.current = { pos, startX: e.clientX, startY: e.clientY };
+    setDraggingPos(pos);
+  }, [isAnimating, isOutOfMoves, board]);
 
-    // No tile selected yet — select this one
-    if (!selectedPosition) {
-      if (isSimpleTile(tile)) {
-        selectPosition(pos);
-      }
-      return;
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!dragRef.current) return;
+
+    const dx = e.clientX - dragRef.current.startX;
+    const dy = e.clientY - dragRef.current.startY;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+
+    if (absDx < DRAG_THRESHOLD && absDy < DRAG_THRESHOLD) return;
+
+    const { pos } = dragRef.current;
+    let targetPos: Position;
+
+    if (absDx > absDy) {
+      targetPos = { row: pos.row, col: pos.col + (dx > 0 ? 1 : -1) };
+    } else {
+      targetPos = { row: pos.row + (dy > 0 ? 1 : -1), col: pos.col };
     }
 
-    // Same tile — deselect
-    if (selectedPosition.row === pos.row && selectedPosition.col === pos.col) {
-      selectPosition(null);
-      return;
-    }
+    dragRef.current = null;
+    setDraggingPos(null);
+    attemptSwap(pos, targetPos);
+  }, [attemptSwap]);
 
-    // Adjacent simple tile — attempt swap
-    if (isAdjacent(selectedPosition, pos) && isSimpleTile(tile)) {
-      attemptSwap(selectedPosition, pos);
-      return;
-    }
-
-    // Non-adjacent — switch selection
-    if (isSimpleTile(tile)) {
-      selectPosition(pos);
-    }
-  };
+  const handlePointerUp = useCallback(() => {
+    dragRef.current = null;
+    setDraggingPos(null);
+  }, []);
 
   if (rows === 0) return null;
 
@@ -88,21 +96,22 @@ export function Match3Board({ match3, allShips }: Match3BoardProps) {
         {board.map((row, r) =>
           row.map((tile, c) => {
             const key = `${r},${c}`;
+            const pos = { row: r, col: c };
             return (
-              <Tile
+              <div
                 key={key}
-                tile={tile}
-                position={{ row: r, col: c }}
-                isSelected={
-                  selectedPosition !== null &&
-                  selectedPosition.row === r &&
-                  selectedPosition.col === c
-                }
-                isMatching={matchingPositions.has(key)}
-                allShips={allShips}
-                disabled={isAnimating || isOutOfMoves}
-                onClick={handleTileClick}
-              />
+                className="match3-cell"
+                onPointerDown={(e) => handlePointerDown(pos, e)}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+              >
+                <Tile
+                  tile={tile}
+                  isMatching={matchingPositions.has(key)}
+                  isDragging={draggingPos?.row === r && draggingPos?.col === c}
+                  allShips={allShips}
+                />
+              </div>
             );
           })
         )}

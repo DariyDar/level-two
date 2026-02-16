@@ -110,15 +110,31 @@
 /* === Food Tiles === */
 
 .match3-tile--food {
-  background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  cursor: not-allowed;
-  border: 2px solid rgba(49, 130, 206, 0.6);
+  background: transparent;
+  box-shadow: none;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.match3-tile--food.match3-tile--intervention {
+  border-color: #b794f4;
 }
 
 .match3-tile__emoji {
   font-size: clamp(14px, 3.5vw, 20px);
   line-height: 1;
+}
+
+/* === Dragging State === */
+
+.match3-tile--dragging {
+  transform: scale(1.12);
+  z-index: 3;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  opacity: 0.85;
+}
+
+.match3-cell {
+  touch-action: none;
 }
 
 /* === Selected State === */
