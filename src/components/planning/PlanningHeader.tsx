@@ -1,4 +1,3 @@
-import { BgSparkline } from './BgSparkline';
 import { BoostButton } from '../simulation/BoostButton';
 import { Tooltip } from '../ui/Tooltip';
 import './PlanningHeader.css';
@@ -9,7 +8,6 @@ interface PlanningHeaderProps {
   moveBudget: number;
   isValid: boolean;
   onSimulate: () => void;
-  bgPrediction: number[];
   fastInsulinCharges: number;
 }
 
@@ -19,7 +17,6 @@ export function PlanningHeader({
   moveBudget,
   isValid,
   onSimulate,
-  bgPrediction,
   fastInsulinCharges,
 }: PlanningHeaderProps) {
   return (
@@ -33,14 +30,12 @@ export function PlanningHeader({
 
       <Tooltip text="Match-3 moves remaining. Swap tiles to unlock food cards!">
         <div className="planning-header__moves">
-          <span className="planning-header__moves-emoji">🎯</span>
+          <span className="planning-header__moves-emoji">⏳</span>
           <span className={`planning-header__value ${movesRemaining <= 0 ? 'planning-header__value--depleted' : ''}`}>
             {movesRemaining}/{moveBudget}
           </span>
         </div>
       </Tooltip>
-
-      <BgSparkline bgHistory={bgPrediction} />
 
       <Tooltip text="Boosts muscle's glucose absorption">
         <div className="planning-header__fast-insulin">

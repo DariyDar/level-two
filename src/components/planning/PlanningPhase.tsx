@@ -18,6 +18,7 @@ import { getDayConfig } from '../../core/utils/levelUtils';
 import { useBgPrediction } from '../../hooks/useBgPrediction';
 import { useMatch3 } from '../../hooks/useMatch3';
 import { PlanningHeader } from './PlanningHeader';
+import { BgSparkline } from './BgSparkline';
 import { SlotGrid, calculateValidDropSlots } from './SlotGrid';
 import { ShipInventory } from './ShipInventory';
 import { Match3Board } from './match3/Match3Board';
@@ -358,9 +359,12 @@ export function PlanningPhase() {
           moveBudget={effectiveMoveBudget}
           isValid={planValidation.isValid}
           onSimulate={handleSimulate}
-          bgPrediction={bgPrediction.bgHistory}
           fastInsulinCharges={dayConfig?.pancreasBoostCharges ?? 0}
         />
+
+        <div className="planning-phase__sparkline">
+          <BgSparkline bgHistory={bgPrediction.bgHistory} />
+        </div>
 
         <SlotGrid
           placedShips={placedShips}

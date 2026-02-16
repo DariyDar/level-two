@@ -22,6 +22,19 @@
   text-align: center;
 }
 
+.planning-phase__sparkline {
+  background: #2d3748;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.planning-phase__sparkline .bg-sparkline {
+  min-width: unset;
+  background: transparent;
+  padding: 0;
+  height: 48px;
+}
+
 .planning-phase--loading {
   display: flex;
   align-items: center;

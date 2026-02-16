@@ -91,8 +91,48 @@
 }
 
 .slot-grid--compact .slot-grid__row {
-  gap: 4px;
-  margin-bottom: 4px;
+  gap: 3px;
+  margin-bottom: 3px;
+}
+
+/* Compact slots: flexible width instead of fixed 80px */
+.slot-grid--compact .slot {
+  width: auto;
+  height: auto;
+  flex: 1;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  min-width: 0;
+}
+
+.slot-grid--compact .slot__number {
+  font-size: 9px;
+}
+
+.slot-grid--compact .slot--pre-occupied::after {
+  font-size: 8px;
+}
+
+.slot-grid--compact .slot__exercise-indicator {
+  font-size: 10px;
+}
+
+/* Compact multi-slot ships: use calc() with percentages */
+.slot-grid--compact .slot--spans-2 .ship-card--placed {
+  width: calc(200% + 3px); /* 2 slots + 1 gap */
+}
+
+.slot-grid--compact .slot--spans-3 .ship-card--placed {
+  width: calc(300% + 6px); /* 3 slots + 2 gaps */
+}
+
+/* Compact ShipCard font sizes */
+.slot-grid--compact .ship-card {
+  font-size: 10px;
+}
+
+.slot-grid--compact .ship-card__emoji {
+  font-size: 16px;
 }
 
 /* On narrow screens, fall back to stacked layout */
@@ -100,5 +140,20 @@
   .slot-grid--compact {
     flex-direction: column;
     gap: 12px;
+  }
+
+  .slot-grid--compact .slot {
+    width: 80px;
+    height: 80px;
+    flex: none;
+    aspect-ratio: auto;
+  }
+
+  .slot-grid--compact .slot--spans-2 .ship-card--placed {
+    width: 168px;
+  }
+
+  .slot-grid--compact .slot--spans-3 .ship-card--placed {
+    width: 256px;
   }
 }
