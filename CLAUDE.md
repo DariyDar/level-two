@@ -183,6 +183,37 @@ Single screen: Food Inventory (left) + BG Graph (right)
 }
 ```
 
+### Food Parameters Table
+
+| # | Food | Emoji | Glucose | Carbs | Duration | Kcal | WP | Cubes | Cols |
+|---|------|-------|--------:|------:|---------:|-----:|---:|------:|-----:|
+| 1 | Banana | 🍌 | 200 | 20g | 60m | 105 | 1 | 10 | 4 |
+| 2 | Apple | 🍎 | 150 | 15g | 45m | 95 | 1 | 8 | 3 |
+| 3 | Ice Cream | 🍦 | 150 | 15g | 30m | 140 | 0 | 8 | 2 |
+| 4 | Popcorn | 🍿 | 150 | 15g | 45m | 100 | 1 | 8 | 3 |
+| 5 | Cookie | 🍪 | 150 | 15g | 45m | 160 | 2 | 8 | 3 |
+| 6 | Caesar Salad | 🥗 | 150 | 15g | 90m | 180 | 3 | 8 | 6 |
+| 7 | Chocolate Muffin | 🧁 | 150 | 15g | 45m | 340 | 0 | 8 | 3 |
+| 8 | Sandwich | 🥪 | 250 | 25g | 90m | 350 | 2 | 13 | 6 |
+| 9 | Chicken Meal | 🍗 | 100 | 10g | 120m | 280 | 3 | 5 | 8 |
+| 10 | Bowl of Rice | 🍚 | 300 | 30g | 120m | 360 | 4 | 15 | 8 |
+| 11 | Hamburger | 🍔 | 300 | 30g | 120m | 540 | 3 | 15 | 8 |
+| 12 | Oatmeal | 🥣 | 250 | 25g | 120m | 300 | 4 | 13 | 8 |
+| 13 | Pizza | 🍕 | 300 | 30g | 90m | 420 | 3 | 15 | 6 |
+| 14 | Boiled Eggs | 🥚 | 50 | 5g | 90m | 155 | 4 | 3 | 6 |
+| 15 | Mixed Berries | 🫐 | 100 | 10g | 45m | 70 | 2 | 5 | 3 |
+| 16 | Greek Yogurt | 🥛 | 100 | 10g | 60m | 130 | 3 | 5 | 4 |
+| 17 | Milk 2% | 🥛 | 100 | 10g | 45m | 120 | 3 | 5 | 3 |
+| 18 | Vegetable Stew | 🥘 | 100 | 10g | 120m | 200 | 4 | 5 | 8 |
+| 19 | Boiled Carrots | 🥕 | 100 | 10g | 60m | 55 | 4 | 5 | 4 |
+| 20 | Chickpeas | 🫘 | 100 | 10g | 90m | 170 | 3 | 5 | 6 |
+| 21 | Cottage Cheese | 🧀 | 100 | 10g | 90m | 110 | 4 | 5 | 6 |
+| 22 | Hard Cheese | 🧀 | 30 | 3g | 60m | 110 | 3 | 2 | 4 |
+| 23 | Avocado | 🥑 | 50 | 5g | 90m | 240 | 3 | 3 | 6 |
+| 24 | Mixed Nuts | 🥜 | 50 | 5g | 60m | 175 | 2 | 3 | 4 |
+
+**Derived columns:** Cubes = glucose / 20, Cols = duration / 15
+
 ### Level Config Structure
 ```json
 {
