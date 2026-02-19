@@ -191,16 +191,23 @@ export function BgGraph({
     }).filter(Boolean) as Array<{ col: number; baseRow: number; count: number }>;
   }, [previewShip, previewColumn, columnCaps, decayEnabled, medicationModifiers]);
 
-  // Intervention preview: column highlights during drag
-  const interventionPreview = useMemo(() => {
+  // Intervention preview: per-column reduction + boost info
+  const interventionPreviewData = useMemo(() => {
     if (!previewIntervention || previewColumn == null) return null;
     const { depth, duration, boostCols = 0, boostExtra = 0 } = previewIntervention;
     const curve = calculateInterventionCurve(depth, duration, previewColumn, boostCols, boostExtra);
-    return curve.map(cc => ({
-      col: previewColumn + cc.columnOffset,
-      cubeCount: cc.cubeCount,
-      isBoosted: cc.columnOffset < boostCols && boostExtra > 0,
-    })).filter(c => c.col >= 0 && c.col < TOTAL_COLUMNS);
+    const reduction = new Array(TOTAL_COLUMNS).fill(0);
+    const boosted = new Set<number>();
+    for (const cc of curve) {
+      const col = previewColumn + cc.columnOffset;
+      if (col >= 0 && col < TOTAL_COLUMNS) {
+        reduction[col] = cc.cubeCount;
+        if (cc.columnOffset < boostCols && boostExtra > 0) {
+          boosted.add(col);
+        }
+      }
+    }
+    return { reduction, boosted };
   }, [previewIntervention, previewColumn]);
 
   const handleCubeClick = useCallback(
@@ -344,19 +351,6 @@ export function BgGraph({
           />
         )}
 
-        {/* Intervention drag preview: column highlights */}
-        {interventionPreview && interventionPreview.map(c => (
-          <rect
-            key={`int-preview-${c.col}`}
-            x={colToX(c.col)}
-            y={PAD_TOP}
-            width={CELL_SIZE}
-            height={GRAPH_H}
-            fill={c.isBoosted ? 'rgba(72, 187, 120, 0.25)' : 'rgba(72, 187, 120, 0.12)'}
-            className="bg-graph__intervention-preview"
-          />
-        ))}
-
         {/* Placed food cubes — active + burned (semi-transparent) */}
         {foodCubeData.map(food => (
           <g key={food.placementId} className="bg-graph__food-group">
@@ -394,6 +388,33 @@ export function BgGraph({
             )}
           </g>
         ))}
+
+        {/* Intervention preview: green overlay on food cubes that would be burned */}
+        {interventionPreviewData && foodCubeData.map(food =>
+          food.columns.map(col => {
+            const red = interventionPreviewData.reduction[col.col];
+            if (red <= 0) return null;
+            const cap = columnCaps[col.col];
+            const burnFloor = Math.max(0, cap - red);
+            const isBoosted = interventionPreviewData.boosted.has(col.col);
+            return Array.from({ length: col.count }, (_, cubeIdx) => {
+              const row = col.baseRow + cubeIdx;
+              if (row >= TOTAL_ROWS || row >= cap || row < burnFloor) return null;
+              return (
+                <rect
+                  key={`burn-pv-${food.placementId}-${col.col}-${cubeIdx}`}
+                  x={colToX(col.col) + 0.5}
+                  y={rowToY(row) + 0.5}
+                  width={CELL_SIZE - 1}
+                  height={CELL_SIZE - 1}
+                  fill={isBoosted ? 'rgba(72, 187, 120, 0.55)' : 'rgba(72, 187, 120, 0.35)'}
+                  rx={2}
+                  className="bg-graph__cube--preview-burn"
+                />
+              );
+            });
+          })
+        )}
 
         {/* Preview cubes (during drag) */}
         {previewCubes && previewCubes.map((col, i) =>

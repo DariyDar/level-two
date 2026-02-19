@@ -84,6 +84,12 @@
   cursor: pointer;
 }
 
-.bg-graph__intervention-preview {
+.bg-graph__cube--preview-burn {
   pointer-events: none;
+  animation: previewBurnPulse 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes previewBurnPulse {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
 }
