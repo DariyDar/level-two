@@ -31,17 +31,13 @@ const ZONE_NORMAL = 140;
 const ZONE_ELEVATED = 200;
 const ZONE_HIGH = 300;
 
-// Food colors for cubes (cycle through for different foods)
-const FOOD_COLORS = [
-  '#63b3ed', // blue
-  '#fc8181', // red
-  '#68d391', // green
-  '#f6ad55', // orange
-  '#b794f4', // purple
-  '#f687b3', // pink
-  '#4fd1c5', // teal
-  '#ecc94b', // yellow
-];
+// GI-based blue gradient: glucose rise rate → light blue (slow) to dark blue (fast)
+function getGiColor(riseRate: number, minRate: number, maxRate: number): string {
+  const t = maxRate > minRate ? (riseRate - minRate) / (maxRate - minRate) : 0;
+  // HSL: hue 215 (blue), saturation 75%, lightness 78% (light) → 32% (dark)
+  const lightness = 78 - t * 46;
+  return `hsl(215, 75%, ${Math.round(lightness)}%)`;
+}
 
 const PREVIEW_COLOR = 'rgba(99, 179, 237, 0.4)';
 
@@ -114,17 +110,15 @@ export function BgGraph({
 
     // Track cumulative height at each column for stacking
     const columnHeights = new Array(TOTAL_COLUMNS).fill(0);
-    const colorMap = new Map<string, number>();
+
+    // Precompute GI rate range across all foods for color normalization
+    const rates = allShips.map(s => s.load / s.duration);
+    const minRate = Math.min(...rates);
+    const maxRate = Math.max(...rates);
 
     for (const placed of placedFoods) {
       const ship = allShips.find(s => s.id === placed.shipId);
       if (!ship) continue;
-
-      // Assign color
-      if (!colorMap.has(placed.shipId)) {
-        colorMap.set(placed.shipId, colorMap.size);
-      }
-      const colorIdx = colorMap.get(placed.shipId)! % FOOD_COLORS.length;
 
       const { glucose, duration } = applyMedicationToFood(ship.load, ship.duration, medicationModifiers);
       const curve = calculateCurve(glucose, duration, placed.dropColumn, decayEnabled);
@@ -143,7 +137,7 @@ export function BgGraph({
         placementId: placed.id,
         shipId: placed.shipId,
         dropColumn: placed.dropColumn,
-        color: FOOD_COLORS[colorIdx],
+        color: getGiColor(ship.load / ship.duration, minRate, maxRate),
         emoji: ship.emoji,
         columns: cols,
       });
