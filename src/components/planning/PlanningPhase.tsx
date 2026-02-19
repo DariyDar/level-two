@@ -36,6 +36,7 @@ export function PlanningPhase() {
     currentLevel,
     currentDay,
     setLevel,
+    goToDay,
     settings,
     updateSettings,
   } = useGameStore();
@@ -287,6 +288,20 @@ export function PlanningPhase() {
             placedInterventions={placedInterventions}
             wpRemaining={wpRemaining}
           />
+
+          {/* Day navigation (cheat buttons) */}
+          <div className="planning-phase__day-nav">
+            {Array.from({ length: currentLevel.days }, (_, i) => i + 1).map(day => (
+              <button
+                key={day}
+                className={`planning-phase__day-btn ${day === currentDay ? 'planning-phase__day-btn--active' : ''}`}
+                onClick={() => goToDay(day)}
+                disabled={day === currentDay}
+              >
+                Day {day}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

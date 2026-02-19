@@ -47,6 +47,7 @@ interface GameState {
   removeIntervention: (placementId: string) => void;
   toggleMedication: (medicationId: string) => void;
   clearFoods: () => void;
+  goToDay: (day: number) => void;
   startNextDay: () => void;
   restartLevel: () => void;
   updateSettings: (settings: Partial<GameSettings>) => void;
@@ -107,6 +108,14 @@ export const useGameStore = create<GameState>()(
         })),
 
       clearFoods: () => set({ placedFoods: [], placedInterventions: [], activeMedications: [] }),
+
+      goToDay: (day) =>
+        set({
+          currentDay: day,
+          placedFoods: [],
+          placedInterventions: [],
+          activeMedications: [],
+        }),
 
       startNextDay: () =>
         set((state) => ({
