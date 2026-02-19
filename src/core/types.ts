@@ -26,7 +26,7 @@ export const TOTAL_ROWS = (GRAPH_CONFIG.bgMax - GRAPH_CONFIG.bgMin) / GRAPH_CONF
 export const DEFAULT_X_TICKS = [8, 11, 14, 17, 20]; // hours
 
 // Y axis tick marks (configurable)
-export const DEFAULT_Y_TICKS = [60, 100, 200, 300, 400]; // mg/dL
+export const DEFAULT_Y_TICKS = [100, 200, 300, 400]; // mg/dL
 
 // === Game Settings ===
 

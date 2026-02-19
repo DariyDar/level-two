@@ -347,7 +347,7 @@ export function BgGraph({
           <>
             <defs>
               <pattern id="intervention-stripes" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
-                <line x1="0" y1="0" x2="0" y2="4" stroke="rgba(56, 161, 105, 0.4)" strokeWidth="2" />
+                <line x1="0" y1="0" x2="0" y2="4" stroke="rgba(34, 120, 70, 0.8)" strokeWidth="2" />
               </pattern>
             </defs>
             {Array.from({ length: TOTAL_COLUMNS }, (_, colIdx) => {
@@ -379,7 +379,7 @@ export function BgGraph({
                     height={CELL_SIZE - 1}
                     fill="url(#intervention-stripes)"
                     rx={2}
-                    opacity={0.6}
+                    opacity={0.9}
                     onClick={() => {
                       // Click on intervention marker removes the first intervention
                       if (placedInterventions.length > 0) {
