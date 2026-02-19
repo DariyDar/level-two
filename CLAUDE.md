@@ -20,7 +20,7 @@ This repository contains **independent projects** on separate branches:
 
 | Branch | Project | Version | Description |
 |--------|---------|---------|-------------|
-| `main` | BG Planner | v0.30.4 | Graph-based food planning with cubes, interventions, decay, wave animations |
+| `main` | BG Planner | v0.31.0 | Graph-based food planning with cubes, interventions, medications, decay, wave animations |
 | `port-planner` | Port Planner | v0.27.1 | Archived — metabolic simulation (WP, slots, organs, SVG pipes) |
 | `match3` | Port Planner + Match-3 | v0.28.11 | Match-3 mini-game for food card acquisition |
 | `tower-defense` | Glucose TD | v0.4.1 | Tower defense reimagining (projectiles, organ zones) |
@@ -102,7 +102,7 @@ Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
 ### Key Files
 
 #### Core Engine
-- `src/version.ts` — version number (v0.30.4)
+- `src/version.ts` — version number (v0.31.0)
 - `src/core/types.ts` — type definitions (Ship, PlacedFood, Intervention, PlacedIntervention, GameSettings, GRAPH_CONFIG)
 - `src/core/cubeEngine.ts` — ramp+decay curve algorithm, intervention reduction, graph state calculation
 
@@ -119,6 +119,8 @@ Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
 - `InterventionCard.tsx` — draggable intervention cards (green) with emoji, duration, depth, WP badge
 - `InterventionCard.css` — intervention card styles
 - `InterventionInventory.tsx` — intervention card list from level config
+- `MedicationPanel.tsx` — medication toggle panel (ON/OFF buttons)
+- `MedicationPanel.css` — medication panel styles (purple theme)
 
 #### State Management
 - `src/store/gameStore.ts` — Zustand store: placedFoods, placedInterventions, settings, combined kcal/WP tracking
@@ -127,6 +129,7 @@ Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
 - `src/config/loader.ts` — loads and transforms foods.json, interventions.json, level configs
 - `public/data/foods.json` — 24 food items with glucose, carbs, protein, fat, duration, kcal, wpCost
 - `public/data/interventions.json` — 2 interventions: Light Walk, Heavy Run
+- `public/data/medications.json` — 3 medications: Metformin, SGLT2 Inhibitor, GLP-1 Agonist
 - `public/data/levels/level-01.json` — 3-day level config with kcalBudget, wpBudget, availableInterventions per day
 
 #### Shared UI
@@ -134,7 +137,7 @@ Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
 - `src/App.tsx` — root app component (single screen, no phase routing)
 - `src/App.css` — app layout styles
 
-### Current State (v0.30.4) — Interventions + Wave Animations
+### Current State (v0.31.0) — Medications + Interventions + Wave Animations
 
 - **Single-Screen Design** ✅
   - Graph on top, food inventory + intervention inventory below (horizontal card layout)
@@ -167,6 +170,18 @@ Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
   - Burned cubes rendered semi-transparent (opacity 0.35) in original food color
   - Click burned cubes to remove intervention
   - Interventions share WP budget with food
+
+- **Medication System** ✅
+  - Three medications as day-wide toggles (ON/OFF), no WP cost
+  - **Metformin** (💊 `peakReduction`): reduces all food glucose by 25% → lower peaks
+  - **SGLT2 Inhibitor** (🧪 `thresholdDrain`): removes up to 3 cubes per column, but not below 200 mg/dL
+    - Purple dashed drain line at 200 mg/dL threshold
+    - Reduction depends on actual food height: `min(depth, max(0, height - floorRow))`
+  - **GLP-1 Agonist** (💉 `slowAbsorption`): duration ×1.5 (wider curves), glucose ÷1.5 (lower peaks), kcal budget −30%, WP +4
+  - Purple toggle panel between graph and food inventory
+  - All medications stack multiplicatively (glucose) and additively (drain, WP)
+  - Available per day via `availableMedications` in level config
+  - Day 1: none, Day 2: Metformin, Day 3: all three
 
 - **Wave Animations** ✅
   - `cubeAppear`: food cubes pop in with scale (0.3→1.08→1) + opacity wave, left-to-right
@@ -239,6 +254,26 @@ Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
   "wpCost": 2
 }
 ```
+
+### Medication Data Structure
+```json
+{
+  "id": "metformin",
+  "name": "Metformin",
+  "emoji": "💊",
+  "type": "peakReduction",
+  "multiplier": 0.75,
+  "description": "Reduces peak glucose by 25%"
+}
+```
+
+### Medication Parameters
+
+| Medication | Emoji | Type | Effect | Parameters |
+|-----------|-------|------|--------|------------|
+| Metformin | 💊 | peakReduction | Glucose ×0.75 | multiplier: 0.75 |
+| SGLT2 Inhibitor | 🧪 | thresholdDrain | -3 cubes, floor 200 | depth: 3, floorMgDl: 200 |
+| GLP-1 Agonist | 💉 | slowAbsorption | Duration ×1.5, kcal −30%, WP +4 | durationMult: 1.5, kcalMult: 0.7, wpBonus: 4 |
 
 ### Food Parameters Table
 

@@ -88,6 +88,43 @@ export interface PlacedIntervention {
   dropColumn: number;
 }
 
+// === Medications ===
+
+export type MedicationType = 'peakReduction' | 'thresholdDrain' | 'slowAbsorption';
+
+export interface Medication {
+  id: string;
+  name: string;
+  emoji: string;
+  type: MedicationType;
+  description: string;
+  // peakReduction (Metformin)
+  multiplier?: number;         // 0.75 = -25% glucose
+  // thresholdDrain (SGLT2)
+  depth?: number;              // max cubes to remove per column
+  floorMgDl?: number;          // don't remove below this level
+  // slowAbsorption (GLP-1)
+  durationMultiplier?: number; // 1.5 = 50% longer duration
+  kcalMultiplier?: number;     // 0.7 = -30% kcal budget
+  wpBonus?: number;            // +4 WP
+}
+
+export interface MedicationModifiers {
+  glucoseMultiplier: number;     // Metformin: 0.75, GLP-1: 1/durationMult
+  durationMultiplier: number;    // GLP-1: 1.5
+  sglt2: { depth: number; floorRow: number } | null;
+  kcalMultiplier: number;        // GLP-1: 0.7
+  wpBonus: number;               // GLP-1: +4
+}
+
+export const DEFAULT_MEDICATION_MODIFIERS: MedicationModifiers = {
+  glucoseMultiplier: 1,
+  durationMultiplier: 1,
+  sglt2: null,
+  kcalMultiplier: 1,
+  wpBonus: 0,
+};
+
 // === Level Config ===
 
 export interface AvailableFood {
@@ -101,6 +138,7 @@ export interface DayConfig {
   wpBudget: number;
   availableFoods: AvailableFood[];
   availableInterventions?: AvailableFood[];
+  availableMedications?: string[];
 }
 
 // === Kcal Assessment ===

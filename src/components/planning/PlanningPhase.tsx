@@ -8,13 +8,16 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import type { Ship, Intervention } from '../../core/types';
+import type { Ship, Intervention, Medication } from '../../core/types';
 import { useGameStore, getDayConfig, selectKcalUsed, selectWpUsed } from '../../store/gameStore';
-import { loadFoods, loadLevel, loadInterventions } from '../../config/loader';
+import { loadFoods, loadLevel, loadInterventions, loadMedications } from '../../config/loader';
+import { computeMedicationModifiers } from '../../core/cubeEngine';
+import { DEFAULT_MEDICATION_MODIFIERS } from '../../core/types';
 import { BgGraph, pointerToColumn } from '../graph';
 import { PlanningHeader } from './PlanningHeader';
 import { ShipInventory } from './ShipInventory';
 import { InterventionInventory } from './InterventionInventory';
+import { MedicationPanel } from './MedicationPanel';
 import { ShipCardOverlay } from './ShipCard';
 import { InterventionCardOverlay } from './InterventionCard';
 import './PlanningPhase.css';
@@ -27,6 +30,8 @@ export function PlanningPhase() {
     placedInterventions,
     placeIntervention,
     removeIntervention,
+    activeMedications,
+    toggleMedication,
     clearFoods,
     currentLevel,
     currentDay,
@@ -37,6 +42,7 @@ export function PlanningPhase() {
 
   const [allShips, setAllShips] = useState<Ship[]>([]);
   const [allInterventions, setAllInterventions] = useState<Intervention[]>([]);
+  const [allMedications, setAllMedications] = useState<Medication[]>([]);
   const [activeShip, setActiveShip] = useState<Ship | null>(null);
   const [activeIntervention, setActiveIntervention] = useState<Intervention | null>(null);
   const [previewColumn, setPreviewColumn] = useState<number | null>(null);
@@ -47,12 +53,14 @@ export function PlanningPhase() {
   useEffect(() => {
     async function loadConfigs() {
       try {
-        const [ships, interventions] = await Promise.all([
+        const [ships, interventions, medications] = await Promise.all([
           loadFoods(),
           loadInterventions(),
+          loadMedications(),
         ]);
         setAllShips(ships);
         setAllInterventions(interventions);
+        setAllMedications(medications);
 
         if (!currentLevel) {
           const level = await loadLevel('level-01');
@@ -75,6 +83,14 @@ export function PlanningPhase() {
     return getDayConfig(currentLevel, currentDay);
   }, [currentLevel, currentDay]);
 
+  // Compute medication modifiers from active medications
+  const medicationModifiers = useMemo(
+    () => activeMedications.length > 0
+      ? computeMedicationModifiers(activeMedications, allMedications)
+      : DEFAULT_MEDICATION_MODIFIERS,
+    [activeMedications, allMedications]
+  );
+
   const kcalUsed = useMemo(
     () => selectKcalUsed(placedFoods, allShips),
     [placedFoods, allShips]
@@ -87,7 +103,8 @@ export function PlanningPhase() {
 
   const kcalBudget = dayConfig?.kcalBudget ?? 2000;
   const wpBudget = dayConfig?.wpBudget ?? 16;
-  const wpRemaining = wpBudget - wpUsed;
+  const effectiveWpBudget = wpBudget + medicationModifiers.wpBonus;
+  const wpRemaining = effectiveWpBudget - wpUsed;
 
   // DnD sensors
   const sensors = useSensors(
@@ -226,6 +243,7 @@ export function PlanningPhase() {
           wpUsed={wpUsed}
           wpBudget={wpBudget}
           settings={settings}
+          medicationModifiers={medicationModifiers}
           onToggleTimeFormat={handleToggleTimeFormat}
           onToggleBgUnit={handleToggleBgUnit}
           onToggleDecay={handleToggleDecay}
@@ -242,10 +260,18 @@ export function PlanningPhase() {
             placedInterventions={placedInterventions}
             allInterventions={allInterventions}
             settings={settings}
+            medicationModifiers={medicationModifiers}
             previewShip={activeShip}
             previewColumn={previewColumn}
             onFoodClick={handleFoodClick}
             onInterventionClick={handleInterventionClick}
+          />
+
+          <MedicationPanel
+            allMedications={allMedications}
+            availableMedicationIds={dayConfig?.availableMedications ?? []}
+            activeMedications={activeMedications}
+            onToggle={toggleMedication}
           />
 
           <ShipInventory

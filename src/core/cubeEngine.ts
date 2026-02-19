@@ -1,5 +1,5 @@
-import type { PlacedFood, Ship, PlacedIntervention, Intervention } from './types';
-import { GRAPH_CONFIG, TOTAL_COLUMNS } from './types';
+import type { PlacedFood, Ship, PlacedIntervention, Intervention, Medication, MedicationModifiers } from './types';
+import { GRAPH_CONFIG, TOTAL_COLUMNS, DEFAULT_MEDICATION_MODIFIERS } from './types';
 
 export interface CubeColumn {
   columnOffset: number; // offset from drop column (0, 1, 2, ...)
@@ -156,4 +156,71 @@ export function calculateInterventionReduction(
   }
 
   return reduction;
+}
+
+// ============================================
+// Medication System
+// ============================================
+
+/**
+ * Aggregate modifiers from all active medications.
+ */
+export function computeMedicationModifiers(
+  activeMedicationIds: string[],
+  allMedications: Medication[],
+): MedicationModifiers {
+  const modifiers: MedicationModifiers = { ...DEFAULT_MEDICATION_MODIFIERS };
+
+  for (const medId of activeMedicationIds) {
+    const med = allMedications.find(m => m.id === medId);
+    if (!med) continue;
+
+    switch (med.type) {
+      case 'peakReduction':
+        modifiers.glucoseMultiplier *= (med.multiplier ?? 1);
+        break;
+      case 'thresholdDrain': {
+        const floorRow = ((med.floorMgDl ?? 200) - GRAPH_CONFIG.bgMin) / GRAPH_CONFIG.cellHeightMgDl;
+        modifiers.sglt2 = {
+          depth: med.depth ?? 3,
+          floorRow,
+        };
+        break;
+      }
+      case 'slowAbsorption':
+        modifiers.durationMultiplier *= (med.durationMultiplier ?? 1);
+        modifiers.glucoseMultiplier *= (1 / (med.durationMultiplier ?? 1));
+        modifiers.kcalMultiplier *= (med.kcalMultiplier ?? 1);
+        modifiers.wpBonus += (med.wpBonus ?? 0);
+        break;
+    }
+  }
+
+  return modifiers;
+}
+
+/**
+ * Apply medication modifiers to food parameters before curve calculation.
+ */
+export function applyMedicationToFood(
+  glucose: number,
+  duration: number,
+  modifiers: MedicationModifiers,
+): { glucose: number; duration: number } {
+  return {
+    glucose: glucose * modifiers.glucoseMultiplier,
+    duration: duration * modifiers.durationMultiplier,
+  };
+}
+
+/**
+ * Calculate SGLT2 threshold drain per column.
+ * Removes up to `depth` cubes, but won't drain below `floorRow`.
+ */
+export function calculateSglt2Reduction(
+  totalFoodHeights: number[],
+  depth: number,
+  floorRow: number,
+): number[] {
+  return totalFoodHeights.map(h => Math.min(depth, Math.max(0, h - floorRow)));
 }

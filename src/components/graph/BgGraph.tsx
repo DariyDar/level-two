@@ -1,16 +1,17 @@
 import { useMemo, useCallback, useRef } from 'react';
 import { useDroppable } from '@dnd-kit/core';
-import type { Ship, PlacedFood, PlacedIntervention, Intervention, GameSettings } from '../../core/types';
+import type { Ship, PlacedFood, PlacedIntervention, Intervention, GameSettings, MedicationModifiers } from '../../core/types';
 import {
   GRAPH_CONFIG,
   TOTAL_COLUMNS,
   TOTAL_ROWS,
   DEFAULT_X_TICKS,
   DEFAULT_Y_TICKS,
+  DEFAULT_MEDICATION_MODIFIERS,
   columnToTimeString,
   formatBgValue,
 } from '../../core/types';
-import { calculateCurve, calculateInterventionReduction } from '../../core/cubeEngine';
+import { calculateCurve, calculateInterventionReduction, applyMedicationToFood, calculateSglt2Reduction } from '../../core/cubeEngine';
 import './BgGraph.css';
 
 // SVG layout constants
@@ -50,6 +51,7 @@ interface BgGraphProps {
   placedInterventions: PlacedIntervention[];
   allInterventions: Intervention[];
   settings: GameSettings;
+  medicationModifiers?: MedicationModifiers;
   previewShip?: Ship | null;
   previewColumn?: number | null;
   onFoodClick?: (placementId: string) => void;
@@ -77,6 +79,7 @@ export function BgGraph({
   placedInterventions,
   allInterventions,
   settings,
+  medicationModifiers = DEFAULT_MEDICATION_MODIFIERS,
   previewShip,
   previewColumn,
   onFoodClick,
@@ -121,7 +124,8 @@ export function BgGraph({
       }
       const colorIdx = colorMap.get(placed.shipId)! % FOOD_COLORS.length;
 
-      const curve = calculateCurve(ship.load, ship.duration, placed.dropColumn, decayEnabled);
+      const { glucose, duration } = applyMedicationToFood(ship.load, ship.duration, medicationModifiers);
+      const curve = calculateCurve(glucose, duration, placed.dropColumn, decayEnabled);
       const cols: Array<{ col: number; baseRow: number; count: number }> = [];
 
       for (const pc of curve) {
@@ -144,9 +148,9 @@ export function BgGraph({
     }
 
     return data;
-  }, [placedFoods, allShips, decayEnabled]);
+  }, [placedFoods, allShips, decayEnabled, medicationModifiers]);
 
-  // Compute max visible row per column (total food cubes - intervention reduction)
+  // Compute max visible row per column (total food cubes - exercise - SGLT2)
   const columnCaps = useMemo(() => {
     const totalHeights = new Array(TOTAL_COLUMNS).fill(0);
     for (const food of foodCubeData) {
@@ -157,37 +161,33 @@ export function BgGraph({
         }
       }
     }
-    return totalHeights.map((h, i) => Math.max(0, h - interventionReduction[i]));
-  }, [foodCubeData, interventionReduction]);
+    // SGLT2 threshold drain (depends on food heights)
+    const sglt2 = medicationModifiers.sglt2;
+    const sglt2Reduction = sglt2
+      ? calculateSglt2Reduction(totalHeights, sglt2.depth, sglt2.floorRow)
+      : new Array(TOTAL_COLUMNS).fill(0);
+
+    return totalHeights.map((h, i) =>
+      Math.max(0, h - interventionReduction[i] - sglt2Reduction[i])
+    );
+  }, [foodCubeData, interventionReduction, medicationModifiers.sglt2]);
 
   // Preview curve (shown during drag hover)
   const previewCubes = useMemo(() => {
     if (!previewShip || previewColumn == null) return null;
-    const curve = calculateCurve(previewShip.load, previewShip.duration, previewColumn, decayEnabled);
-    // Calculate base heights at each column (existing cubes after intervention)
-    const baseHeights = new Array(TOTAL_COLUMNS).fill(0);
-    for (const food of foodCubeData) {
-      for (const col of food.columns) {
-        const top = col.baseRow + col.count;
-        if (top > baseHeights[col.col]) {
-          baseHeights[col.col] = top;
-        }
-      }
-    }
-    // Apply intervention reduction to bases
-    for (let i = 0; i < TOTAL_COLUMNS; i++) {
-      baseHeights[i] = Math.max(0, baseHeights[i] - interventionReduction[i]);
-    }
+    const { glucose, duration } = applyMedicationToFood(previewShip.load, previewShip.duration, medicationModifiers);
+    const curve = calculateCurve(glucose, duration, previewColumn, decayEnabled);
+    // Use columnCaps as base heights (already includes all reductions)
     return curve.map((pc: { columnOffset: number; cubeCount: number }) => {
       const graphCol = previewColumn + pc.columnOffset;
       if (graphCol < 0 || graphCol >= TOTAL_COLUMNS) return null;
       return {
         col: graphCol,
-        baseRow: baseHeights[graphCol],
+        baseRow: columnCaps[graphCol],
         count: pc.cubeCount,
       };
     }).filter(Boolean) as Array<{ col: number; baseRow: number; count: number }>;
-  }, [previewShip, previewColumn, foodCubeData, interventionReduction, decayEnabled]);
+  }, [previewShip, previewColumn, columnCaps, decayEnabled, medicationModifiers]);
 
   const handleCubeClick = useCallback(
     (placementId: string, isIntervention: boolean) => {
@@ -316,6 +316,20 @@ export function BgGraph({
           );
         })}
 
+        {/* SGLT2 drain threshold line */}
+        {medicationModifiers.sglt2 && (
+          <line
+            x1={PAD_LEFT}
+            y1={rowToY(medicationModifiers.sglt2.floorRow - 1)}
+            x2={PAD_LEFT + GRAPH_W}
+            y2={rowToY(medicationModifiers.sglt2.floorRow - 1)}
+            stroke="#b794f4"
+            strokeWidth={1.5}
+            strokeDasharray="6 3"
+            opacity={0.7}
+          />
+        )}
+
         {/* Placed food cubes — active + burned (semi-transparent) */}
         {foodCubeData.map(food => (
           <g key={food.placementId} className="bg-graph__food-group">
@@ -337,10 +351,16 @@ export function BgGraph({
                     rx={2}
                     className={isBurned ? 'bg-graph__cube--burned' : 'bg-graph__cube'}
                     style={{ animationDelay: `${waveDelay}ms` }}
-                    onClick={() => handleCubeClick(
-                      isBurned ? placedInterventions[0]?.id ?? food.placementId : food.placementId,
-                      isBurned && placedInterventions.length > 0
-                    )}
+                    onClick={() => {
+                      if (isBurned) {
+                        if (placedInterventions.length > 0) {
+                          handleCubeClick(placedInterventions[0]?.id ?? food.placementId, true);
+                        }
+                        // Medication-burned cubes: no-op
+                      } else {
+                        handleCubeClick(food.placementId, false);
+                      }
+                    }}
                   />
                 );
               })

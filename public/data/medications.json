@@ -1,0 +1,31 @@
+{
+  "medications": [
+    {
+      "id": "metformin",
+      "name": "Metformin",
+      "emoji": "\ud83d\udc8a",
+      "type": "peakReduction",
+      "multiplier": 0.75,
+      "description": "Reduces peak glucose by 25%"
+    },
+    {
+      "id": "sglt2",
+      "name": "SGLT2 Inhibitor",
+      "emoji": "\ud83e\uddea",
+      "type": "thresholdDrain",
+      "depth": 3,
+      "floorMgDl": 200,
+      "description": "Removes up to 3 cubes, floor at 200 mg/dL"
+    },
+    {
+      "id": "glp1",
+      "name": "GLP-1 Agonist",
+      "emoji": "\ud83d\udc89",
+      "type": "slowAbsorption",
+      "durationMultiplier": 1.5,
+      "kcalMultiplier": 0.7,
+      "wpBonus": 4,
+      "description": "Slower absorption, reduced appetite, +4 WP"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
-import type { GameSettings } from '../../core/types';
-import { getKcalAssessment } from '../../core/types';
+import type { GameSettings, MedicationModifiers } from '../../core/types';
+import { getKcalAssessment, DEFAULT_MEDICATION_MODIFIERS } from '../../core/types';
 import './PlanningHeader.css';
 
 interface PlanningHeaderProps {
@@ -9,6 +9,7 @@ interface PlanningHeaderProps {
   wpUsed: number;
   wpBudget: number;
   settings: GameSettings;
+  medicationModifiers?: MedicationModifiers;
   onToggleTimeFormat: () => void;
   onToggleBgUnit: () => void;
   onToggleDecay: () => void;
@@ -21,12 +22,17 @@ export function PlanningHeader({
   wpUsed,
   wpBudget,
   settings,
+  medicationModifiers = DEFAULT_MEDICATION_MODIFIERS,
   onToggleTimeFormat,
   onToggleBgUnit,
   onToggleDecay,
 }: PlanningHeaderProps) {
-  const assessment = getKcalAssessment(kcalUsed, kcalBudget);
-  const wpOver = wpUsed > wpBudget;
+  const effectiveKcalBudget = Math.round(kcalBudget * medicationModifiers.kcalMultiplier);
+  const effectiveWpBudget = wpBudget + medicationModifiers.wpBonus;
+  const assessment = getKcalAssessment(kcalUsed, effectiveKcalBudget);
+  const wpOver = wpUsed > effectiveWpBudget;
+  const hasKcalMod = medicationModifiers.kcalMultiplier !== 1;
+  const hasWpMod = medicationModifiers.wpBonus !== 0;
 
   return (
     <div className="planning-header">
@@ -35,15 +41,19 @@ export function PlanningHeader({
       <div className="planning-header__wp">
         <span className="planning-header__wp-label">WP</span>
         <span className={`planning-header__wp-value ${wpOver ? 'planning-header__wp-value--over' : ''}`}>
-          {wpUsed}/{wpBudget}
+          {wpUsed}/{effectiveWpBudget}
+          {hasWpMod && <span className="planning-header__wp-bonus"> (+{medicationModifiers.wpBonus})</span>}
         </span>
-        <span className="planning-header__wp-icon">☀️</span>
+        <span className="planning-header__wp-icon">{'\u2600\uFE0F'}</span>
       </div>
 
       <div className="planning-header__kcal">
         <span className="planning-header__kcal-value">{kcalUsed}</span>
-        <span className="planning-header__kcal-unit">kcal</span>
-        <span className="planning-header__kcal-dash">—</span>
+        <span className="planning-header__kcal-unit">
+          /{effectiveKcalBudget} kcal
+          {hasKcalMod && <span className="planning-header__kcal-mod"> ({Math.round(medicationModifiers.kcalMultiplier * 100)}%)</span>}
+        </span>
+        <span className="planning-header__kcal-dash">{'\u2014'}</span>
         <span
           className="planning-header__kcal-assessment"
           style={{ color: assessment.color }}

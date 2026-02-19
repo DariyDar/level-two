@@ -34,6 +34,7 @@ interface GameState {
   // Planning (graph-based)
   placedFoods: PlacedFood[];
   placedInterventions: PlacedIntervention[];
+  activeMedications: string[];
 
   // Settings
   settings: GameSettings;
@@ -44,6 +45,7 @@ interface GameState {
   removeFood: (placementId: string) => void;
   placeIntervention: (interventionId: string, dropColumn: number) => void;
   removeIntervention: (placementId: string) => void;
+  toggleMedication: (medicationId: string) => void;
   clearFoods: () => void;
   startNextDay: () => void;
   restartLevel: () => void;
@@ -58,6 +60,7 @@ export const useGameStore = create<GameState>()(
       currentDay: 1,
       placedFoods: [],
       placedInterventions: [],
+      activeMedications: [],
       settings: DEFAULT_SETTINGS,
 
       // Actions
@@ -67,6 +70,7 @@ export const useGameStore = create<GameState>()(
           currentDay: 1,
           placedFoods: [],
           placedInterventions: [],
+          activeMedications: [],
         }),
 
       placeFood: (shipId, dropColumn) =>
@@ -95,13 +99,21 @@ export const useGameStore = create<GameState>()(
           placedInterventions: state.placedInterventions.filter((i) => i.id !== placementId),
         })),
 
-      clearFoods: () => set({ placedFoods: [], placedInterventions: [] }),
+      toggleMedication: (medicationId) =>
+        set((state) => ({
+          activeMedications: state.activeMedications.includes(medicationId)
+            ? state.activeMedications.filter(id => id !== medicationId)
+            : [...state.activeMedications, medicationId],
+        })),
+
+      clearFoods: () => set({ placedFoods: [], placedInterventions: [], activeMedications: [] }),
 
       startNextDay: () =>
         set((state) => ({
           currentDay: state.currentDay + 1,
           placedFoods: [],
           placedInterventions: [],
+          activeMedications: [],
         })),
 
       restartLevel: () =>
@@ -109,6 +121,7 @@ export const useGameStore = create<GameState>()(
           currentDay: 1,
           placedFoods: [],
           placedInterventions: [],
+          activeMedications: [],
         }),
 
       updateSettings: (newSettings) =>
@@ -118,7 +131,7 @@ export const useGameStore = create<GameState>()(
     }),
     {
       name: 'bg-graph-save',
-      version: 4,
+      version: 5,
       partialize: (state) => ({
         currentDay: state.currentDay,
         settings: state.settings,

@@ -1,4 +1,4 @@
-import type { Ship, LevelConfig, LoadType, AvailableFood, Intervention } from '../core/types';
+import type { Ship, LevelConfig, LoadType, AvailableFood, Intervention, Medication, MedicationType } from '../core/types';
 
 // Raw JSON types (before transformation)
 interface RawFoodConfig {
@@ -28,6 +28,7 @@ interface RawLevelConfig {
     wpBudget?: number;
     availableFoods: AvailableFood[] | string[];
     availableInterventions?: AvailableFood[] | string[];
+    availableMedications?: string[];
   }>;
 }
 
@@ -84,6 +85,7 @@ function transformLevel(raw: RawLevelConfig): LevelConfig {
       availableInterventions: dc.availableInterventions
         ? normalizeAvailableFoods(dc.availableInterventions)
         : undefined,
+      availableMedications: dc.availableMedications,
     }));
   }
 
@@ -110,9 +112,40 @@ function transformIntervention(raw: RawInterventionConfig): Intervention {
   };
 }
 
+interface RawMedicationConfig {
+  id: string;
+  name: string;
+  emoji: string;
+  type: string;
+  description?: string;
+  multiplier?: number;
+  depth?: number;
+  floorMgDl?: number;
+  durationMultiplier?: number;
+  kcalMultiplier?: number;
+  wpBonus?: number;
+}
+
+function transformMedication(raw: RawMedicationConfig): Medication {
+  return {
+    id: raw.id,
+    name: raw.name,
+    emoji: raw.emoji,
+    type: raw.type as MedicationType,
+    description: raw.description ?? '',
+    multiplier: raw.multiplier,
+    depth: raw.depth,
+    floorMgDl: raw.floorMgDl,
+    durationMultiplier: raw.durationMultiplier,
+    kcalMultiplier: raw.kcalMultiplier,
+    wpBonus: raw.wpBonus,
+  };
+}
+
 // Cache for loaded configs
 let foodsCache: Ship[] | null = null;
 let interventionsCache: Intervention[] | null = null;
+let medicationsCache: Medication[] | null = null;
 
 export async function loadFoods(): Promise<Ship[]> {
   if (foodsCache) return foodsCache;
@@ -134,6 +167,16 @@ export async function loadInterventions(): Promise<Intervention[]> {
   return interventions;
 }
 
+export async function loadMedications(): Promise<Medication[]> {
+  if (medicationsCache) return medicationsCache;
+
+  const response = await fetch('/data/medications.json', { cache: 'no-store' });
+  const data = await response.json();
+  const medications = data.medications.map(transformMedication);
+  medicationsCache = medications;
+  return medications;
+}
+
 export async function loadLevel(levelId: string): Promise<LevelConfig> {
   const response = await fetch(`/data/levels/${levelId}.json`, { cache: 'no-store' });
   const data = await response.json();
@@ -149,4 +192,5 @@ export function getShipById(ships: Ship[], id: string): Ship | undefined {
 export function clearConfigCache(): void {
   foodsCache = null;
   interventionsCache = null;
+  medicationsCache = null;
 }

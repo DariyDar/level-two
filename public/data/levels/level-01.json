@@ -40,7 +40,8 @@
       "availableInterventions": [
         { "id": "lightwalk", "count": 1 },
         { "id": "heavyrun", "count": 1 }
-      ]
+      ],
+      "availableMedications": ["metformin"]
     },
     {
       "day": 3,
@@ -58,7 +59,8 @@
       "availableInterventions": [
         { "id": "lightwalk", "count": 1 },
         { "id": "heavyrun", "count": 1 }
-      ]
+      ],
+      "availableMedications": ["metformin", "sglt2", "glp1"]
     }
   ]
 }
