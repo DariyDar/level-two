@@ -185,34 +185,36 @@ Single screen: Food Inventory (left) + BG Graph (right)
 
 ### Food Parameters Table
 
-| # | Food | Emoji | Glucose | Carbs | Duration | Kcal | WP | Cubes | Cols |
-|---|------|-------|--------:|------:|---------:|-----:|---:|------:|-----:|
-| 1 | Banana | 🍌 | 200 | 20g | 60m | 105 | 1 | 10 | 4 |
-| 2 | Apple | 🍎 | 150 | 15g | 45m | 95 | 1 | 8 | 3 |
-| 3 | Ice Cream | 🍦 | 150 | 15g | 30m | 140 | 0 | 8 | 2 |
-| 4 | Popcorn | 🍿 | 150 | 15g | 45m | 100 | 1 | 8 | 3 |
-| 5 | Cookie | 🍪 | 150 | 15g | 45m | 160 | 2 | 8 | 3 |
-| 6 | Caesar Salad | 🥗 | 150 | 15g | 90m | 180 | 3 | 8 | 6 |
-| 7 | Chocolate Muffin | 🧁 | 150 | 15g | 45m | 340 | 0 | 8 | 3 |
-| 8 | Sandwich | 🥪 | 250 | 25g | 90m | 350 | 2 | 13 | 6 |
-| 9 | Chicken Meal | 🍗 | 100 | 10g | 120m | 280 | 3 | 5 | 8 |
-| 10 | Bowl of Rice | 🍚 | 300 | 30g | 120m | 360 | 4 | 15 | 8 |
-| 11 | Hamburger | 🍔 | 300 | 30g | 120m | 540 | 3 | 15 | 8 |
-| 12 | Oatmeal | 🥣 | 250 | 25g | 120m | 300 | 4 | 13 | 8 |
-| 13 | Pizza | 🍕 | 300 | 30g | 90m | 420 | 3 | 15 | 6 |
-| 14 | Boiled Eggs | 🥚 | 50 | 5g | 90m | 155 | 4 | 3 | 6 |
-| 15 | Mixed Berries | 🫐 | 100 | 10g | 45m | 70 | 2 | 5 | 3 |
-| 16 | Greek Yogurt | 🥛 | 100 | 10g | 60m | 130 | 3 | 5 | 4 |
-| 17 | Milk 2% | 🥛 | 100 | 10g | 45m | 120 | 3 | 5 | 3 |
-| 18 | Vegetable Stew | 🥘 | 100 | 10g | 120m | 200 | 4 | 5 | 8 |
-| 19 | Boiled Carrots | 🥕 | 100 | 10g | 60m | 55 | 4 | 5 | 4 |
-| 20 | Chickpeas | 🫘 | 100 | 10g | 90m | 170 | 3 | 5 | 6 |
-| 21 | Cottage Cheese | 🧀 | 100 | 10g | 90m | 110 | 4 | 5 | 6 |
-| 22 | Hard Cheese | 🧀 | 30 | 3g | 60m | 110 | 3 | 2 | 4 |
-| 23 | Avocado | 🥑 | 50 | 5g | 90m | 240 | 3 | 3 | 6 |
-| 24 | Mixed Nuts | 🥜 | 50 | 5g | 60m | 175 | 2 | 3 | 4 |
+Based on USDA FoodData Central, GI databases. `glucose = carbs × 10`, duration from GI + macronutrient composition.
 
-**Derived columns:** Cubes = glucose / 20, Cols = duration / 15
+| # | Food | Emoji | Glucose | Carbs | Duration | Kcal | WP | Cubes | Cols | GI |
+|---|------|-------|--------:|------:|---------:|-----:|---:|------:|-----:|---:|
+| 1 | Banana | 🍌 | 270 | 27g | 45m | 105 | 1 | 14 | 3 | 51 |
+| 2 | Apple | 🍎 | 250 | 25g | 45m | 95 | 1 | 13 | 3 | 36 |
+| 3 | Ice Cream | 🍦 | 240 | 24g | 60m | 207 | 0 | 12 | 4 | 62 |
+| 4 | Popcorn | 🍿 | 220 | 22g | 45m | 113 | 1 | 11 | 3 | 55 |
+| 5 | Cookie | 🍪 | 170 | 17g | 30m | 146 | 2 | 9 | 2 | 49 |
+| 6 | Caesar Salad | 🥗 | 100 | 10g | 75m | 190 | 3 | 5 | 5 | 50 |
+| 7 | Choco Muffin | 🧁 | 520 | 52g | 60m | 397 | 0 | 26 | 4 | 59 |
+| 8 | Sandwich | 🥪 | 400 | 40g | 75m | 500 | 2 | 20 | 5 | 56 |
+| 9 | Chicken Meal | 🍗 | 50 | 5g | 120m | 280 | 3 | 3 | 8 | ~0 |
+| 10 | Bowl of Rice | 🍚 | 450 | 45g | 45m | 205 | 4 | 23 | 3 | 73 |
+| 11 | Hamburger | 🍔 | 240 | 24g | 75m | 295 | 3 | 12 | 5 | 66 |
+| 12 | Oatmeal | 🥣 | 280 | 28g | 60m | 166 | 4 | 14 | 4 | 55 |
+| 13 | Pizza | 🍕 | 340 | 34g | 60m | 300 | 3 | 17 | 4 | 51 |
+| 14 | Boiled Eggs | 🥚 | 10 | 1g | 150m | 155 | 4 | 1 | 10 | 0 |
+| 15 | Mixed Berries | 🫐 | 210 | 21g | 45m | 85 | 2 | 11 | 3 | 35 |
+| 16 | Greek Yogurt | 🥛 | 80 | 8g | 75m | 195 | 3 | 4 | 5 | 11 |
+| 17 | Milk 2% | 🥛 | 120 | 12g | 45m | 122 | 3 | 6 | 3 | 31 |
+| 18 | Vegetable Stew | 🥘 | 200 | 20g | 75m | 168 | 4 | 10 | 5 | 48 |
+| 19 | Boiled Carrots | 🥕 | 80 | 8g | 45m | 53 | 4 | 4 | 3 | 40 |
+| 20 | Chickpeas | 🫘 | 270 | 27g | 75m | 164 | 3 | 14 | 5 | 28 |
+| 21 | Cottage Cheese | 🧀 | 50 | 5g | 120m | 206 | 4 | 3 | 8 | 10 |
+| 22 | Hard Cheese | 🧀 | 10 | 1g | 150m | 120 | 3 | 1 | 10 | 0 |
+| 23 | Avocado | 🥑 | 90 | 9g | 105m | 160 | 3 | 5 | 7 | 15 |
+| 24 | Mixed Nuts | 🥜 | 40 | 4g | 105m | 182 | 2 | 2 | 7 | 24 |
+
+**Derived:** Cubes = glucose / 20, Cols = duration / 15. Sources: USDA FoodData Central, glycemic-index.net
 
 ### Level Config Structure
 ```json
