@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useRef } from 'react';
 import { useDroppable } from '@dnd-kit/core';
-import type { Ship, PlacedFood, GameSettings } from '../../core/types';
+import type { Ship, PlacedFood, PlacedIntervention, Intervention, GameSettings } from '../../core/types';
 import {
   GRAPH_CONFIG,
   TOTAL_COLUMNS,
@@ -10,7 +10,7 @@ import {
   columnToTimeString,
   formatBgValue,
 } from '../../core/types';
-import { calculateCurve, calculateGraphState } from '../../core/cubeEngine';
+import { calculateCurve, calculateInterventionReduction } from '../../core/cubeEngine';
 import './BgGraph.css';
 
 // SVG layout constants
@@ -47,10 +47,13 @@ const PREVIEW_COLOR = 'rgba(99, 179, 237, 0.4)';
 interface BgGraphProps {
   placedFoods: PlacedFood[];
   allShips: Ship[];
+  placedInterventions: PlacedIntervention[];
+  allInterventions: Intervention[];
   settings: GameSettings;
   previewShip?: Ship | null;
   previewColumn?: number | null;
   onFoodClick?: (placementId: string) => void;
+  onInterventionClick?: (placementId: string) => void;
 }
 
 // Convert row (0 = bottom = bgMin) to SVG y
@@ -71,10 +74,13 @@ function mgdlToRow(mgdl: number): number {
 export function BgGraph({
   placedFoods,
   allShips,
+  placedInterventions,
+  allInterventions,
   settings,
   previewShip,
   previewColumn,
   onFoodClick,
+  onInterventionClick,
 }: BgGraphProps) {
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -84,10 +90,10 @@ export function BgGraph({
 
   const { decayEnabled } = settings;
 
-  // Calculate graph state (BG at each column)
-  const bgValues = useMemo(
-    () => calculateGraphState(placedFoods, allShips, decayEnabled),
-    [placedFoods, allShips, decayEnabled]
+  // Calculate intervention reduction per column (in cubes)
+  const interventionReduction = useMemo(
+    () => calculateInterventionReduction(placedInterventions, allInterventions),
+    [placedInterventions, allInterventions]
   );
 
   // Build per-food cube data for coloring
@@ -138,14 +144,37 @@ export function BgGraph({
     return data;
   }, [placedFoods, allShips, decayEnabled]);
 
+  // Compute max visible row per column (total food cubes - intervention reduction)
+  const columnCaps = useMemo(() => {
+    const totalHeights = new Array(TOTAL_COLUMNS).fill(0);
+    for (const food of foodCubeData) {
+      for (const col of food.columns) {
+        const top = col.baseRow + col.count;
+        if (top > totalHeights[col.col]) {
+          totalHeights[col.col] = top;
+        }
+      }
+    }
+    return totalHeights.map((h, i) => Math.max(0, h - interventionReduction[i]));
+  }, [foodCubeData, interventionReduction]);
+
   // Preview curve (shown during drag hover)
   const previewCubes = useMemo(() => {
     if (!previewShip || previewColumn == null) return null;
     const curve = calculateCurve(previewShip.load, previewShip.duration, previewColumn, decayEnabled);
-    // Calculate base heights at each column (existing cubes)
+    // Calculate base heights at each column (existing cubes after intervention)
     const baseHeights = new Array(TOTAL_COLUMNS).fill(0);
-    for (const val of bgValues.entries()) {
-      baseHeights[val[0]] = val[1] / GRAPH_CONFIG.cellHeightMgDl;
+    for (const food of foodCubeData) {
+      for (const col of food.columns) {
+        const top = col.baseRow + col.count;
+        if (top > baseHeights[col.col]) {
+          baseHeights[col.col] = top;
+        }
+      }
+    }
+    // Apply intervention reduction to bases
+    for (let i = 0; i < TOTAL_COLUMNS; i++) {
+      baseHeights[i] = Math.max(0, baseHeights[i] - interventionReduction[i]);
     }
     return curve.map((pc: { columnOffset: number; cubeCount: number }) => {
       const graphCol = previewColumn + pc.columnOffset;
@@ -156,16 +185,17 @@ export function BgGraph({
         count: pc.cubeCount,
       };
     }).filter(Boolean) as Array<{ col: number; baseRow: number; count: number }>;
-  }, [previewShip, previewColumn, bgValues]);
-
-  // BG line path — disabled for now
-  // const bgLinePath = useMemo(() => { ... }, [bgValues]);
+  }, [previewShip, previewColumn, foodCubeData, interventionReduction, decayEnabled]);
 
   const handleCubeClick = useCallback(
-    (placementId: string) => {
-      onFoodClick?.(placementId);
+    (placementId: string, isIntervention: boolean) => {
+      if (isIntervention) {
+        onInterventionClick?.(placementId);
+      } else {
+        onFoodClick?.(placementId);
+      }
     },
-    [onFoodClick]
+    [onFoodClick, onInterventionClick]
   );
 
   return (
@@ -284,13 +314,15 @@ export function BgGraph({
           );
         })}
 
-        {/* Placed food cubes */}
+        {/* Placed food cubes (capped by intervention reduction) */}
         {foodCubeData.map(food => (
           <g key={food.placementId} className="bg-graph__food-group">
             {food.columns.map(col =>
               Array.from({ length: col.count }, (_, cubeIdx) => {
                 const row = col.baseRow + cubeIdx;
                 if (row >= TOTAL_ROWS) return null;
+                // Skip cubes above the intervention cap
+                if (row >= columnCaps[col.col]) return null;
                 return (
                   <rect
                     key={`${food.placementId}-${col.col}-${cubeIdx}`}
@@ -302,14 +334,64 @@ export function BgGraph({
                     opacity={0.85}
                     rx={2}
                     className="bg-graph__cube"
-                    onClick={() => handleCubeClick(food.placementId)}
+                    onClick={() => handleCubeClick(food.placementId, false)}
                   />
                 );
               })
             )}
-            {/* Food emoji label — disabled for now */}
           </g>
         ))}
+
+        {/* Intervention effect markers (shows removed area with striped pattern) */}
+        {placedInterventions.length > 0 && foodCubeData.length > 0 && (
+          <>
+            <defs>
+              <pattern id="intervention-stripes" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="4" stroke="rgba(56, 161, 105, 0.4)" strokeWidth="2" />
+              </pattern>
+            </defs>
+            {Array.from({ length: TOTAL_COLUMNS }, (_, colIdx) => {
+              const reduction = interventionReduction[colIdx];
+              if (reduction <= 0) return null;
+              // Find total food height at this column
+              let totalHeight = 0;
+              for (const food of foodCubeData) {
+                for (const col of food.columns) {
+                  if (col.col === colIdx) {
+                    const top = col.baseRow + col.count;
+                    if (top > totalHeight) totalHeight = top;
+                  }
+                }
+              }
+              if (totalHeight <= 0) return null;
+              const cap = columnCaps[colIdx];
+              const removedFrom = cap;
+              const removedTo = Math.min(totalHeight, TOTAL_ROWS);
+              if (removedFrom >= removedTo) return null;
+              return Array.from({ length: removedTo - removedFrom }, (_, idx) => {
+                const row = removedFrom + idx;
+                return (
+                  <rect
+                    key={`intervention-mark-${colIdx}-${idx}`}
+                    x={colToX(colIdx) + 0.5}
+                    y={rowToY(row) + 0.5}
+                    width={CELL_SIZE - 1}
+                    height={CELL_SIZE - 1}
+                    fill="url(#intervention-stripes)"
+                    rx={2}
+                    opacity={0.6}
+                    onClick={() => {
+                      // Click on intervention marker removes the first intervention
+                      if (placedInterventions.length > 0) {
+                        handleCubeClick(placedInterventions[0].id, true);
+                      }
+                    }}
+                  />
+                );
+              });
+            })}
+          </>
+        )}
 
         {/* Preview cubes (during drag) */}
         {previewCubes && previewCubes.map((col, i) =>

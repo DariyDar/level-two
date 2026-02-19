@@ -8,13 +8,15 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import type { Ship } from '../../core/types';
+import type { Ship, Intervention } from '../../core/types';
 import { useGameStore, getDayConfig, selectKcalUsed, selectWpUsed } from '../../store/gameStore';
-import { loadFoods, loadLevel } from '../../config/loader';
+import { loadFoods, loadLevel, loadInterventions } from '../../config/loader';
 import { BgGraph, pointerToColumn } from '../graph';
 import { PlanningHeader } from './PlanningHeader';
 import { ShipInventory } from './ShipInventory';
+import { InterventionInventory } from './InterventionInventory';
 import { ShipCardOverlay } from './ShipCard';
+import { InterventionCardOverlay } from './InterventionCard';
 import './PlanningPhase.css';
 
 export function PlanningPhase() {
@@ -22,6 +24,9 @@ export function PlanningPhase() {
     placedFoods,
     placeFood,
     removeFood,
+    placedInterventions,
+    placeIntervention,
+    removeIntervention,
     clearFoods,
     currentLevel,
     currentDay,
@@ -31,7 +36,9 @@ export function PlanningPhase() {
   } = useGameStore();
 
   const [allShips, setAllShips] = useState<Ship[]>([]);
+  const [allInterventions, setAllInterventions] = useState<Intervention[]>([]);
   const [activeShip, setActiveShip] = useState<Ship | null>(null);
+  const [activeIntervention, setActiveIntervention] = useState<Intervention | null>(null);
   const [previewColumn, setPreviewColumn] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const graphRef = useRef<HTMLDivElement>(null);
@@ -40,8 +47,12 @@ export function PlanningPhase() {
   useEffect(() => {
     async function loadConfigs() {
       try {
-        const ships = await loadFoods();
+        const [ships, interventions] = await Promise.all([
+          loadFoods(),
+          loadInterventions(),
+        ]);
         setAllShips(ships);
+        setAllInterventions(interventions);
 
         if (!currentLevel) {
           const level = await loadLevel('level-01');
@@ -70,12 +81,12 @@ export function PlanningPhase() {
   );
 
   const wpUsed = useMemo(
-    () => selectWpUsed(placedFoods, allShips),
-    [placedFoods, allShips]
+    () => selectWpUsed(placedFoods, allShips, placedInterventions, allInterventions),
+    [placedFoods, allShips, placedInterventions, allInterventions]
   );
 
   const kcalBudget = dayConfig?.kcalBudget ?? 2000;
-  const wpBudget = dayConfig?.wpBudget ?? 10;
+  const wpBudget = dayConfig?.wpBudget ?? 16;
   const wpRemaining = wpBudget - wpUsed;
 
   // DnD sensors
@@ -90,50 +101,45 @@ export function PlanningPhase() {
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const ship = event.active.data.current?.ship as Ship | undefined;
-    if (!ship) return;
-    setActiveShip(ship);
+    const intervention = event.active.data.current?.intervention as Intervention | undefined;
+    if (ship) {
+      setActiveShip(ship);
+      setActiveIntervention(null);
+    } else if (intervention) {
+      setActiveIntervention(intervention);
+      setActiveShip(null);
+    }
   }, []);
 
   const handleDragMove = useCallback((_event: DragMoveEvent) => {
-    // Compute column from pointer position over graph
-    if (!graphRef.current || !activeShip) {
+    if (!graphRef.current || (!activeShip && !activeIntervention)) {
       setPreviewColumn(null);
       return;
     }
 
-    // Use activatorEvent from the drag event to get current pointer position
-    // Since DragMoveEvent doesn't directly give pointer coords,
-    // we rely on the over + graph element
     const graphEl = graphRef.current.querySelector('.bg-graph') as HTMLElement;
     if (!graphEl) {
       setPreviewColumn(null);
       return;
     }
 
-    // Get the droppable rect and compute from the delta
     const { delta, activatorEvent } = _event;
     if (activatorEvent && 'clientX' in activatorEvent) {
       const pointerX = (activatorEvent as PointerEvent).clientX + delta.x;
       const col = pointerToColumn(graphEl, pointerX);
       setPreviewColumn(col);
     }
-  }, [activeShip]);
+  }, [activeShip, activeIntervention]);
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
 
       setActiveShip(null);
+      setActiveIntervention(null);
       setPreviewColumn(null);
 
       if (!over || over.id !== 'bg-graph') return;
-
-      const ship = active.data.current?.ship as Ship | undefined;
-      if (!ship) return;
-
-      // Check WP budget
-      const shipWp = ship.wpCost ?? 0;
-      if (shipWp > wpRemaining) return;
 
       // Compute drop column from pointer position
       const graphEl = document.querySelector('.bg-graph') as HTMLElement;
@@ -145,12 +151,25 @@ export function PlanningPhase() {
         const pointerX = (activatorEvent as PointerEvent).clientX + delta.x;
         col = pointerToColumn(graphEl, pointerX);
       }
-
       if (col == null) return;
 
-      placeFood(ship.id, col);
+      // Check if it's a food or intervention drop
+      const isIntervention = active.data.current?.isIntervention === true;
+
+      if (isIntervention) {
+        const intervention = active.data.current?.intervention as Intervention | undefined;
+        if (!intervention) return;
+        if (intervention.wpCost > wpRemaining) return;
+        placeIntervention(intervention.id, col);
+      } else {
+        const ship = active.data.current?.ship as Ship | undefined;
+        if (!ship) return;
+        const shipWp = ship.wpCost ?? 0;
+        if (shipWp > wpRemaining) return;
+        placeFood(ship.id, col);
+      }
     },
-    [placeFood, wpRemaining]
+    [placeFood, placeIntervention, wpRemaining]
   );
 
   const handleFoodClick = useCallback(
@@ -158,6 +177,13 @@ export function PlanningPhase() {
       removeFood(placementId);
     },
     [removeFood]
+  );
+
+  const handleInterventionClick = useCallback(
+    (placementId: string) => {
+      removeIntervention(placementId);
+    },
+    [removeIntervention]
   );
 
   const handleToggleTimeFormat = useCallback(() => {
@@ -213,10 +239,13 @@ export function PlanningPhase() {
           <BgGraph
             placedFoods={placedFoods}
             allShips={allShips}
+            placedInterventions={placedInterventions}
+            allInterventions={allInterventions}
             settings={settings}
             previewShip={activeShip}
             previewColumn={previewColumn}
             onFoodClick={handleFoodClick}
+            onInterventionClick={handleInterventionClick}
           />
 
           <ShipInventory
@@ -225,11 +254,19 @@ export function PlanningPhase() {
             placedFoods={placedFoods}
             wpRemaining={wpRemaining}
           />
+
+          <InterventionInventory
+            allInterventions={allInterventions}
+            availableInterventions={dayConfig?.availableInterventions || []}
+            placedInterventions={placedInterventions}
+            wpRemaining={wpRemaining}
+          />
         </div>
       </div>
 
       <DragOverlay dropAnimation={null}>
         {activeShip && <ShipCardOverlay ship={activeShip} />}
+        {activeIntervention && <InterventionCardOverlay intervention={activeIntervention} />}
       </DragOverlay>
     </DndContext>
   );

@@ -71,6 +71,23 @@ export interface PlacedFood {
   dropColumn: number;     // Column index where dropped (0 = start of graph)
 }
 
+// === Interventions (exercise) ===
+
+export interface Intervention {
+  id: string;
+  name: string;
+  emoji: string;
+  depth: number;          // Cubes to remove at peak
+  duration: number;       // Ramp-up duration in minutes
+  wpCost: number;
+}
+
+export interface PlacedIntervention {
+  id: string;             // Unique placement ID
+  interventionId: string; // Reference to Intervention.id
+  dropColumn: number;
+}
+
 // === Level Config ===
 
 export interface AvailableFood {

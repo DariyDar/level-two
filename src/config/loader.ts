@@ -1,4 +1,4 @@
-import type { Ship, LevelConfig, LoadType, AvailableFood } from '../core/types';
+import type { Ship, LevelConfig, LoadType, AvailableFood, Intervention } from '../core/types';
 
 // Raw JSON types (before transformation)
 interface RawFoodConfig {
@@ -90,8 +90,29 @@ function transformLevel(raw: RawLevelConfig): LevelConfig {
   return transformed;
 }
 
+interface RawInterventionConfig {
+  id: string;
+  name: string;
+  emoji: string;
+  depth: number;
+  duration: number;
+  wpCost: number;
+}
+
+function transformIntervention(raw: RawInterventionConfig): Intervention {
+  return {
+    id: raw.id,
+    name: raw.name,
+    emoji: raw.emoji,
+    depth: raw.depth,
+    duration: raw.duration,
+    wpCost: raw.wpCost,
+  };
+}
+
 // Cache for loaded configs
 let foodsCache: Ship[] | null = null;
+let interventionsCache: Intervention[] | null = null;
 
 export async function loadFoods(): Promise<Ship[]> {
   if (foodsCache) return foodsCache;
@@ -101,6 +122,16 @@ export async function loadFoods(): Promise<Ship[]> {
   const ships = data.foods.map(transformFood);
   foodsCache = ships;
   return ships;
+}
+
+export async function loadInterventions(): Promise<Intervention[]> {
+  if (interventionsCache) return interventionsCache;
+
+  const response = await fetch('/data/interventions.json', { cache: 'no-store' });
+  const data = await response.json();
+  const interventions = data.interventions.map(transformIntervention);
+  interventionsCache = interventions;
+  return interventions;
 }
 
 export async function loadLevel(levelId: string): Promise<LevelConfig> {
@@ -117,4 +148,5 @@ export function getShipById(ships: Ship[], id: string): Ship | undefined {
 // Clear cache (useful for testing)
 export function clearConfigCache(): void {
   foodsCache = null;
+  interventionsCache = null;
 }

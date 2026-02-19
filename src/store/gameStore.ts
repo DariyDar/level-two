@@ -3,9 +3,11 @@ import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import type {
   PlacedFood,
+  PlacedIntervention,
   LevelConfig,
   DayConfig,
   Ship,
+  Intervention,
   GameSettings,
 } from '../core/types';
 import { DEFAULT_SETTINGS } from '../core/types';
@@ -31,6 +33,7 @@ interface GameState {
 
   // Planning (graph-based)
   placedFoods: PlacedFood[];
+  placedInterventions: PlacedIntervention[];
 
   // Settings
   settings: GameSettings;
@@ -39,6 +42,8 @@ interface GameState {
   setLevel: (level: LevelConfig) => void;
   placeFood: (shipId: string, dropColumn: number) => void;
   removeFood: (placementId: string) => void;
+  placeIntervention: (interventionId: string, dropColumn: number) => void;
+  removeIntervention: (placementId: string) => void;
   clearFoods: () => void;
   startNextDay: () => void;
   restartLevel: () => void;
@@ -52,6 +57,7 @@ export const useGameStore = create<GameState>()(
       currentLevel: null,
       currentDay: 1,
       placedFoods: [],
+      placedInterventions: [],
       settings: DEFAULT_SETTINGS,
 
       // Actions
@@ -60,6 +66,7 @@ export const useGameStore = create<GameState>()(
           currentLevel: level,
           currentDay: 1,
           placedFoods: [],
+          placedInterventions: [],
         }),
 
       placeFood: (shipId, dropColumn) =>
@@ -75,18 +82,33 @@ export const useGameStore = create<GameState>()(
           placedFoods: state.placedFoods.filter((f) => f.id !== placementId),
         })),
 
-      clearFoods: () => set({ placedFoods: [] }),
+      placeIntervention: (interventionId, dropColumn) =>
+        set((state) => ({
+          placedInterventions: [
+            ...state.placedInterventions,
+            { id: uuidv4(), interventionId, dropColumn },
+          ],
+        })),
+
+      removeIntervention: (placementId) =>
+        set((state) => ({
+          placedInterventions: state.placedInterventions.filter((i) => i.id !== placementId),
+        })),
+
+      clearFoods: () => set({ placedFoods: [], placedInterventions: [] }),
 
       startNextDay: () =>
         set((state) => ({
           currentDay: state.currentDay + 1,
           placedFoods: [],
+          placedInterventions: [],
         })),
 
       restartLevel: () =>
         set({
           currentDay: 1,
           placedFoods: [],
+          placedInterventions: [],
         }),
 
       updateSettings: (newSettings) =>
@@ -96,7 +118,7 @@ export const useGameStore = create<GameState>()(
     }),
     {
       name: 'bg-graph-save',
-      version: 3,
+      version: 4,
       partialize: (state) => ({
         currentDay: state.currentDay,
         settings: state.settings,
@@ -118,12 +140,21 @@ export function selectKcalUsed(placedFoods: PlacedFood[], allShips: Ship[]): num
   return total;
 }
 
-// Selector: compute WP usage
-export function selectWpUsed(placedFoods: PlacedFood[], allShips: Ship[]): number {
+// Selector: compute WP usage (food + interventions)
+export function selectWpUsed(
+  placedFoods: PlacedFood[],
+  allShips: Ship[],
+  placedInterventions: PlacedIntervention[],
+  allInterventions: Intervention[],
+): number {
   let total = 0;
   for (const placed of placedFoods) {
     const ship = allShips.find(s => s.id === placed.shipId);
     if (ship) total += (ship.wpCost ?? 0);
+  }
+  for (const placed of placedInterventions) {
+    const intervention = allInterventions.find(i => i.id === placed.interventionId);
+    if (intervention) total += intervention.wpCost;
   }
   return total;
 }

@@ -1,0 +1,131 @@
+.intervention-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+  color: white;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  position: relative;
+  touch-action: none;
+  width: 160px;
+  height: 60px;
+}
+
+.intervention-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.intervention-card:active {
+  cursor: grabbing;
+}
+
+.intervention-card--dragging {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intervention-card--overlay {
+  cursor: grabbing;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  transition: none;
+  transform: none !important;
+}
+
+.intervention-card__emoji {
+  font-size: 24px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.intervention-card__details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.intervention-card__name {
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.intervention-card__info {
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.intervention-card__badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 13px;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fbbf24;
+  padding: 1px 5px;
+  border-radius: 4px;
+  min-width: 20px;
+  text-align: center;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  z-index: 1;
+}
+
+.intervention-card__count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #e53e3e;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* Disabled (WP insufficient) */
+.intervention-card--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+}
+
+.intervention-card--disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* CSS Tooltip */
+.intervention-card[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a202c;
+  color: #e2e8f0;
+  font-size: 12px;
+  font-weight: 400;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease 133ms;
+}
+
+.intervention-card:not(.intervention-card--dragging):hover[data-tooltip]::after {
+  opacity: 1;
+}

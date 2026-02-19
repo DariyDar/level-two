@@ -1,0 +1,20 @@
+{
+  "interventions": [
+    {
+      "id": "lightwalk",
+      "name": "Light Walk",
+      "emoji": "🚶",
+      "depth": 3,
+      "duration": 60,
+      "wpCost": 2
+    },
+    {
+      "id": "heavyrun",
+      "name": "Heavy Run",
+      "emoji": "🏃",
+      "depth": 5,
+      "duration": 30,
+      "wpCost": 4
+    }
+  ]
+}

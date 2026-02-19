@@ -1,4 +1,4 @@
-import type { PlacedFood, Ship } from './types';
+import type { PlacedFood, Ship, PlacedIntervention, Intervention } from './types';
 import { GRAPH_CONFIG, TOTAL_COLUMNS } from './types';
 
 export interface CubeColumn {
@@ -102,4 +102,58 @@ export function buildFoodPyramids(
       columns,
     };
   });
+}
+
+/**
+ * Calculate intervention curve: ramp up during duration, then flat to end.
+ * Returns cubes to REMOVE per column.
+ */
+export function calculateInterventionCurve(
+  depth: number,
+  durationMinutes: number,
+  dropColumn: number,
+): CubeColumn[] {
+  const riseCols = Math.max(1, Math.round(durationMinutes / GRAPH_CONFIG.cellWidthMin));
+  if (depth <= 0) return [];
+
+  const result: CubeColumn[] = [];
+  const totalCols = TOTAL_COLUMNS - dropColumn;
+
+  for (let i = 0; i < totalCols; i++) {
+    let height: number;
+    if (i < riseCols) {
+      height = Math.round(depth * (i + 1) / riseCols);
+    } else {
+      height = depth;
+    }
+    if (height <= 0) continue;
+    result.push({ columnOffset: i, cubeCount: height });
+  }
+
+  return result;
+}
+
+/**
+ * Calculate total intervention reduction per column (in cubes).
+ */
+export function calculateInterventionReduction(
+  placedInterventions: PlacedIntervention[],
+  allInterventions: Intervention[],
+): number[] {
+  const reduction = new Array(TOTAL_COLUMNS).fill(0);
+
+  for (const placed of placedInterventions) {
+    const intervention = allInterventions.find(i => i.id === placed.interventionId);
+    if (!intervention) continue;
+
+    const curve = calculateInterventionCurve(intervention.depth, intervention.duration, placed.dropColumn);
+    for (const col of curve) {
+      const graphCol = placed.dropColumn + col.columnOffset;
+      if (graphCol >= 0 && graphCol < TOTAL_COLUMNS) {
+        reduction[graphCol] += col.cubeCount;
+      }
+    }
+  }
+
+  return reduction;
 }
