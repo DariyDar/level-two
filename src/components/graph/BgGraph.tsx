@@ -111,10 +111,13 @@ export function BgGraph({
     // Track cumulative height at each column for stacking
     const columnHeights = new Array(TOTAL_COLUMNS).fill(0);
 
-    // Precompute GI rate range across all foods for color normalization
-    const rates = allShips.map(s => s.load / s.duration);
-    const minRate = Math.min(...rates);
-    const maxRate = Math.max(...rates);
+    // Precompute GI rate range from placed foods only for color normalization
+    const placedShipIds = new Set(placedFoods.map(p => p.shipId));
+    const placedRates = allShips
+      .filter(s => placedShipIds.has(s.id))
+      .map(s => s.load / s.duration);
+    const minRate = placedRates.length > 0 ? Math.min(...placedRates) : 0;
+    const maxRate = placedRates.length > 0 ? Math.max(...placedRates) : 1;
 
     for (const placed of placedFoods) {
       const ship = allShips.find(s => s.id === placed.shipId);
