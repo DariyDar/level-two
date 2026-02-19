@@ -80,6 +80,8 @@ export interface Intervention {
   depth: number;          // Cubes to remove at peak
   duration: number;       // Ramp-up duration in minutes
   wpCost: number;
+  boostCols?: number;     // First N columns get extra depth (burst zone)
+  boostExtra?: number;    // Extra cubes removed in burst zone
 }
 
 export interface PlacedIntervention {

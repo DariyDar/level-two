@@ -83,3 +83,7 @@
 .bg-graph__food-group {
   cursor: pointer;
 }
+
+.bg-graph__intervention-preview {
+  pointer-events: none;
+}

@@ -107,11 +107,16 @@ export function buildFoodPyramids(
 /**
  * Calculate intervention curve: ramp up during duration, then flat to end.
  * Returns cubes to REMOVE per column.
+ *
+ * Boost zone: first `boostCols` columns get `boostExtra` additional cubes
+ * on top of the normal ramp/plateau value.
  */
 export function calculateInterventionCurve(
   depth: number,
   durationMinutes: number,
   dropColumn: number,
+  boostCols: number = 0,
+  boostExtra: number = 0,
 ): CubeColumn[] {
   const riseCols = Math.max(1, Math.round(durationMinutes / GRAPH_CONFIG.cellWidthMin));
   if (depth <= 0) return [];
@@ -125,6 +130,10 @@ export function calculateInterventionCurve(
       height = Math.round(depth * (i + 1) / riseCols);
     } else {
       height = depth;
+    }
+    // Apply boost in first N columns
+    if (i < boostCols && boostExtra > 0) {
+      height += boostExtra;
     }
     if (height <= 0) continue;
     result.push({ columnOffset: i, cubeCount: height });
@@ -146,7 +155,10 @@ export function calculateInterventionReduction(
     const intervention = allInterventions.find(i => i.id === placed.interventionId);
     if (!intervention) continue;
 
-    const curve = calculateInterventionCurve(intervention.depth, intervention.duration, placed.dropColumn);
+    const curve = calculateInterventionCurve(
+      intervention.depth, intervention.duration, placed.dropColumn,
+      intervention.boostCols ?? 0, intervention.boostExtra ?? 0,
+    );
     for (const col of curve) {
       const graphCol = placed.dropColumn + col.columnOffset;
       if (graphCol >= 0 && graphCol < TOTAL_COLUMNS) {

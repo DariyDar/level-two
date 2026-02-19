@@ -99,6 +99,8 @@ interface RawInterventionConfig {
   depth: number;
   duration: number;
   wpCost: number;
+  boostCols?: number;
+  boostExtra?: number;
 }
 
 function transformIntervention(raw: RawInterventionConfig): Intervention {
@@ -109,6 +111,8 @@ function transformIntervention(raw: RawInterventionConfig): Intervention {
     depth: raw.depth,
     duration: raw.duration,
     wpCost: raw.wpCost,
+    boostCols: raw.boostCols,
+    boostExtra: raw.boostExtra,
   };
 }
 

@@ -263,6 +263,7 @@ export function PlanningPhase() {
             settings={settings}
             medicationModifiers={medicationModifiers}
             previewShip={activeShip}
+            previewIntervention={activeIntervention}
             previewColumn={previewColumn}
             onFoodClick={handleFoodClick}
             onInterventionClick={handleInterventionClick}

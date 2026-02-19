@@ -31,7 +31,10 @@ export function InterventionCard({
     transform: CSS.Transform.toString(transform),
   };
 
-  const tooltip = `${intervention.name} · ${intervention.duration} min · WP: ${intervention.wpCost} · -${intervention.depth} cubes`;
+  const boostInfo = intervention.boostCols && intervention.boostExtra
+    ? ` · Burst: -${intervention.depth + intervention.boostExtra} for ${intervention.boostCols} cols`
+    : '';
+  const tooltip = `${intervention.name} · ${intervention.duration} min · WP: ${intervention.wpCost} · -${intervention.depth} cubes${boostInfo}`;
 
   return (
     <div

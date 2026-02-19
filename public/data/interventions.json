@@ -6,7 +6,9 @@
       "emoji": "🚶",
       "depth": 3,
       "duration": 60,
-      "wpCost": 2
+      "wpCost": 2,
+      "boostCols": 3,
+      "boostExtra": 1
     },
     {
       "id": "heavyrun",
@@ -14,7 +16,9 @@
       "emoji": "🏃",
       "depth": 5,
       "duration": 30,
-      "wpCost": 4
+      "wpCost": 4,
+      "boostCols": 5,
+      "boostExtra": 2
     }
   ]
 }

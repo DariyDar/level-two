@@ -11,7 +11,7 @@ import {
   columnToTimeString,
   formatBgValue,
 } from '../../core/types';
-import { calculateCurve, calculateInterventionReduction, applyMedicationToFood, calculateSglt2Reduction } from '../../core/cubeEngine';
+import { calculateCurve, calculateInterventionCurve, calculateInterventionReduction, applyMedicationToFood, calculateSglt2Reduction } from '../../core/cubeEngine';
 import './BgGraph.css';
 
 // SVG layout constants
@@ -53,6 +53,7 @@ interface BgGraphProps {
   settings: GameSettings;
   medicationModifiers?: MedicationModifiers;
   previewShip?: Ship | null;
+  previewIntervention?: Intervention | null;
   previewColumn?: number | null;
   onFoodClick?: (placementId: string) => void;
   onInterventionClick?: (placementId: string) => void;
@@ -81,6 +82,7 @@ export function BgGraph({
   settings,
   medicationModifiers = DEFAULT_MEDICATION_MODIFIERS,
   previewShip,
+  previewIntervention,
   previewColumn,
   onFoodClick,
   onInterventionClick,
@@ -188,6 +190,18 @@ export function BgGraph({
       };
     }).filter(Boolean) as Array<{ col: number; baseRow: number; count: number }>;
   }, [previewShip, previewColumn, columnCaps, decayEnabled, medicationModifiers]);
+
+  // Intervention preview: column highlights during drag
+  const interventionPreview = useMemo(() => {
+    if (!previewIntervention || previewColumn == null) return null;
+    const { depth, duration, boostCols = 0, boostExtra = 0 } = previewIntervention;
+    const curve = calculateInterventionCurve(depth, duration, previewColumn, boostCols, boostExtra);
+    return curve.map(cc => ({
+      col: previewColumn + cc.columnOffset,
+      cubeCount: cc.cubeCount,
+      isBoosted: cc.columnOffset < boostCols && boostExtra > 0,
+    })).filter(c => c.col >= 0 && c.col < TOTAL_COLUMNS);
+  }, [previewIntervention, previewColumn]);
 
   const handleCubeClick = useCallback(
     (placementId: string, isIntervention: boolean) => {
@@ -329,6 +343,19 @@ export function BgGraph({
             opacity={0.7}
           />
         )}
+
+        {/* Intervention drag preview: column highlights */}
+        {interventionPreview && interventionPreview.map(c => (
+          <rect
+            key={`int-preview-${c.col}`}
+            x={colToX(c.col)}
+            y={PAD_TOP}
+            width={CELL_SIZE}
+            height={GRAPH_H}
+            fill={c.isBoosted ? 'rgba(72, 187, 120, 0.25)' : 'rgba(72, 187, 120, 0.12)'}
+            className="bg-graph__intervention-preview"
+          />
+        ))}
 
         {/* Placed food cubes — active + burned (semi-transparent) */}
         {foodCubeData.map(food => (
