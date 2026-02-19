@@ -191,23 +191,19 @@ export function BgGraph({
     }).filter(Boolean) as Array<{ col: number; baseRow: number; count: number }>;
   }, [previewShip, previewColumn, columnCaps, decayEnabled, medicationModifiers]);
 
-  // Intervention preview: per-column reduction + boost info
+  // Intervention preview: per-column reduction array
   const interventionPreviewData = useMemo(() => {
     if (!previewIntervention || previewColumn == null) return null;
     const { depth, duration, boostCols = 0, boostExtra = 0 } = previewIntervention;
     const curve = calculateInterventionCurve(depth, duration, previewColumn, boostCols, boostExtra);
     const reduction = new Array(TOTAL_COLUMNS).fill(0);
-    const boosted = new Set<number>();
     for (const cc of curve) {
       const col = previewColumn + cc.columnOffset;
       if (col >= 0 && col < TOTAL_COLUMNS) {
         reduction[col] = cc.cubeCount;
-        if (cc.columnOffset < boostCols && boostExtra > 0) {
-          boosted.add(col);
-        }
       }
     }
-    return { reduction, boosted };
+    return reduction;
   }, [previewIntervention, previewColumn]);
 
   const handleCubeClick = useCallback(
@@ -392,11 +388,10 @@ export function BgGraph({
         {/* Intervention preview: green overlay on food cubes that would be burned */}
         {interventionPreviewData && foodCubeData.map(food =>
           food.columns.map(col => {
-            const red = interventionPreviewData.reduction[col.col];
+            const red = interventionPreviewData[col.col];
             if (red <= 0) return null;
             const cap = columnCaps[col.col];
             const burnFloor = Math.max(0, cap - red);
-            const isBoosted = interventionPreviewData.boosted.has(col.col);
             return Array.from({ length: col.count }, (_, cubeIdx) => {
               const row = col.baseRow + cubeIdx;
               if (row >= TOTAL_ROWS || row >= cap || row < burnFloor) return null;
@@ -407,7 +402,7 @@ export function BgGraph({
                   y={rowToY(row) + 0.5}
                   width={CELL_SIZE - 1}
                   height={CELL_SIZE - 1}
-                  fill={isBoosted ? 'rgba(72, 187, 120, 0.55)' : 'rgba(72, 187, 120, 0.35)'}
+                  fill="rgba(34, 197, 94, 0.6)"
                   rx={2}
                   className="bg-graph__cube--preview-burn"
                 />
