@@ -9,7 +9,7 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import type { Ship } from '../../core/types';
-import { useGameStore, getDayConfig, selectKcalUsed } from '../../store/gameStore';
+import { useGameStore, getDayConfig, selectKcalUsed, selectWpUsed } from '../../store/gameStore';
 import { loadFoods, loadLevel } from '../../config/loader';
 import { BgGraph, pointerToColumn } from '../graph';
 import { PlanningHeader } from './PlanningHeader';
@@ -68,7 +68,14 @@ export function PlanningPhase() {
     [placedFoods, allShips]
   );
 
+  const wpUsed = useMemo(
+    () => selectWpUsed(placedFoods, allShips),
+    [placedFoods, allShips]
+  );
+
   const kcalBudget = dayConfig?.kcalBudget ?? 2000;
+  const wpBudget = dayConfig?.wpBudget ?? 10;
+  const wpRemaining = wpBudget - wpUsed;
 
   // DnD sensors
   const sensors = useSensors(
@@ -123,6 +130,10 @@ export function PlanningPhase() {
       const ship = active.data.current?.ship as Ship | undefined;
       if (!ship) return;
 
+      // Check WP budget
+      const shipWp = ship.wpCost ?? 0;
+      if (shipWp > wpRemaining) return;
+
       // Compute drop column from pointer position
       const graphEl = document.querySelector('.bg-graph') as HTMLElement;
       if (!graphEl) return;
@@ -138,7 +149,7 @@ export function PlanningPhase() {
 
       placeFood(ship.id, col);
     },
-    [placeFood]
+    [placeFood, wpRemaining]
   );
 
   const handleFoodClick = useCallback(
@@ -180,6 +191,8 @@ export function PlanningPhase() {
           dayLabel={`Day ${currentDay}/${currentLevel.days}`}
           kcalUsed={kcalUsed}
           kcalBudget={kcalBudget}
+          wpUsed={wpUsed}
+          wpBudget={wpBudget}
           settings={settings}
           onToggleTimeFormat={handleToggleTimeFormat}
           onToggleBgUnit={handleToggleBgUnit}
@@ -190,12 +203,6 @@ export function PlanningPhase() {
         </div>
 
         <div className="planning-phase__content">
-          <ShipInventory
-            allShips={allShips}
-            availableFoods={dayConfig?.availableFoods || []}
-            placedFoods={placedFoods}
-          />
-
           <BgGraph
             placedFoods={placedFoods}
             allShips={allShips}
@@ -203,6 +210,13 @@ export function PlanningPhase() {
             previewShip={activeShip}
             previewColumn={previewColumn}
             onFoodClick={handleFoodClick}
+          />
+
+          <ShipInventory
+            allShips={allShips}
+            availableFoods={dayConfig?.availableFoods || []}
+            placedFoods={placedFoods}
+            wpRemaining={wpRemaining}
           />
         </div>
       </div>

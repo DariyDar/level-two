@@ -7,6 +7,7 @@ interface ShipInventoryProps {
   allShips: Ship[];
   availableFoods: AvailableFood[];
   placedFoods: PlacedFood[];
+  wpRemaining: number;
 }
 
 interface InventoryItem {
@@ -19,6 +20,7 @@ export function ShipInventory({
   allShips,
   availableFoods,
   placedFoods,
+  wpRemaining,
 }: ShipInventoryProps) {
   const placedCounts = useMemo(() => {
     const counts = new Map<string, number>();
@@ -53,13 +55,18 @@ export function ShipInventory({
         {inventoryItems.length === 0 ? (
           <div className="ship-inventory__empty">All cards placed!</div>
         ) : (
-          inventoryItems.map(({ ship, index }) => (
-            <ShipCard
-              key={`${ship.id}-${index}`}
-              ship={ship}
-              instanceId={`inventory-${ship.id}-${index}`}
-            />
-          ))
+          inventoryItems.map(({ ship, index }) => {
+            const wpCost = ship.wpCost ?? 0;
+            const wpDisabled = wpCost > wpRemaining;
+            return (
+              <ShipCard
+                key={`${ship.id}-${index}`}
+                ship={ship}
+                instanceId={`inventory-${ship.id}-${index}`}
+                wpDisabled={wpDisabled}
+              />
+            );
+          })
         )}
       </div>
     </div>

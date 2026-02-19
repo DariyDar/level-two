@@ -7,6 +7,8 @@ interface RawFoodConfig {
   emoji?: string;
   glucose: number;
   carbs: number;
+  protein?: number;
+  fat?: number;
   duration: number;
   kcal: number;
   description?: string;
@@ -23,6 +25,7 @@ interface RawLevelConfig {
   dayConfigs?: Array<{
     day: number;
     kcalBudget: number;
+    wpBudget?: number;
     availableFoods: AvailableFood[] | string[];
     availableInterventions?: AvailableFood[] | string[];
   }>;
@@ -36,6 +39,8 @@ function transformFood(raw: RawFoodConfig): Ship {
     emoji: raw.emoji || '🍽️',
     load: raw.glucose,
     carbs: raw.carbs,
+    protein: raw.protein,
+    fat: raw.fat,
     duration: raw.duration,
     kcal: raw.kcal,
     loadType: 'Glucose' as LoadType,
@@ -74,6 +79,7 @@ function transformLevel(raw: RawLevelConfig): LevelConfig {
     transformed.dayConfigs = raw.dayConfigs.map((dc) => ({
       day: dc.day,
       kcalBudget: dc.kcalBudget,
+      wpBudget: dc.wpBudget ?? 10,
       availableFoods: normalizeAvailableFoods(dc.availableFoods),
       availableInterventions: dc.availableInterventions
         ? normalizeAvailableFoods(dc.availableInterventions)

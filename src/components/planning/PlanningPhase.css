@@ -25,18 +25,7 @@
 
 .planning-phase__content {
   display: flex;
+  flex-direction: column;
   gap: 16px;
-  align-items: flex-start;
-}
-
-/* Mobile: stack vertically */
-@media (max-width: 767px) {
-  .planning-phase__content {
-    flex-direction: column;
-  }
-
-  .planning-phase__content .ship-inventory {
-    width: 100%;
-    max-height: none;
-  }
+  align-items: stretch;
 }

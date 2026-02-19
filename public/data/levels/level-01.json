@@ -7,6 +7,7 @@
     {
       "day": 1,
       "kcalBudget": 2000,
+      "wpBudget": 10,
       "availableFoods": [
         { "id": "banana", "count": 1 },
         { "id": "apple", "count": 1 },
@@ -21,6 +22,7 @@
     {
       "day": 2,
       "kcalBudget": 1800,
+      "wpBudget": 8,
       "availableFoods": [
         { "id": "banana", "count": 1 },
         { "id": "popcorn", "count": 1 },
@@ -35,6 +37,7 @@
     {
       "day": 3,
       "kcalBudget": 1600,
+      "wpBudget": 6,
       "availableFoods": [
         { "id": "apple", "count": 1 },
         { "id": "popcorn", "count": 1 },

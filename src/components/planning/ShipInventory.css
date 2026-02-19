@@ -5,10 +5,6 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: 200px;
-  flex-shrink: 0;
-  max-height: calc(100vh - 160px);
-  overflow-y: auto;
 }
 
 .ship-inventory__title {
@@ -21,17 +17,13 @@
 
 .ship-inventory__grid {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 8px;
-}
-
-.ship-inventory__grid .ship-card {
-  width: 100%;
 }
 
 .ship-inventory__empty {
   width: 100%;
-  padding: 24px;
+  padding: 16px;
   text-align: center;
   color: #718096;
   font-size: 14px;

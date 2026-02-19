@@ -1,10 +1,13 @@
 import type { GameSettings } from '../../core/types';
+import { getKcalAssessment } from '../../core/types';
 import './PlanningHeader.css';
 
 interface PlanningHeaderProps {
   dayLabel: string;
   kcalUsed: number;
   kcalBudget: number;
+  wpUsed: number;
+  wpBudget: number;
   settings: GameSettings;
   onToggleTimeFormat: () => void;
   onToggleBgUnit: () => void;
@@ -14,32 +17,37 @@ export function PlanningHeader({
   dayLabel,
   kcalUsed,
   kcalBudget,
+  wpUsed,
+  wpBudget,
   settings,
   onToggleTimeFormat,
   onToggleBgUnit,
 }: PlanningHeaderProps) {
-  const kcalOver = kcalUsed > kcalBudget;
-  const kcalPercent = Math.min(100, (kcalUsed / kcalBudget) * 100);
+  const assessment = getKcalAssessment(kcalUsed, kcalBudget);
+  const wpOver = wpUsed > wpBudget;
 
   return (
     <div className="planning-header">
       <div className="planning-header__day">{dayLabel}</div>
 
+      <div className="planning-header__wp">
+        <span className="planning-header__wp-label">WP</span>
+        <span className={`planning-header__wp-value ${wpOver ? 'planning-header__wp-value--over' : ''}`}>
+          {wpUsed}/{wpBudget}
+        </span>
+        <span className="planning-header__wp-icon">☀️</span>
+      </div>
+
       <div className="planning-header__kcal">
-        <div className="planning-header__kcal-label">
-          <span className={`planning-header__kcal-value ${kcalOver ? 'planning-header__kcal-value--over' : ''}`}>
-            {kcalUsed}
-          </span>
-          <span className="planning-header__kcal-divider">/</span>
-          <span className="planning-header__kcal-budget">{kcalBudget}</span>
-          <span className="planning-header__kcal-unit">kcal</span>
-        </div>
-        <div className="planning-header__kcal-bar">
-          <div
-            className={`planning-header__kcal-fill ${kcalOver ? 'planning-header__kcal-fill--over' : ''}`}
-            style={{ width: `${kcalPercent}%` }}
-          />
-        </div>
+        <span className="planning-header__kcal-value">{kcalUsed}</span>
+        <span className="planning-header__kcal-unit">kcal</span>
+        <span className="planning-header__kcal-dash">—</span>
+        <span
+          className="planning-header__kcal-assessment"
+          style={{ color: assessment.color }}
+        >
+          {assessment.label}
+        </span>
       </div>
 
       <div className="planning-header__settings">

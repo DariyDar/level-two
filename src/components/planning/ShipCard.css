@@ -106,6 +106,18 @@
   text-align: center;
 }
 
+/* Disabled (WP insufficient) */
+.ship-card--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+}
+
+.ship-card--disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 /* CSS Tooltip */
 .ship-card[data-tooltip]::after {
   content: attr(data-tooltip);

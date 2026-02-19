@@ -6,7 +6,7 @@ import './ShipCard.css';
 function getCardTooltip(ship: Ship): string {
   const cost = ship.wpCost ?? 0;
   const costText = cost > 0 ? `WP: ${cost}` : 'Free';
-  return `${ship.name} · ${ship.kcal} kcal · ${ship.duration} min · ${costText}`;
+  return `${ship.name} · ${ship.kcal} kcal · ${ship.carbs ?? 0}g carbs · ${ship.duration} min · ${costText}`;
 }
 
 interface ShipCardProps {
@@ -14,6 +14,7 @@ interface ShipCardProps {
   instanceId?: string;
   isPlaced?: boolean;
   remainingCount?: number;
+  wpDisabled?: boolean;
 }
 
 export function ShipCard({
@@ -21,11 +22,13 @@ export function ShipCard({
   instanceId,
   isPlaced = false,
   remainingCount,
+  wpDisabled = false,
 }: ShipCardProps) {
   const draggableId = instanceId ?? `inventory-${ship.id}`;
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: draggableId,
+    disabled: wpDisabled,
     data: {
       ship,
       isPlaced,
@@ -48,11 +51,12 @@ export function ShipCard({
         'ship-card--type-glucose',
         isPlaced && 'ship-card--placed',
         isDragging && 'ship-card--dragging',
+        wpDisabled && 'ship-card--disabled',
       ]
         .filter(Boolean)
         .join(' ')}
       data-tooltip={getCardTooltip(ship)}
-      {...listeners}
+      {...(wpDisabled ? {} : listeners)}
       {...attributes}
     >
       <span className="ship-card__emoji">{ship.emoji}</span>
@@ -65,7 +69,7 @@ export function ShipCard({
       <div className="ship-card__details">
         <span className="ship-card__name">{ship.name}</span>
         <span className="ship-card__info">
-          {ship.kcal} kcal · {ship.duration}m
+          {ship.kcal} kcal · {ship.carbs ?? 0}g · {ship.duration}m
         </span>
       </div>
 
@@ -91,7 +95,7 @@ export function ShipCardOverlay({ ship }: { ship: Ship }) {
       <div className="ship-card__details">
         <span className="ship-card__name">{ship.name}</span>
         <span className="ship-card__info">
-          {ship.kcal} kcal · {ship.duration}m
+          {ship.kcal} kcal · {ship.carbs ?? 0}g · {ship.duration}m
         </span>
       </div>
     </div>

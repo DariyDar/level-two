@@ -19,6 +19,7 @@ function getDayConfig(level: LevelConfig, day: number): DayConfig | null {
   return {
     day,
     kcalBudget: level.kcalBudget ?? 2000,
+    wpBudget: 10,
     availableFoods: level.availableFoods ?? [],
   };
 }
@@ -113,6 +114,16 @@ export function selectKcalUsed(placedFoods: PlacedFood[], allShips: Ship[]): num
   for (const placed of placedFoods) {
     const ship = allShips.find(s => s.id === placed.shipId);
     if (ship) total += ship.kcal;
+  }
+  return total;
+}
+
+// Selector: compute WP usage
+export function selectWpUsed(placedFoods: PlacedFood[], allShips: Ship[]): number {
+  let total = 0;
+  for (const placed of placedFoods) {
+    const ship = allShips.find(s => s.id === placed.shipId);
+    if (ship) total += (ship.wpCost ?? 0);
   }
   return total;
 }

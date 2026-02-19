@@ -50,7 +50,9 @@ export interface Ship {
   name: string;
   emoji: string;
   load: number;           // Glucose amount in mg/dL
-  carbs?: number;         // Carbohydrates in grams (for display)
+  carbs?: number;         // Carbohydrates in grams
+  protein?: number;       // Protein in grams
+  fat?: number;           // Fat in grams
   duration: number;       // Unload duration in minutes (determines pyramid width)
   kcal: number;           // Kilocalories
   loadType: LoadType;
@@ -77,8 +79,28 @@ export interface AvailableFood {
 export interface DayConfig {
   day: number;
   kcalBudget: number;
+  wpBudget: number;
   availableFoods: AvailableFood[];
   availableInterventions?: AvailableFood[];
+}
+
+// === Kcal Assessment ===
+
+export interface KcalAssessment {
+  label: string;
+  color: string;
+}
+
+export function getKcalAssessment(kcalUsed: number, kcalBudget: number): KcalAssessment {
+  if (kcalUsed === 0) return { label: 'Fasting', color: '#718096' };
+  const pct = (kcalUsed / kcalBudget) * 100;
+  if (pct < 25) return { label: 'Starving', color: '#e53e3e' };
+  if (pct < 50) return { label: 'Hungry', color: '#ed8936' };
+  if (pct < 75) return { label: 'Light', color: '#ecc94b' };
+  if (pct < 100) return { label: 'Well Fed', color: '#48bb78' };
+  if (pct < 120) return { label: 'Full', color: '#38a169' };
+  if (pct < 150) return { label: 'Overeating', color: '#ed8936' };
+  return { label: 'Stuffed', color: '#e53e3e' };
 }
 
 export interface LevelConfig {

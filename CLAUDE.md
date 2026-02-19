@@ -20,7 +20,7 @@ This repository contains **independent projects** on separate branches:
 
 | Branch | Project | Version | Description |
 |--------|---------|---------|-------------|
-| `main` | BG Planner | v0.28.0 | Graph-based food planning with cube mechanics, calorie tracking |
+| `main` | BG Planner | v0.29.0 | Graph-based food planning with cube mechanics, WP budget, kcal assessment |
 | `port-planner` | Port Planner | v0.27.1 | Archived — metabolic simulation (WP, slots, organs, SVG pipes) |
 | `match3` | Port Planner + Match-3 | v0.28.11 | Match-3 mini-game for food card acquisition |
 | `tower-defense` | Glucose TD | v0.4.1 | Tower defense reimagining (projectiles, organ zones) |
@@ -101,7 +101,7 @@ Single screen: Food Inventory (left) + BG Graph (right)
 ### Key Files
 
 #### Core Engine
-- `src/version.ts` — version number (v0.28.0)
+- `src/version.ts` — version number (v0.29.0)
 - `src/core/types.ts` — type definitions (Ship, PlacedFood, GameSettings, GRAPH_CONFIG)
 - `src/core/cubeEngine.ts` — pyramid distribution algorithm, graph state calculation
 
@@ -112,28 +112,28 @@ Single screen: Food Inventory (left) + BG Graph (right)
 
 #### Planning Phase (`src/components/planning/`)
 - `PlanningPhase.tsx` — single-screen orchestrator with DnD context
-- `PlanningHeader.tsx` — header with day label, kcal counter, settings toggles
+- `PlanningHeader.tsx` — header with day label, WP budget, kcal assessment, settings toggles
 - `ShipCard.tsx` — draggable food cards with emoji, kcal, duration, WP badge
 - `ShipInventory.tsx` — food card list from level config
 
 #### State Management
-- `src/store/gameStore.ts` — Zustand store: placedFoods, settings, kcal tracking
+- `src/store/gameStore.ts` — Zustand store: placedFoods, settings, kcal/WP tracking
 
 #### Configuration
 - `src/config/loader.ts` — loads and transforms foods.json, level configs
-- `public/data/foods.json` — 24 food items with glucose, carbs, duration, kcal, wpCost
-- `public/data/levels/level-01.json` — 3-day level config with kcalBudget per day
+- `public/data/foods.json` — 24 food items with glucose, carbs, protein, fat, duration, kcal, wpCost
+- `public/data/levels/level-01.json` — 3-day level config with kcalBudget, wpBudget per day
 
 #### Shared UI
 - `src/components/ui/Tooltip.tsx` — universal tooltip component
 - `src/App.tsx` — root app component (single screen, no phase routing)
 - `src/App.css` — app layout styles
 
-### Current State (v0.28.0) — Graph-Based Planning
+### Current State (v0.29.0) — WP Budget + Kcal Assessment
 
 - **Single-Screen Design** ✅
   - No more Planning → Simulation → Results phase transitions
-  - One screen: food inventory + BG graph
+  - Graph on top, food inventory below (horizontal card layout)
   - Old simulation engine, results system, organs, degradation — all removed
 
 - **BG Graph** ✅
@@ -152,16 +152,35 @@ Single screen: Food Inventory (left) + BG Graph (right)
   - Stacking: cubes from different foods stack vertically
   - BG line: red line connecting tops of cube stacks
 
+- **WP Budget** ✅
+  - Per-day wpBudget from level config (e.g., Day 1: 10, Day 2: 8, Day 3: 6)
+  - Header shows wpUsed/wpBudget with ☀️ icon
+  - **Hard limit**: cards are disabled (grayed out, non-draggable) when WP insufficient
+  - Drop is rejected if wpCost exceeds remaining WP
+
 - **Food Cards** ✅
-  - Display: emoji, name, kcal, duration
-  - WP cost badge preserved (for future use)
+  - Display: emoji, name, kcal, carbs (g), duration (m)
+  - WP cost badge (☀️) when wpCost > 0
+  - Disabled state (grayed out) when WP insufficient
   - Drag from inventory → drop on graph
   - Click on placed cubes → remove food
+  - Inventory below graph, cards arranged horizontally (flex-wrap)
 
-- **Calorie System** ✅
-  - Per-day kcalBudget from level config
-  - Header shows used/budget with progress bar
-  - Visual warning when over budget (red)
+- **Kcal Assessment** ✅
+  - No hard calorie limit — kcal is informational
+  - Header shows total kcal + text assessment based on % of kcalBudget:
+    - 0%: Fasting (gray)
+    - <25%: Starving (red)
+    - 25-50%: Hungry (orange)
+    - 50-75%: Light (yellow)
+    - 75-100%: Well Fed (green)
+    - 100-120%: Full (green)
+    - 120-150%: Overeating (orange)
+    - >150%: Stuffed (red)
+
+- **Food Nutritional Data** ✅
+  - All 24 foods have: carbs, protein, fat, kcal (from USDA)
+  - protein/fat stored for future use, not displayed on cards yet
 
 - **Game Settings** ✅
   - Time format toggle: 12h ↔ 24h
@@ -174,9 +193,11 @@ Single screen: Food Inventory (left) + BG Graph (right)
   "id": "banana",
   "name": "Banana",
   "emoji": "🍌",
-  "glucose": 200,
-  "carbs": 20,
-  "duration": 60,
+  "glucose": 270,
+  "carbs": 27,
+  "protein": 1,
+  "fat": 0,
+  "duration": 45,
   "kcal": 105,
   "wpCost": 1,
   "description": "Natural energy, potassium rich."
@@ -187,34 +208,34 @@ Single screen: Food Inventory (left) + BG Graph (right)
 
 Based on USDA FoodData Central, GI databases. `glucose = carbs × 10`, duration from GI + macronutrient composition.
 
-| # | Food | Emoji | Glucose | Carbs | Duration | Kcal | WP | Cubes | Cols | GI |
-|---|------|-------|--------:|------:|---------:|-----:|---:|------:|-----:|---:|
-| 1 | Banana | 🍌 | 270 | 27g | 45m | 105 | 1 | 14 | 3 | 51 |
-| 2 | Apple | 🍎 | 250 | 25g | 45m | 95 | 1 | 13 | 3 | 36 |
-| 3 | Ice Cream | 🍦 | 240 | 24g | 60m | 207 | 0 | 12 | 4 | 62 |
-| 4 | Popcorn | 🍿 | 220 | 22g | 45m | 113 | 1 | 11 | 3 | 55 |
-| 5 | Cookie | 🍪 | 170 | 17g | 30m | 146 | 2 | 9 | 2 | 49 |
-| 6 | Caesar Salad | 🥗 | 100 | 10g | 75m | 190 | 3 | 5 | 5 | 50 |
-| 7 | Choco Muffin | 🧁 | 520 | 52g | 60m | 397 | 0 | 26 | 4 | 59 |
-| 8 | Sandwich | 🥪 | 400 | 40g | 75m | 500 | 2 | 20 | 5 | 56 |
-| 9 | Chicken Meal | 🍗 | 50 | 5g | 120m | 280 | 3 | 3 | 8 | ~0 |
-| 10 | Bowl of Rice | 🍚 | 450 | 45g | 45m | 205 | 4 | 23 | 3 | 73 |
-| 11 | Hamburger | 🍔 | 240 | 24g | 75m | 295 | 3 | 12 | 5 | 66 |
-| 12 | Oatmeal | 🥣 | 280 | 28g | 60m | 166 | 4 | 14 | 4 | 55 |
-| 13 | Pizza | 🍕 | 340 | 34g | 60m | 300 | 3 | 17 | 4 | 51 |
-| 14 | Boiled Eggs | 🥚 | 10 | 1g | 150m | 155 | 4 | 1 | 10 | 0 |
-| 15 | Mixed Berries | 🫐 | 210 | 21g | 45m | 85 | 2 | 11 | 3 | 35 |
-| 16 | Greek Yogurt | 🥛 | 80 | 8g | 75m | 195 | 3 | 4 | 5 | 11 |
-| 17 | Milk 2% | 🥛 | 120 | 12g | 45m | 122 | 3 | 6 | 3 | 31 |
-| 18 | Vegetable Stew | 🥘 | 200 | 20g | 75m | 168 | 4 | 10 | 5 | 48 |
-| 19 | Boiled Carrots | 🥕 | 80 | 8g | 45m | 53 | 4 | 4 | 3 | 40 |
-| 20 | Chickpeas | 🫘 | 270 | 27g | 75m | 164 | 3 | 14 | 5 | 28 |
-| 21 | Cottage Cheese | 🧀 | 50 | 5g | 120m | 206 | 4 | 3 | 8 | 10 |
-| 22 | Hard Cheese | 🧀 | 10 | 1g | 150m | 120 | 3 | 1 | 10 | 0 |
-| 23 | Avocado | 🥑 | 90 | 9g | 105m | 160 | 3 | 5 | 7 | 15 |
-| 24 | Mixed Nuts | 🥜 | 40 | 4g | 105m | 182 | 2 | 2 | 7 | 24 |
+| # | Food | Emoji | Carbs | Protein | Fat | Kcal | WP | Duration | Cubes | Cols |
+|---|------|-------|------:|--------:|----:|-----:|---:|---------:|------:|-----:|
+| 1 | Banana | 🍌 | 27g | 1g | 0g | 105 | 1 | 45m | 14 | 3 |
+| 2 | Apple | 🍎 | 25g | 1g | 0g | 95 | 1 | 45m | 13 | 3 |
+| 3 | Ice Cream | 🍦 | 24g | 4g | 11g | 207 | 0 | 60m | 12 | 4 |
+| 4 | Popcorn | 🍿 | 22g | 3g | 2g | 113 | 1 | 45m | 11 | 3 |
+| 5 | Cookie | 🍪 | 17g | 2g | 7g | 146 | 2 | 30m | 9 | 2 |
+| 6 | Caesar Salad | 🥗 | 10g | 9g | 12g | 190 | 3 | 75m | 5 | 5 |
+| 7 | Choco Muffin | 🧁 | 52g | 6g | 18g | 397 | 0 | 60m | 26 | 4 |
+| 8 | Sandwich | 🥪 | 40g | 22g | 28g | 500 | 2 | 75m | 20 | 5 |
+| 9 | Chicken Meal | 🍗 | 5g | 35g | 12g | 280 | 3 | 120m | 3 | 8 |
+| 10 | Bowl of Rice | 🍚 | 45g | 4g | 0g | 205 | 4 | 45m | 23 | 3 |
+| 11 | Hamburger | 🍔 | 24g | 17g | 14g | 295 | 3 | 75m | 12 | 5 |
+| 12 | Oatmeal | 🥣 | 28g | 6g | 4g | 166 | 4 | 60m | 14 | 4 |
+| 13 | Pizza | 🍕 | 34g | 12g | 12g | 300 | 3 | 60m | 17 | 4 |
+| 14 | Boiled Eggs | 🥚 | 1g | 13g | 10g | 155 | 4 | 150m | 1 | 10 |
+| 15 | Mixed Berries | 🫐 | 21g | 2g | 1g | 85 | 2 | 45m | 11 | 3 |
+| 16 | Greek Yogurt | 🥛 | 8g | 11g | 11g | 195 | 3 | 75m | 4 | 5 |
+| 17 | Milk 2% | 🥛 | 12g | 8g | 5g | 122 | 3 | 45m | 6 | 3 |
+| 18 | Vegetable Stew | 🥘 | 20g | 5g | 5g | 168 | 4 | 75m | 10 | 5 |
+| 19 | Boiled Carrots | 🥕 | 8g | 1g | 0g | 53 | 4 | 45m | 4 | 3 |
+| 20 | Chickpeas | 🫘 | 27g | 9g | 3g | 164 | 3 | 75m | 14 | 5 |
+| 21 | Cottage Cheese | 🧀 | 5g | 25g | 9g | 206 | 4 | 120m | 3 | 8 |
+| 22 | Hard Cheese | 🧀 | 1g | 7g | 9g | 120 | 3 | 150m | 1 | 10 |
+| 23 | Avocado | 🥑 | 9g | 2g | 15g | 160 | 3 | 105m | 5 | 7 |
+| 24 | Mixed Nuts | 🥜 | 4g | 5g | 16g | 182 | 2 | 105m | 2 | 7 |
 
-**Derived:** Cubes = glucose / 20, Cols = duration / 15. Sources: USDA FoodData Central, glycemic-index.net
+**Derived:** Cubes = glucose / 20 (glucose = carbs × 10), Cols = duration / 15. Sources: USDA FoodData Central, glycemic-index.net
 
 ### Level Config Structure
 ```json
@@ -226,6 +247,7 @@ Based on USDA FoodData Central, GI databases. `glucose = carbs × 10`, duration 
     {
       "day": 1,
       "kcalBudget": 2000,
+      "wpBudget": 10,
       "availableFoods": [
         { "id": "banana", "count": 1 }
       ]
@@ -273,7 +295,7 @@ Cubes are colored per food type (8-color cycle): blue, red, green, orange, purpl
 - Organ system (liver, pancreas, muscles, kidneys)
 - Pipe system (SVG flow visualization)
 - Slot grid (time slot placement)
-- WP budget system (spend/refund)
+- Old WP budget system (spend/refund per slot — replaced by new graph-based WP budget)
 - BG sparkline (replaced by main graph)
 - Phase transitions (Planning/Simulation/Results)
 - Degradation circles
