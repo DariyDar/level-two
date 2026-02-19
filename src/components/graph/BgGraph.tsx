@@ -101,6 +101,7 @@ export function BgGraph({
     const data: Array<{
       placementId: string;
       shipId: string;
+      dropColumn: number;
       color: string;
       emoji: string;
       columns: Array<{ col: number; baseRow: number; count: number }>;
@@ -135,6 +136,7 @@ export function BgGraph({
       data.push({
         placementId: placed.id,
         shipId: placed.shipId,
+        dropColumn: placed.dropColumn,
         color: FOOD_COLORS[colorIdx],
         emoji: ship.emoji,
         columns: cols,
@@ -314,15 +316,16 @@ export function BgGraph({
           );
         })}
 
-        {/* Placed food cubes (capped by intervention reduction) */}
+        {/* Placed food cubes — active + burned (semi-transparent) */}
         {foodCubeData.map(food => (
           <g key={food.placementId} className="bg-graph__food-group">
             {food.columns.map(col =>
               Array.from({ length: col.count }, (_, cubeIdx) => {
                 const row = col.baseRow + cubeIdx;
                 if (row >= TOTAL_ROWS) return null;
-                // Skip cubes above the intervention cap
-                if (row >= columnCaps[col.col]) return null;
+                const isBurned = row >= columnCaps[col.col];
+                const colOffset = col.col - food.dropColumn;
+                const waveDelay = colOffset * 20;
                 return (
                   <rect
                     key={`${food.placementId}-${col.col}-${cubeIdx}`}
@@ -331,67 +334,19 @@ export function BgGraph({
                     width={CELL_SIZE - 1}
                     height={CELL_SIZE - 1}
                     fill={food.color}
-                    opacity={0.85}
                     rx={2}
-                    className="bg-graph__cube"
-                    onClick={() => handleCubeClick(food.placementId, false)}
+                    className={isBurned ? 'bg-graph__cube--burned' : 'bg-graph__cube'}
+                    style={{ animationDelay: `${waveDelay}ms` }}
+                    onClick={() => handleCubeClick(
+                      isBurned ? placedInterventions[0]?.id ?? food.placementId : food.placementId,
+                      isBurned && placedInterventions.length > 0
+                    )}
                   />
                 );
               })
             )}
           </g>
         ))}
-
-        {/* Intervention effect markers (shows removed area with striped pattern) */}
-        {placedInterventions.length > 0 && foodCubeData.length > 0 && (
-          <>
-            <defs>
-              <pattern id="intervention-stripes" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
-                <line x1="0" y1="0" x2="0" y2="4" stroke="rgba(34, 120, 70, 0.8)" strokeWidth="2" />
-              </pattern>
-            </defs>
-            {Array.from({ length: TOTAL_COLUMNS }, (_, colIdx) => {
-              const reduction = interventionReduction[colIdx];
-              if (reduction <= 0) return null;
-              // Find total food height at this column
-              let totalHeight = 0;
-              for (const food of foodCubeData) {
-                for (const col of food.columns) {
-                  if (col.col === colIdx) {
-                    const top = col.baseRow + col.count;
-                    if (top > totalHeight) totalHeight = top;
-                  }
-                }
-              }
-              if (totalHeight <= 0) return null;
-              const cap = columnCaps[colIdx];
-              const removedFrom = cap;
-              const removedTo = Math.min(totalHeight, TOTAL_ROWS);
-              if (removedFrom >= removedTo) return null;
-              return Array.from({ length: removedTo - removedFrom }, (_, idx) => {
-                const row = removedFrom + idx;
-                return (
-                  <rect
-                    key={`intervention-mark-${colIdx}-${idx}`}
-                    x={colToX(colIdx) + 0.5}
-                    y={rowToY(row) + 0.5}
-                    width={CELL_SIZE - 1}
-                    height={CELL_SIZE - 1}
-                    fill="url(#intervention-stripes)"
-                    rx={2}
-                    opacity={0.9}
-                    onClick={() => {
-                      // Click on intervention marker removes the first intervention
-                      if (placedInterventions.length > 0) {
-                        handleCubeClick(placedInterventions[0].id, true);
-                      }
-                    }}
-                  />
-                );
-              });
-            })}
-          </>
-        )}
 
         {/* Preview cubes (during drag) */}
         {previewCubes && previewCubes.map((col, i) =>

@@ -20,15 +20,55 @@
   display: block;
 }
 
+/* Cube appear animation (wave effect on food placement) */
+@keyframes cubeAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  60% {
+    opacity: 0.9;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+}
+
+/* Cube burn animation (wave effect on intervention) */
+@keyframes cubeBurn {
+  0% {
+    opacity: 0.85;
+  }
+  40% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.15;
+  }
+}
+
 .bg-graph__cube {
   cursor: pointer;
-  transition: opacity 0.15s;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cubeAppear 0.35s ease-out both;
 }
 
 .bg-graph__cube:hover {
   opacity: 1 !important;
   stroke: #2d3748;
   stroke-width: 1;
+}
+
+.bg-graph__cube--burned {
+  animation: cubeBurn 0.4s ease-out both;
+  cursor: pointer;
+}
+
+.bg-graph__cube--burned:hover {
+  opacity: 0.3 !important;
 }
 
 .bg-graph__cube--preview {
