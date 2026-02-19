@@ -20,7 +20,7 @@ This repository contains **independent projects** on separate branches:
 
 | Branch | Project | Version | Description |
 |--------|---------|---------|-------------|
-| `main` | BG Planner | v0.29.0 | Graph-based food planning with cube mechanics, WP budget, kcal assessment |
+| `main` | BG Planner | v0.30.4 | Graph-based food planning with cubes, interventions, decay, wave animations |
 | `port-planner` | Port Planner | v0.27.1 | Archived — metabolic simulation (WP, slots, organs, SVG pipes) |
 | `match3` | Port Planner + Match-3 | v0.28.11 | Match-3 mini-game for food card acquisition |
 | `tower-defense` | Glucose TD | v0.4.1 | Tower defense reimagining (projectiles, organ zones) |
@@ -81,7 +81,7 @@ What counts as "significant":
 
 ## Project: BG Planner (branch: `main`)
 
-**BG Planner** — a blood glucose management game where players drag food cards directly onto a BG graph timeline. Food converts into colored "cubes" (20 mg/dL blocks) arranged in a pyramid shape. The goal is to plan meals within calorie limits while keeping BG levels reasonable.
+**BG Planner** — a blood glucose management game where players drag food cards and exercise interventions onto a BG graph timeline. Food converts into colored "cubes" (20 mg/dL blocks) with ramp-up and decay curves. Interventions (walking, running) remove cubes from the top. The goal is to plan meals within WP budget while keeping BG levels reasonable.
 
 ### Tech Stack
 - React 19 + TypeScript + Vite
@@ -91,50 +91,54 @@ What counts as "significant":
 ### Game Flow
 
 ```
-Single screen: Food Inventory (left) + BG Graph (right)
-→ Drag food card onto graph
-→ Food converts to pyramid of cubes
-→ Track calories vs budget
-→ Click cubes to remove placed food
+Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
+→ Drag food card onto graph → cubes appear with wave animation
+→ Drag intervention onto graph → top cubes fade out with wave animation
+→ Track WP budget (food + interventions share same pool)
+→ Track kcal with assessment labels
+→ Click cubes to remove placed food/intervention
 ```
 
 ### Key Files
 
 #### Core Engine
-- `src/version.ts` — version number (v0.29.0)
-- `src/core/types.ts` — type definitions (Ship, PlacedFood, GameSettings, GRAPH_CONFIG)
-- `src/core/cubeEngine.ts` — pyramid distribution algorithm, graph state calculation
+- `src/version.ts` — version number (v0.30.4)
+- `src/core/types.ts` — type definitions (Ship, PlacedFood, Intervention, PlacedIntervention, GameSettings, GRAPH_CONFIG)
+- `src/core/cubeEngine.ts` — ramp+decay curve algorithm, intervention reduction, graph state calculation
 
 #### Graph Component (`src/components/graph/`)
-- `BgGraph.tsx` — SVG-based BG graph with grid, cubes, zones, drag-and-drop target
-- `BgGraph.css` — graph styles
+- `BgGraph.tsx` — SVG-based BG graph with grid, cubes, zones, intervention burn rendering, wave animations, drag-and-drop target
+- `BgGraph.css` — graph styles, cubeAppear/cubeBurn keyframe animations
 - `index.ts` — exports
 
 #### Planning Phase (`src/components/planning/`)
-- `PlanningPhase.tsx` — single-screen orchestrator with DnD context
-- `PlanningHeader.tsx` — header with day label, WP budget, kcal assessment, settings toggles
-- `ShipCard.tsx` — draggable food cards with emoji, kcal, duration, WP badge
+- `PlanningPhase.tsx` — single-screen orchestrator with DnD context for food + interventions
+- `PlanningHeader.tsx` — header with day label, WP budget, kcal assessment, settings toggles (time format, BG unit, decay ON/OFF)
+- `ShipCard.tsx` — draggable food cards with emoji, kcal, carbs, duration, WP badge
 - `ShipInventory.tsx` — food card list from level config
+- `InterventionCard.tsx` — draggable intervention cards (green) with emoji, duration, depth, WP badge
+- `InterventionCard.css` — intervention card styles
+- `InterventionInventory.tsx` — intervention card list from level config
 
 #### State Management
-- `src/store/gameStore.ts` — Zustand store: placedFoods, settings, kcal/WP tracking
+- `src/store/gameStore.ts` — Zustand store: placedFoods, placedInterventions, settings, combined kcal/WP tracking
 
 #### Configuration
-- `src/config/loader.ts` — loads and transforms foods.json, level configs
+- `src/config/loader.ts` — loads and transforms foods.json, interventions.json, level configs
 - `public/data/foods.json` — 24 food items with glucose, carbs, protein, fat, duration, kcal, wpCost
-- `public/data/levels/level-01.json` — 3-day level config with kcalBudget, wpBudget per day
+- `public/data/interventions.json` — 2 interventions: Light Walk, Heavy Run
+- `public/data/levels/level-01.json` — 3-day level config with kcalBudget, wpBudget, availableInterventions per day
 
 #### Shared UI
 - `src/components/ui/Tooltip.tsx` — universal tooltip component
 - `src/App.tsx` — root app component (single screen, no phase routing)
 - `src/App.css` — app layout styles
 
-### Current State (v0.29.0) — WP Budget + Kcal Assessment
+### Current State (v0.30.4) — Interventions + Wave Animations
 
 - **Single-Screen Design** ✅
-  - No more Planning → Simulation → Results phase transitions
-  - Graph on top, food inventory below (horizontal card layout)
-  - Old simulation engine, results system, organs, degradation — all removed
+  - Graph on top, food inventory + intervention inventory below (horizontal card layout)
+  - No phase transitions — everything on one screen
 
 - **BG Graph** ✅
   - SVG graph with X axis (8 AM to 8 PM, 48 columns × 15 min)
@@ -142,21 +146,39 @@ Single screen: Food Inventory (left) + BG Graph (right)
   - Grid lines: major every hour, minor every 15 min
   - Zone colors: green (60-140), yellow (140-200), orange (200-300), red (300-400)
   - X axis labels: 8 AM, 11 AM, 2 PM, 5 PM, 8 PM
-  - Y axis labels: 60, 100, 200, 300, 400
-  - Droppable zone for @dnd-kit
+  - Y axis labels: 100, 200, 300, 400 (60 mg/dL label removed)
+  - BG line and food emoji on graph — disabled
+  - Droppable zone for @dnd-kit (accepts both food and interventions)
 
 - **Cube Engine** ✅
-  - Food → cubes: glucose / 20 = number of cubes
-  - Duration → columns: duration / 15 = column count
-  - Pyramid distribution: peak at ~40% of duration (realistic absorption curve)
+  - Food → cubes: glucose / 20 = peak cube height
+  - Duration → columns: duration / 15 = ramp-up column count
+  - **Ramp + Decay curve** (replaces old pyramid):
+    - Rise phase: linear from 0 to peak over duration columns
+    - Decay ON: gradual decline after peak (~0.5 cubes per column = 1 cube/30 min)
+    - Decay OFF: flat plateau from peak to right edge
   - Stacking: cubes from different foods stack vertically
-  - BG line: red line connecting tops of cube stacks
+  - Decay toggle: ON/OFF button in header (toggling restarts game)
+
+- **Intervention System** ✅
+  - Two interventions: Light Walk (🚶 60m, 2 WP, -3 cubes) and Heavy Run (🏃 30m, 4 WP, -5 cubes)
+  - Intervention curve: ramp up during duration, then flat to end of graph
+  - Cubes are removed from the **top** of the food stack at each column
+  - Burned cubes rendered semi-transparent (opacity 0.35) in original food color
+  - Click burned cubes to remove intervention
+  - Interventions share WP budget with food
+
+- **Wave Animations** ✅
+  - `cubeAppear`: food cubes pop in with scale (0.3→1.08→1) + opacity wave, left-to-right
+  - `cubeBurn`: burned cubes fade to 0.35 opacity with wave effect
+  - Wave delay: 20ms per column offset from drop point
 
 - **WP Budget** ✅
-  - Per-day wpBudget from level config (e.g., Day 1: 10, Day 2: 8, Day 3: 6)
+  - Per-day wpBudget from level config (16 for all days)
   - Header shows wpUsed/wpBudget with ☀️ icon
-  - **Hard limit**: cards are disabled (grayed out, non-draggable) when WP insufficient
-  - Drop is rejected if wpCost exceeds remaining WP
+  - **Combined tracking**: food wpCost + intervention wpCost share same pool
+  - **Hard limit**: cards disabled (grayed out, non-draggable) when WP insufficient
+  - Drop rejected if wpCost exceeds remaining WP
 
 - **Food Cards** ✅
   - Display: emoji, name, kcal, carbs (g), duration (m)
@@ -168,6 +190,7 @@ Single screen: Food Inventory (left) + BG Graph (right)
 
 - **Kcal Assessment** ✅
   - No hard calorie limit — kcal is informational
+  - All food kcal values multiplied by 2.5 (from original USDA per-serving)
   - Header shows total kcal + text assessment based on % of kcalBudget:
     - 0%: Fasting (gray)
     - <25%: Starving (red)
@@ -179,12 +202,13 @@ Single screen: Food Inventory (left) + BG Graph (right)
     - >150%: Stuffed (red)
 
 - **Food Nutritional Data** ✅
-  - All 24 foods have: carbs, protein, fat, kcal (from USDA)
+  - All 24 foods have: carbs, protein, fat, kcal (from USDA × 2.5)
   - protein/fat stored for future use, not displayed on cards yet
 
 - **Game Settings** ✅
   - Time format toggle: 12h ↔ 24h
   - BG unit toggle: mg/dL ↔ mmol/L
+  - Decay toggle: ON ↔ OFF (restarts game)
   - Persisted in localStorage
 
 ### Food Data Structure
@@ -198,44 +222,63 @@ Single screen: Food Inventory (left) + BG Graph (right)
   "protein": 1,
   "fat": 0,
   "duration": 45,
-  "kcal": 105,
+  "kcal": 263,
   "wpCost": 1,
   "description": "Natural energy, potassium rich."
 }
 ```
 
+### Intervention Data Structure
+```json
+{
+  "id": "lightwalk",
+  "name": "Light Walk",
+  "emoji": "🚶",
+  "depth": 3,
+  "duration": 60,
+  "wpCost": 2
+}
+```
+
 ### Food Parameters Table
 
-Based on USDA FoodData Central, GI databases. `glucose = carbs × 10`, duration from GI + macronutrient composition.
+Based on USDA FoodData Central, GI databases. `glucose = carbs × 10`, duration from GI + macronutrient composition. Kcal = USDA per-serving × 2.5.
 
 | # | Food | Emoji | Carbs | Protein | Fat | Kcal | WP | Duration | Cubes | Cols |
 |---|------|-------|------:|--------:|----:|-----:|---:|---------:|------:|-----:|
-| 1 | Banana | 🍌 | 27g | 1g | 0g | 105 | 1 | 45m | 14 | 3 |
-| 2 | Apple | 🍎 | 25g | 1g | 0g | 95 | 1 | 45m | 13 | 3 |
-| 3 | Ice Cream | 🍦 | 24g | 4g | 11g | 207 | 0 | 60m | 12 | 4 |
-| 4 | Popcorn | 🍿 | 22g | 3g | 2g | 113 | 1 | 45m | 11 | 3 |
-| 5 | Cookie | 🍪 | 17g | 2g | 7g | 146 | 2 | 30m | 9 | 2 |
-| 6 | Caesar Salad | 🥗 | 10g | 9g | 12g | 190 | 3 | 75m | 5 | 5 |
-| 7 | Choco Muffin | 🧁 | 52g | 6g | 18g | 397 | 0 | 60m | 26 | 4 |
-| 8 | Sandwich | 🥪 | 40g | 22g | 28g | 500 | 2 | 75m | 20 | 5 |
-| 9 | Chicken Meal | 🍗 | 5g | 35g | 12g | 280 | 3 | 120m | 3 | 8 |
-| 10 | Bowl of Rice | 🍚 | 45g | 4g | 0g | 205 | 4 | 45m | 23 | 3 |
-| 11 | Hamburger | 🍔 | 24g | 17g | 14g | 295 | 3 | 75m | 12 | 5 |
-| 12 | Oatmeal | 🥣 | 28g | 6g | 4g | 166 | 4 | 60m | 14 | 4 |
-| 13 | Pizza | 🍕 | 34g | 12g | 12g | 300 | 3 | 60m | 17 | 4 |
-| 14 | Boiled Eggs | 🥚 | 1g | 13g | 10g | 155 | 4 | 150m | 1 | 10 |
-| 15 | Mixed Berries | 🫐 | 21g | 2g | 1g | 85 | 2 | 45m | 11 | 3 |
-| 16 | Greek Yogurt | 🥛 | 8g | 11g | 11g | 195 | 3 | 75m | 4 | 5 |
-| 17 | Milk 2% | 🥛 | 12g | 8g | 5g | 122 | 3 | 45m | 6 | 3 |
-| 18 | Vegetable Stew | 🥘 | 20g | 5g | 5g | 168 | 4 | 75m | 10 | 5 |
-| 19 | Boiled Carrots | 🥕 | 8g | 1g | 0g | 53 | 4 | 45m | 4 | 3 |
-| 20 | Chickpeas | 🫘 | 27g | 9g | 3g | 164 | 3 | 75m | 14 | 5 |
-| 21 | Cottage Cheese | 🧀 | 5g | 25g | 9g | 206 | 4 | 120m | 3 | 8 |
-| 22 | Hard Cheese | 🧀 | 1g | 7g | 9g | 120 | 3 | 150m | 1 | 10 |
-| 23 | Avocado | 🥑 | 9g | 2g | 15g | 160 | 3 | 105m | 5 | 7 |
-| 24 | Mixed Nuts | 🥜 | 4g | 5g | 16g | 182 | 2 | 105m | 2 | 7 |
+| 1 | Banana | 🍌 | 27g | 1g | 0g | 263 | 1 | 45m | 14 | 3 |
+| 2 | Apple | 🍎 | 25g | 1g | 0g | 238 | 1 | 45m | 13 | 3 |
+| 3 | Ice Cream | 🍦 | 24g | 4g | 11g | 518 | 0 | 60m | 12 | 4 |
+| 4 | Popcorn | 🍿 | 22g | 3g | 2g | 283 | 1 | 45m | 11 | 3 |
+| 5 | Cookie | 🍪 | 17g | 2g | 7g | 365 | 2 | 30m | 9 | 2 |
+| 6 | Caesar Salad | 🥗 | 10g | 9g | 12g | 475 | 3 | 75m | 5 | 5 |
+| 7 | Choco Muffin | 🧁 | 52g | 6g | 18g | 993 | 0 | 60m | 26 | 4 |
+| 8 | Sandwich | 🥪 | 40g | 22g | 28g | 1250 | 2 | 75m | 20 | 5 |
+| 9 | Chicken Meal | 🍗 | 5g | 35g | 12g | 700 | 3 | 120m | 3 | 8 |
+| 10 | Bowl of Rice | 🍚 | 45g | 4g | 0g | 513 | 4 | 45m | 23 | 3 |
+| 11 | Hamburger | 🍔 | 24g | 17g | 14g | 738 | 3 | 75m | 12 | 5 |
+| 12 | Oatmeal | 🥣 | 28g | 6g | 4g | 415 | 4 | 60m | 14 | 4 |
+| 13 | Pizza | 🍕 | 34g | 12g | 12g | 750 | 3 | 60m | 17 | 4 |
+| 14 | Boiled Eggs | 🥚 | 1g | 13g | 10g | 388 | 4 | 150m | 1 | 10 |
+| 15 | Mixed Berries | 🫐 | 21g | 2g | 1g | 213 | 2 | 45m | 11 | 3 |
+| 16 | Greek Yogurt | 🥛 | 8g | 11g | 11g | 488 | 3 | 75m | 4 | 5 |
+| 17 | Milk 2% | 🥛 | 12g | 8g | 5g | 305 | 3 | 45m | 6 | 3 |
+| 18 | Vegetable Stew | 🥘 | 20g | 5g | 5g | 420 | 4 | 75m | 10 | 5 |
+| 19 | Boiled Carrots | 🥕 | 8g | 1g | 0g | 133 | 4 | 45m | 4 | 3 |
+| 20 | Chickpeas | 🫘 | 27g | 9g | 3g | 410 | 3 | 75m | 14 | 5 |
+| 21 | Cottage Cheese | 🧀 | 5g | 25g | 9g | 515 | 4 | 120m | 3 | 8 |
+| 22 | Hard Cheese | 🧀 | 1g | 7g | 9g | 300 | 3 | 150m | 1 | 10 |
+| 23 | Avocado | 🥑 | 9g | 2g | 15g | 400 | 3 | 105m | 5 | 7 |
+| 24 | Mixed Nuts | 🥜 | 4g | 5g | 16g | 455 | 2 | 105m | 2 | 7 |
 
 **Derived:** Cubes = glucose / 20 (glucose = carbs × 10), Cols = duration / 15. Sources: USDA FoodData Central, glycemic-index.net
+
+### Intervention Parameters
+
+| Intervention | Emoji | Depth | Duration | WP | Effect |
+|-------------|-------|------:|---------:|---:|--------|
+| Light Walk | 🚶 | 3 cubes | 60m | 2 | Removes 3 cubes from top, ramp 60m then flat to end |
+| Heavy Run | 🏃 | 5 cubes | 30m | 4 | Removes 5 cubes from top, ramp 30m then flat to end |
 
 ### Level Config Structure
 ```json
@@ -247,9 +290,13 @@ Based on USDA FoodData Central, GI databases. `glucose = carbs × 10`, duration 
     {
       "day": 1,
       "kcalBudget": 2000,
-      "wpBudget": 10,
+      "wpBudget": 16,
       "availableFoods": [
         { "id": "banana", "count": 1 }
+      ],
+      "availableInterventions": [
+        { "id": "lightwalk", "count": 1 },
+        { "id": "heavyrun", "count": 1 }
       ]
     }
   ]
@@ -268,15 +315,25 @@ Based on USDA FoodData Central, GI databases. `glucose = carbs × 10`, duration 
 | TOTAL_COLUMNS | 48 | `types.ts` derived |
 | TOTAL_ROWS | 17 | `types.ts` derived |
 | CELL_SIZE | 18px (SVG) | `BgGraph.tsx` |
+| DECAY_RATE | 0.5 cubes/col | `cubeEngine.ts` |
 
 ### Cube Engine Details
 
-#### Pyramid Algorithm
-1. `totalCubes = glucose / 20`
-2. `columnCount = duration / 15`
-3. Weights generated with peak at 40% of duration
-4. Cubes distributed proportionally, rounded to preserve total
-5. Drop column = left edge (start of food absorption)
+#### Ramp + Decay/Plateau Algorithm
+1. `peakCubes = Math.round(glucose / 20)`
+2. `riseCols = Math.round(duration / 15)`
+3. Rise phase (cols 0..riseCols-1): linear from 1 to peakCubes
+4. If decay ON: decline at 0.5 cubes/col until 0
+5. If decay OFF: flat plateau at peakCubes to right edge
+6. Drop column = left edge (start of food absorption)
+
+#### Intervention Algorithm
+1. `depth` = cubes to remove at peak
+2. `riseCols = Math.round(duration / 15)`
+3. Rise phase: linear from 1 to depth
+4. Plateau: flat at depth from peak to right edge of graph
+5. Multiple interventions stack (reductions add up)
+6. Cubes removed from top — bottom cubes stay visible
 
 #### Food Colors
 Cubes are colored per food type (8-color cycle): blue, red, green, orange, purple, pink, teal, yellow
@@ -295,18 +352,17 @@ Cubes are colored per food type (8-color cycle): blue, red, green, orange, purpl
 - Organ system (liver, pancreas, muscles, kidneys)
 - Pipe system (SVG flow visualization)
 - Slot grid (time slot placement)
-- Old WP budget system (spend/refund per slot — replaced by new graph-based WP budget)
+- Old WP budget system (spend/refund per slot — replaced by graph-based WP)
 - BG sparkline (replaced by main graph)
 - Phase transitions (Planning/Simulation/Results)
 - Degradation circles
-- Exercise interventions (to be redesigned)
 - Metformin, fiber system
 
 ### Known Issues
 - Preview during drag doesn't show ghost cubes yet (pointer tracking needs refinement)
 - Win/loss conditions not yet implemented (to be discussed)
-- Interventions not yet redesigned for graph-based system
 - No multi-day progression (day navigation UI not yet built)
+- Intervention click on burned cubes always removes the first intervention (not necessarily the one that burned that specific cube)
 
 ---
 
