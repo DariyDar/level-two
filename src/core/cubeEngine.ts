@@ -13,18 +13,21 @@ export interface FoodPyramid {
   columns: CubeColumn[];
 }
 
+// Background metabolic decay: 1 cube per 30 min = 0.5 cubes per 15-min column
+const DECAY_RATE = 0.5;
+
 /**
  * Calculate glucose curve for a food item.
  *
- * Shape: linear ramp-up during `duration`, then flat plateau to the right edge.
+ * Shape: linear ramp-up during `duration`, then gradual decay to zero.
  *
  *   peakCubes = glucose / 20
  *   riseCols  = duration / 15
  *
  *   During rise (col 0..riseCols-1): height = peakCubes * (col+1) / riseCols
- *   Plateau (col riseCols..end):      height = peakCubes
+ *   Decay (col riseCols..end):       height = peakCubes - DECAY_RATE * (col - riseCols + 1), min 0
  *
- * The returned columns extend from dropColumn to TOTAL_COLUMNS.
+ * The returned columns extend from dropColumn until height reaches 0 or end of graph.
  */
 export function calculateCurve(
   glucose: number,
@@ -45,13 +48,13 @@ export function calculateCurve(
       // Ramp-up phase: linear rise from 1 to peakCubes
       height = Math.round(peakCubes * (i + 1) / riseCols);
     } else {
-      // Plateau phase: flat at peak
-      height = peakCubes;
+      // Decay phase: gradual decline (background energy expenditure)
+      const decaySteps = i - riseCols + 1;
+      height = Math.round(peakCubes - DECAY_RATE * decaySteps);
     }
 
-    if (height > 0) {
-      result.push({ columnOffset: i, cubeCount: height });
-    }
+    if (height <= 0) break;
+    result.push({ columnOffset: i, cubeCount: height });
   }
 
   return result;
