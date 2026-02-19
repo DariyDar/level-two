@@ -156,21 +156,8 @@ export function BgGraph({
     }).filter(Boolean) as Array<{ col: number; baseRow: number; count: number }>;
   }, [previewShip, previewColumn, bgValues]);
 
-  // BG line path (connecting tops of stacks)
-  const bgLinePath = useMemo(() => {
-    if (bgValues.every(v => v === 0)) return '';
-
-    const points: string[] = [];
-    for (let i = 0; i < TOTAL_COLUMNS; i++) {
-      const x = colToX(i) + CELL_SIZE / 2;
-      const bgRow = bgValues[i] / GRAPH_CONFIG.cellHeightMgDl;
-      const y = rowToY(bgRow - 1) + (bgRow > 0 ? 0 : CELL_SIZE);
-      if (bgRow > 0) {
-        points.push(`${points.length === 0 ? 'M' : 'L'} ${x} ${y}`);
-      }
-    }
-    return points.join(' ');
-  }, [bgValues]);
+  // BG line path — disabled for now
+  // const bgLinePath = useMemo(() => { ... }, [bgValues]);
 
   const handleCubeClick = useCallback(
     (placementId: string) => {
@@ -318,18 +305,7 @@ export function BgGraph({
                 );
               })
             )}
-            {/* Food emoji label at the drop column */}
-            {food.columns.length > 0 && (
-              <text
-                x={colToX(food.columns[0].col) + CELL_SIZE / 2}
-                y={rowToY(food.columns[0].baseRow + food.columns[0].count) - 3}
-                textAnchor="middle"
-                fontSize={11}
-                className="bg-graph__food-label"
-              >
-                {food.emoji}
-              </text>
-            )}
+            {/* Food emoji label — disabled for now */}
           </g>
         ))}
 
@@ -353,18 +329,7 @@ export function BgGraph({
           })
         )}
 
-        {/* BG line on top of cubes */}
-        {bgLinePath && (
-          <path
-            d={bgLinePath}
-            fill="none"
-            stroke="#e53e3e"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            opacity={0.7}
-          />
-        )}
+        {/* BG line — disabled for now */}
       </svg>
     </div>
   );
