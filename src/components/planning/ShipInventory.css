@@ -4,14 +4,29 @@
   padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
+  width: 200px;
+  flex-shrink: 0;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+}
+
+.ship-inventory__title {
+  color: #a0aec0;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .ship-inventory__grid {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  min-height: 100px;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ship-inventory__grid .ship-card {
+  width: 100%;
 }
 
 .ship-inventory__empty {

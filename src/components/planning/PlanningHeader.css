@@ -1,83 +1,98 @@
 .planning-header {
   display: flex;
-  align-items: stretch;
+  align-items: center;
   gap: 16px;
-  padding: 12px 16px;
+  padding: 10px 16px;
   background: #2d3748;
   border-radius: 12px;
 }
 
-.planning-header__bg {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 8px 16px;
-  background: #1a202c;
-  border-radius: 8px;
-  min-width: 70px;
-}
-
-.planning-header__wp {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 8px 16px;
-  background: #1a202c;
-  border-radius: 8px;
-  min-width: 70px;
-}
-
-.planning-header__label {
-  font-size: 11px;
-  color: #718096;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  line-height: 24px; /* Match ☀️ emoji height so values align */
-}
-
-.planning-header__wp-emoji {
-  font-size: 24px;
-  line-height: 1;
-}
-
-.planning-header__value {
-  font-size: 24px;
+.planning-header__day {
+  font-size: 16px;
   font-weight: 700;
+  color: #e2e8f0;
+  white-space: nowrap;
+}
+
+.planning-header__kcal {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.planning-header__kcal-label {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  font-size: 14px;
+  color: #e2e8f0;
+}
+
+.planning-header__kcal-value {
+  font-weight: 700;
+  font-size: 18px;
   color: #48bb78;
 }
 
-.planning-header__value--depleted {
+.planning-header__kcal-value--over {
   color: #fc8181;
 }
 
-.planning-header__fast-insulin {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  pointer-events: none;
+.planning-header__kcal-divider {
+  color: #718096;
 }
 
-.planning-header__simulate {
-  padding: 0 24px;
-  border: none;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
+.planning-header__kcal-budget {
+  color: #a0aec0;
+  font-weight: 600;
+}
+
+.planning-header__kcal-unit {
+  color: #718096;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.planning-header__kcal-bar {
+  height: 6px;
+  background: #1a202c;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.planning-header__kcal-fill {
+  height: 100%;
   background: #48bb78;
-  color: white;
-  font-size: 14px;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.planning-header__kcal-fill--over {
+  background: #fc8181;
+}
+
+.planning-header__settings {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.planning-header__toggle {
+  padding: 4px 10px;
+  border: 1px solid #4a5568;
+  border-radius: 6px;
+  background: #1a202c;
+  color: #a0aec0;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.15s;
+  white-space: nowrap;
 }
 
-.planning-header__simulate:hover:not(:disabled) {
-  background: #38a169;
-  transform: scale(1.02);
-}
-
-.planning-header__simulate:disabled {
-  background: #4a5568;
-  cursor: not-allowed;
-  opacity: 0.7;
+.planning-header__toggle:hover {
+  background: #2d3748;
+  border-color: #63b3ed;
+  color: #e2e8f0;
 }

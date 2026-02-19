@@ -1,46 +1,31 @@
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import type { Ship } from '../../core/types';
-import { isGlucoseShip } from '../../core/types';
-import { useGameStore } from '../../store/gameStore';
 import './ShipCard.css';
 
-const SIZE_TO_SPEED: Record<string, string> = { S: 'Fast', M: 'Medium', L: 'Slow' };
-
 function getCardTooltip(ship: Ship): string {
-  if (isGlucoseShip(ship)) {
-    const speed = SIZE_TO_SPEED[ship.size] ?? 'Medium';
-    const cost = ship.wpCost ?? 0;
-    const costText = cost > 0 ? `Cost ${cost}☀️ to place` : 'Free to place';
-    const sugary = ship.tags?.includes('sugary') ? 'Sugary · Rapid glucose spike\n' : '';
-    return `${sugary}${speed} · ${costText}`;
-  }
-  return ship.description ?? ship.name;
+  const cost = ship.wpCost ?? 0;
+  const costText = cost > 0 ? `WP: ${cost}` : 'Free';
+  return `${ship.name} · ${ship.kcal} kcal · ${ship.duration} min · ${costText}`;
 }
 
 interface ShipCardProps {
   ship: Ship;
   instanceId?: string;
   isPlaced?: boolean;
-  isPreOccupied?: boolean;
   remainingCount?: number;
-  showDetails?: boolean;
 }
 
 export function ShipCard({
   ship,
   instanceId,
   isPlaced = false,
-  isPreOccupied = false,
   remainingCount,
-  showDetails = false,
 }: ShipCardProps) {
-  const showDetailedIndicators = useGameStore((s) => s.showDetailedIndicators);
   const draggableId = instanceId ?? `inventory-${ship.id}`;
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: draggableId,
-    disabled: isPreOccupied,
     data: {
       ship,
       isPlaced,
@@ -60,10 +45,8 @@ export function ShipCard({
       style={style}
       className={[
         'ship-card',
-        `ship-card--size-${ship.size.toLowerCase()}`,
-        `ship-card--type-${ship.loadType.toLowerCase()}`,
+        'ship-card--type-glucose',
         isPlaced && 'ship-card--placed',
-        isPreOccupied && 'ship-card--locked',
         isDragging && 'ship-card--dragging',
       ]
         .filter(Boolean)
@@ -74,25 +57,17 @@ export function ShipCard({
     >
       <span className="ship-card__emoji">{ship.emoji}</span>
 
-      {/* WP cost badge - top right */}
+      {/* WP cost badge */}
       {wpCost > 0 && (
         <span className="ship-card__badge ship-card__badge--wp">{wpCost}☀️</span>
       )}
 
-      {/* Sugary badge - bottom left */}
-      {ship.tags?.includes('sugary') && (
-        <span className="ship-card__badge ship-card__badge--sugary">🧊</span>
-      )}
-
-      {showDetails && (
-        <div className="ship-card__details">
-          <span className="ship-card__name">{ship.name}</span>
-          <span className="ship-card__info">
-            {ship.loadType === 'Glucose' ? `${ship.carbs ?? ship.load}g` : ''}
-            {showDetailedIndicators && `${ship.loadType === 'Glucose' ? ' · ' : ''}${ship.size === 'S' ? 1 : ship.size === 'M' ? 2 : 3}h`}
-          </span>
-        </div>
-      )}
+      <div className="ship-card__details">
+        <span className="ship-card__name">{ship.name}</span>
+        <span className="ship-card__info">
+          {ship.kcal} kcal · {ship.duration}m
+        </span>
+      </div>
 
       {remainingCount !== undefined && remainingCount < 99 && (
         <span className="ship-card__count">×{remainingCount}</span>
@@ -103,35 +78,20 @@ export function ShipCard({
 
 // Drag overlay version (no drag handlers)
 export function ShipCardOverlay({ ship }: { ship: Ship }) {
-  const showDetailedIndicators = useGameStore((s) => s.showDetailedIndicators);
   const wpCost = ship.wpCost ?? 0;
 
   return (
-    <div
-      className={[
-        'ship-card',
-        'ship-card--overlay',
-        `ship-card--size-${ship.size.toLowerCase()}`,
-        `ship-card--type-${ship.loadType.toLowerCase()}`,
-      ].join(' ')}
-    >
+    <div className="ship-card ship-card--overlay ship-card--type-glucose">
       <span className="ship-card__emoji">{ship.emoji}</span>
 
-      {/* WP cost badge - top right */}
       {wpCost > 0 && (
         <span className="ship-card__badge ship-card__badge--wp">{wpCost}☀️</span>
-      )}
-
-      {/* Sugary badge - bottom left */}
-      {ship.tags?.includes('sugary') && (
-        <span className="ship-card__badge ship-card__badge--sugary">🧊</span>
       )}
 
       <div className="ship-card__details">
         <span className="ship-card__name">{ship.name}</span>
         <span className="ship-card__info">
-          {ship.loadType === 'Glucose' ? `${ship.carbs ?? ship.load}g` : ''}
-          {showDetailedIndicators && `${ship.loadType === 'Glucose' ? ' · ' : ''}${ship.size === 'S' ? 1 : ship.size === 'M' ? 2 : 3}h`}
+          {ship.kcal} kcal · {ship.duration}m
         </span>
       </div>
     </div>

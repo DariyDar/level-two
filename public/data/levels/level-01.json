@@ -3,11 +3,10 @@
   "name": "First Steps",
   "description": "Learn the basics of meal planning across three days.",
   "days": 3,
-  "initialBG": 100,
   "dayConfigs": [
     {
       "day": 1,
-      "wpBudget": 12,
+      "kcalBudget": 2000,
       "availableFoods": [
         { "id": "banana", "count": 1 },
         { "id": "apple", "count": 1 },
@@ -17,24 +16,11 @@
         { "id": "berriesmixed", "count": 1 },
         { "id": "pizza", "count": 1 },
         { "id": "greekyogurt", "count": 1 }
-      ],
-      "availableInterventions": [
-        { "id": "light_exercise", "count": 1 }
-      ],
-      "preOccupiedSlots": [
-        { "slot": 13, "shipId": "oatmeal" }
-      ],
-      "blockedSlots": [5, 11],
-      "pancreasBoostCharges": 1,
-      "segmentCarbs": {
-        "Morning": { "min": 25, "optimal": 30, "max": 35 },
-        "Day": { "min": 30, "optimal": 35, "max": 40 },
-        "Evening": { "min": 20, "optimal": 25, "max": 30 }
-      }
+      ]
     },
     {
       "day": 2,
-      "wpBudget": 14,
+      "kcalBudget": 1800,
       "availableFoods": [
         { "id": "banana", "count": 1 },
         { "id": "popcorn", "count": 1 },
@@ -44,25 +30,11 @@
         { "id": "milk", "count": 1 },
         { "id": "chickpeas", "count": 1 },
         { "id": "caesarsalad", "count": 1 }
-      ],
-      "availableInterventions": [
-        { "id": "light_exercise", "count": 2 }
-      ],
-      "preOccupiedSlots": [
-        { "slot": 1, "shipId": "chocolatemuffin" },
-        { "slot": 7, "shipId": "chicken" }
-      ],
-      "blockedSlots": [6, 14],
-      "pancreasBoostCharges": 1,
-      "segmentCarbs": {
-        "Morning": { "min": 25, "optimal": 30, "max": 35 },
-        "Day": { "min": 30, "optimal": 35, "max": 40 },
-        "Evening": { "min": 20, "optimal": 25, "max": 30 }
-      }
+      ]
     },
     {
       "day": 3,
-      "wpBudget": 15,
+      "kcalBudget": 1600,
       "availableFoods": [
         { "id": "apple", "count": 1 },
         { "id": "popcorn", "count": 1 },
@@ -71,29 +43,7 @@
         { "id": "boiledcarrots", "count": 1 },
         { "id": "milk", "count": 1 },
         { "id": "cheesewedge", "count": 1 }
-      ],
-      "availableInterventions": [
-        { "id": "light_exercise", "count": 1 },
-        { "id": "intense_exercise", "count": 1 }
-      ],
-      "preOccupiedSlots": [
-        { "slot": 4, "shipId": "cookie" },
-        { "slot": 13, "shipId": "icecream" }
-      ],
-      "blockedSlots": [3, 9, 11, 17],
-      "pancreasBoostCharges": 2,
-      "segmentCarbs": {
-        "Morning": { "min": 25, "optimal": 30, "max": 35 },
-        "Day": { "min": 30, "optimal": 35, "max": 40 },
-        "Evening": { "min": 20, "optimal": 25, "max": 30 }
-      }
+      ]
     }
-  ],
-  "interventionCharges": {
-    "liverBoost": 3,
-    "pancreasBoost": 2
-  },
-  "winCondition": {
-    "maxDegradationCircles": 5
-  }
+  ]
 }

@@ -1,35 +1,19 @@
-import { useGameStore } from './store/gameStore';
 import { PlanningPhase } from './components/planning';
-import { SimulationPhase } from './components/simulation';
-import { ResultsPhase } from './components/results';
-import { EyeToggle } from './components/ui/EyeToggle';
 import { VERSION } from './version';
 import './App.css';
 
 function App() {
-  const { phase, degradation, bgHistory } = useGameStore();
-
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🚢 Port Planner</h1>
+        <h1>BG Planner</h1>
       </header>
 
       <main className="app-main">
-        {phase === 'Planning' && <PlanningPhase />}
-        {phase === 'Simulation' && <SimulationPhase />}
-        {phase === 'Results' && <ResultsPhase bgHistory={bgHistory} />}
+        <PlanningPhase />
       </main>
 
-      <EyeToggle />
-
-      <footer className="app-footer">
-        <div className="degradation-status">
-          <span>🫀 Liver: {degradation.liver}%</span>
-          <span>🫁 Pancreas: {degradation.pancreas}%</span>
-        </div>
-        <div className="version-badge">{VERSION}</div>
-      </footer>
+      <div className="version-badge">{VERSION}</div>
     </div>
   );
 }

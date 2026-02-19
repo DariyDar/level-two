@@ -1,0 +1,45 @@
+.bg-graph {
+  flex: 1;
+  min-width: 0;
+  background: #fff;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  padding: 8px;
+  transition: border-color 0.2s;
+  overflow: hidden;
+}
+
+.bg-graph--drag-over {
+  border-color: #63b3ed;
+  box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.2);
+}
+
+.bg-graph__svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.bg-graph__cube {
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.bg-graph__cube:hover {
+  opacity: 1 !important;
+  stroke: #2d3748;
+  stroke-width: 1;
+}
+
+.bg-graph__cube--preview {
+  pointer-events: none;
+}
+
+.bg-graph__food-label {
+  pointer-events: none;
+  user-select: none;
+}
+
+.bg-graph__food-group {
+  cursor: pointer;
+}

@@ -1,135 +1,71 @@
 // ============================================
-// Core Types for Port Management Game
+// Core Types for BG Graph Planning Game
 // ============================================
 
 // === Enums / Unions ===
 
-export type ShipSize = 'S' | 'M' | 'L';
-
 export type LoadType = 'Glucose' | 'Treatment';
 
-export type DaySegment = 'Morning' | 'Day' | 'Evening';
+// === Graph Configuration ===
 
-export type GamePhase = 'Planning' | 'Simulation' | 'Results';
+export const GRAPH_CONFIG = {
+  startHour: 8,       // 8 AM
+  endHour: 20,        // 8 PM
+  cellWidthMin: 15,   // minutes per column
+  cellHeightMgDl: 20, // mg/dL per row
+  bgMin: 60,          // Y axis minimum
+  bgMax: 400,         // Y axis maximum
+} as const;
 
-// === Willpower Points ===
+// Derived constants
+export const TOTAL_MINUTES = (GRAPH_CONFIG.endHour - GRAPH_CONFIG.startHour) * 60; // 720
+export const TOTAL_COLUMNS = TOTAL_MINUTES / GRAPH_CONFIG.cellWidthMin; // 48
+export const TOTAL_ROWS = (GRAPH_CONFIG.bgMax - GRAPH_CONFIG.bgMin) / GRAPH_CONFIG.cellHeightMgDl; // 17
 
-export const DEFAULT_WP_BUDGET = 16;
+// X axis tick marks (configurable)
+export const DEFAULT_X_TICKS = [8, 11, 14, 17, 20]; // hours
 
-// Naming Convention Mapping (Excel v0.6 ↔ Code):
-// Containers (store substances):
-//   'bg' (code) = BGContainer (Excel) - blood glucose
-//   'liver' (code) = LiverContainer (Excel) - liver glucose buffer
-//   'metforminEffect' (code) = Metformin Effect Container (Excel)
-//   'exerciseEffect' (code) = Exercise Effect Container (Excel)
-export type ContainerId =
-  | 'liver'
-  | 'bg'
-  | 'metforminEffect'
-  | 'exerciseEffect'
-  | 'intenseExerciseEffect';
+// Y axis tick marks (configurable)
+export const DEFAULT_Y_TICKS = [60, 100, 200, 300, 400]; // mg/dL
 
-// Organs (process/utilize substances):
-//   'liver' (code) = Liver (Excel) - organ with container
-//   'pancreas' (code) = Pancreas (Excel) - controls insulin response
-//   'muscles' (code) = Muscle (Excel) - glucose utilization
-export type OrganId = 'liver' | 'pancreas' | 'muscles';
+// === Game Settings ===
 
-// === Constants ===
+export interface GameSettings {
+  timeFormat: '12h' | '24h';
+  bgUnit: 'mg/dL' | 'mmol/L';
+}
 
-export const SHIP_SIZE_TO_SLOTS: Record<ShipSize, number> = {
-  S: 1,
-  M: 2,
-  L: 3,
+export const DEFAULT_SETTINGS: GameSettings = {
+  timeFormat: '12h',
+  bgUnit: 'mg/dL',
 };
 
-export const SHIP_SIZE_TO_HOURS: Record<ShipSize, number> = {
-  S: 1,
-  M: 2,
-  L: 3,
-};
+// mg/dL to mmol/L conversion factor
+export const MGDL_TO_MMOL = 1 / 18;
 
-export const DAY_SEGMENTS: DaySegment[] = ['Morning', 'Day', 'Evening'];
-
-export const SLOTS_PER_ROW = 3;
-export const ROWS_PER_SEGMENT = 2;
-export const SLOTS_PER_SEGMENT = SLOTS_PER_ROW * ROWS_PER_SEGMENT; // 6
-export const TOTAL_SLOTS = SLOTS_PER_SEGMENT * DAY_SEGMENTS.length; // 18
-
-export const HOURS_PER_SEGMENT = 6;
-export const TOTAL_HOURS = HOURS_PER_SEGMENT * DAY_SEGMENTS.length; // 18
-
-export const STARTING_HOUR = 6; // 06:00
-
-// === Ship Models ===
+// === Ship (Food/Intervention) Models ===
 
 export interface Ship {
   id: string;
   name: string;
   emoji: string;
-  size: ShipSize;
-  load: number;
-  carbs?: number; // Carbohydrates in grams (for display on food ships)
+  load: number;           // Glucose amount in mg/dL
+  carbs?: number;         // Carbohydrates in grams (for display)
+  duration: number;       // Unload duration in minutes (determines pyramid width)
+  kcal: number;           // Kilocalories
   loadType: LoadType;
-  targetContainer: ContainerId;
+  targetContainer: string;
   description?: string;
-  wpCost?: number; // Willpower cost (0-9, 0 = free)
-  fiber?: boolean; // Fiber content (displays leaf icon)
-  group?: string; // Group for per-segment limits (e.g., "exercise")
-  requiresEmptySlotBefore?: boolean; // Previous slot must not contain food
-  tags?: string[]; // Tags affecting behavior (e.g., "sugary" = 2x unload speed)
+  wpCost?: number;        // Willpower cost (preserved for future use)
 }
 
-export interface PlacedShip {
-  instanceId: string;
-  shipId: string;
-  segment: DaySegment;
-  row: 0 | 1;
-  startSlot: number;
-  isPreOccupied?: boolean; // Can't be moved or removed
+// === Placed Food on Graph ===
+
+export interface PlacedFood {
+  id: string;             // Unique placement ID
+  shipId: string;         // Reference to Ship.id
+  dropColumn: number;     // Column index where dropped (0 = start of graph)
 }
-
-// === Container Models ===
-
-export interface ContainerState {
-  id: ContainerId;
-  level: number;
-  capacity: number;
-  decayRate?: number;
-}
-
-export type ContainerStates = Record<ContainerId, ContainerState>;
-
-export interface BGThresholds {
-  low: number;      // 70
-  target: number;   // 100
-  high: number;     // 200
-  critical: number; // 300
-}
-
-// === Degradation Models ===
-
-// v0.5.0: Tier-based degradation system
-export interface DegradationState {
-  liver: {
-    tier: number;        // Current degradation tier (0-5)
-    tierEffects: {
-      capacityReduction: number; // mg/dL reduction from base capacity
-    };
-  };
-  pancreas: {
-    tier: number;        // Current degradation tier (0-4)
-    tierEffects: {
-      maxTierReduction: number; // Reduction in max muscle activation tier
-    };
-  };
-}
-
-// Legacy type for backward compatibility
-export type SimpleDegradation = {
-  liver: number;
-  pancreas: number;
-};
 
 // === Level Config ===
 
@@ -138,36 +74,11 @@ export interface AvailableFood {
   count: number;
 }
 
-export interface PreOccupiedSlot {
-  slot: number;  // 1-18 (sequential slot number)
-  shipId: string;
-}
-
-export interface SegmentCarbLimits {
-  min: number;
-  optimal: number;
-  max: number;
-}
-
 export interface DayConfig {
   day: number;
+  kcalBudget: number;
   availableFoods: AvailableFood[];
-  availableInterventions: AvailableFood[];
-  preOccupiedSlots?: PreOccupiedSlot[];
-  blockedSlots?: number[]; // Slot numbers (1-18) that cannot accept any cards
-  wpBudget?: number; // Override WP budget for this day
-  // Legacy day-level carb requirements
-  carbRequirements?: {
-    min: number;
-    max: number;
-  };
-  // Segment-level carb requirements (preferred)
-  segmentCarbs?: {
-    Morning?: SegmentCarbLimits;
-    Day?: SegmentCarbLimits;
-    Evening?: SegmentCarbLimits;
-  };
-  pancreasBoostCharges?: number; // Fast Insulin charges for this day
+  availableInterventions?: AvailableFood[];
 }
 
 export interface LevelConfig {
@@ -175,109 +86,10 @@ export interface LevelConfig {
   name: string;
   description?: string;
   days: number;
-  initialBG?: number; // Starting BG level (default 100)
-  wpBudget?: number; // Level-wide WP budget override
-  // Legacy fields (used if dayConfigs not present)
-  availableFoods?: AvailableFood[];
-  carbRequirements?: {
-    min: number;
-    max: number;
-  };
-  // Day-specific configs (overrides legacy fields)
   dayConfigs?: DayConfig[];
-  availableInterventions?: AvailableFood[]; // Legacy: level-wide (use dayConfigs instead)
-  preOccupiedSlots?: PreOccupiedSlot[];
-  initialDegradation?: SimpleDegradation;
-  interventionCharges: {
-    liverBoost: number;
-    pancreasBoost: number;
-  };
-  winCondition: {
-    maxDegradationCircles?: number; // Default: 5. Defeat if circles >= this value
-  };
-}
-
-// === Results Models ===
-
-export type DayAssessment = 'Excellent' | 'Decent' | 'Poor' | 'Defeat';
-
-export const DEFAULT_ASSESSMENT_THRESHOLDS = {
-  excellent: 0,  // 0 circles
-  decent: 1,     // 1 circle
-  poor: 2,       // 2-4 circles
-  defeat: 5,     // 5 circles = defeat
-} as const;
-
-export interface DayMetrics {
-  averageBG: number;
-  minBG: number;
-  maxBG: number;
-  timeInRange: number;
-  timeAboveHigh: number;
-  timeAboveCritical: number;
-  timeBelowLow: number;
-  excessBG: number;
-}
-
-export interface DegradationBuffer {
-  totalCircles: number;      // 0-5 circles activated based on excessBG
-  distribution: {
-    liver: number;            // Number of circles assigned to liver
-    pancreas: number;         // Number of circles assigned to pancreas
-  };
-}
-
-export interface DayResults {
-  day: number;
-  bgHistory: number[];
-  metrics: DayMetrics;
-  degradation: SimpleDegradation;
-  degradationBuffer: DegradationBuffer;
-  assessment: DayAssessment;
-}
-
-// === Slot Models ===
-
-export interface SlotPosition {
-  segment: DaySegment;
-  row: 0 | 1;
-  index: 0 | 1 | 2;
-}
-
-export type SlotId = `${DaySegment}-${0 | 1}-${0 | 1 | 2}`;
-
-// === Validation ===
-
-export interface SegmentValidation {
-  segment: DaySegment;
-  currentCarbs: number;
-  min: number;
-  optimal: number;
-  max: number;
-}
-
-export interface PlanValidation {
-  isValid: boolean;
-  totalCarbs: number;
-  minCarbs: number;
-  maxCarbs: number;
-  segments: SegmentValidation[];
-  errors: string[];
-  warnings: string[];
-}
-
-// === Boost Config ===
-
-export interface BoostConfig {
-  cooldownHours: number;
-  durationHours: number;
-  rateTier?: number;    // For Liver Boost
-  tierBonus?: number;   // For Pancreas Boost
-}
-
-export interface BoostsConfig {
-  liverBoost: BoostConfig;
-  pancreasBoost: BoostConfig;
+  // Legacy/fallback
+  availableFoods?: AvailableFood[];
+  kcalBudget?: number;
 }
 
 // === Type Guards ===
@@ -286,49 +98,39 @@ export function isGlucoseShip(ship: Ship): boolean {
   return ship.loadType === 'Glucose';
 }
 
-export function isTreatmentShip(ship: Ship): boolean {
-  return ship.loadType === 'Treatment';
-}
-
-export function isEffectContainer(id: ContainerId): boolean {
-  return id === 'metforminEffect' || id === 'exerciseEffect';
-}
-
-export function isValidSlotIndex(index: number): index is 0 | 1 | 2 {
-  return index === 0 || index === 1 || index === 2;
-}
-
-export function isValidRow(row: number): row is 0 | 1 {
-  return row === 0 || row === 1;
-}
-
 // === Utility Functions ===
 
 /**
- * Convert sequential slot number (1-18) to SlotPosition
+ * Convert column index to time string
  */
-export function slotNumberToPosition(slotNum: number): SlotPosition {
-  if (slotNum < 1 || slotNum > 18) {
-    throw new Error(`Invalid slot number: ${slotNum}. Must be 1-18.`);
+export function columnToTimeString(column: number, format: '12h' | '24h'): string {
+  const totalMinutes = GRAPH_CONFIG.startHour * 60 + column * GRAPH_CONFIG.cellWidthMin;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (format === '24h') {
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
 
-  const zeroIndexed = slotNum - 1;
-  const segmentIndex = Math.floor(zeroIndexed / 6);
-  const withinSegment = zeroIndexed % 6;
-  const row = Math.floor(withinSegment / 3) as 0 | 1;
-  const index = (withinSegment % 3) as 0 | 1 | 2;
-
-  return {
-    segment: DAY_SEGMENTS[segmentIndex],
-    row,
-    index,
-  };
+  const h12 = hours % 12 || 12;
+  const ampm = hours < 12 ? 'AM' : 'PM';
+  if (minutes === 0) return `${h12} ${ampm}`;
+  return `${h12}:${minutes.toString().padStart(2, '0')} ${ampm}`;
 }
 
 /**
- * Convert SlotPosition to sequential slot number (1-18)
+ * Convert mg/dL to mmol/L
  */
-export function positionToSlotNumber(pos: SlotPosition): number {
-  const segmentIndex = DAY_SEGMENTS.indexOf(pos.segment);
-  return segmentIndex * 6 + pos.row * 3 + pos.index + 1;
+export function mgdlToMmol(mgdl: number): number {
+  return Math.round(mgdl * MGDL_TO_MMOL * 10) / 10;
+}
+
+/**
+ * Format BG value based on unit setting
+ */
+export function formatBgValue(mgdl: number, unit: 'mg/dL' | 'mmol/L'): string {
+  if (unit === 'mmol/L') {
+    return `${mgdlToMmol(mgdl)}`;
+  }
+  return `${mgdl}`;
 }

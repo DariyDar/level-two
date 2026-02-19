@@ -1,73 +1,63 @@
-import { BgSparkline } from './BgSparkline';
-import { BoostButton } from '../simulation/BoostButton';
-import { Tooltip } from '../ui/Tooltip';
+import type { GameSettings } from '../../core/types';
 import './PlanningHeader.css';
 
 interface PlanningHeaderProps {
-  currentBG: number;
-  wpRemaining: number;
-  wpBudget: number;
-  isValid: boolean;
-  onSimulate: () => void;
-  bgPrediction: number[];
-  fastInsulinCharges: number;
+  dayLabel: string;
+  kcalUsed: number;
+  kcalBudget: number;
+  settings: GameSettings;
+  onToggleTimeFormat: () => void;
+  onToggleBgUnit: () => void;
 }
 
 export function PlanningHeader({
-  currentBG,
-  wpRemaining,
-  wpBudget,
-  isValid,
-  onSimulate,
-  bgPrediction,
-  fastInsulinCharges,
+  dayLabel,
+  kcalUsed,
+  kcalBudget,
+  settings,
+  onToggleTimeFormat,
+  onToggleBgUnit,
 }: PlanningHeaderProps) {
+  const kcalOver = kcalUsed > kcalBudget;
+  const kcalPercent = Math.min(100, (kcalUsed / kcalBudget) * 100);
+
   return (
     <div className="planning-header">
-      <Tooltip text="Starting blood glucose level for this day">
-        <div className="planning-header__bg">
-          <span className="planning-header__label">BG</span>
-          <span className="planning-header__value">{currentBG}</span>
-        </div>
-      </Tooltip>
+      <div className="planning-header__day">{dayLabel}</div>
 
-      <Tooltip text="Willpower — spend to place food cards. Each card's ☀️ cost is shown on its badge">
-        <div className="planning-header__wp">
-          <span className="planning-header__wp-emoji">☀️</span>
-          <span className={`planning-header__value ${wpRemaining <= 0 ? 'planning-header__value--depleted' : ''}`}>
-            {wpRemaining}/{wpBudget}
+      <div className="planning-header__kcal">
+        <div className="planning-header__kcal-label">
+          <span className={`planning-header__kcal-value ${kcalOver ? 'planning-header__kcal-value--over' : ''}`}>
+            {kcalUsed}
           </span>
+          <span className="planning-header__kcal-divider">/</span>
+          <span className="planning-header__kcal-budget">{kcalBudget}</span>
+          <span className="planning-header__kcal-unit">kcal</span>
         </div>
-      </Tooltip>
-
-      <BgSparkline bgHistory={bgPrediction} />
-
-      <Tooltip text="Boosts muscle's glucose absorption">
-        <div className="planning-header__fast-insulin">
-          <BoostButton
-            label="Fast Insulin"
-            emoji="💧"
-            boost={{
-              charges: fastInsulinCharges,
-              maxCharges: fastInsulinCharges,
-              cooldownTicks: 0,
-              isActive: false,
-              activeTicks: 0,
-            }}
-            cooldownMax={0}
-            onActivate={() => {}}
-            isFastInsulin
+        <div className="planning-header__kcal-bar">
+          <div
+            className={`planning-header__kcal-fill ${kcalOver ? 'planning-header__kcal-fill--over' : ''}`}
+            style={{ width: `${kcalPercent}%` }}
           />
         </div>
-      </Tooltip>
+      </div>
 
-      <button
-        className="planning-header__simulate"
-        onClick={onSimulate}
-        disabled={!isValid}
-      >
-        Simulate
-      </button>
+      <div className="planning-header__settings">
+        <button
+          className="planning-header__toggle"
+          onClick={onToggleTimeFormat}
+          title="Toggle time format"
+        >
+          {settings.timeFormat}
+        </button>
+        <button
+          className="planning-header__toggle"
+          onClick={onToggleBgUnit}
+          title="Toggle BG unit"
+        >
+          {settings.bgUnit}
+        </button>
+      </div>
     </div>
   );
 }

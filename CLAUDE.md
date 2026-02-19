@@ -16,13 +16,15 @@ git add ... && git commit ... && git push
 
 ## Repository Structure
 
-This repository contains **two independent projects** on separate branches:
+This repository contains **independent projects** on separate branches:
 
 | Branch | Project | Version | Description |
 |--------|---------|---------|-------------|
-| `main` | Port Planner | v0.24.11 | Metabolic simulation (WP system, drag-and-drop meal planning, SVG pipes) |
-| `tower-defense` | Glucose TD | v0.4.1 | Tower defense reimagining (projectiles, organ zones, survival mode) |
-| `Dariy` | Port Planner | v0.25.1 | Archived — Mood system branch (superseded by main) |
+| `main` | BG Planner | v0.28.0 | Graph-based food planning with cube mechanics, calorie tracking |
+| `port-planner` | Port Planner | v0.27.1 | Archived — metabolic simulation (WP, slots, organs, SVG pipes) |
+| `match3` | Port Planner + Match-3 | v0.28.11 | Match-3 mini-game for food card acquisition |
+| `tower-defense` | Glucose TD | v0.4.1 | Tower defense reimagining (projectiles, organ zones) |
+| `Dariy` | Port Planner | v0.25.1 | Archived — Mood system branch |
 
 **Production deploy** (Vercel): `main` branch → https://level-two-eight.vercel.app/
 
@@ -77,9 +79,9 @@ What counts as "significant":
 
 ---
 
-## Project: Port Planner (branch: `main`)
+## Project: BG Planner (branch: `main`)
 
-**Port Planner** — a metabolic simulation game teaching blood glucose management through a port/ship metaphor. Players drag-and-drop food cards into time slots to plan meals, then watch a glucose simulation with SVG pipe visualizations, and review results with organ degradation tracking.
+**BG Planner** — a blood glucose management game where players drag food cards directly onto a BG graph timeline. Food converts into colored "cubes" (20 mg/dL blocks) arranged in a pyramid shape. The goal is to plan meals within calorie limits while keeping BG levels reasonable.
 
 ### Tech Stack
 - React 19 + TypeScript + Vite
@@ -89,126 +91,167 @@ What counts as "significant":
 ### Game Flow
 
 ```
-Planning → Simulation → Results → (next day) → Planning → ...
-                                  (defeat)   → Restart Level
-                                  (last day) → Victory → Restart
+Single screen: Food Inventory (left) + BG Graph (right)
+→ Drag food card onto graph
+→ Food converts to pyramid of cubes
+→ Track calories vs budget
+→ Click cubes to remove placed food
 ```
 
 ### Key Files
-- `src/version.ts` — version number (v0.24.11)
-- `src/store/gameStore.ts` — global game state (WP system, phase transitions, degradation)
-- `src/core/simulation/SimulationEngine.ts` — simulation engine with pancreas tier logic
-- `src/core/types.ts` — TypeScript type definitions (Ship, BlockedSlotConfig, PlanValidation, etc.)
-- `src/core/utils/levelUtils.ts` — day config resolution (pancreasBoostCharges, blockedSlots)
-- `src/core/rules/types.ts` — rule system types (ignoresDegradation, minBaseTier modifier)
-- `src/core/results/calculateResults.ts` — results: excessBG calculation, degradation pipeline, assessment
-- `src/config/loader.ts` — loads and transforms JSON configs (foods, interventions)
-- `src/config/organRules.json` — organ behavior rules (pancreas tiers, liver thresholds, muscle rates)
-- `src/config/degradationConfig.json` — degradation system configuration
-- `src/components/simulation/` — simulation UI
-  - `PipeSystem.tsx` — SVG pipe overlay with chevron flow indicators
-  - `PipeSystem.css` — pipe styles (wall/fill/chevron, non-scaling-stroke)
-  - `BodyDiagram.tsx` — absolute-positioned organs layout (corner organs, center BG)
-  - `OrganTierCircles.tsx` — unified tier/degradation indicator
-  - `OrganSprite.tsx` — organ icon with tier circles, substrate pulse animation
-  - `BoostButton.tsx` — boost buttons with numeric charge badge
-  - `SimulationPhase.tsx` — simulation orchestrator with hint text
-- `src/components/planning/` — planning phase UI
-  - `PlanningHeader.tsx` — header with BG, ☀️ WP indicator, Fast Insulin, Simulate button, tooltips
-  - `ShipCard.tsx` — draggable ship cards with WP badge (☀️), CSS data-tooltip
-  - `ShipInventory.tsx` — unified inventory (foods + interventions)
-  - `SlotGrid.tsx` — slot grid with blocked slots, exercise effect zones
-  - `Slot.tsx` — individual slot with ⚡ exercise effect indicator
-  - `PlanningPhase.tsx` — planning orchestrator with hint text above day title
-- `src/components/results/` — results phase UI
-  - `ResultsPhase.tsx` — results orchestrator (assessment, victory popup, defeat/restart)
-  - `BGGraph.tsx` — SVG BG history graph with zone coloring
-  - `ExcessBGIndicator.tsx` — excess BG circles/crosses with subtitle
-  - `OrganDegradationDisplay.tsx` — liver/pancreas degradation with icons and markers
-- `src/components/ui/` — shared UI components
-  - `EyeToggle.tsx` — toggle for detailed indicators visibility
-  - `Tooltip.tsx` — universal tooltip component (hover, position, delay)
-- `public/data/` — JSON configs
-  - `foods.json` — food items with glucose, carbs, WP cost
-  - `interventions.json` — intervention cards (exercise, metformin)
-  - `levels/level-01.json` — 3-day level config with per-day WP budgets, blocked slots
-- `docs/organ-parameters.csv` — organ parameters documentation
 
-### Current State (v0.24.11) — WP System, Tooltips, Victory
+#### Core Engine
+- `src/version.ts` — version number (v0.28.0)
+- `src/core/types.ts` — type definitions (Ship, PlacedFood, GameSettings, GRAPH_CONFIG)
+- `src/core/cubeEngine.ts` — pyramid distribution algorithm, graph state calculation
 
-- **Victory Popup (v0.24.10-v0.24.11)** ✅
-  - "Level Passed!" popup after completing all 3 days without defeat
-  - "Restart Level" button on defeat, "Restart" on victory
-  - Animated overlay with scaleIn/fadeIn animations
+#### Graph Component (`src/components/graph/`)
+- `BgGraph.tsx` — SVG-based BG graph with grid, cubes, zones, drag-and-drop target
+- `BgGraph.css` — graph styles
+- `index.ts` — exports
 
-- **Tooltips & Hints (v0.24.4-v0.24.8)** ✅
-  - CSS `data-tooltip` + `::after` on food/intervention cards (133ms delay)
-  - Food tooltips: "Fast · Cost 3☀️ to place" / "Free to place"
-  - Intervention tooltips: show description text
-  - Tooltip wrappers for BG, WP, Fast Insulin indicators in header
-  - Tooltips for carb range + current in segment headers
-  - Simulation: tooltips on organs and Fast Insulin button
-  - Results: tooltips on organ degradation and excess BG markers
-  - Planning hint: "Drag & drop food cards into time slots to plan your meals..."
-  - Simulation hint: "Watch the glucose flow — use Fast Insulin if blood sugar spikes"
+#### Planning Phase (`src/components/planning/`)
+- `PlanningPhase.tsx` — single-screen orchestrator with DnD context
+- `PlanningHeader.tsx` — header with day label, kcal counter, settings toggles
+- `ShipCard.tsx` — draggable food cards with emoji, kcal, duration, WP badge
+- `ShipInventory.tsx` — food card list from level config
 
-- **WP Badge Enhancement (v0.24.4-v0.24.6)** ✅
-  - ☀️ emoji (24px) as WP icon in header
-  - WP badge on cards: font-size 13px with ☀️
-  - BG and WP indicators aligned horizontally
+#### State Management
+- `src/store/gameStore.ts` — Zustand store: placedFoods, settings, kcal tracking
 
-- **Exercise Effect Zones (v0.24.7)** ✅
-  - ⚡ indicators on slots affected by exercise duration
-  - Orange for light exercise (temporary, ~1h), green for intense (permanent, rest of day)
-  - Computed from ship targetContainer and decay rates
+#### Configuration
+- `src/config/loader.ts` — loads and transforms foods.json, level configs
+- `public/data/foods.json` — 24 food items with glucose, carbs, duration, kcal, wpCost
+- `public/data/levels/level-01.json` — 3-day level config with kcalBudget per day
 
-- **WP System** ✅
-  - Willpower budget per day (configurable in level JSON)
-  - wpCost on food cards (shown as ☀️ badge)
-  - WP indicator in header: remaining/total
-  - Day 1: 12 WP budget
+#### Shared UI
+- `src/components/ui/Tooltip.tsx` — universal tooltip component
+- `src/App.tsx` — root app component (single screen, no phase routing)
+- `src/App.css` — app layout styles
 
-- **Level Structure** ✅
-  - 3-day level with per-day configurations
-  - Per-day: WP budget, carb requirements, blocked slots, pre-occupied slots
-  - Blocked slots with narrative text
-  - Pre-occupied slots (cannot be removed)
-  - Win condition: maxDegradationCircles (default 3)
+### Current State (v0.28.0) — Graph-Based Planning
 
-### Simulation System
-- **SVG Pipe System** — animated glucose flow with chevron indicators
-- **Body Diagram** — absolute-positioned organs at corners, center BG pill-shape
-- **Organs**: Liver (slowdown), Muscles (drain), Pancreas (tier control), Kidneys (disabled)
-- **Fast Insulin** — +1 muscle tier boost, ignores degradation limits
-- **Substep simulation** — 10 substeps/hour for smooth updates
-- **Pancreas Tiers**: BG thresholds → tiers 0-4 → muscle drain rates
+- **Single-Screen Design** ✅
+  - No more Planning → Simulation → Results phase transitions
+  - One screen: food inventory + BG graph
+  - Old simulation engine, results system, organs, degradation — all removed
 
-### Results System
-- **Assessment**: Excellent (0 circles), Decent (1), Poor (2-3), Defeat (4-5+)
-- **BG Graph**: SVG with green/orange/red zone coloring
-- **ExcessBG Indicator**: 5 markers (green circles / pink crosses)
-- **Organ Degradation**: Liver + Pancreas with circle markers
-- **Victory**: "Level Passed!" popup on completing all days
-- **Defeat**: "Too much damage!" message with Restart Level button
+- **BG Graph** ✅
+  - SVG graph with X axis (8 AM to 8 PM, 48 columns × 15 min)
+  - Y axis (60 to 400 mg/dL, 17 rows × 20 mg/dL)
+  - Grid lines: major every hour, minor every 15 min
+  - Zone colors: green (60-140), yellow (140-200), orange (200-300), red (300-400)
+  - X axis labels: 8 AM, 11 AM, 2 PM, 5 PM, 8 PM
+  - Y axis labels: 60, 100, 200, 300, 400
+  - Droppable zone for @dnd-kit
 
-### Exercise Interventions
-- **Light Exercise**: size S, exerciseEffect, +1 tier temporary (~1h)
-- **Intense Exercise**: size S, intenseExerciseEffect, +1 tier permanent
-  - `requiresEmptySlotBefore`: slot N-1 must be empty
-- **Exercise (M size)**: size M, exerciseEffect, strong boost
-- Group limit: max 1 exercise per segment
+- **Cube Engine** ✅
+  - Food → cubes: glucose / 20 = number of cubes
+  - Duration → columns: duration / 15 = column count
+  - Pyramid distribution: peak at ~40% of duration (realistic absorption curve)
+  - Stacking: cubes from different foods stack vertically
+  - BG line: red line connecting tops of cube stacks
 
-### Disabled Features
-- **Kidneys**: kidneyRate=0, visuals preserved but always inactive
-- **Liver Boost**: Button hidden in SimulationPhase
-- **Metformin**: Card exists but effect system not implemented
-- **Fiber System**: Code preserved (FiberIndicator.tsx), not rendered
-- **Glucose Particle System**: Superseded by SVG Pipe System
+- **Food Cards** ✅
+  - Display: emoji, name, kcal, duration
+  - WP cost badge preserved (for future use)
+  - Drag from inventory → drop on graph
+  - Click on placed cubes → remove food
+
+- **Calorie System** ✅
+  - Per-day kcalBudget from level config
+  - Header shows used/budget with progress bar
+  - Visual warning when over budget (red)
+
+- **Game Settings** ✅
+  - Time format toggle: 12h ↔ 24h
+  - BG unit toggle: mg/dL ↔ mmol/L
+  - Persisted in localStorage
+
+### Food Data Structure
+```json
+{
+  "id": "banana",
+  "name": "Banana",
+  "emoji": "🍌",
+  "glucose": 200,
+  "carbs": 20,
+  "duration": 60,
+  "kcal": 105,
+  "wpCost": 1,
+  "description": "Natural energy, potassium rich."
+}
+```
+
+### Level Config Structure
+```json
+{
+  "id": "level-01",
+  "name": "First Steps",
+  "days": 3,
+  "dayConfigs": [
+    {
+      "day": 1,
+      "kcalBudget": 2000,
+      "availableFoods": [
+        { "id": "banana", "count": 1 }
+      ]
+    }
+  ]
+}
+```
+
+### Graph Configuration Constants
+| Constant | Value | Location |
+|----------|-------|----------|
+| startHour | 8 (8 AM) | `types.ts` GRAPH_CONFIG |
+| endHour | 20 (8 PM) | `types.ts` GRAPH_CONFIG |
+| cellWidthMin | 15 min | `types.ts` GRAPH_CONFIG |
+| cellHeightMgDl | 20 mg/dL | `types.ts` GRAPH_CONFIG |
+| bgMin | 60 mg/dL | `types.ts` GRAPH_CONFIG |
+| bgMax | 400 mg/dL | `types.ts` GRAPH_CONFIG |
+| TOTAL_COLUMNS | 48 | `types.ts` derived |
+| TOTAL_ROWS | 17 | `types.ts` derived |
+| CELL_SIZE | 18px (SVG) | `BgGraph.tsx` |
+
+### Cube Engine Details
+
+#### Pyramid Algorithm
+1. `totalCubes = glucose / 20`
+2. `columnCount = duration / 15`
+3. Weights generated with peak at 40% of duration
+4. Cubes distributed proportionally, rounded to preserve total
+5. Drop column = left edge (start of food absorption)
+
+#### Food Colors
+Cubes are colored per food type (8-color cycle): blue, red, green, orange, purple, pink, teal, yellow
+
+#### BG Zones
+| Zone | Range | Color |
+|------|-------|-------|
+| Normal | 60-140 mg/dL | Green |
+| Elevated | 140-200 mg/dL | Yellow |
+| High | 200-300 mg/dL | Orange |
+| Danger | 300-400 mg/dL | Red |
+
+### Removed Systems (archived in `port-planner` branch)
+- Simulation engine (SimulationEngine, RuleEngine)
+- Results system (calculateResults, assessment, degradation)
+- Organ system (liver, pancreas, muscles, kidneys)
+- Pipe system (SVG flow visualization)
+- Slot grid (time slot placement)
+- WP budget system (spend/refund)
+- BG sparkline (replaced by main graph)
+- Phase transitions (Planning/Simulation/Results)
+- Degradation circles
+- Exercise interventions (to be redesigned)
+- Metformin, fiber system
 
 ### Known Issues
-- Effect Containers: No threshold-based activation
-- Metformin: Card exists but full effect system not implemented
-- GlucoseParticleSystem files still in codebase (unused)
+- Preview during drag doesn't show ghost cubes yet (pointer tracking needs refinement)
+- Win/loss conditions not yet implemented (to be discussed)
+- Interventions not yet redesigned for graph-based system
+- No multi-day progression (day navigation UI not yet built)
 
 ---
 

@@ -1,32 +1,16 @@
-import type { Ship, LevelConfig, ShipSize, LoadType, AvailableFood } from '../core/types';
+import type { Ship, LevelConfig, LoadType, AvailableFood } from '../core/types';
 
 // Raw JSON types (before transformation)
 interface RawFoodConfig {
   id: string;
   name: string;
-  image?: string;
   emoji?: string;
-  size: ShipSize;
   glucose: number;
-  carbs: number; // Carbohydrates in grams (for UI display)
-  description?: string;
-  wpCost?: number; // Willpower cost (0-9)
-  fiber?: boolean;
-  tags?: string[];
-}
-
-interface RawInterventionConfig {
-  id: string;
-  name: string;
-  image?: string;
-  emoji?: string;
-  size: ShipSize;
-  load: number;
-  targetContainer: string;
+  carbs: number;
+  duration: number;
+  kcal: number;
   description?: string;
   wpCost?: number;
-  group?: string;
-  requiresEmptySlotBefore?: boolean;
 }
 
 interface RawLevelConfig {
@@ -34,40 +18,14 @@ interface RawLevelConfig {
   name: string;
   description?: string;
   days: number;
-  initialBG?: number;
-  availableFoods?: AvailableFood[] | string[]; // Optional: can be in dayConfigs instead
-  availableInterventions?: AvailableFood[] | string[]; // Legacy: level-wide
-  preOccupiedSlots?: { slot: number; shipId: string }[];
-  carbRequirements?: { // Optional: can be in dayConfigs instead
-    min: number;
-    max: number;
-  };
-  dayConfigs?: Array<{ // Day-specific configurations
+  kcalBudget?: number;
+  availableFoods?: AvailableFood[] | string[];
+  dayConfigs?: Array<{
     day: number;
+    kcalBudget: number;
     availableFoods: AvailableFood[] | string[];
     availableInterventions?: AvailableFood[] | string[];
-    preOccupiedSlots?: { slot: number; shipId: string }[];
-    blockedSlots?: number[];
-    wpBudget?: number;
-    carbRequirements?: { min: number; max: number };
-    segmentCarbs?: {
-      Morning?: { min: number; optimal: number; max: number };
-      Day?: { min: number; optimal: number; max: number };
-      Evening?: { min: number; optimal: number; max: number };
-    };
-    pancreasBoostCharges?: number;
   }>;
-  initialDegradation?: {
-    liver: number;
-    pancreas: number;
-  };
-  interventionCharges: {
-    liverBoost: number;
-    pancreasBoost: number;
-  };
-  winCondition: {
-    maxDegradationCircles?: number;
-  };
 }
 
 // Transform raw food config to Ship
@@ -76,57 +34,26 @@ function transformFood(raw: RawFoodConfig): Ship {
     id: raw.id,
     name: raw.name,
     emoji: raw.emoji || '🍽️',
-    size: raw.size,
     load: raw.glucose,
     carbs: raw.carbs,
+    duration: raw.duration,
+    kcal: raw.kcal,
     loadType: 'Glucose' as LoadType,
-    targetContainer: 'liver',
+    targetContainer: 'bg',
     description: raw.description,
     wpCost: raw.wpCost ?? 0,
-    fiber: raw.fiber,
-    tags: raw.tags,
-  };
-}
-
-// Transform raw intervention config to Ship
-function transformIntervention(raw: RawInterventionConfig): Ship {
-  return {
-    id: raw.id,
-    name: raw.name,
-    emoji: raw.emoji || '💊',
-    size: raw.size,
-    load: raw.load,
-    loadType: 'Treatment' as LoadType,
-    targetContainer: raw.targetContainer as 'metforminEffect' | 'exerciseEffect' | 'intenseExerciseEffect',
-    description: raw.description,
-    wpCost: raw.wpCost ?? 0,
-    group: raw.group,
-    requiresEmptySlotBefore: raw.requiresEmptySlotBefore,
   };
 }
 
 // Normalize availableFoods to always be AvailableFood[]
-function normalizeAvailableFoods(foods?: AvailableFood[] | string[]): AvailableFood[] | undefined {
-  if (!foods || foods.length === 0) return foods as undefined;
+function normalizeAvailableFoods(foods?: AvailableFood[] | string[]): AvailableFood[] {
+  if (!foods || foods.length === 0) return [];
 
-  // Check if it's already in the new format
   if (typeof foods[0] === 'object') {
     return foods as AvailableFood[];
   }
 
-  // Convert old string[] format to new format (unlimited count = 99)
   return (foods as string[]).map(id => ({ id, count: 99 }));
-}
-
-// Normalize availableInterventions to always be AvailableFood[]
-function normalizeAvailableInterventions(interventions?: AvailableFood[] | string[]): AvailableFood[] {
-  if (!interventions || interventions.length === 0) return [];
-
-  if (typeof interventions[0] === 'object') {
-    return interventions as AvailableFood[];
-  }
-
-  return (interventions as string[]).map(id => ({ id, count: 99 }));
 }
 
 // Transform raw level config
@@ -136,40 +63,21 @@ function transformLevel(raw: RawLevelConfig): LevelConfig {
     name: raw.name,
     description: raw.description,
     days: raw.days,
-    initialBG: raw.initialBG ?? 100,
-    preOccupiedSlots: raw.preOccupiedSlots ?? [],
-    initialDegradation: raw.initialDegradation ?? { liver: 0, pancreas: 0 },
-    interventionCharges: raw.interventionCharges,
-    winCondition: raw.winCondition,
+    kcalBudget: raw.kcalBudget,
   };
 
-  // Handle legacy level-wide availableInterventions
-  if (raw.availableInterventions) {
-    transformed.availableInterventions = normalizeAvailableInterventions(raw.availableInterventions);
-  }
-
-  // Handle legacy availableFoods (optional now if dayConfigs exists)
   if (raw.availableFoods) {
     transformed.availableFoods = normalizeAvailableFoods(raw.availableFoods);
   }
 
-  // Handle legacy carbRequirements (optional now if dayConfigs exists)
-  if (raw.carbRequirements) {
-    transformed.carbRequirements = raw.carbRequirements;
-  }
-
-  // Normalize dayConfigs if present
   if (raw.dayConfigs) {
     transformed.dayConfigs = raw.dayConfigs.map((dc) => ({
       day: dc.day,
-      availableFoods: normalizeAvailableFoods(dc.availableFoods) || [],
-      availableInterventions: normalizeAvailableInterventions(dc.availableInterventions),
-      preOccupiedSlots: dc.preOccupiedSlots ?? [],
-      blockedSlots: dc.blockedSlots ?? [],
-      wpBudget: dc.wpBudget,
-      carbRequirements: dc.carbRequirements,
-      segmentCarbs: dc.segmentCarbs,
-      pancreasBoostCharges: dc.pancreasBoostCharges,
+      kcalBudget: dc.kcalBudget,
+      availableFoods: normalizeAvailableFoods(dc.availableFoods),
+      availableInterventions: dc.availableInterventions
+        ? normalizeAvailableFoods(dc.availableInterventions)
+        : undefined,
     }));
   }
 
@@ -178,7 +86,6 @@ function transformLevel(raw: RawLevelConfig): LevelConfig {
 
 // Cache for loaded configs
 let foodsCache: Ship[] | null = null;
-let interventionsCache: Ship[] | null = null;
 
 export async function loadFoods(): Promise<Ship[]> {
   if (foodsCache) return foodsCache;
@@ -190,28 +97,10 @@ export async function loadFoods(): Promise<Ship[]> {
   return ships;
 }
 
-export async function loadInterventions(): Promise<Ship[]> {
-  if (interventionsCache) return interventionsCache;
-
-  const response = await fetch('/data/interventions.json', { cache: 'no-store' });
-  const data = await response.json();
-  const ships = data.interventions.map(transformIntervention);
-  interventionsCache = ships;
-  return ships;
-}
-
 export async function loadLevel(levelId: string): Promise<LevelConfig> {
   const response = await fetch(`/data/levels/${levelId}.json`, { cache: 'no-store' });
   const data = await response.json();
   return transformLevel(data);
-}
-
-export async function loadAllShips(): Promise<Ship[]> {
-  const [foods, interventions] = await Promise.all([
-    loadFoods(),
-    loadInterventions(),
-  ]);
-  return [...foods, ...interventions];
 }
 
 // Get ship by ID from cache
@@ -222,5 +111,4 @@ export function getShipById(ships: Ship[], id: string): Ship | undefined {
 // Clear cache (useful for testing)
 export function clearConfigCache(): void {
   foodsCache = null;
-  interventionsCache = null;
 }
