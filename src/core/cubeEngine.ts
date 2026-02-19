@@ -14,58 +14,44 @@ export interface FoodPyramid {
 }
 
 /**
- * Calculate pyramid distribution of cubes for a food item.
- * Cubes are distributed in a bell/pyramid shape across the duration columns.
- * Peak is slightly left-of-center (food absorption peaks early).
+ * Calculate glucose curve for a food item.
+ *
+ * Shape: linear ramp-up during `duration`, then flat plateau to the right edge.
+ *
+ *   peakCubes = glucose / 20
+ *   riseCols  = duration / 15
+ *
+ *   During rise (col 0..riseCols-1): height = peakCubes * (col+1) / riseCols
+ *   Plateau (col riseCols..end):      height = peakCubes
+ *
+ * The returned columns extend from dropColumn to TOTAL_COLUMNS.
  */
-export function calculatePyramid(glucose: number, durationMinutes: number): CubeColumn[] {
-  const totalCubes = Math.round(glucose / GRAPH_CONFIG.cellHeightMgDl);
-  const columnCount = Math.max(1, Math.round(durationMinutes / GRAPH_CONFIG.cellWidthMin));
+export function calculateCurve(
+  glucose: number,
+  durationMinutes: number,
+  dropColumn: number
+): CubeColumn[] {
+  const peakCubes = Math.round(glucose / GRAPH_CONFIG.cellHeightMgDl);
+  const riseCols = Math.max(1, Math.round(durationMinutes / GRAPH_CONFIG.cellWidthMin));
 
-  if (totalCubes <= 0) return [];
-  if (columnCount === 1) return [{ columnOffset: 0, cubeCount: totalCubes }];
+  if (peakCubes <= 0) return [];
 
-  // Generate triangular/pyramid weights
-  // Peak at ~40% of duration (slightly early, like real glucose absorption)
-  const peakPosition = (columnCount - 1) * 0.4;
-  const weights: number[] = [];
-
-  for (let i = 0; i < columnCount; i++) {
-    const distance = Math.abs(i - peakPosition);
-    const maxDistance = Math.max(peakPosition, columnCount - 1 - peakPosition);
-    const weight = Math.max(0.1, 1 - distance / (maxDistance + 0.5));
-    weights.push(weight);
-  }
-
-  // Normalize weights and distribute cubes
-  const totalWeight = weights.reduce((sum, w) => sum + w, 0);
-  const rawCubes = weights.map(w => (w / totalWeight) * totalCubes);
-
-  // Round while preserving total
   const result: CubeColumn[] = [];
-  let distributed = 0;
+  const totalCols = TOTAL_COLUMNS - dropColumn;
 
-  for (let i = 0; i < columnCount; i++) {
-    let cubes: number;
-    if (i === columnCount - 1) {
-      // Last column gets remainder
-      cubes = totalCubes - distributed;
+  for (let i = 0; i < totalCols; i++) {
+    let height: number;
+    if (i < riseCols) {
+      // Ramp-up phase: linear rise from 1 to peakCubes
+      height = Math.round(peakCubes * (i + 1) / riseCols);
     } else {
-      cubes = Math.round(rawCubes[i]);
+      // Plateau phase: flat at peak
+      height = peakCubes;
     }
-    cubes = Math.max(0, cubes);
-    distributed += cubes;
 
-    if (cubes > 0) {
-      result.push({ columnOffset: i, cubeCount: cubes });
+    if (height > 0) {
+      result.push({ columnOffset: i, cubeCount: height });
     }
-  }
-
-  // Safety: if rounding errors caused mismatch, adjust the peak column
-  if (distributed !== totalCubes && result.length > 0) {
-    const peakIdx = result.reduce((maxIdx, col, idx) =>
-      col.cubeCount > result[maxIdx].cubeCount ? idx : maxIdx, 0);
-    result[peakIdx].cubeCount += (totalCubes - distributed);
   }
 
   return result;
@@ -86,8 +72,8 @@ export function calculateGraphState(
     const ship = allShips.find(s => s.id === placed.shipId);
     if (!ship) continue;
 
-    const pyramid = calculatePyramid(ship.load, ship.duration);
-    for (const col of pyramid) {
+    const curve = calculateCurve(ship.load, ship.duration, placed.dropColumn);
+    for (const col of curve) {
       const graphColumn = placed.dropColumn + col.columnOffset;
       if (graphColumn >= 0 && graphColumn < TOTAL_COLUMNS) {
         bgValues[graphColumn] += col.cubeCount * GRAPH_CONFIG.cellHeightMgDl;
@@ -99,7 +85,7 @@ export function calculateGraphState(
 }
 
 /**
- * Build detailed pyramid data for each placed food (for rendering).
+ * Build detailed curve data for each placed food (for rendering).
  */
 export function buildFoodPyramids(
   placedFoods: PlacedFood[],
@@ -107,7 +93,7 @@ export function buildFoodPyramids(
 ): FoodPyramid[] {
   return placedFoods.map(placed => {
     const ship = allShips.find(s => s.id === placed.shipId);
-    const columns = ship ? calculatePyramid(ship.load, ship.duration) : [];
+    const columns = ship ? calculateCurve(ship.load, ship.duration, placed.dropColumn) : [];
     return {
       placementId: placed.id,
       shipId: placed.shipId,

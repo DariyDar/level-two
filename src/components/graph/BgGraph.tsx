@@ -10,7 +10,7 @@ import {
   columnToTimeString,
   formatBgValue,
 } from '../../core/types';
-import { calculatePyramid, calculateGraphState } from '../../core/cubeEngine';
+import { calculateCurve, calculateGraphState } from '../../core/cubeEngine';
 import './BgGraph.css';
 
 // SVG layout constants
@@ -112,10 +112,10 @@ export function BgGraph({
       }
       const colorIdx = colorMap.get(placed.shipId)! % FOOD_COLORS.length;
 
-      const pyramid = calculatePyramid(ship.load, ship.duration);
+      const curve = calculateCurve(ship.load, ship.duration, placed.dropColumn);
       const cols: Array<{ col: number; baseRow: number; count: number }> = [];
 
-      for (const pc of pyramid) {
+      for (const pc of curve) {
         const graphCol = placed.dropColumn + pc.columnOffset;
         if (graphCol >= 0 && graphCol < TOTAL_COLUMNS) {
           const baseRow = columnHeights[graphCol];
@@ -136,16 +136,16 @@ export function BgGraph({
     return data;
   }, [placedFoods, allShips]);
 
-  // Preview pyramid (shown during drag hover)
+  // Preview curve (shown during drag hover)
   const previewCubes = useMemo(() => {
     if (!previewShip || previewColumn == null) return null;
-    const pyramid = calculatePyramid(previewShip.load, previewShip.duration);
+    const curve = calculateCurve(previewShip.load, previewShip.duration, previewColumn);
     // Calculate base heights at each column (existing cubes)
     const baseHeights = new Array(TOTAL_COLUMNS).fill(0);
     for (const val of bgValues.entries()) {
       baseHeights[val[0]] = val[1] / GRAPH_CONFIG.cellHeightMgDl;
     }
-    return pyramid.map(pc => {
+    return curve.map((pc: { columnOffset: number; cubeCount: number }) => {
       const graphCol = previewColumn + pc.columnOffset;
       if (graphCol < 0 || graphCol >= TOTAL_COLUMNS) return null;
       return {
