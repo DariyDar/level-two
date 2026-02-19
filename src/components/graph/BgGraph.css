@@ -45,7 +45,7 @@
     opacity: 0.3;
   }
   100% {
-    opacity: 0.15;
+    opacity: 0.05;
   }
 }
 
@@ -68,7 +68,7 @@
 }
 
 .bg-graph__cube--burned:hover {
-  opacity: 0.3 !important;
+  opacity: 0.2 !important;
 }
 
 .bg-graph__cube--preview {
