@@ -11,6 +11,7 @@ interface PlanningHeaderProps {
   settings: GameSettings;
   onToggleTimeFormat: () => void;
   onToggleBgUnit: () => void;
+  onToggleDecay: () => void;
 }
 
 export function PlanningHeader({
@@ -22,6 +23,7 @@ export function PlanningHeader({
   settings,
   onToggleTimeFormat,
   onToggleBgUnit,
+  onToggleDecay,
 }: PlanningHeaderProps) {
   const assessment = getKcalAssessment(kcalUsed, kcalBudget);
   const wpOver = wpUsed > wpBudget;
@@ -64,6 +66,13 @@ export function PlanningHeader({
           title="Toggle BG unit"
         >
           {settings.bgUnit}
+        </button>
+        <button
+          className={`planning-header__toggle ${settings.decayEnabled ? 'planning-header__toggle--active' : ''}`}
+          onClick={onToggleDecay}
+          title="Toggle glucose decay (restarts game)"
+        >
+          {settings.decayEnabled ? 'Decay ON' : 'Decay OFF'}
         </button>
       </div>
     </div>

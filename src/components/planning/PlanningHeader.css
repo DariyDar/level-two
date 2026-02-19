@@ -100,3 +100,9 @@
   border-color: #63b3ed;
   color: #e2e8f0;
 }
+
+.planning-header__toggle--active {
+  background: #2b6cb0;
+  border-color: #63b3ed;
+  color: #e2e8f0;
+}

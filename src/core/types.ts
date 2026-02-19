@@ -33,11 +33,13 @@ export const DEFAULT_Y_TICKS = [60, 100, 200, 300, 400]; // mg/dL
 export interface GameSettings {
   timeFormat: '12h' | '24h';
   bgUnit: 'mg/dL' | 'mmol/L';
+  decayEnabled: boolean;
 }
 
 export const DEFAULT_SETTINGS: GameSettings = {
   timeFormat: '12h',
   bgUnit: 'mg/dL',
+  decayEnabled: true,
 };
 
 // mg/dL to mmol/L conversion factor

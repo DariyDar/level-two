@@ -22,6 +22,7 @@ export function PlanningPhase() {
     placedFoods,
     placeFood,
     removeFood,
+    clearFoods,
     currentLevel,
     currentDay,
     setLevel,
@@ -171,6 +172,11 @@ export function PlanningPhase() {
     });
   }, [settings.bgUnit, updateSettings]);
 
+  const handleToggleDecay = useCallback(() => {
+    updateSettings({ decayEnabled: !settings.decayEnabled });
+    clearFoods();
+  }, [settings.decayEnabled, updateSettings, clearFoods]);
+
   if (isLoading || !currentLevel) {
     return (
       <div className="planning-phase planning-phase--loading">
@@ -196,6 +202,7 @@ export function PlanningPhase() {
           settings={settings}
           onToggleTimeFormat={handleToggleTimeFormat}
           onToggleBgUnit={handleToggleBgUnit}
+          onToggleDecay={handleToggleDecay}
         />
 
         <div className="planning-phase__hint">

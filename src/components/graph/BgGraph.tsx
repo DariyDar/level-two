@@ -82,10 +82,12 @@ export function BgGraph({
     id: 'bg-graph',
   });
 
+  const { decayEnabled } = settings;
+
   // Calculate graph state (BG at each column)
   const bgValues = useMemo(
-    () => calculateGraphState(placedFoods, allShips),
-    [placedFoods, allShips]
+    () => calculateGraphState(placedFoods, allShips, decayEnabled),
+    [placedFoods, allShips, decayEnabled]
   );
 
   // Build per-food cube data for coloring
@@ -112,7 +114,7 @@ export function BgGraph({
       }
       const colorIdx = colorMap.get(placed.shipId)! % FOOD_COLORS.length;
 
-      const curve = calculateCurve(ship.load, ship.duration, placed.dropColumn);
+      const curve = calculateCurve(ship.load, ship.duration, placed.dropColumn, decayEnabled);
       const cols: Array<{ col: number; baseRow: number; count: number }> = [];
 
       for (const pc of curve) {
@@ -134,12 +136,12 @@ export function BgGraph({
     }
 
     return data;
-  }, [placedFoods, allShips]);
+  }, [placedFoods, allShips, decayEnabled]);
 
   // Preview curve (shown during drag hover)
   const previewCubes = useMemo(() => {
     if (!previewShip || previewColumn == null) return null;
-    const curve = calculateCurve(previewShip.load, previewShip.duration, previewColumn);
+    const curve = calculateCurve(previewShip.load, previewShip.duration, previewColumn, decayEnabled);
     // Calculate base heights at each column (existing cubes)
     const baseHeights = new Array(TOTAL_COLUMNS).fill(0);
     for (const val of bgValues.entries()) {
