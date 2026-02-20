@@ -342,12 +342,13 @@ export function BgGraph({
     [onFoodClick, onInterventionClick, interactive]
   );
 
-  // Food markers: one marker per placed food at its peak column, positioned above its own skyline
+  // Food markers: one marker per placed food at its peak column, touching its own skyline
   const markerData = useMemo(() => {
     return placedFoods.map(placed => {
       const ship = allShips.find(s => s.id === placed.shipId);
       if (!ship) return null;
       const { glucose, duration } = applyMedicationToFood(ship.load, ship.duration, medicationModifiers);
+      // Use decayed curve to find the peak column
       const curve = calculateCurve(glucose, duration, placed.dropColumn, decayRate);
       let maxCount = 0;
       let peakOffset = 0;
@@ -358,15 +359,19 @@ export function BgGraph({
         }
       }
       const peakCol = Math.min(placed.dropColumn + peakOffset, TOTAL_COLUMNS - 1);
+      // Get skyline height from plateau data (baseRow + count) to match rendered cubes
+      const foodEntry = foodCubeData.find(f => f.placementId === placed.id);
+      const peakColEntry = foodEntry?.columns.find(c => c.col === peakCol);
+      const skylineH = peakColEntry ? peakColEntry.baseRow + peakColEntry.count : maxCount;
       return {
         placementId: placed.id,
         shipId: placed.shipId,
         emoji: ship.emoji,
         peakCol,
-        ownPeakH: maxCount, // this food's own peak height (not combined stack)
+        skylineH,
       };
     }).filter((d): d is NonNullable<typeof d> => d !== null);
-  }, [placedFoods, allShips, medicationModifiers, decayRate]);
+  }, [placedFoods, allShips, medicationModifiers, decayRate, foodCubeData]);
 
   // Food marker pointer drag handlers
   const handleMarkerPointerDown = useCallback((e: React.PointerEvent<SVGGElement>, placementId: string) => {
@@ -599,16 +604,27 @@ export function BgGraph({
 
         {/* Per-food skyline outlines — thin white lines separating stacked foods */}
         {foodSkylinePaths.map(fp => (
-          <path
-            key={`food-sky-${fp.id}`}
-            d={fp.d}
-            fill="none"
-            stroke="white"
-            strokeWidth={2}
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            pointerEvents="none"
-          />
+          <g key={`food-sky-${fp.id}`} pointerEvents="none">
+            {/* Shadow */}
+            <path
+              d={fp.d}
+              fill="none"
+              stroke="rgba(0,0,0,0.15)"
+              strokeWidth={4}
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              transform="translate(0, 1.5)"
+            />
+            {/* White outline */}
+            <path
+              d={fp.d}
+              fill="none"
+              stroke="white"
+              strokeWidth={2}
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+          </g>
         ))}
 
         {/* BG skyline — single path with rounded corners + shadow line below */}
@@ -643,7 +659,7 @@ export function BgGraph({
         {/* Food markers — emoji labels above each food's own peak */}
         {interactive && markerData.map(b => {
           const cx = colToX(b.peakCol) + CELL_SIZE / 2;
-          const tailBottomY = PAD_TOP + GRAPH_H - b.ownPeakH * CELL_SIZE;
+          const tailBottomY = PAD_TOP + GRAPH_H - b.skylineH * CELL_SIZE;
           const tailH = 11;
           const tailTopY = tailBottomY - tailH;
           const mW = 50;
