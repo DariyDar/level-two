@@ -41,6 +41,9 @@ interface GameState {
   pancreasTierPerDay: Record<number, PancreasTier>;
   lockedBarsPerDay: Record<number, number>;
 
+  // WP carry-over tracking
+  submittedWpPerDay: Record<number, { wpUsed: number; effectiveWpBudget: number }>;
+
   // Settings
   settings: GameSettings;
 
@@ -59,6 +62,7 @@ interface GameState {
   setPancreasTier: (day: number, tier: PancreasTier) => void;
   lockPancreasBars: () => void;
   unlockPancreasBars: (day: number) => void;
+  submitDayWp: (day: number, wpUsed: number, effectiveWpBudget: number) => void;
 }
 
 export const useGameStore = create<GameState>()(
@@ -72,6 +76,7 @@ export const useGameStore = create<GameState>()(
       activeMedications: [],
       pancreasTierPerDay: {},
       lockedBarsPerDay: {},
+      submittedWpPerDay: {},
       settings: DEFAULT_SETTINGS,
 
       // Actions
@@ -84,6 +89,7 @@ export const useGameStore = create<GameState>()(
           activeMedications: [],
           pancreasTierPerDay: {},
           lockedBarsPerDay: {},
+          submittedWpPerDay: {},
         }),
 
       placeFood: (shipId, dropColumn) =>
@@ -145,6 +151,7 @@ export const useGameStore = create<GameState>()(
           activeMedications: [],
           pancreasTierPerDay: {},
           lockedBarsPerDay: {},
+          submittedWpPerDay: {},
         }),
 
       updateSettings: (newSettings) =>
@@ -174,15 +181,24 @@ export const useGameStore = create<GameState>()(
           delete next[day];
           return { lockedBarsPerDay: next };
         }),
+
+      submitDayWp: (day, wpUsed, effectiveWpBudget) =>
+        set((state) => ({
+          submittedWpPerDay: {
+            ...state.submittedWpPerDay,
+            [day]: { wpUsed, effectiveWpBudget },
+          },
+        })),
     }),
     {
       name: 'bg-graph-save',
-      version: 6,
+      version: 7,
       partialize: (state) => ({
         currentDay: state.currentDay,
         settings: state.settings,
         pancreasTierPerDay: state.pancreasTierPerDay,
         lockedBarsPerDay: state.lockedBarsPerDay,
+        submittedWpPerDay: state.submittedWpPerDay,
       }),
     }
   )
@@ -218,4 +234,15 @@ export function selectWpUsed(
     if (intervention) total += intervention.wpCost;
   }
   return total;
+}
+
+// Selector: compute WP penalty from previous day's unspent WP
+export function selectWpPenalty(
+  currentDay: number,
+  submittedWpPerDay: Record<number, { wpUsed: number; effectiveWpBudget: number }>,
+): number {
+  if (currentDay <= 1) return 0;
+  const prev = submittedWpPerDay[currentDay - 1];
+  if (!prev) return 0;
+  return Math.max(0, prev.effectiveWpBudget - prev.wpUsed);
 }

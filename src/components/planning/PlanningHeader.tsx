@@ -8,6 +8,7 @@ interface PlanningHeaderProps {
   kcalBudget: number;
   wpUsed: number;
   wpBudget: number;
+  wpPenalty?: number;
   settings: GameSettings;
   medicationModifiers?: MedicationModifiers;
   submitEnabled: boolean;
@@ -22,6 +23,7 @@ export function PlanningHeader({
   kcalBudget,
   wpUsed,
   wpBudget,
+  wpPenalty = 0,
   settings,
   medicationModifiers = DEFAULT_MEDICATION_MODIFIERS,
   submitEnabled,
@@ -30,23 +32,36 @@ export function PlanningHeader({
   onToggleBgUnit,
 }: PlanningHeaderProps) {
   const effectiveKcalBudget = Math.round(kcalBudget * medicationModifiers.kcalMultiplier);
-  const effectiveWpBudget = wpBudget + medicationModifiers.wpBonus;
+  const rawWpBudget = wpBudget + medicationModifiers.wpBonus;
+  const wpFloor = Math.ceil(wpBudget * 0.5);
+  const effectiveWpBudget = Math.max(rawWpBudget - wpPenalty, wpFloor);
   const assessment = getKcalAssessment(kcalUsed, effectiveKcalBudget);
   const wpOver = wpUsed > effectiveWpBudget;
+  const wpPerfect = wpUsed === effectiveWpBudget && wpUsed > 0;
   const hasKcalMod = medicationModifiers.kcalMultiplier !== 1;
   const hasWpMod = medicationModifiers.wpBonus !== 0;
+  const hasPenalty = wpPenalty > 0;
 
   return (
     <div className="planning-header">
       <div className="planning-header__day">{dayLabel}</div>
 
-      <div className="planning-header__wp">
+      <div className="planning-header__wp" data-tooltip={
+        hasPenalty
+          ? `${wpPenalty} unspent WP from previous day`
+          : undefined
+      }>
         <span className="planning-header__wp-label">WP</span>
         <span className={`planning-header__wp-value ${wpOver ? 'planning-header__wp-value--over' : ''}`}>
-          {wpUsed}/{effectiveWpBudget}
+          {wpUsed}/
+          {hasPenalty && (
+            <span className="planning-header__wp-strikethrough">{rawWpBudget}</span>
+          )}
+          {hasPenalty ? ' ' : ''}{effectiveWpBudget}
           {hasWpMod && <span className="planning-header__wp-bonus"> (+{medicationModifiers.wpBonus})</span>}
         </span>
         <span className="planning-header__wp-icon">{'\u2600\uFE0F'}</span>
+        {wpPerfect && <span className="planning-header__wp-perfect">{'\u2713'}</span>}
       </div>
 
       <div className="planning-header__kcal">

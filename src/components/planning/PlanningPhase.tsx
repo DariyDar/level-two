@@ -9,10 +9,10 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import type { Ship, Intervention, Medication, GamePhase, PenaltyResult, PancreasTier } from '../../core/types';
-import { useGameStore, getDayConfig, selectKcalUsed, selectWpUsed } from '../../store/gameStore';
+import { useGameStore, getDayConfig, selectKcalUsed, selectWpUsed, selectWpPenalty } from '../../store/gameStore';
 import { loadFoods, loadLevel, loadInterventions, loadMedications } from '../../config/loader';
 import { computeMedicationModifiers, calculatePenaltyFromState } from '../../core/cubeEngine';
-import { DEFAULT_MEDICATION_MODIFIERS, getKcalAssessment, PANCREAS_TIERS, PANCREAS_TOTAL_BARS } from '../../core/types';
+import { DEFAULT_MEDICATION_MODIFIERS, getKcalAssessment, PANCREAS_TIERS, PANCREAS_TOTAL_BARS, WP_PENALTY_WEIGHT, calculateStars } from '../../core/types';
 import { BgGraph, pointerToColumn } from '../graph';
 import { PlanningHeader } from './PlanningHeader';
 import { ShipInventory } from './ShipInventory';
@@ -66,6 +66,8 @@ export function PlanningPhase() {
     setPancreasTier,
     lockPancreasBars,
     unlockPancreasBars,
+    submittedWpPerDay,
+    submitDayWp,
   } = useGameStore();
 
   const [allShips, setAllShips] = useState<Ship[]>([]);
@@ -137,7 +139,10 @@ export function PlanningPhase() {
 
   const kcalBudget = dayConfig?.kcalBudget ?? 2000;
   const wpBudget = dayConfig?.wpBudget ?? 16;
-  const effectiveWpBudget = wpBudget + medicationModifiers.wpBonus;
+  const wpPenalty = selectWpPenalty(currentDay, submittedWpPerDay);
+  const rawWpBudget = wpBudget + medicationModifiers.wpBonus;
+  const wpFloor = Math.ceil(wpBudget * 0.5);
+  const effectiveWpBudget = Math.max(rawWpBudget - wpPenalty, wpFloor);
   const wpRemaining = effectiveWpBudget - wpUsed;
 
   // Pancreas tier system
@@ -277,6 +282,9 @@ export function PlanningPhase() {
     // Lock pancreas bars for this day
     lockPancreasBars();
 
+    // Save WP state for carry-over penalty
+    submitDayWp(currentDay, wpUsed, effectiveWpBudget);
+
     // Save current placements for replay
     replayDataRef.current = {
       foods: placedFoods.map(f => ({ shipId: f.shipId, dropColumn: f.dropColumn })),
@@ -289,7 +297,7 @@ export function PlanningPhase() {
     clearFoods();
     setGamePhase('replaying');
     setPenaltyResult(null);
-  }, [submitEnabled, placedFoods, placedInterventions, activeMedications, clearFoods, lockPancreasBars, currentDecayRate]);
+  }, [submitEnabled, placedFoods, placedInterventions, activeMedications, clearFoods, lockPancreasBars, currentDecayRate, submitDayWp, currentDay, wpUsed, effectiveWpBudget]);
 
   // === Replay animation effect ===
   useEffect(() => {
@@ -330,6 +338,22 @@ export function PlanningPhase() {
             medicationModifiers,
             replayDecayRate,
           );
+
+          // Last day: add WP penalty for unspent WP
+          const isLastDay = currentLevel && currentDay >= currentLevel.days;
+          if (isLastDay) {
+            const submittedWp = state.submittedWpPerDay[currentDay];
+            if (submittedWp) {
+              const unspent = submittedWp.effectiveWpBudget - submittedWp.wpUsed;
+              if (unspent > 0) {
+                const wpPenaltyPoints = unspent * WP_PENALTY_WEIGHT;
+                penalty.totalPenalty = Math.round((penalty.totalPenalty + wpPenaltyPoints) * 10) / 10;
+                const { stars, label } = calculateStars(penalty.totalPenalty);
+                penalty.stars = stars;
+                penalty.label = label;
+              }
+            }
+          }
 
           setPenaltyResult(penalty);
           setGamePhase('results');
@@ -408,6 +432,7 @@ export function PlanningPhase() {
           kcalBudget={kcalBudget}
           wpUsed={wpUsed}
           wpBudget={wpBudget}
+          wpPenalty={wpPenalty}
           settings={settings}
           medicationModifiers={medicationModifiers}
           submitEnabled={submitEnabled}
@@ -483,6 +508,7 @@ export function PlanningPhase() {
               result={penaltyResult}
               currentDay={currentDay}
               totalDays={currentLevel.days}
+              unspentWp={effectiveWpBudget - wpUsed}
               onRetry={handleRetry}
               onNextDay={handleNextDay}
             />

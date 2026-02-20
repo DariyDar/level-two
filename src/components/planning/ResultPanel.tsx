@@ -1,10 +1,12 @@
 import type { PenaltyResult } from '../../core/types';
+import { WP_PENALTY_WEIGHT } from '../../core/types';
 import './ResultPanel.css';
 
 interface ResultPanelProps {
   result: PenaltyResult;
   currentDay: number;
   totalDays: number;
+  unspentWp?: number;
   onRetry: () => void;
   onNextDay: () => void;
 }
@@ -24,10 +26,11 @@ function StarDisplay({ count }: { count: number }) {
   );
 }
 
-export function ResultPanel({ result, currentDay, totalDays, onRetry, onNextDay }: ResultPanelProps) {
+export function ResultPanel({ result, currentDay, totalDays, unspentWp = 0, onRetry, onNextDay }: ResultPanelProps) {
   const isDefeat = result.stars === 0;
   const isPerfect = result.stars === 3;
   const isLastDay = currentDay >= totalDays;
+  const hasUnspentWp = unspentWp > 0;
 
   return (
     <div className={`result-panel result-panel--${result.label.toLowerCase()}`}>
@@ -57,6 +60,26 @@ export function ResultPanel({ result, currentDay, totalDays, onRetry, onNextDay 
           </span>
         )}
       </div>
+
+      {hasUnspentWp && (
+        <div className="result-panel__wp-warning">
+          {isLastDay ? (
+            <span className="result-panel__wp-warning-text">
+              {unspentWp} unspent WP {'\u2192'} +{unspentWp * WP_PENALTY_WEIGHT} penalty
+            </span>
+          ) : (
+            <span className="result-panel__wp-warning-text">
+              {unspentWp} unspent WP {'\u2192'} Day {currentDay + 1}: {'\u2212'}{unspentWp} WP
+            </span>
+          )}
+        </div>
+      )}
+
+      {!hasUnspentWp && (
+        <div className="result-panel__wp-perfect">
+          All WP spent {'\u2014'} Discipline!
+        </div>
+      )}
 
       <div className="result-panel__actions">
         {!isPerfect && (

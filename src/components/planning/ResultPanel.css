@@ -125,6 +125,30 @@
   border: 1px solid rgba(72, 187, 120, 0.4);
 }
 
+/* WP carry-over warning */
+.result-panel__wp-warning {
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+.result-panel__wp-warning-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fbbf24;
+}
+
+.result-panel__wp-perfect {
+  font-size: 13px;
+  font-weight: 600;
+  color: #48bb78;
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: rgba(72, 187, 120, 0.15);
+  border: 1px solid rgba(72, 187, 120, 0.4);
+}
+
 /* Action buttons */
 .result-panel__actions {
   display: flex;

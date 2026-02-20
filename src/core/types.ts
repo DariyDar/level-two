@@ -53,6 +53,11 @@ export const PANCREAS_TIERS: Record<PancreasTier, { decayRate: number; cost: num
 
 export const PANCREAS_TOTAL_BARS = 3;
 
+// === WP Carry-Over Penalty ===
+
+/** Each unspent WP on the last day adds this many penalty points */
+export const WP_PENALTY_WEIGHT = 5;
+
 // mg/dL to mmol/L conversion factor
 export const MGDL_TO_MMOL = 1 / 18;
 
