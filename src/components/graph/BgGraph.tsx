@@ -44,6 +44,14 @@ function getGiColor(riseRate: number, minRate: number, maxRate: number): string 
 const PREVIEW_COLOR = 'rgba(99, 179, 237, 0.4)';
 const PREVIEW_PANCREAS_COLOR = 'rgba(246, 153, 63, 0.35)';
 
+// BG zone colors for the level line
+function getZoneColor(height: number): string {
+  if (height <= 4) return '#48bb78'; // green: 60-140 mg/dL
+  if (height <= 7) return '#ecc94b'; // yellow: 140-200 mg/dL
+  if (height <= 12) return '#ed8936'; // orange: 200-300 mg/dL
+  return '#fc8181';                   // red: 300+ mg/dL
+}
+
 interface BgGraphProps {
   placedFoods: PlacedFood[];
   allShips: Ship[];
@@ -450,6 +458,32 @@ export function BgGraph({
             )}
           </g>
         ))}
+
+        {/* BG level line — bold line tracing the effective glucose surface */}
+        {columnCaps.some(h => h > 0) && (
+          <g className="bg-graph__bg-line" pointerEvents="none">
+            {columnCaps.map((h, col) => {
+              if (col >= TOTAL_COLUMNS - 1) return null;
+              const nextH = columnCaps[col + 1];
+              if (h === 0 && nextH === 0) return null;
+              const x1 = colToX(col) + CELL_SIZE / 2;
+              const x2 = colToX(col + 1) + CELL_SIZE / 2;
+              const y1 = PAD_TOP + GRAPH_H - h * CELL_SIZE;
+              const y2 = PAD_TOP + GRAPH_H - nextH * CELL_SIZE;
+              const color = getZoneColor(Math.max(h, nextH));
+              return (
+                <line
+                  key={`bg-line-${col}`}
+                  x1={x1} y1={y1}
+                  x2={x2} y2={y2}
+                  stroke={color}
+                  strokeWidth={2.5}
+                  strokeLinecap="round"
+                />
+              );
+            })}
+          </g>
+        )}
 
         {/* Penalty highlight overlays (after submit) */}
         {showPenaltyHighlight && foodCubeData.map(food =>

@@ -207,11 +207,11 @@ export const PENALTY_RED_ROW = 12;    // row 12 = 300 mg/dL
 export const PENALTY_ORANGE_WEIGHT = 0.5;
 export const PENALTY_RED_WEIGHT = 1.5;
 
-/** Star rating thresholds */
+/** Star rating thresholds (softened 25% from original 10/40/80) */
 export function calculateStars(penalty: number): { stars: number; label: string } {
-  if (penalty <= 10) return { stars: 3, label: 'Perfect' };
-  if (penalty <= 40) return { stars: 2, label: 'Good' };
-  if (penalty <= 80) return { stars: 1, label: 'Pass' };
+  if (penalty <= 12.5) return { stars: 3, label: 'Perfect' };
+  if (penalty <= 50) return { stars: 2, label: 'Good' };
+  if (penalty <= 100) return { stars: 1, label: 'Pass' };
   return { stars: 0, label: 'Defeat' };
 }
 
