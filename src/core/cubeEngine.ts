@@ -16,8 +16,8 @@ export interface FoodPyramid {
 /**
  * Calculate glucose curve for a food item.
  *
- * Shape: linear ramp-up during `duration`, then:
- *   - decayRate > 0: gradual decline at given rate (pancreas tiers: 0.5/1.0/1.5)
+ * Shape: linear ramp-up during `duration` with continuous drain from column 0:
+ *   - decayRate > 0: drain accumulates from first column (pancreas tiers: 0.5/1.0/1.5)
  *   - decayRate === 0: flat plateau to the right edge (pancreas OFF)
  */
 export function calculateCurve(
@@ -37,18 +37,22 @@ export function calculateCurve(
   for (let i = 0; i < totalCols; i++) {
     let height: number;
     if (i < riseCols) {
-      // Ramp-up phase: linear rise from 1 to peakCubes
-      height = Math.round(peakCubes * (i + 1) / riseCols);
+      // Ramp-up phase: linear rise minus continuous drain from col 0
+      const rawRise = peakCubes * (i + 1) / riseCols;
+      height = Math.round(rawRise - decayRate * (i + 1));
     } else if (decayRate > 0) {
-      // Decay phase: pancreas digestion at tier-specific rate
-      const decaySteps = i - riseCols + 1;
-      height = Math.round(peakCubes - decayRate * decaySteps);
+      // Post-peak: continuous drain accumulated from col 0
+      height = Math.round(peakCubes - decayRate * (i + 1));
     } else {
       // Plateau phase: flat at peak (pancreas OFF)
       height = peakCubes;
     }
 
-    if (height <= 0) break;
+    if (height <= 0) {
+      // During rise, food may still produce cubes later — skip but don't stop
+      if (i < riseCols) continue;
+      break;
+    }
     result.push({ columnOffset: i, cubeCount: height });
   }
 
