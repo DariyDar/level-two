@@ -186,21 +186,8 @@ export function BgGraph({
     );
   }, [pancreasCaps, interventionReduction, medicationModifiers.sglt2]);
 
-  // Plateau heights: total food cube heights (before any reductions)
-  const plateauHeights = useMemo(() => {
-    const heights = new Array(TOTAL_COLUMNS).fill(0);
-    for (const food of foodCubeData) {
-      for (const col of food.columns) {
-        const top = col.baseRow + col.count;
-        if (top > heights[col.col]) {
-          heights[col.col] = top;
-        }
-      }
-    }
-    return heights;
-  }, [foodCubeData]);
-
   // Preview curve (shown during drag hover)
+  // Stacks on pancreasCaps (effective height after pancreas) to show real glucose contribution
   const previewCubes = useMemo(() => {
     if (!previewShip || previewColumn == null) return null;
     const { glucose, duration } = applyMedicationToFood(previewShip.load, previewShip.duration, medicationModifiers);
@@ -211,11 +198,11 @@ export function BgGraph({
       if (graphCol < 0 || graphCol >= TOTAL_COLUMNS) return null;
       return {
         col: graphCol,
-        baseRow: plateauHeights[graphCol],
+        baseRow: pancreasCaps[graphCol],
         count: pc.cubeCount,
       };
     }).filter(Boolean) as Array<{ col: number; baseRow: number; count: number }>;
-  }, [previewShip, previewColumn, plateauHeights, medicationModifiers, decayRate]);
+  }, [previewShip, previewColumn, pancreasCaps, medicationModifiers, decayRate]);
 
   // Intervention preview: per-column reduction array
   const interventionPreviewData = useMemo(() => {
