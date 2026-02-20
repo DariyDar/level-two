@@ -330,12 +330,17 @@ export function PlanningPhase() {
           // We need to read current state from the store
           const state = useGameStore.getState();
           const replayDecayRate = replayDataRef.current?.decayRate ?? currentDecayRate;
+          // Recompute medication modifiers from replay data (closure's medicationModifiers
+          // is stale because clearFoods() resets activeMedications before the effect fires)
+          const replayMedMods = data.medications.length > 0
+            ? computeMedicationModifiers(data.medications, allMedications)
+            : DEFAULT_MEDICATION_MODIFIERS;
           const penalty = calculatePenaltyFromState(
             state.placedFoods,
             allShips,
             state.placedInterventions,
             allInterventions,
-            medicationModifiers,
+            replayMedMods,
             replayDecayRate,
           );
 

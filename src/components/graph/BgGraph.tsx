@@ -459,28 +459,40 @@ export function BgGraph({
           </g>
         ))}
 
-        {/* BG level line — bold line tracing the effective glucose surface */}
+        {/* BG level line — step-wise line tracing the effective glucose surface */}
         {columnCaps.some(h => h > 0) && (
           <g className="bg-graph__bg-line" pointerEvents="none">
-            {columnCaps.map((h, col) => {
-              if (col >= TOTAL_COLUMNS - 1) return null;
-              const nextH = columnCaps[col + 1];
-              if (h === 0 && nextH === 0) return null;
-              const x1 = colToX(col) + CELL_SIZE / 2;
-              const x2 = colToX(col + 1) + CELL_SIZE / 2;
-              const y1 = PAD_TOP + GRAPH_H - h * CELL_SIZE;
-              const y2 = PAD_TOP + GRAPH_H - nextH * CELL_SIZE;
-              const color = getZoneColor(Math.max(h, nextH));
-              return (
-                <line
-                  key={`bg-line-${col}`}
-                  x1={x1} y1={y1}
-                  x2={x2} y2={y2}
-                  stroke={color}
-                  strokeWidth={2.5}
-                  strokeLinecap="round"
-                />
-              );
+            {columnCaps.flatMap((h, col) => {
+              const result: React.ReactElement[] = [];
+              const prevH = col > 0 ? columnCaps[col - 1] : 0;
+
+              // Vertical segment at left edge when height changes
+              if (h !== prevH && (h > 0 || prevH > 0)) {
+                result.push(
+                  <line
+                    key={`bg-v-${col}`}
+                    x1={colToX(col)} y1={PAD_TOP + GRAPH_H - prevH * CELL_SIZE}
+                    x2={colToX(col)} y2={PAD_TOP + GRAPH_H - h * CELL_SIZE}
+                    stroke={getZoneColor(Math.max(h, prevH))}
+                    strokeWidth={3}
+                  />
+                );
+              }
+
+              // Horizontal segment across the column
+              if (h > 0) {
+                result.push(
+                  <line
+                    key={`bg-h-${col}`}
+                    x1={colToX(col)} y1={PAD_TOP + GRAPH_H - h * CELL_SIZE}
+                    x2={colToX(col) + CELL_SIZE} y2={PAD_TOP + GRAPH_H - h * CELL_SIZE}
+                    stroke={getZoneColor(h)}
+                    strokeWidth={3}
+                  />
+                );
+              }
+
+              return result;
             })}
           </g>
         )}
