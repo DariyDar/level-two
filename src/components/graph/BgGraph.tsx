@@ -204,8 +204,8 @@ export function BgGraph({
   const previewCubes = useMemo(() => {
     if (!previewShip || previewColumn == null) return null;
     const { glucose, duration } = applyMedicationToFood(previewShip.load, previewShip.duration, medicationModifiers);
-    // Preview uses plateau (all cubes visible including future pancreas-eaten)
-    const curve = calculateCurve(glucose, duration, previewColumn, 0);
+    // Preview shows curve with current pancreas decay applied
+    const curve = calculateCurve(glucose, duration, previewColumn, decayRate);
     return curve.map((pc: { columnOffset: number; cubeCount: number }) => {
       const graphCol = previewColumn + pc.columnOffset;
       if (graphCol < 0 || graphCol >= TOTAL_COLUMNS) return null;
@@ -215,7 +215,7 @@ export function BgGraph({
         count: pc.cubeCount,
       };
     }).filter(Boolean) as Array<{ col: number; baseRow: number; count: number }>;
-  }, [previewShip, previewColumn, plateauHeights, medicationModifiers]);
+  }, [previewShip, previewColumn, plateauHeights, medicationModifiers, decayRate]);
 
   // Intervention preview: per-column reduction array
   const interventionPreviewData = useMemo(() => {
