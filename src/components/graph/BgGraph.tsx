@@ -199,7 +199,7 @@ export function BgGraph({
   }, [pancreasCaps, interventionReduction, medicationModifiers.sglt2]);
 
   // Preview curve (shown during drag hover)
-  // Shows full plateau (all cubes) with pancreas-eaten cubes marked in orange
+  // Shows full honest picture: plateau cubes + pancreas effect + correction of existing orange cubes
   const previewCubes = useMemo(() => {
     if (!previewShip || previewColumn == null) return null;
     const { glucose, duration } = applyMedicationToFood(previewShip.load, previewShip.duration, medicationModifiers);
@@ -218,19 +218,33 @@ export function BgGraph({
       }
     }
 
-    return plateauCurve.map((pc) => {
+    const cubes: Array<{ col: number; row: number; isPancreasEaten: boolean }> = [];
+
+    for (const pc of plateauCurve) {
       const graphCol = previewColumn + pc.columnOffset;
-      if (graphCol < 0 || graphCol >= TOTAL_COLUMNS) return null;
+      if (graphCol < 0 || graphCol >= TOTAL_COLUMNS) continue;
       const decayedCount = decayedCounts[graphCol] ?? 0;
       // Combined pancreas cap = existing decayed height + this food's decayed contribution
-      const combinedPancreasCap = pancreasCaps[graphCol] + decayedCount;
-      return {
-        col: graphCol,
-        baseRow: plateauHeights[graphCol],
-        count: pc.cubeCount,
-        pancreasCap: combinedPancreasCap,
-      };
-    }).filter(Boolean) as Array<{ col: number; baseRow: number; count: number; pancreasCap: number }>;
+      const combinedCap = pancreasCaps[graphCol] + decayedCount;
+      const existingCap = pancreasCaps[graphCol];
+      const existingPlateau = plateauHeights[graphCol];
+
+      // Correction cubes: existing food's orange cubes that become normal with combined cap
+      // These overlay the orange "partition" between existing food and preview
+      const correctionEnd = Math.min(combinedCap, existingPlateau);
+      for (let row = existingCap; row < correctionEnd; row++) {
+        cubes.push({ col: graphCol, row, isPancreasEaten: false });
+      }
+
+      // Preview food cubes
+      for (let cubeIdx = 0; cubeIdx < pc.cubeCount; cubeIdx++) {
+        const row = existingPlateau + cubeIdx;
+        if (row >= TOTAL_ROWS) break;
+        cubes.push({ col: graphCol, row, isPancreasEaten: row >= combinedCap });
+      }
+    }
+
+    return cubes;
   }, [previewShip, previewColumn, pancreasCaps, plateauHeights, medicationModifiers, decayRate]);
 
   // Intervention preview: per-column reduction array
@@ -494,25 +508,19 @@ export function BgGraph({
         )}
 
         {/* Preview cubes (during drag) — blue for normal, orange for pancreas-eaten */}
-        {previewCubes && previewCubes.map((col, i) =>
-          Array.from({ length: col.count }, (_, cubeIdx) => {
-            const row = col.baseRow + cubeIdx;
-            if (row >= TOTAL_ROWS) return null;
-            const isPancreasEaten = row >= col.pancreasCap;
-            return (
-              <rect
-                key={`preview-${i}-${cubeIdx}`}
-                x={colToX(col.col) + 0.5}
-                y={rowToY(row) + 0.5}
-                width={CELL_SIZE - 1}
-                height={CELL_SIZE - 1}
-                fill={isPancreasEaten ? PREVIEW_PANCREAS_COLOR : PREVIEW_COLOR}
-                rx={2}
-                className="bg-graph__cube--preview"
-              />
-            );
-          })
-        )}
+        {/* Includes correction overlays on existing food's orange cubes that become normal */}
+        {previewCubes && previewCubes.map((cube, i) => (
+          <rect
+            key={`preview-${i}`}
+            x={colToX(cube.col) + 0.5}
+            y={rowToY(cube.row) + 0.5}
+            width={CELL_SIZE - 1}
+            height={CELL_SIZE - 1}
+            fill={cube.isPancreasEaten ? PREVIEW_PANCREAS_COLOR : PREVIEW_COLOR}
+            rx={2}
+            className="bg-graph__cube--preview"
+          />
+        ))}
 
         {/* Penalty threshold line at 200 mg/dL (shown during results) */}
         {showPenaltyHighlight && (
