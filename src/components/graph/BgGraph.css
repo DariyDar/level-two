@@ -71,6 +71,24 @@
   opacity: 0.2 !important;
 }
 
+/* Pancreas-eaten cubes (orange semi-transparent) */
+@keyframes pancreasDigest {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0.45;
+  }
+}
+
+.bg-graph__cube--pancreas {
+  animation: pancreasDigest 0.4s ease-out both;
+  pointer-events: none;
+}
+
 .bg-graph__cube--preview {
   pointer-events: none;
 }

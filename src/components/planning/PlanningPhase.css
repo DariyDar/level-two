@@ -41,6 +41,18 @@
   align-items: stretch;
 }
 
+/* Interventions row: inventory + pancreas button side by side */
+.planning-phase__interventions-row {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.planning-phase__interventions-row > .ship-inventory {
+  flex: 1;
+  min-width: 0;
+}
+
 /* Day navigation (cheat buttons) */
 .planning-phase__day-nav {
   display: flex;

@@ -9,8 +9,9 @@ import type {
   Ship,
   Intervention,
   GameSettings,
+  PancreasTier,
 } from '../core/types';
-import { DEFAULT_SETTINGS } from '../core/types';
+import { DEFAULT_SETTINGS, PANCREAS_TIERS } from '../core/types';
 
 // Helper to get day config
 function getDayConfig(level: LevelConfig, day: number): DayConfig | null {
@@ -36,6 +37,10 @@ interface GameState {
   placedInterventions: PlacedIntervention[];
   activeMedications: string[];
 
+  // Pancreas tier system
+  pancreasTierPerDay: Record<number, PancreasTier>;
+  lockedBarsPerDay: Record<number, number>;
+
   // Settings
   settings: GameSettings;
 
@@ -51,6 +56,9 @@ interface GameState {
   startNextDay: () => void;
   restartLevel: () => void;
   updateSettings: (settings: Partial<GameSettings>) => void;
+  setPancreasTier: (day: number, tier: PancreasTier) => void;
+  lockPancreasBars: () => void;
+  unlockPancreasBars: (day: number) => void;
 }
 
 export const useGameStore = create<GameState>()(
@@ -62,6 +70,8 @@ export const useGameStore = create<GameState>()(
       placedFoods: [],
       placedInterventions: [],
       activeMedications: [],
+      pancreasTierPerDay: {},
+      lockedBarsPerDay: {},
       settings: DEFAULT_SETTINGS,
 
       // Actions
@@ -72,6 +82,8 @@ export const useGameStore = create<GameState>()(
           placedFoods: [],
           placedInterventions: [],
           activeMedications: [],
+          pancreasTierPerDay: {},
+          lockedBarsPerDay: {},
         }),
 
       placeFood: (shipId, dropColumn) =>
@@ -131,19 +143,46 @@ export const useGameStore = create<GameState>()(
           placedFoods: [],
           placedInterventions: [],
           activeMedications: [],
+          pancreasTierPerDay: {},
+          lockedBarsPerDay: {},
         }),
 
       updateSettings: (newSettings) =>
         set((state) => ({
           settings: { ...state.settings, ...newSettings },
         })),
+
+      setPancreasTier: (day, tier) =>
+        set((state) => ({
+          pancreasTierPerDay: { ...state.pancreasTierPerDay, [day]: tier },
+        })),
+
+      lockPancreasBars: () =>
+        set((state) => {
+          const tier = (state.pancreasTierPerDay[state.currentDay] ?? 1) as PancreasTier;
+          return {
+            lockedBarsPerDay: {
+              ...state.lockedBarsPerDay,
+              [state.currentDay]: PANCREAS_TIERS[tier].cost,
+            },
+          };
+        }),
+
+      unlockPancreasBars: (day) =>
+        set((state) => {
+          const next = { ...state.lockedBarsPerDay };
+          delete next[day];
+          return { lockedBarsPerDay: next };
+        }),
     }),
     {
       name: 'bg-graph-save',
-      version: 5,
+      version: 6,
       partialize: (state) => ({
         currentDay: state.currentDay,
         settings: state.settings,
+        pancreasTierPerDay: state.pancreasTierPerDay,
+        lockedBarsPerDay: state.lockedBarsPerDay,
       }),
     }
   )

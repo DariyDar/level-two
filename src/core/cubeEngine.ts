@@ -13,21 +13,18 @@ export interface FoodPyramid {
   columns: CubeColumn[];
 }
 
-// Background metabolic decay: 1 cube per 30 min = 0.5 cubes per 15-min column
-const DECAY_RATE = 0.5;
-
 /**
  * Calculate glucose curve for a food item.
  *
  * Shape: linear ramp-up during `duration`, then:
- *   - decay mode ON:  gradual decline to zero
- *   - decay mode OFF: flat plateau to the right edge
+ *   - decayRate > 0: gradual decline at given rate (pancreas tiers: 0.5/1.0/1.5)
+ *   - decayRate === 0: flat plateau to the right edge (pancreas OFF)
  */
 export function calculateCurve(
   glucose: number,
   durationMinutes: number,
   dropColumn: number,
-  decayEnabled: boolean = true
+  decayRate: number = 0.5
 ): CubeColumn[] {
   const peakCubes = Math.round(glucose / GRAPH_CONFIG.cellHeightMgDl);
   const riseCols = Math.max(1, Math.round(durationMinutes / GRAPH_CONFIG.cellWidthMin));
@@ -42,12 +39,12 @@ export function calculateCurve(
     if (i < riseCols) {
       // Ramp-up phase: linear rise from 1 to peakCubes
       height = Math.round(peakCubes * (i + 1) / riseCols);
-    } else if (decayEnabled) {
-      // Decay phase: gradual decline (background energy expenditure)
+    } else if (decayRate > 0) {
+      // Decay phase: pancreas digestion at tier-specific rate
       const decaySteps = i - riseCols + 1;
-      height = Math.round(peakCubes - DECAY_RATE * decaySteps);
+      height = Math.round(peakCubes - decayRate * decaySteps);
     } else {
-      // Plateau phase: flat at peak (no decay)
+      // Plateau phase: flat at peak (pancreas OFF)
       height = peakCubes;
     }
 
@@ -64,7 +61,7 @@ export function calculateCurve(
 export function calculateGraphState(
   placedFoods: PlacedFood[],
   allShips: Ship[],
-  decayEnabled: boolean = true
+  decayRate: number = 0.5
 ): number[] {
   const bgValues = new Array(TOTAL_COLUMNS).fill(0);
 
@@ -72,7 +69,7 @@ export function calculateGraphState(
     const ship = allShips.find(s => s.id === placed.shipId);
     if (!ship) continue;
 
-    const curve = calculateCurve(ship.load, ship.duration, placed.dropColumn, decayEnabled);
+    const curve = calculateCurve(ship.load, ship.duration, placed.dropColumn, decayRate);
     for (const col of curve) {
       const graphColumn = placed.dropColumn + col.columnOffset;
       if (graphColumn >= 0 && graphColumn < TOTAL_COLUMNS) {
@@ -90,11 +87,11 @@ export function calculateGraphState(
 export function buildFoodPyramids(
   placedFoods: PlacedFood[],
   allShips: Ship[],
-  decayEnabled: boolean = true
+  decayRate: number = 0.5
 ): FoodPyramid[] {
   return placedFoods.map(placed => {
     const ship = allShips.find(s => s.id === placed.shipId);
-    const columns = ship ? calculateCurve(ship.load, ship.duration, placed.dropColumn, decayEnabled) : [];
+    const columns = ship ? calculateCurve(ship.load, ship.duration, placed.dropColumn, decayRate) : [];
     return {
       placementId: placed.id,
       shipId: placed.shipId,
@@ -278,7 +275,7 @@ export function calculatePenaltyFromState(
   placedInterventions: PlacedIntervention[],
   allInterventions: Intervention[],
   medicationModifiers: MedicationModifiers,
-  decayEnabled: boolean,
+  decayRate: number,
 ): PenaltyResult {
   // Build food heights per column
   const totalHeights = new Array(TOTAL_COLUMNS).fill(0);
@@ -286,7 +283,7 @@ export function calculatePenaltyFromState(
     const ship = allShips.find(s => s.id === placed.shipId);
     if (!ship) continue;
     const { glucose, duration } = applyMedicationToFood(ship.load, ship.duration, medicationModifiers);
-    const curve = calculateCurve(glucose, duration, placed.dropColumn, decayEnabled);
+    const curve = calculateCurve(glucose, duration, placed.dropColumn, decayRate);
     for (const col of curve) {
       const graphCol = placed.dropColumn + col.columnOffset;
       if (graphCol >= 0 && graphCol < TOTAL_COLUMNS) {

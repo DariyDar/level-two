@@ -2,7 +2,6 @@ import { useMemo, useCallback, useRef } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import type { Ship, PlacedFood, PlacedIntervention, Intervention, GameSettings, MedicationModifiers } from '../../core/types';
 import {
-  GRAPH_CONFIG,
   TOTAL_COLUMNS,
   TOTAL_ROWS,
   DEFAULT_X_TICKS,
@@ -10,6 +9,7 @@ import {
   DEFAULT_MEDICATION_MODIFIERS,
   PENALTY_ORANGE_ROW,
   PENALTY_RED_ROW,
+  GRAPH_CONFIG,
   columnToTimeString,
   formatBgValue,
 } from '../../core/types';
@@ -49,6 +49,7 @@ interface BgGraphProps {
   placedInterventions: PlacedIntervention[];
   allInterventions: Intervention[];
   settings: GameSettings;
+  decayRate: number;
   medicationModifiers?: MedicationModifiers;
   previewShip?: Ship | null;
   previewIntervention?: Intervention | null;
@@ -80,6 +81,7 @@ export function BgGraph({
   placedInterventions,
   allInterventions,
   settings,
+  decayRate,
   medicationModifiers = DEFAULT_MEDICATION_MODIFIERS,
   previewShip,
   previewIntervention,
@@ -94,8 +96,6 @@ export function BgGraph({
   const { setNodeRef, isOver } = useDroppable({
     id: 'bg-graph',
   });
-
-  const { decayEnabled } = settings;
 
   // Calculate intervention reduction per column (in cubes)
   const interventionReduction = useMemo(
@@ -130,7 +130,8 @@ export function BgGraph({
       if (!ship) continue;
 
       const { glucose, duration } = applyMedicationToFood(ship.load, ship.duration, medicationModifiers);
-      const curve = calculateCurve(glucose, duration, placed.dropColumn, decayEnabled);
+      // Always use plateau (decayRate=0) to render all cubes including pancreas-eaten
+      const curve = calculateCurve(glucose, duration, placed.dropColumn, 0);
       const cols: Array<{ col: number; baseRow: number; count: number }> = [];
 
       for (const pc of curve) {
@@ -153,46 +154,68 @@ export function BgGraph({
     }
 
     return data;
-  }, [placedFoods, allShips, decayEnabled, medicationModifiers]);
+  }, [placedFoods, allShips, medicationModifiers]);
 
-  // Compute max visible row per column (total food cubes - exercise - SGLT2)
-  const columnCaps = useMemo(() => {
-    const totalHeights = new Array(TOTAL_COLUMNS).fill(0);
-    for (const food of foodCubeData) {
-      for (const col of food.columns) {
-        const top = col.baseRow + col.count;
-        if (top > totalHeights[col.col]) {
-          totalHeights[col.col] = top;
+  // Pancreas caps: food height after pancreas decay (before interventions/SGLT2)
+  const pancreasCaps = useMemo(() => {
+    const heights = new Array(TOTAL_COLUMNS).fill(0);
+    for (const placed of placedFoods) {
+      const ship = allShips.find(s => s.id === placed.shipId);
+      if (!ship) continue;
+      const { glucose, duration } = applyMedicationToFood(ship.load, ship.duration, medicationModifiers);
+      const curve = calculateCurve(glucose, duration, placed.dropColumn, decayRate);
+      for (const col of curve) {
+        const graphCol = placed.dropColumn + col.columnOffset;
+        if (graphCol >= 0 && graphCol < TOTAL_COLUMNS) {
+          heights[graphCol] += col.cubeCount;
         }
       }
     }
-    // SGLT2 threshold drain (depends on food heights)
+    return heights;
+  }, [placedFoods, allShips, medicationModifiers, decayRate]);
+
+  // Column caps: visible height after pancreas + interventions + SGLT2
+  const columnCaps = useMemo(() => {
     const sglt2 = medicationModifiers.sglt2;
     const sglt2Reduction = sglt2
-      ? calculateSglt2Reduction(totalHeights, sglt2.depth, sglt2.floorRow)
+      ? calculateSglt2Reduction(pancreasCaps, sglt2.depth, sglt2.floorRow)
       : new Array(TOTAL_COLUMNS).fill(0);
 
-    return totalHeights.map((h, i) =>
+    return pancreasCaps.map((h, i) =>
       Math.max(0, h - interventionReduction[i] - sglt2Reduction[i])
     );
-  }, [foodCubeData, interventionReduction, medicationModifiers.sglt2]);
+  }, [pancreasCaps, interventionReduction, medicationModifiers.sglt2]);
+
+  // Plateau heights: total food cube heights (before any reductions)
+  const plateauHeights = useMemo(() => {
+    const heights = new Array(TOTAL_COLUMNS).fill(0);
+    for (const food of foodCubeData) {
+      for (const col of food.columns) {
+        const top = col.baseRow + col.count;
+        if (top > heights[col.col]) {
+          heights[col.col] = top;
+        }
+      }
+    }
+    return heights;
+  }, [foodCubeData]);
 
   // Preview curve (shown during drag hover)
   const previewCubes = useMemo(() => {
     if (!previewShip || previewColumn == null) return null;
     const { glucose, duration } = applyMedicationToFood(previewShip.load, previewShip.duration, medicationModifiers);
-    const curve = calculateCurve(glucose, duration, previewColumn, decayEnabled);
-    // Use columnCaps as base heights (already includes all reductions)
+    // Preview uses plateau (all cubes visible including future pancreas-eaten)
+    const curve = calculateCurve(glucose, duration, previewColumn, 0);
     return curve.map((pc: { columnOffset: number; cubeCount: number }) => {
       const graphCol = previewColumn + pc.columnOffset;
       if (graphCol < 0 || graphCol >= TOTAL_COLUMNS) return null;
       return {
         col: graphCol,
-        baseRow: columnCaps[graphCol],
+        baseRow: plateauHeights[graphCol],
         count: pc.cubeCount,
       };
     }).filter(Boolean) as Array<{ col: number; baseRow: number; count: number }>;
-  }, [previewShip, previewColumn, columnCaps, decayEnabled, medicationModifiers]);
+  }, [previewShip, previewColumn, plateauHeights, medicationModifiers]);
 
   // Intervention preview: per-column reduction array
   const interventionPreviewData = useMemo(() => {
@@ -351,16 +374,25 @@ export function BgGraph({
           />
         )}
 
-        {/* Placed food cubes — active + burned (semi-transparent) */}
+        {/* Placed food cubes — normal + pancreas-eaten (orange) + burned (semi-transparent) */}
         {foodCubeData.map(food => (
           <g key={food.placementId} className="bg-graph__food-group">
             {food.columns.map(col =>
               Array.from({ length: col.count }, (_, cubeIdx) => {
                 const row = col.baseRow + cubeIdx;
                 if (row >= TOTAL_ROWS) return null;
-                const isBurned = row >= columnCaps[col.col];
+                const isPancreasEaten = row >= pancreasCaps[col.col];
+                const isBurned = !isPancreasEaten && row >= columnCaps[col.col];
                 const colOffset = col.col - food.dropColumn;
                 const waveDelay = colOffset * 20;
+                const cubeClass = isPancreasEaten
+                  ? 'bg-graph__cube--pancreas'
+                  : isBurned
+                    ? 'bg-graph__cube--burned'
+                    : 'bg-graph__cube';
+                const cubeFill = isPancreasEaten
+                  ? 'rgba(246, 153, 63, 0.5)'
+                  : food.color;
                 return (
                   <rect
                     key={`${food.placementId}-${col.col}-${cubeIdx}`}
@@ -368,11 +400,12 @@ export function BgGraph({
                     y={rowToY(row) + 0.5}
                     width={CELL_SIZE - 1}
                     height={CELL_SIZE - 1}
-                    fill={food.color}
+                    fill={cubeFill}
                     rx={2}
-                    className={isBurned ? 'bg-graph__cube--burned' : 'bg-graph__cube'}
+                    className={cubeClass}
                     style={{ animationDelay: `${waveDelay}ms` }}
                     onClick={() => {
+                      if (isPancreasEaten) return;
                       if (isBurned) {
                         if (placedInterventions.length > 0) {
                           handleCubeClick(placedInterventions[0]?.id ?? food.placementId, true);

@@ -33,14 +33,25 @@ export const DEFAULT_Y_TICKS = [100, 200, 300, 400]; // mg/dL
 export interface GameSettings {
   timeFormat: '12h' | '24h';
   bgUnit: 'mg/dL' | 'mmol/L';
-  decayEnabled: boolean;
 }
 
 export const DEFAULT_SETTINGS: GameSettings = {
   timeFormat: '12h',
   bgUnit: 'mg/dL',
-  decayEnabled: true,
 };
+
+// === Pancreas Tier System ===
+
+export type PancreasTier = 0 | 1 | 2 | 3;
+
+export const PANCREAS_TIERS: Record<PancreasTier, { decayRate: number; cost: number; label: string }> = {
+  0: { decayRate: 0, cost: 0, label: 'OFF' },
+  1: { decayRate: 0.5, cost: 0, label: 'I' },
+  2: { decayRate: 1.0, cost: 1, label: 'II' },
+  3: { decayRate: 1.5, cost: 2, label: 'III' },
+};
+
+export const PANCREAS_TOTAL_BARS = 3;
 
 // mg/dL to mmol/L conversion factor
 export const MGDL_TO_MMOL = 1 / 18;

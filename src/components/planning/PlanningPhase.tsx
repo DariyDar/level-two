@@ -8,16 +8,17 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import type { Ship, Intervention, Medication, GamePhase, PenaltyResult } from '../../core/types';
+import type { Ship, Intervention, Medication, GamePhase, PenaltyResult, PancreasTier } from '../../core/types';
 import { useGameStore, getDayConfig, selectKcalUsed, selectWpUsed } from '../../store/gameStore';
 import { loadFoods, loadLevel, loadInterventions, loadMedications } from '../../config/loader';
 import { computeMedicationModifiers, calculatePenaltyFromState } from '../../core/cubeEngine';
-import { DEFAULT_MEDICATION_MODIFIERS, getKcalAssessment } from '../../core/types';
+import { DEFAULT_MEDICATION_MODIFIERS, getKcalAssessment, PANCREAS_TIERS, PANCREAS_TOTAL_BARS } from '../../core/types';
 import { BgGraph, pointerToColumn } from '../graph';
 import { PlanningHeader } from './PlanningHeader';
 import { ShipInventory } from './ShipInventory';
 import { InterventionInventory } from './InterventionInventory';
 import { MedicationPanel } from './MedicationPanel';
+import { PancreasButton } from './PancreasButton';
 import { ResultPanel } from './ResultPanel';
 import { ShipCardOverlay } from './ShipCard';
 import { InterventionCardOverlay } from './InterventionCard';
@@ -29,6 +30,17 @@ interface ReplayData {
   foods: Array<{ shipId: string; dropColumn: number }>;
   interventions: Array<{ interventionId: string; dropColumn: number }>;
   medications: string[];
+  decayRate: number;
+}
+
+function getNextPancreasTier(current: PancreasTier, maxBars: number): PancreasTier {
+  const sequence: PancreasTier[] = [0, 1, 2, 3];
+  const currentIdx = sequence.indexOf(current);
+  for (let offset = 1; offset <= 4; offset++) {
+    const next = sequence[(currentIdx + offset) % 4];
+    if (PANCREAS_TIERS[next].cost <= maxBars) return next;
+  }
+  return 1;
 }
 
 export function PlanningPhase() {
@@ -49,6 +61,11 @@ export function PlanningPhase() {
     startNextDay,
     settings,
     updateSettings,
+    pancreasTierPerDay,
+    lockedBarsPerDay,
+    setPancreasTier,
+    lockPancreasBars,
+    unlockPancreasBars,
   } = useGameStore();
 
   const [allShips, setAllShips] = useState<Ship[]>([]);
@@ -122,6 +139,12 @@ export function PlanningPhase() {
   const wpBudget = dayConfig?.wpBudget ?? 16;
   const effectiveWpBudget = wpBudget + medicationModifiers.wpBonus;
   const wpRemaining = effectiveWpBudget - wpUsed;
+
+  // Pancreas tier system
+  const currentPancreasTier = (pancreasTierPerDay[currentDay] ?? 1) as PancreasTier;
+  const currentDecayRate = PANCREAS_TIERS[currentPancreasTier].decayRate;
+  const totalLockedBars = Object.values(lockedBarsPerDay).reduce((a, b) => a + b, 0);
+  const barsAvailable = PANCREAS_TOTAL_BARS - totalLockedBars;
 
   // Submit button enabled when kcal >= Light (50%) and in planning phase
   const effectiveKcalBudget = Math.round(kcalBudget * medicationModifiers.kcalMultiplier);
@@ -242,29 +265,37 @@ export function PlanningPhase() {
     });
   }, [settings.bgUnit, updateSettings]);
 
-  const handleToggleDecay = useCallback(() => {
-    updateSettings({ decayEnabled: !settings.decayEnabled });
-    clearFoods();
-    setGamePhase('planning');
-    setPenaltyResult(null);
-  }, [settings.decayEnabled, updateSettings, clearFoods]);
+  const handleCyclePancreas = useCallback(() => {
+    const nextTier = getNextPancreasTier(currentPancreasTier, barsAvailable);
+    setPancreasTier(currentDay, nextTier);
+    // Clear graph when toggling pancreas ON/OFF (tier 0 boundary)
+    if ((nextTier === 0) !== (currentPancreasTier === 0)) {
+      clearFoods();
+      setGamePhase('planning');
+      setPenaltyResult(null);
+    }
+  }, [currentPancreasTier, barsAvailable, currentDay, setPancreasTier, clearFoods]);
 
   // === Submit handler: save state, clear graph, start replay ===
   const handleSubmit = useCallback(() => {
     if (!submitEnabled) return;
+
+    // Lock pancreas bars for this day
+    lockPancreasBars();
 
     // Save current placements for replay
     replayDataRef.current = {
       foods: placedFoods.map(f => ({ shipId: f.shipId, dropColumn: f.dropColumn })),
       interventions: placedInterventions.map(i => ({ interventionId: i.interventionId, dropColumn: i.dropColumn })),
       medications: [...activeMedications],
+      decayRate: currentDecayRate,
     };
 
     // Clear graph
     clearFoods();
     setGamePhase('replaying');
     setPenaltyResult(null);
-  }, [submitEnabled, placedFoods, placedInterventions, activeMedications, clearFoods]);
+  }, [submitEnabled, placedFoods, placedInterventions, activeMedications, clearFoods, lockPancreasBars, currentDecayRate]);
 
   // === Replay animation effect ===
   useEffect(() => {
@@ -296,13 +327,14 @@ export function PlanningPhase() {
 
           // We need to read current state from the store
           const state = useGameStore.getState();
+          const replayDecayRate = replayDataRef.current?.decayRate ?? currentDecayRate;
           const penalty = calculatePenaltyFromState(
             state.placedFoods,
             allShips,
             state.placedInterventions,
             allInterventions,
             medicationModifiers,
-            settings.decayEnabled,
+            replayDecayRate,
           );
 
           setPenaltyResult(penalty);
@@ -332,11 +364,12 @@ export function PlanningPhase() {
 
   // === Result actions ===
   const handleRetry = useCallback(() => {
+    unlockPancreasBars(currentDay);
     clearFoods();
     setGamePhase('planning');
     setPenaltyResult(null);
     replayDataRef.current = null;
-  }, [clearFoods]);
+  }, [clearFoods, unlockPancreasBars, currentDay]);
 
   const handleNextDay = useCallback(() => {
     startNextDay();
@@ -387,7 +420,6 @@ export function PlanningPhase() {
           onSubmit={handleSubmit}
           onToggleTimeFormat={handleToggleTimeFormat}
           onToggleBgUnit={handleToggleBgUnit}
-          onToggleDecay={handleToggleDecay}
         />
 
         {isPlanning && (
@@ -408,6 +440,7 @@ export function PlanningPhase() {
             placedInterventions={placedInterventions}
             allInterventions={allInterventions}
             settings={settings}
+            decayRate={currentDecayRate}
             medicationModifiers={medicationModifiers}
             previewShip={isPlanning ? activeShip : null}
             previewIntervention={isPlanning ? activeIntervention : null}
@@ -434,12 +467,20 @@ export function PlanningPhase() {
                 wpRemaining={wpRemaining}
               />
 
-              <InterventionInventory
-                allInterventions={allInterventions}
-                availableInterventions={dayConfig?.availableInterventions || []}
-                placedInterventions={placedInterventions}
-                wpRemaining={wpRemaining}
-              />
+              <div className="planning-phase__interventions-row">
+                <InterventionInventory
+                  allInterventions={allInterventions}
+                  availableInterventions={dayConfig?.availableInterventions || []}
+                  placedInterventions={placedInterventions}
+                  wpRemaining={wpRemaining}
+                />
+                <PancreasButton
+                  currentTier={currentPancreasTier}
+                  barsAvailable={barsAvailable}
+                  onCycle={handleCyclePancreas}
+                  disabled={gamePhase !== 'planning'}
+                />
+              </div>
             </>
           )}
 
