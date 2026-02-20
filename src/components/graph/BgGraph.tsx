@@ -42,6 +42,7 @@ function getGiColor(riseRate: number, minRate: number, maxRate: number): string 
 }
 
 const PREVIEW_COLOR = 'rgba(99, 179, 237, 0.4)';
+const PREVIEW_PANCREAS_COLOR = 'rgba(246, 153, 63, 0.35)';
 
 interface BgGraphProps {
   placedFoods: PlacedFood[];
@@ -174,6 +175,17 @@ export function BgGraph({
     return heights;
   }, [placedFoods, allShips, medicationModifiers, decayRate]);
 
+  // Plateau heights: total food height with no decay (for preview stacking base)
+  const plateauHeights = useMemo(() => {
+    const heights = new Array(TOTAL_COLUMNS).fill(0);
+    for (const food of foodCubeData) {
+      for (const col of food.columns) {
+        heights[col.col] += col.count;
+      }
+    }
+    return heights;
+  }, [foodCubeData]);
+
   // Column caps: visible height after pancreas + interventions + SGLT2
   const columnCaps = useMemo(() => {
     const sglt2 = medicationModifiers.sglt2;
@@ -187,22 +199,39 @@ export function BgGraph({
   }, [pancreasCaps, interventionReduction, medicationModifiers.sglt2]);
 
   // Preview curve (shown during drag hover)
-  // Stacks on pancreasCaps (effective height after pancreas) to show real glucose contribution
+  // Shows full plateau (all cubes) with pancreas-eaten cubes marked in orange
   const previewCubes = useMemo(() => {
     if (!previewShip || previewColumn == null) return null;
     const { glucose, duration } = applyMedicationToFood(previewShip.load, previewShip.duration, medicationModifiers);
-    // Preview shows curve with current pancreas decay applied
-    const curve = calculateCurve(glucose, duration, previewColumn, decayRate);
-    return curve.map((pc: { columnOffset: number; cubeCount: number }) => {
+
+    // Plateau curve: all cubes including pancreas-eaten
+    const plateauCurve = calculateCurve(glucose, duration, previewColumn, 0);
+    // Decayed curve: effective cubes after pancreas
+    const decayedCurve = calculateCurve(glucose, duration, previewColumn, decayRate);
+
+    // Build decayed count lookup by column
+    const decayedCounts: Record<number, number> = {};
+    for (const pc of decayedCurve) {
+      const graphCol = previewColumn + pc.columnOffset;
+      if (graphCol >= 0 && graphCol < TOTAL_COLUMNS) {
+        decayedCounts[graphCol] = pc.cubeCount;
+      }
+    }
+
+    return plateauCurve.map((pc) => {
       const graphCol = previewColumn + pc.columnOffset;
       if (graphCol < 0 || graphCol >= TOTAL_COLUMNS) return null;
+      const decayedCount = decayedCounts[graphCol] ?? 0;
+      // Combined pancreas cap = existing decayed height + this food's decayed contribution
+      const combinedPancreasCap = pancreasCaps[graphCol] + decayedCount;
       return {
         col: graphCol,
-        baseRow: pancreasCaps[graphCol],
+        baseRow: plateauHeights[graphCol],
         count: pc.cubeCount,
+        pancreasCap: combinedPancreasCap,
       };
-    }).filter(Boolean) as Array<{ col: number; baseRow: number; count: number }>;
-  }, [previewShip, previewColumn, pancreasCaps, medicationModifiers, decayRate]);
+    }).filter(Boolean) as Array<{ col: number; baseRow: number; count: number; pancreasCap: number }>;
+  }, [previewShip, previewColumn, pancreasCaps, plateauHeights, medicationModifiers, decayRate]);
 
   // Intervention preview: per-column reduction array
   const interventionPreviewData = useMemo(() => {
@@ -464,11 +493,12 @@ export function BgGraph({
           })
         )}
 
-        {/* Preview cubes (during drag) */}
+        {/* Preview cubes (during drag) — blue for normal, orange for pancreas-eaten */}
         {previewCubes && previewCubes.map((col, i) =>
           Array.from({ length: col.count }, (_, cubeIdx) => {
             const row = col.baseRow + cubeIdx;
             if (row >= TOTAL_ROWS) return null;
+            const isPancreasEaten = row >= col.pancreasCap;
             return (
               <rect
                 key={`preview-${i}-${cubeIdx}`}
@@ -476,7 +506,7 @@ export function BgGraph({
                 y={rowToY(row) + 0.5}
                 width={CELL_SIZE - 1}
                 height={CELL_SIZE - 1}
-                fill={PREVIEW_COLOR}
+                fill={isPancreasEaten ? PREVIEW_PANCREAS_COLOR : PREVIEW_COLOR}
                 rx={2}
                 className="bg-graph__cube--preview"
               />
