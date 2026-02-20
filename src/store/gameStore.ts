@@ -51,6 +51,7 @@ interface GameState {
   setLevel: (level: LevelConfig) => void;
   placeFood: (shipId: string, dropColumn: number) => void;
   removeFood: (placementId: string) => void;
+  moveFood: (placementId: string, newDropColumn: number) => void;
   placeIntervention: (interventionId: string, dropColumn: number) => void;
   removeIntervention: (placementId: string) => void;
   toggleMedication: (medicationId: string) => void;
@@ -103,6 +104,13 @@ export const useGameStore = create<GameState>()(
       removeFood: (placementId) =>
         set((state) => ({
           placedFoods: state.placedFoods.filter((f) => f.id !== placementId),
+        })),
+
+      moveFood: (placementId, newDropColumn) =>
+        set((state) => ({
+          placedFoods: state.placedFoods.map((f) =>
+            f.id === placementId ? { ...f, dropColumn: newDropColumn } : f
+          ),
         })),
 
       placeIntervention: (interventionId, dropColumn) =>

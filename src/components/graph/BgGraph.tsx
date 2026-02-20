@@ -44,13 +44,13 @@ function getGiColor(riseRate: number, minRate: number, maxRate: number): string 
 const PREVIEW_COLOR = 'rgba(99, 179, 237, 0.4)';
 const PREVIEW_PANCREAS_COLOR = 'rgba(246, 153, 63, 0.35)';
 
-// BG zone colors for the level line
-function getZoneColor(height: number): string {
-  if (height <= 4) return '#48bb78'; // green: 60-140 mg/dL
-  if (height <= 7) return '#ecc94b'; // yellow: 140-200 mg/dL
-  if (height <= 12) return '#ed8936'; // orange: 200-300 mg/dL
-  return '#fc8181';                   // red: 300+ mg/dL
-}
+// Zone clip bands for skyline coloring (rendered bottom→top, higher zones paint on top)
+const ZONE_CLIP_BANDS = [
+  { id: 'zone-clip-green', color: '#48bb78', yTop: PAD_TOP + GRAPH_H - 4 * CELL_SIZE - 3, yBot: PAD_TOP + GRAPH_H + 3 },
+  { id: 'zone-clip-yellow', color: '#ecc94b', yTop: PAD_TOP + GRAPH_H - 7 * CELL_SIZE - 3, yBot: PAD_TOP + GRAPH_H - 4 * CELL_SIZE + 3 },
+  { id: 'zone-clip-orange', color: '#ed8936', yTop: PAD_TOP + GRAPH_H - 12 * CELL_SIZE - 3, yBot: PAD_TOP + GRAPH_H - 7 * CELL_SIZE + 3 },
+  { id: 'zone-clip-red', color: '#fc8181', yTop: PAD_TOP - 3, yBot: PAD_TOP + GRAPH_H - 12 * CELL_SIZE + 3 },
+];
 
 interface BgGraphProps {
   placedFoods: PlacedFood[];
@@ -66,6 +66,7 @@ interface BgGraphProps {
   showPenaltyHighlight?: boolean;
   interactive?: boolean;
   onFoodClick?: (placementId: string) => void;
+  onFoodMove?: (placementId: string, newColumn: number) => void;
   onInterventionClick?: (placementId: string) => void;
 }
 
@@ -98,9 +99,11 @@ export function BgGraph({
   showPenaltyHighlight = false,
   interactive = true,
   onFoodClick,
+  onFoodMove,
   onInterventionClick,
 }: BgGraphProps) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const bubbleDragRef = useRef<{ placementId: string; lastCol: number } | null>(null);
 
   const { setNodeRef, isOver } = useDroppable({
     id: 'bg-graph',
@@ -206,6 +209,37 @@ export function BgGraph({
     );
   }, [pancreasCaps, interventionReduction, medicationModifiers.sglt2]);
 
+  // Skyline path: single SVG path tracing the step-wise top surface of columnCaps
+  const skylinePath = useMemo(() => {
+    const parts: string[] = [];
+    let inSegment = false;
+
+    for (let col = 0; col < TOTAL_COLUMNS; col++) {
+      const h = columnCaps[col];
+
+      if (h <= 0) {
+        inSegment = false;
+        continue;
+      }
+
+      const y = PAD_TOP + GRAPH_H - h * CELL_SIZE;
+
+      if (!inSegment) {
+        parts.push(`M ${colToX(col)} ${y}`);
+        inSegment = true;
+      } else {
+        const prevH = columnCaps[col - 1];
+        if (prevH !== h) {
+          parts.push(`V ${y}`);
+        }
+      }
+
+      parts.push(`H ${colToX(col) + CELL_SIZE}`);
+    }
+
+    return parts.length > 0 ? parts.join(' ') : '';
+  }, [columnCaps]);
+
   // Preview curve (shown during drag hover)
   // Shows full honest picture: plateau cubes + pancreas effect + correction of existing orange cubes
   const previewCubes = useMemo(() => {
@@ -282,6 +316,71 @@ export function BgGraph({
     [onFoodClick, onInterventionClick, interactive]
   );
 
+  // Bubble data: one bubble per placed food at its peak column
+  const bubbleData = useMemo(() => {
+    return placedFoods.map(placed => {
+      const ship = allShips.find(s => s.id === placed.shipId);
+      if (!ship) return null;
+      const { glucose, duration } = applyMedicationToFood(ship.load, ship.duration, medicationModifiers);
+      const curve = calculateCurve(glucose, duration, placed.dropColumn, decayRate);
+      let maxCount = 0;
+      let peakOffset = 0;
+      for (const col of curve) {
+        if (col.cubeCount > maxCount) {
+          maxCount = col.cubeCount;
+          peakOffset = col.columnOffset;
+        }
+      }
+      const peakCol = Math.min(placed.dropColumn + peakOffset, TOTAL_COLUMNS - 1);
+      return {
+        placementId: placed.id,
+        shipId: placed.shipId,
+        emoji: ship.emoji,
+        peakCol,
+        skylineH: columnCaps[peakCol],
+      };
+    }).filter((d): d is NonNullable<typeof d> => d !== null);
+  }, [placedFoods, allShips, medicationModifiers, decayRate, columnCaps]);
+
+  // Bubble pointer drag handlers
+  const handleBubblePointerDown = useCallback((e: React.PointerEvent<SVGGElement>, placementId: string) => {
+    if (!interactive) return;
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    bubbleDragRef.current = { placementId, lastCol: -1 };
+  }, [interactive]);
+
+  const handleBubblePointerMove = useCallback((e: React.PointerEvent<SVGGElement>) => {
+    const drag = bubbleDragRef.current;
+    if (!drag) return;
+    const svg = svgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const scale = rect.width / SVG_W;
+    const svgX = (e.clientX - rect.left) / scale;
+    const col = Math.max(0, Math.min(Math.floor((svgX - PAD_LEFT) / CELL_SIZE), TOTAL_COLUMNS - 1));
+    if (col !== drag.lastCol) {
+      drag.lastCol = col;
+      onFoodMove?.(drag.placementId, col);
+    }
+  }, [onFoodMove]);
+
+  const handleBubblePointerUp = useCallback((e: React.PointerEvent<SVGGElement>) => {
+    const drag = bubbleDragRef.current;
+    if (!drag) return;
+    bubbleDragRef.current = null;
+    const svg = svgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const scale = rect.width / SVG_W;
+    const svgX = (e.clientX - rect.left) / scale;
+    const svgY = (e.clientY - rect.top) / scale;
+    if (svgX < PAD_LEFT || svgX > PAD_LEFT + GRAPH_W || svgY < PAD_TOP || svgY > PAD_TOP + GRAPH_H) {
+      onFoodClick?.(drag.placementId);
+    }
+  }, [onFoodClick]);
+
   return (
     <div ref={setNodeRef} className={`bg-graph ${isOver ? 'bg-graph--drag-over' : ''}`}>
       <svg
@@ -290,6 +389,19 @@ export function BgGraph({
         className="bg-graph__svg"
         preserveAspectRatio="xMidYMid meet"
       >
+        <defs>
+          {/* Zone clip paths for skyline coloring */}
+          {ZONE_CLIP_BANDS.map(z => (
+            <clipPath key={z.id} id={z.id}>
+              <rect x={0} y={z.yTop} width={SVG_W} height={z.yBot - z.yTop} />
+            </clipPath>
+          ))}
+          {/* Bubble drop shadow */}
+          <filter id="bubble-shadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="1" stdDeviation="1.5" floodColor="#000" floodOpacity="0.12" />
+          </filter>
+        </defs>
+
         {/* Zone backgrounds */}
         <rect
           x={PAD_LEFT}
@@ -459,43 +571,81 @@ export function BgGraph({
           </g>
         ))}
 
-        {/* BG level line — step-wise line tracing the effective glucose surface */}
-        {columnCaps.some(h => h > 0) && (
-          <g className="bg-graph__bg-line" pointerEvents="none">
-            {columnCaps.flatMap((h, col) => {
-              const result: React.ReactElement[] = [];
-              const prevH = col > 0 ? columnCaps[col - 1] : 0;
-
-              // Vertical segment at left edge when height changes
-              if (h !== prevH && (h > 0 || prevH > 0)) {
-                result.push(
-                  <line
-                    key={`bg-v-${col}`}
-                    x1={colToX(col)} y1={PAD_TOP + GRAPH_H - prevH * CELL_SIZE}
-                    x2={colToX(col)} y2={PAD_TOP + GRAPH_H - h * CELL_SIZE}
-                    stroke={getZoneColor(Math.max(h, prevH))}
-                    strokeWidth={3}
-                  />
-                );
-              }
-
-              // Horizontal segment across the column
-              if (h > 0) {
-                result.push(
-                  <line
-                    key={`bg-h-${col}`}
-                    x1={colToX(col)} y1={PAD_TOP + GRAPH_H - h * CELL_SIZE}
-                    x2={colToX(col) + CELL_SIZE} y2={PAD_TOP + GRAPH_H - h * CELL_SIZE}
-                    stroke={getZoneColor(h)}
-                    strokeWidth={3}
-                  />
-                );
-              }
-
-              return result;
-            })}
+        {/* BG skyline — single path with rounded corners + shadow line below */}
+        {skylinePath && (
+          <g className="bg-graph__skyline" pointerEvents="none">
+            {/* Shadow line — offset 2px below, wider, semi-transparent */}
+            <path
+              d={skylinePath}
+              fill="none"
+              stroke="rgba(0,0,0,0.18)"
+              strokeWidth={5}
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              transform="translate(0, 2)"
+            />
+            {/* Zone-colored skyline — clipped per zone band */}
+            {ZONE_CLIP_BANDS.map(z => (
+              <path
+                key={z.id}
+                d={skylinePath}
+                fill="none"
+                stroke={z.color}
+                strokeWidth={3}
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                clipPath={`url(#${z.id})`}
+              />
+            ))}
           </g>
         )}
+
+        {/* Food bubbles — emoji labels above each food's peak */}
+        {interactive && bubbleData.map(b => {
+          const cx = colToX(b.peakCol) + CELL_SIZE / 2;
+          const tailBottomY = PAD_TOP + GRAPH_H - b.skylineH * CELL_SIZE;
+          const tailH = 5;
+          const tailTopY = tailBottomY - tailH;
+          const bW = 22;
+          const bH = 20;
+          const bY = tailTopY - bH;
+          return (
+            <g
+              key={`bubble-${b.placementId}`}
+              style={{ cursor: 'grab' }}
+              onPointerDown={(e) => handleBubblePointerDown(e, b.placementId)}
+              onPointerMove={handleBubblePointerMove}
+              onPointerUp={handleBubblePointerUp}
+            >
+              {/* Shadow + background + tail */}
+              <g filter="url(#bubble-shadow)">
+                <rect
+                  x={cx - bW / 2} y={bY}
+                  width={bW} height={bH}
+                  rx={4} fill="white"
+                  stroke="#cbd5e0" strokeWidth={0.5}
+                />
+                <polygon
+                  points={`${cx - 3.5},${tailTopY} ${cx + 3.5},${tailTopY} ${cx},${tailBottomY}`}
+                  fill="white" stroke="#cbd5e0" strokeWidth={0.5}
+                />
+                {/* Cover the border between rect and tail */}
+                <line
+                  x1={cx - 3} y1={tailTopY} x2={cx + 3} y2={tailTopY}
+                  stroke="white" strokeWidth={1.5}
+                />
+              </g>
+              {/* Emoji */}
+              <text
+                x={cx} y={bY + bH / 2 + 1}
+                textAnchor="middle" dominantBaseline="central"
+                fontSize={13} style={{ pointerEvents: 'none' }}
+              >
+                {b.emoji}
+              </text>
+            </g>
+          );
+        })}
 
         {/* Penalty highlight overlays (after submit) */}
         {showPenaltyHighlight && foodCubeData.map(food =>
