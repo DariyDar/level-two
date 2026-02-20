@@ -8,6 +8,8 @@ import {
   DEFAULT_X_TICKS,
   DEFAULT_Y_TICKS,
   DEFAULT_MEDICATION_MODIFIERS,
+  PENALTY_ORANGE_ROW,
+  PENALTY_RED_ROW,
   columnToTimeString,
   formatBgValue,
 } from '../../core/types';
@@ -51,6 +53,8 @@ interface BgGraphProps {
   previewShip?: Ship | null;
   previewIntervention?: Intervention | null;
   previewColumn?: number | null;
+  showPenaltyHighlight?: boolean;
+  interactive?: boolean;
   onFoodClick?: (placementId: string) => void;
   onInterventionClick?: (placementId: string) => void;
 }
@@ -80,6 +84,8 @@ export function BgGraph({
   previewShip,
   previewIntervention,
   previewColumn,
+  showPenaltyHighlight = false,
+  interactive = true,
   onFoodClick,
   onInterventionClick,
 }: BgGraphProps) {
@@ -205,13 +211,14 @@ export function BgGraph({
 
   const handleCubeClick = useCallback(
     (placementId: string, isIntervention: boolean) => {
+      if (!interactive) return;
       if (isIntervention) {
         onInterventionClick?.(placementId);
       } else {
         onFoodClick?.(placementId);
       }
     },
-    [onFoodClick, onInterventionClick]
+    [onFoodClick, onInterventionClick, interactive]
   );
 
   return (
@@ -370,7 +377,6 @@ export function BgGraph({
                         if (placedInterventions.length > 0) {
                           handleCubeClick(placedInterventions[0]?.id ?? food.placementId, true);
                         }
-                        // Medication-burned cubes: no-op
                       } else {
                         handleCubeClick(food.placementId, false);
                       }
@@ -381,6 +387,36 @@ export function BgGraph({
             )}
           </g>
         ))}
+
+        {/* Penalty highlight overlays (after submit) */}
+        {showPenaltyHighlight && foodCubeData.map(food =>
+          food.columns.map(col =>
+            Array.from({ length: col.count }, (_, cubeIdx) => {
+              const row = col.baseRow + cubeIdx;
+              if (row >= TOTAL_ROWS) return null;
+              // Only highlight non-burned cubes in penalty zones
+              if (row >= columnCaps[col.col]) return null;
+              const isOrange = row >= PENALTY_ORANGE_ROW && row < PENALTY_RED_ROW;
+              const isRed = row >= PENALTY_RED_ROW;
+              if (!isOrange && !isRed) return null;
+              const waveDelay = col.col * 15;
+              return (
+                <rect
+                  key={`penalty-${food.placementId}-${col.col}-${cubeIdx}`}
+                  x={colToX(col.col) + 0.5}
+                  y={rowToY(row) + 0.5}
+                  width={CELL_SIZE - 1}
+                  height={CELL_SIZE - 1}
+                  fill={isRed ? 'rgba(245, 101, 101, 0.7)' : 'rgba(237, 137, 54, 0.6)'}
+                  rx={2}
+                  className="bg-graph__cube--penalty"
+                  style={{ animationDelay: `${waveDelay}ms` }}
+                  pointerEvents="none"
+                />
+              );
+            })
+          )
+        )}
 
         {/* Intervention preview: green overlay on food cubes that would be burned */}
         {interventionPreviewData && foodCubeData.map(food =>
@@ -428,7 +464,19 @@ export function BgGraph({
           })
         )}
 
-        {/* BG line — disabled for now */}
+        {/* Penalty threshold line at 200 mg/dL (shown during results) */}
+        {showPenaltyHighlight && (
+          <line
+            x1={PAD_LEFT}
+            y1={rowToY(PENALTY_ORANGE_ROW - 1)}
+            x2={PAD_LEFT + GRAPH_W}
+            y2={rowToY(PENALTY_ORANGE_ROW - 1)}
+            stroke="#e53e3e"
+            strokeWidth={1.5}
+            strokeDasharray="6 3"
+            opacity={0.8}
+          />
+        )}
       </svg>
     </div>
   );

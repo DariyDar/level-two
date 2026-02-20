@@ -10,6 +10,8 @@ interface PlanningHeaderProps {
   wpBudget: number;
   settings: GameSettings;
   medicationModifiers?: MedicationModifiers;
+  submitEnabled: boolean;
+  onSubmit: () => void;
   onToggleTimeFormat: () => void;
   onToggleBgUnit: () => void;
   onToggleDecay: () => void;
@@ -23,6 +25,8 @@ export function PlanningHeader({
   wpBudget,
   settings,
   medicationModifiers = DEFAULT_MEDICATION_MODIFIERS,
+  submitEnabled,
+  onSubmit,
   onToggleTimeFormat,
   onToggleBgUnit,
   onToggleDecay,
@@ -61,6 +65,15 @@ export function PlanningHeader({
           {assessment.label}
         </span>
       </div>
+
+      <button
+        className={`planning-header__submit ${submitEnabled ? '' : 'planning-header__submit--disabled'}`}
+        onClick={onSubmit}
+        disabled={!submitEnabled}
+        title={submitEnabled ? 'Submit your meal plan' : 'Eat at least Light to submit'}
+      >
+        Submit
+      </button>
 
       <div className="planning-header__settings">
         <button

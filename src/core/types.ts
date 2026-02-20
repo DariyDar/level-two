@@ -173,6 +173,32 @@ export interface LevelConfig {
   kcalBudget?: number;
 }
 
+// === Submit / Rating System ===
+
+export type GamePhase = 'planning' | 'replaying' | 'results';
+
+export interface PenaltyResult {
+  totalPenalty: number;
+  orangeCount: number;  // cubes in 200-300 zone
+  redCount: number;     // cubes in 300+ zone
+  stars: number;        // 0-3
+  label: string;        // "Perfect", "Good", "Pass", "Defeat"
+}
+
+/** Penalty zone thresholds (in row units from bgMin) */
+export const PENALTY_ORANGE_ROW = 7;  // row 7 = 200 mg/dL
+export const PENALTY_RED_ROW = 12;    // row 12 = 300 mg/dL
+export const PENALTY_ORANGE_WEIGHT = 0.5;
+export const PENALTY_RED_WEIGHT = 1.5;
+
+/** Star rating thresholds */
+export function calculateStars(penalty: number): { stars: number; label: string } {
+  if (penalty <= 10) return { stars: 3, label: 'Perfect' };
+  if (penalty <= 40) return { stars: 2, label: 'Good' };
+  if (penalty <= 80) return { stars: 1, label: 'Pass' };
+  return { stars: 0, label: 'Defeat' };
+}
+
 // === Type Guards ===
 
 export function isGlucoseShip(ship: Ship): boolean {

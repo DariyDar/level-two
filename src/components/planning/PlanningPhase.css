@@ -14,6 +14,17 @@
   padding: 0 8px;
 }
 
+.planning-phase__hint--replay {
+  color: #fbbf24;
+  font-weight: 600;
+  animation: replayPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes replayPulse {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+
 .planning-phase--loading {
   display: flex;
   align-items: center;

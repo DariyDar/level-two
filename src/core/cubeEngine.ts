@@ -1,5 +1,5 @@
-import type { PlacedFood, Ship, PlacedIntervention, Intervention, Medication, MedicationModifiers } from './types';
-import { GRAPH_CONFIG, TOTAL_COLUMNS, DEFAULT_MEDICATION_MODIFIERS } from './types';
+import type { PlacedFood, Ship, PlacedIntervention, Intervention, Medication, MedicationModifiers, PenaltyResult } from './types';
+import { GRAPH_CONFIG, TOTAL_COLUMNS, DEFAULT_MEDICATION_MODIFIERS, PENALTY_ORANGE_ROW, PENALTY_RED_ROW, PENALTY_ORANGE_WEIGHT, PENALTY_RED_WEIGHT, calculateStars } from './types';
 
 export interface CubeColumn {
   columnOffset: number; // offset from drop column (0, 1, 2, ...)
@@ -235,4 +235,79 @@ export function calculateSglt2Reduction(
   floorRow: number,
 ): number[] {
   return totalFoodHeights.map(h => Math.min(depth, Math.max(0, h - floorRow)));
+}
+
+// ============================================
+// Penalty / Rating Calculation
+// ============================================
+
+/**
+ * Calculate penalty from effective column heights (after interventions + medications).
+ * Cubes in 200-300 mg/dL (rows 7-11) = 0.5 weight each.
+ * Cubes above 300 mg/dL (rows 12+) = 1.5 weight each.
+ */
+export function calculatePenalty(columnCaps: number[]): PenaltyResult {
+  let totalPenalty = 0;
+  let orangeCount = 0;
+  let redCount = 0;
+
+  for (const h of columnCaps) {
+    const orange = Math.max(0, Math.min(h, PENALTY_RED_ROW) - PENALTY_ORANGE_ROW);
+    const red = Math.max(0, h - PENALTY_RED_ROW);
+    orangeCount += orange;
+    redCount += red;
+    totalPenalty += orange * PENALTY_ORANGE_WEIGHT + red * PENALTY_RED_WEIGHT;
+  }
+
+  const { stars, label } = calculateStars(totalPenalty);
+  return {
+    totalPenalty: Math.round(totalPenalty * 10) / 10,
+    orangeCount,
+    redCount,
+    stars,
+    label,
+  };
+}
+
+/**
+ * Calculate penalty from full game state (all placements + medications).
+ */
+export function calculatePenaltyFromState(
+  placedFoods: PlacedFood[],
+  allShips: Ship[],
+  placedInterventions: PlacedIntervention[],
+  allInterventions: Intervention[],
+  medicationModifiers: MedicationModifiers,
+  decayEnabled: boolean,
+): PenaltyResult {
+  // Build food heights per column
+  const totalHeights = new Array(TOTAL_COLUMNS).fill(0);
+  for (const placed of placedFoods) {
+    const ship = allShips.find(s => s.id === placed.shipId);
+    if (!ship) continue;
+    const { glucose, duration } = applyMedicationToFood(ship.load, ship.duration, medicationModifiers);
+    const curve = calculateCurve(glucose, duration, placed.dropColumn, decayEnabled);
+    for (const col of curve) {
+      const graphCol = placed.dropColumn + col.columnOffset;
+      if (graphCol >= 0 && graphCol < TOTAL_COLUMNS) {
+        totalHeights[graphCol] += col.cubeCount;
+      }
+    }
+  }
+
+  // Intervention reduction
+  const interventionRed = calculateInterventionReduction(placedInterventions, allInterventions);
+
+  // SGLT2 reduction
+  const sglt2 = medicationModifiers.sglt2;
+  const sglt2Red = sglt2
+    ? calculateSglt2Reduction(totalHeights, sglt2.depth, sglt2.floorRow)
+    : new Array(TOTAL_COLUMNS).fill(0);
+
+  // Column caps (effective visible height)
+  const columnCaps = totalHeights.map((h, i) =>
+    Math.max(0, h - interventionRed[i] - sglt2Red[i])
+  );
+
+  return calculatePenalty(columnCaps);
 }
