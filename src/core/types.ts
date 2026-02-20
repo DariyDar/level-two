@@ -46,9 +46,9 @@ export type PancreasTier = 0 | 1 | 2 | 3;
 
 export const PANCREAS_TIERS: Record<PancreasTier, { decayRate: number; cost: number; label: string }> = {
   0: { decayRate: 0, cost: 0, label: 'OFF' },
-  1: { decayRate: 0.5, cost: 0, label: 'I' },
-  2: { decayRate: 1.0, cost: 1, label: 'II' },
-  3: { decayRate: 1.5, cost: 2, label: 'III' },
+  1: { decayRate: 0.25, cost: 0, label: 'I' },
+  2: { decayRate: 0.5, cost: 1, label: 'II' },
+  3: { decayRate: 0.75, cost: 2, label: 'III' },
 };
 
 export const PANCREAS_TOTAL_BARS = 3;

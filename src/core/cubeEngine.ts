@@ -24,7 +24,7 @@ export function calculateCurve(
   glucose: number,
   durationMinutes: number,
   dropColumn: number,
-  decayRate: number = 0.5
+  decayRate: number = 0.25
 ): CubeColumn[] {
   const peakCubes = Math.round(glucose / GRAPH_CONFIG.cellHeightMgDl);
   const riseCols = Math.max(1, Math.round(durationMinutes / GRAPH_CONFIG.cellWidthMin));
@@ -65,7 +65,7 @@ export function calculateCurve(
 export function calculateGraphState(
   placedFoods: PlacedFood[],
   allShips: Ship[],
-  decayRate: number = 0.5
+  decayRate: number = 0.25
 ): number[] {
   const bgValues = new Array(TOTAL_COLUMNS).fill(0);
 
@@ -91,7 +91,7 @@ export function calculateGraphState(
 export function buildFoodPyramids(
   placedFoods: PlacedFood[],
   allShips: Ship[],
-  decayRate: number = 0.5
+  decayRate: number = 0.25
 ): FoodPyramid[] {
   return placedFoods.map(placed => {
     const ship = allShips.find(s => s.id === placed.shipId);
