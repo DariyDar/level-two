@@ -103,7 +103,7 @@ export function BgGraph({
   onInterventionClick,
 }: BgGraphProps) {
   const svgRef = useRef<SVGSVGElement>(null);
-  const bubbleDragRef = useRef<{ placementId: string; lastCol: number } | null>(null);
+  const markerDragRef = useRef<{ placementId: string; lastCol: number } | null>(null);
 
   const { setNodeRef, isOver } = useDroppable({
     id: 'bg-graph',
@@ -316,8 +316,8 @@ export function BgGraph({
     [onFoodClick, onInterventionClick, interactive]
   );
 
-  // Bubble data: one bubble per placed food at its peak column
-  const bubbleData = useMemo(() => {
+  // Food markers: one marker per placed food at its peak column, positioned above its own skyline
+  const markerData = useMemo(() => {
     return placedFoods.map(placed => {
       const ship = allShips.find(s => s.id === placed.shipId);
       if (!ship) return null;
@@ -337,22 +337,22 @@ export function BgGraph({
         shipId: placed.shipId,
         emoji: ship.emoji,
         peakCol,
-        skylineH: columnCaps[peakCol],
+        ownPeakH: maxCount, // this food's own peak height (not combined stack)
       };
     }).filter((d): d is NonNullable<typeof d> => d !== null);
-  }, [placedFoods, allShips, medicationModifiers, decayRate, columnCaps]);
+  }, [placedFoods, allShips, medicationModifiers, decayRate]);
 
-  // Bubble pointer drag handlers
-  const handleBubblePointerDown = useCallback((e: React.PointerEvent<SVGGElement>, placementId: string) => {
+  // Food marker pointer drag handlers
+  const handleMarkerPointerDown = useCallback((e: React.PointerEvent<SVGGElement>, placementId: string) => {
     if (!interactive) return;
     e.preventDefault();
     e.stopPropagation();
     e.currentTarget.setPointerCapture(e.pointerId);
-    bubbleDragRef.current = { placementId, lastCol: -1 };
+    markerDragRef.current = { placementId, lastCol: -1 };
   }, [interactive]);
 
-  const handleBubblePointerMove = useCallback((e: React.PointerEvent<SVGGElement>) => {
-    const drag = bubbleDragRef.current;
+  const handleMarkerPointerMove = useCallback((e: React.PointerEvent<SVGGElement>) => {
+    const drag = markerDragRef.current;
     if (!drag) return;
     const svg = svgRef.current;
     if (!svg) return;
@@ -366,10 +366,10 @@ export function BgGraph({
     }
   }, [onFoodMove]);
 
-  const handleBubblePointerUp = useCallback((e: React.PointerEvent<SVGGElement>) => {
-    const drag = bubbleDragRef.current;
+  const handleMarkerPointerUp = useCallback((e: React.PointerEvent<SVGGElement>) => {
+    const drag = markerDragRef.current;
     if (!drag) return;
-    bubbleDragRef.current = null;
+    markerDragRef.current = null;
     const svg = svgRef.current;
     if (!svg) return;
     const rect = svg.getBoundingClientRect();
@@ -396,7 +396,7 @@ export function BgGraph({
               <rect x={0} y={z.yTop} width={SVG_W} height={z.yBot - z.yTop} />
             </clipPath>
           ))}
-          {/* Bubble drop shadow */}
+          {/* Food marker drop shadow */}
           <filter id="bubble-shadow" x="-50%" y="-50%" width="200%" height="200%">
             <feDropShadow dx="0" dy="1" stdDeviation="1.5" floodColor="#000" floodOpacity="0.12" />
           </filter>
@@ -600,46 +600,46 @@ export function BgGraph({
           </g>
         )}
 
-        {/* Food bubbles — emoji labels above each food's peak */}
-        {interactive && bubbleData.map(b => {
+        {/* Food markers — emoji labels above each food's own peak */}
+        {interactive && markerData.map(b => {
           const cx = colToX(b.peakCol) + CELL_SIZE / 2;
-          const tailBottomY = PAD_TOP + GRAPH_H - b.skylineH * CELL_SIZE;
-          const tailH = 5;
+          const tailBottomY = PAD_TOP + GRAPH_H - b.ownPeakH * CELL_SIZE;
+          const tailH = 11;
           const tailTopY = tailBottomY - tailH;
-          const bW = 22;
-          const bH = 20;
-          const bY = tailTopY - bH;
+          const mW = 50;
+          const mH = 44;
+          const mY = tailTopY - mH;
           return (
             <g
-              key={`bubble-${b.placementId}`}
+              key={`marker-${b.placementId}`}
               style={{ cursor: 'grab' }}
-              onPointerDown={(e) => handleBubblePointerDown(e, b.placementId)}
-              onPointerMove={handleBubblePointerMove}
-              onPointerUp={handleBubblePointerUp}
+              onPointerDown={(e) => handleMarkerPointerDown(e, b.placementId)}
+              onPointerMove={handleMarkerPointerMove}
+              onPointerUp={handleMarkerPointerUp}
             >
               {/* Shadow + background + tail */}
               <g filter="url(#bubble-shadow)">
                 <rect
-                  x={cx - bW / 2} y={bY}
-                  width={bW} height={bH}
-                  rx={4} fill="white"
-                  stroke="#cbd5e0" strokeWidth={0.5}
+                  x={cx - mW / 2} y={mY}
+                  width={mW} height={mH}
+                  rx={8} fill="white"
+                  stroke="#cbd5e0" strokeWidth={0.7}
                 />
                 <polygon
-                  points={`${cx - 3.5},${tailTopY} ${cx + 3.5},${tailTopY} ${cx},${tailBottomY}`}
-                  fill="white" stroke="#cbd5e0" strokeWidth={0.5}
+                  points={`${cx - 6},${tailTopY} ${cx + 6},${tailTopY} ${cx},${tailBottomY}`}
+                  fill="white" stroke="#cbd5e0" strokeWidth={0.7}
                 />
                 {/* Cover the border between rect and tail */}
                 <line
-                  x1={cx - 3} y1={tailTopY} x2={cx + 3} y2={tailTopY}
-                  stroke="white" strokeWidth={1.5}
+                  x1={cx - 5.5} y1={tailTopY} x2={cx + 5.5} y2={tailTopY}
+                  stroke="white" strokeWidth={2}
                 />
               </g>
               {/* Emoji */}
               <text
-                x={cx} y={bY + bH / 2 + 1}
+                x={cx} y={mY + mH / 2 + 1}
                 textAnchor="middle" dominantBaseline="central"
-                fontSize={13} style={{ pointerEvents: 'none' }}
+                fontSize={30} style={{ pointerEvents: 'none' }}
               >
                 {b.emoji}
               </text>
