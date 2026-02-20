@@ -209,49 +209,57 @@ export function BgGraph({
     );
   }, [pancreasCaps, interventionReduction, medicationModifiers.sglt2]);
 
-  // Per-food skyline paths: white outline for foods that have other foods stacked on top
+  // Per-food skyline paths: white outline for each food's effective boundary
   const foodSkylinePaths = useMemo(() => {
     if (foodCubeData.length < 2) return [];
-    return foodCubeData
-      .filter(food =>
-        food.columns.some(c => c.baseRow + c.count < plateauHeights[c.col])
-      )
-      .map(food => {
-        const parts: string[] = [];
-        let prevCol = -2;
-        for (const c of food.columns) {
-          const topRow = c.baseRow + c.count;
-          const y = PAD_TOP + GRAPH_H - topRow * CELL_SIZE;
-          const x = colToX(c.col);
-          if (c.col !== prevCol + 1) {
-            parts.push(`M ${x} ${y}`);
-          } else {
-            parts.push(`V ${y}`);
-          }
-          parts.push(`H ${x + CELL_SIZE}`);
-          prevCol = c.col;
+    return foodCubeData.map(food => {
+      const parts: string[] = [];
+      let prevCol = -2;
+      let prevBaseY = 0;
+      for (const c of food.columns) {
+        const effTop = Math.min(c.baseRow + c.count, pancreasCaps[c.col]);
+        if (effTop <= c.baseRow) continue; // fully eaten — skip
+        const y = PAD_TOP + GRAPH_H - effTop * CELL_SIZE;
+        const baseY = PAD_TOP + GRAPH_H - c.baseRow * CELL_SIZE;
+        const x = colToX(c.col);
+        if (c.col !== prevCol + 1) {
+          // Close previous segment
+          if (prevCol >= 0) parts.push(`V ${prevBaseY}`);
+          // Start new segment from base
+          parts.push(`M ${x} ${baseY}`);
+          parts.push(`V ${y}`);
+        } else {
+          parts.push(`V ${y}`);
         }
-        return { id: food.placementId, d: parts.join(' ') };
-      });
-  }, [foodCubeData, plateauHeights]);
+        parts.push(`H ${x + CELL_SIZE}`);
+        prevCol = c.col;
+        prevBaseY = baseY;
+      }
+      // Close last segment
+      if (prevCol >= 0) parts.push(`V ${prevBaseY}`);
+      return { id: food.placementId, d: parts.join(' ') };
+    }).filter(fp => fp.d.length > 0);
+  }, [foodCubeData, pancreasCaps]);
 
   // Skyline path: single SVG path tracing the step-wise top surface of columnCaps
   const skylinePath = useMemo(() => {
     const parts: string[] = [];
     let inSegment = false;
+    const bottomY = PAD_TOP + GRAPH_H;
 
     for (let col = 0; col < TOTAL_COLUMNS; col++) {
       const h = columnCaps[col];
 
       if (h <= 0) {
-        inSegment = false;
+        if (inSegment) { parts.push(`V ${bottomY}`); inSegment = false; }
         continue;
       }
 
       const y = PAD_TOP + GRAPH_H - h * CELL_SIZE;
 
       if (!inSegment) {
-        parts.push(`M ${colToX(col)} ${y}`);
+        parts.push(`M ${colToX(col)} ${bottomY}`);
+        parts.push(`V ${y}`);
         inSegment = true;
       } else {
         const prevH = columnCaps[col - 1];
@@ -263,6 +271,7 @@ export function BgGraph({
       parts.push(`H ${colToX(col) + CELL_SIZE}`);
     }
 
+    if (inSegment) parts.push(`V ${bottomY}`);
     return parts.length > 0 ? parts.join(' ') : '';
   }, [columnCaps]);
 
@@ -342,36 +351,29 @@ export function BgGraph({
     [onFoodClick, onInterventionClick, interactive]
   );
 
-  // Food markers: one marker per placed food at its peak column, touching its own skyline
+  // Food markers: one marker per placed food at its effective peak
   const markerData = useMemo(() => {
     return placedFoods.map(placed => {
       const ship = allShips.find(s => s.id === placed.shipId);
       if (!ship) return null;
-      const { glucose, duration } = applyMedicationToFood(ship.load, ship.duration, medicationModifiers);
-      // Use decayed curve to find the peak column
-      const curve = calculateCurve(glucose, duration, placed.dropColumn, decayRate);
-      let maxCount = 0;
-      let peakOffset = 0;
-      for (const col of curve) {
-        if (col.cubeCount > maxCount) {
-          maxCount = col.cubeCount;
-          peakOffset = col.columnOffset;
-        }
-      }
-      const peakCol = Math.min(placed.dropColumn + peakOffset, TOTAL_COLUMNS - 1);
-      // Get skyline height from plateau data (baseRow + count) to match rendered cubes
+      // Find peak from effective heights (plateau capped by pancreas)
       const foodEntry = foodCubeData.find(f => f.placementId === placed.id);
-      const peakColEntry = foodEntry?.columns.find(c => c.col === peakCol);
-      const skylineH = peakColEntry ? peakColEntry.baseRow + peakColEntry.count : maxCount;
+      if (!foodEntry || foodEntry.columns.length === 0) return null;
+      let maxEffH = 0;
+      let peakCol = placed.dropColumn;
+      for (const c of foodEntry.columns) {
+        const effH = Math.min(c.baseRow + c.count, pancreasCaps[c.col]);
+        if (effH > maxEffH) { maxEffH = effH; peakCol = c.col; }
+      }
       return {
         placementId: placed.id,
         shipId: placed.shipId,
         emoji: ship.emoji,
         peakCol,
-        skylineH,
+        skylineH: maxEffH,
       };
     }).filter((d): d is NonNullable<typeof d> => d !== null);
-  }, [placedFoods, allShips, medicationModifiers, decayRate, foodCubeData]);
+  }, [placedFoods, allShips, foodCubeData, pancreasCaps]);
 
   // Food marker pointer drag handlers
   const handleMarkerPointerDown = useCallback((e: React.PointerEvent<SVGGElement>, placementId: string) => {
