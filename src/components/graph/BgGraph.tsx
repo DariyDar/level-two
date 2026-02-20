@@ -209,6 +209,32 @@ export function BgGraph({
     );
   }, [pancreasCaps, interventionReduction, medicationModifiers.sglt2]);
 
+  // Per-food skyline paths: white outline for foods that have other foods stacked on top
+  const foodSkylinePaths = useMemo(() => {
+    if (foodCubeData.length < 2) return [];
+    return foodCubeData
+      .filter(food =>
+        food.columns.some(c => c.baseRow + c.count < plateauHeights[c.col])
+      )
+      .map(food => {
+        const parts: string[] = [];
+        let prevCol = -2;
+        for (const c of food.columns) {
+          const topRow = c.baseRow + c.count;
+          const y = PAD_TOP + GRAPH_H - topRow * CELL_SIZE;
+          const x = colToX(c.col);
+          if (c.col !== prevCol + 1) {
+            parts.push(`M ${x} ${y}`);
+          } else {
+            parts.push(`V ${y}`);
+          }
+          parts.push(`H ${x + CELL_SIZE}`);
+          prevCol = c.col;
+        }
+        return { id: food.placementId, d: parts.join(' ') };
+      });
+  }, [foodCubeData, plateauHeights]);
+
   // Skyline path: single SVG path tracing the step-wise top surface of columnCaps
   const skylinePath = useMemo(() => {
     const parts: string[] = [];
@@ -569,6 +595,20 @@ export function BgGraph({
               })
             )}
           </g>
+        ))}
+
+        {/* Per-food skyline outlines — thin white lines separating stacked foods */}
+        {foodSkylinePaths.map(fp => (
+          <path
+            key={`food-sky-${fp.id}`}
+            d={fp.d}
+            fill="none"
+            stroke="white"
+            strokeWidth={2}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            pointerEvents="none"
+          />
         ))}
 
         {/* BG skyline — single path with rounded corners + shadow line below */}
