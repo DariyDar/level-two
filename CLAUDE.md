@@ -20,7 +20,7 @@ This repository contains **independent projects** on separate branches:
 
 | Branch | Project | Version | Description |
 |--------|---------|---------|-------------|
-| `main` | BG Planner | v0.31.0 | Graph-based food planning with cubes, interventions, medications, decay, wave animations |
+| `main` | BG Planner | v0.31.7 | Graph-based food planning with cubes, interventions, medications, decay, wave animations |
 | `port-planner` | Port Planner | v0.27.1 | Archived — metabolic simulation (WP, slots, organs, SVG pipes) |
 | `match3` | Port Planner + Match-3 | v0.28.11 | Match-3 mini-game for food card acquisition |
 | `tower-defense` | Glucose TD | v0.4.1 | Tower defense reimagining (projectiles, organ zones) |
@@ -102,7 +102,7 @@ Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
 ### Key Files
 
 #### Core Engine
-- `src/version.ts` — version number (v0.31.0)
+- `src/version.ts` — version number (v0.31.7)
 - `src/core/types.ts` — type definitions (Ship, PlacedFood, Intervention, PlacedIntervention, GameSettings, GRAPH_CONFIG)
 - `src/core/cubeEngine.ts` — ramp+decay curve algorithm, intervention reduction, graph state calculation
 
@@ -137,7 +137,7 @@ Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
 - `src/App.tsx` — root app component (single screen, no phase routing)
 - `src/App.css` — app layout styles
 
-### Current State (v0.31.0) — Medications + Interventions + Wave Animations
+### Current State (v0.31.7) — Medications + Boost Zones + GI Color Gradient
 
 - **Single-Screen Design** ✅
   - Graph on top, food inventory + intervention inventory below (horizontal card layout)
@@ -166,6 +166,10 @@ Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
 - **Intervention System** ✅
   - Two interventions: Light Walk (🚶 60m, 2 WP, -3 cubes) and Heavy Run (🏃 30m, 4 WP, -5 cubes)
   - Intervention curve: ramp up during duration, then flat to end of graph
+  - **Boost zones**: first N columns get extra depth (burst effect)
+    - Light Walk: first 3 cols at -4 cubes (base 3 + boost 1)
+    - Heavy Run: first 5 cols at -7 cubes (base 5 + boost 2)
+  - **Drag preview**: when dragging an intervention over the graph, per-cube green overlays show exactly which food cubes would be burned (pulsing animation)
   - Cubes are removed from the **top** of the food stack at each column
   - Burned cubes rendered semi-transparent (opacity 0.35) in original food color
   - Click burned cubes to remove intervention
@@ -220,6 +224,16 @@ Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
   - All 24 foods have: carbs, protein, fat, kcal (from USDA × 2.5)
   - protein/fat stored for future use, not displayed on cards yet
 
+- **Food Cube Colors** ✅
+  - GI-based blue gradient: cubes colored from light blue to dark blue based on glucose rise rate
+  - Formula: `rate = glucose / duration` (mg/dL per minute), higher rate = darker blue
+  - HSL gradient: `hsl(215, 75%, L%)` where `L = 78 - t*46`, t normalized 0..1
+  - **Dynamic normalization**: min/max computed from only placed foods (colors shift as foods are added/removed)
+
+- **Day Navigation** ✅
+  - Cheat buttons at bottom: "Day 1", "Day 2", "Day 3" for quick switching
+  - Active day highlighted, disabled when already on that day
+
 - **Game Settings** ✅
   - Time format toggle: 12h ↔ 24h
   - BG unit toggle: mg/dL ↔ mmol/L
@@ -237,7 +251,7 @@ Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
   "protein": 1,
   "fat": 0,
   "duration": 45,
-  "kcal": 263,
+  "kcal": 302,
   "wpCost": 1,
   "description": "Natural energy, potassium rich."
 }
@@ -251,7 +265,9 @@ Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
   "emoji": "🚶",
   "depth": 3,
   "duration": 60,
-  "wpCost": 2
+  "wpCost": 2,
+  "boostCols": 3,
+  "boostExtra": 1
 }
 ```
 
@@ -277,43 +293,43 @@ Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
 
 ### Food Parameters Table
 
-Based on USDA FoodData Central, GI databases. `glucose = carbs × 10`, duration from GI + macronutrient composition. Kcal = USDA per-serving × 2.5.
+Based on USDA FoodData Central, GI databases. `glucose = carbs × 10`, duration from GI + macronutrient composition. Kcal = USDA per-serving × 2.5 × 1.15.
 
 | # | Food | Emoji | Carbs | Protein | Fat | Kcal | WP | Duration | Cubes | Cols |
 |---|------|-------|------:|--------:|----:|-----:|---:|---------:|------:|-----:|
-| 1 | Banana | 🍌 | 27g | 1g | 0g | 263 | 1 | 45m | 14 | 3 |
-| 2 | Apple | 🍎 | 25g | 1g | 0g | 238 | 1 | 45m | 13 | 3 |
-| 3 | Ice Cream | 🍦 | 24g | 4g | 11g | 518 | 0 | 60m | 12 | 4 |
-| 4 | Popcorn | 🍿 | 22g | 3g | 2g | 283 | 1 | 45m | 11 | 3 |
-| 5 | Cookie | 🍪 | 17g | 2g | 7g | 365 | 2 | 30m | 9 | 2 |
-| 6 | Caesar Salad | 🥗 | 10g | 9g | 12g | 475 | 3 | 75m | 5 | 5 |
-| 7 | Choco Muffin | 🧁 | 52g | 6g | 18g | 993 | 0 | 60m | 26 | 4 |
-| 8 | Sandwich | 🥪 | 40g | 22g | 28g | 1250 | 2 | 75m | 20 | 5 |
-| 9 | Chicken Meal | 🍗 | 5g | 35g | 12g | 700 | 3 | 120m | 3 | 8 |
-| 10 | Bowl of Rice | 🍚 | 45g | 4g | 0g | 513 | 4 | 45m | 23 | 3 |
-| 11 | Hamburger | 🍔 | 24g | 17g | 14g | 738 | 3 | 75m | 12 | 5 |
-| 12 | Oatmeal | 🥣 | 28g | 6g | 4g | 415 | 4 | 60m | 14 | 4 |
-| 13 | Pizza | 🍕 | 34g | 12g | 12g | 750 | 3 | 60m | 17 | 4 |
-| 14 | Boiled Eggs | 🥚 | 1g | 13g | 10g | 388 | 4 | 150m | 1 | 10 |
-| 15 | Mixed Berries | 🫐 | 21g | 2g | 1g | 213 | 2 | 45m | 11 | 3 |
-| 16 | Greek Yogurt | 🥛 | 8g | 11g | 11g | 488 | 3 | 75m | 4 | 5 |
-| 17 | Milk 2% | 🥛 | 12g | 8g | 5g | 305 | 3 | 45m | 6 | 3 |
-| 18 | Vegetable Stew | 🥘 | 20g | 5g | 5g | 420 | 4 | 75m | 10 | 5 |
-| 19 | Boiled Carrots | 🥕 | 8g | 1g | 0g | 133 | 4 | 45m | 4 | 3 |
-| 20 | Chickpeas | 🫘 | 27g | 9g | 3g | 410 | 3 | 75m | 14 | 5 |
-| 21 | Cottage Cheese | 🧀 | 5g | 25g | 9g | 515 | 4 | 120m | 3 | 8 |
-| 22 | Hard Cheese | 🧀 | 1g | 7g | 9g | 300 | 3 | 150m | 1 | 10 |
-| 23 | Avocado | 🥑 | 9g | 2g | 15g | 400 | 3 | 105m | 5 | 7 |
-| 24 | Mixed Nuts | 🥜 | 4g | 5g | 16g | 455 | 2 | 105m | 2 | 7 |
+| 1 | Banana | 🍌 | 27g | 1g | 0g | 302 | 1 | 45m | 14 | 3 |
+| 2 | Apple | 🍎 | 25g | 1g | 0g | 274 | 1 | 45m | 13 | 3 |
+| 3 | Ice Cream | 🍦 | 24g | 4g | 11g | 596 | 0 | 60m | 12 | 4 |
+| 4 | Popcorn | 🍿 | 22g | 3g | 2g | 325 | 1 | 45m | 11 | 3 |
+| 5 | Cookie | 🍪 | 17g | 2g | 7g | 420 | 2 | 30m | 9 | 2 |
+| 6 | Caesar Salad | 🥗 | 10g | 9g | 12g | 546 | 3 | 75m | 5 | 5 |
+| 7 | Choco Muffin | 🧁 | 52g | 6g | 18g | 1142 | 0 | 60m | 26 | 4 |
+| 8 | Sandwich | 🥪 | 40g | 22g | 28g | 1438 | 2 | 75m | 20 | 5 |
+| 9 | Chicken Meal | 🍗 | 5g | 35g | 12g | 805 | 3 | 120m | 3 | 8 |
+| 10 | Bowl of Rice | 🍚 | 45g | 4g | 0g | 590 | 4 | 45m | 23 | 3 |
+| 11 | Hamburger | 🍔 | 24g | 17g | 14g | 849 | 3 | 75m | 12 | 5 |
+| 12 | Oatmeal | 🥣 | 28g | 6g | 4g | 477 | 4 | 60m | 14 | 4 |
+| 13 | Pizza | 🍕 | 34g | 12g | 12g | 863 | 3 | 60m | 17 | 4 |
+| 14 | Boiled Eggs | 🥚 | 1g | 13g | 10g | 446 | 4 | 150m | 1 | 10 |
+| 15 | Mixed Berries | 🫐 | 21g | 2g | 1g | 245 | 2 | 45m | 11 | 3 |
+| 16 | Greek Yogurt | 🥛 | 8g | 11g | 11g | 561 | 3 | 75m | 4 | 5 |
+| 17 | Milk 2% | 🥛 | 12g | 8g | 5g | 351 | 3 | 45m | 6 | 3 |
+| 18 | Vegetable Stew | 🥘 | 20g | 5g | 5g | 483 | 4 | 75m | 10 | 5 |
+| 19 | Boiled Carrots | 🥕 | 8g | 1g | 0g | 153 | 4 | 45m | 4 | 3 |
+| 20 | Chickpeas | 🫘 | 27g | 9g | 3g | 472 | 3 | 75m | 14 | 5 |
+| 21 | Cottage Cheese | 🧀 | 5g | 25g | 9g | 592 | 4 | 120m | 3 | 8 |
+| 22 | Hard Cheese | 🧀 | 1g | 7g | 9g | 345 | 3 | 150m | 1 | 10 |
+| 23 | Avocado | 🥑 | 9g | 2g | 15g | 460 | 3 | 105m | 5 | 7 |
+| 24 | Mixed Nuts | 🥜 | 4g | 5g | 16g | 523 | 2 | 105m | 2 | 7 |
 
 **Derived:** Cubes = glucose / 20 (glucose = carbs × 10), Cols = duration / 15. Sources: USDA FoodData Central, glycemic-index.net
 
 ### Intervention Parameters
 
-| Intervention | Emoji | Depth | Duration | WP | Effect |
-|-------------|-------|------:|---------:|---:|--------|
-| Light Walk | 🚶 | 3 cubes | 60m | 2 | Removes 3 cubes from top, ramp 60m then flat to end |
-| Heavy Run | 🏃 | 5 cubes | 30m | 4 | Removes 5 cubes from top, ramp 30m then flat to end |
+| Intervention | Emoji | Depth | Duration | WP | Boost | Effect |
+|-------------|-------|------:|---------:|---:|-------|--------|
+| Light Walk | 🚶 | 3 cubes | 60m | 2 | +1 for 3 cols | Removes 3 cubes (4 in burst zone), ramp 60m then flat |
+| Heavy Run | 🏃 | 5 cubes | 30m | 4 | +2 for 5 cols | Removes 5 cubes (7 in burst zone), ramp 30m then flat |
 
 ### Level Config Structure
 ```json
@@ -367,11 +383,12 @@ Based on USDA FoodData Central, GI databases. `glucose = carbs × 10`, duration 
 2. `riseCols = Math.round(duration / 15)`
 3. Rise phase: linear from 1 to depth
 4. Plateau: flat at depth from peak to right edge of graph
-5. Multiple interventions stack (reductions add up)
-6. Cubes removed from top — bottom cubes stay visible
+5. **Boost zone**: first `boostCols` columns get `+boostExtra` depth on top of normal curve
+6. Multiple interventions stack (reductions add up)
+7. Cubes removed from top — bottom cubes stay visible
 
 #### Food Colors
-Cubes are colored per food type (8-color cycle): blue, red, green, orange, purple, pink, teal, yellow
+GI-based blue gradient using HSL: `hsl(215, 75%, L%)` where lightness ranges from 78% (slowest rise) to 32% (fastest rise). Rise rate = `glucose / duration`. Normalized dynamically across placed foods only — colors shift as foods are added/removed from the graph.
 
 #### BG Zones
 | Zone | Range | Color |
@@ -394,10 +411,9 @@ Cubes are colored per food type (8-color cycle): blue, red, green, orange, purpl
 - Metformin, fiber system
 
 ### Known Issues
-- Preview during drag doesn't show ghost cubes yet (pointer tracking needs refinement)
 - Win/loss conditions not yet implemented (to be discussed)
-- No multi-day progression (day navigation UI not yet built)
 - Intervention click on burned cubes always removes the first intervention (not necessarily the one that burned that specific cube)
+- Food drag preview doesn't show ghost cubes yet (intervention preview works)
 
 ---
 
