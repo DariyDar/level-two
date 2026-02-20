@@ -22,12 +22,12 @@ export function PancreasButton({
     <div
       className={`pancreas-button ${disabled ? 'pancreas-button--disabled' : ''}`}
       onClick={disabled ? undefined : onCycle}
-      title={`Pancreas ${tierInfo.label} — click to cycle`}
+      title={`Pancreas naturally digests glucose over time. Tier ${tierInfo.label}${tierInfo.cost > 0 ? ` (${tierInfo.cost} bar${tierInfo.cost > 1 ? 's' : ''})` : ''} — tap to change`}
     >
       <div className="pancreas-button__header">
         <span className="pancreas-button__emoji">{'\uD83E\uDEC1'}</span>
         <span className="pancreas-button__label">Pancreas</span>
-        <span className={`pancreas-button__tier ${currentTier === 0 ? 'pancreas-button__tier--off' : ''}`}>
+        <span className="pancreas-button__tier">
           {tierInfo.label}
         </span>
       </div>

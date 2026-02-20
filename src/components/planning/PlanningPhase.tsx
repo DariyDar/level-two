@@ -34,10 +34,10 @@ interface ReplayData {
 }
 
 function getNextPancreasTier(current: PancreasTier, maxBars: number): PancreasTier {
-  const sequence: PancreasTier[] = [0, 1, 2, 3];
+  const sequence: PancreasTier[] = [1, 2, 3];
   const currentIdx = sequence.indexOf(current);
-  for (let offset = 1; offset <= 4; offset++) {
-    const next = sequence[(currentIdx + offset) % 4];
+  for (let offset = 1; offset <= 3; offset++) {
+    const next = sequence[(currentIdx + offset) % 3];
     if (PANCREAS_TIERS[next].cost <= maxBars) return next;
   }
   return 1;
@@ -268,13 +268,7 @@ export function PlanningPhase() {
   const handleCyclePancreas = useCallback(() => {
     const nextTier = getNextPancreasTier(currentPancreasTier, barsAvailable);
     setPancreasTier(currentDay, nextTier);
-    // Clear graph when toggling pancreas ON/OFF (tier 0 boundary)
-    if ((nextTier === 0) !== (currentPancreasTier === 0)) {
-      clearFoods();
-      setGamePhase('planning');
-      setPenaltyResult(null);
-    }
-  }, [currentPancreasTier, barsAvailable, currentDay, setPancreasTier, clearFoods]);
+  }, [currentPancreasTier, barsAvailable, currentDay, setPancreasTier]);
 
   // === Submit handler: save state, clear graph, start replay ===
   const handleSubmit = useCallback(() => {
