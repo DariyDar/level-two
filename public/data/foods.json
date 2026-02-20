@@ -60,7 +60,7 @@
       "carbs": 17,
       "protein": 2,
       "fat": 7,
-      "duration": 30,
+      "duration": 60,
       "kcal": 420,
       "wpCost": 2,
       "description": "Sweet treat, fast sugar spike."
@@ -73,7 +73,7 @@
       "carbs": 10,
       "protein": 9,
       "fat": 12,
-      "duration": 75,
+      "duration": 120,
       "kcal": 546,
       "wpCost": 3,
       "description": "Fresh and healthy, mostly from croutons."
@@ -99,7 +99,7 @@
       "carbs": 40,
       "protein": 22,
       "fat": 28,
-      "duration": 75,
+      "duration": 150,
       "kcal": 1438,
       "wpCost": 2,
       "description": "Balanced meal, bread + protein + fat."
@@ -125,7 +125,7 @@
       "carbs": 45,
       "protein": 4,
       "fat": 0,
-      "duration": 45,
+      "duration": 150,
       "kcal": 590,
       "wpCost": 4,
       "description": "High GI staple, fast glucose spike."
@@ -138,7 +138,7 @@
       "carbs": 24,
       "protein": 17,
       "fat": 14,
-      "duration": 75,
+      "duration": 180,
       "kcal": 849,
       "wpCost": 3,
       "description": "Bun carbs slowed by fat and protein."
@@ -151,7 +151,7 @@
       "carbs": 28,
       "protein": 6,
       "fat": 4,
-      "duration": 60,
+      "duration": 120,
       "kcal": 477,
       "wpCost": 4,
       "description": "Complex starch with fiber."
@@ -164,7 +164,7 @@
       "carbs": 34,
       "protein": 12,
       "fat": 12,
-      "duration": 60,
+      "duration": 90,
       "kcal": 863,
       "wpCost": 3,
       "description": "White flour crust, cheese slows absorption."
@@ -203,7 +203,7 @@
       "carbs": 8,
       "protein": 11,
       "fat": 11,
-      "duration": 75,
+      "duration": 90,
       "kcal": 561,
       "wpCost": 3,
       "description": "Protein + fat slow carb absorption."
@@ -229,7 +229,7 @@
       "carbs": 20,
       "protein": 5,
       "fat": 5,
-      "duration": 75,
+      "duration": 150,
       "kcal": 483,
       "wpCost": 4,
       "description": "Mixed vegetables with fiber."
@@ -255,7 +255,7 @@
       "carbs": 27,
       "protein": 9,
       "fat": 3,
-      "duration": 75,
+      "duration": 90,
       "kcal": 472,
       "wpCost": 3,
       "description": "High fiber + protein slow absorption."
@@ -294,7 +294,7 @@
       "carbs": 9,
       "protein": 2,
       "fat": 15,
-      "duration": 105,
+      "duration": 150,
       "kcal": 460,
       "wpCost": 3,
       "description": "Healthy fats, very slow digestion."
@@ -307,7 +307,7 @@
       "carbs": 4,
       "protein": 5,
       "fat": 16,
-      "duration": 105,
+      "duration": 150,
       "kcal": 523,
       "wpCost": 2,
       "description": "High fat + protein, minimal carbs."

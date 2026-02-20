@@ -20,7 +20,7 @@ This repository contains **independent projects** on separate branches:
 
 | Branch | Project | Version | Description |
 |--------|---------|---------|-------------|
-| `main` | BG Planner | v0.31.7 | Graph-based food planning with cubes, interventions, medications, decay, wave animations |
+| `main` | BG Planner | v0.31.8 | Graph-based food planning with cubes, interventions, medications, decay, wave animations |
 | `port-planner` | Port Planner | v0.27.1 | Archived — metabolic simulation (WP, slots, organs, SVG pipes) |
 | `match3` | Port Planner + Match-3 | v0.28.11 | Match-3 mini-game for food card acquisition |
 | `tower-defense` | Glucose TD | v0.4.1 | Tower defense reimagining (projectiles, organ zones) |
@@ -102,7 +102,7 @@ Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
 ### Key Files
 
 #### Core Engine
-- `src/version.ts` — version number (v0.31.7)
+- `src/version.ts` — version number (v0.31.8)
 - `src/core/types.ts` — type definitions (Ship, PlacedFood, Intervention, PlacedIntervention, GameSettings, GRAPH_CONFIG)
 - `src/core/cubeEngine.ts` — ramp+decay curve algorithm, intervention reduction, graph state calculation
 
@@ -137,7 +137,7 @@ Single screen: BG Graph (top) + Food Inventory + Intervention Inventory (bottom)
 - `src/App.tsx` — root app component (single screen, no phase routing)
 - `src/App.css` — app layout styles
 
-### Current State (v0.31.7) — Medications + Boost Zones + GI Color Gradient
+### Current State (v0.31.8) — Medications + Boost Zones + GI Color Gradient
 
 - **Single-Screen Design** ✅
   - Graph on top, food inventory + intervention inventory below (horizontal card layout)
@@ -301,26 +301,26 @@ Based on USDA FoodData Central, GI databases. `glucose = carbs × 10`, duration 
 | 2 | Apple | 🍎 | 25g | 1g | 0g | 274 | 1 | 45m | 13 | 3 |
 | 3 | Ice Cream | 🍦 | 24g | 4g | 11g | 596 | 0 | 60m | 12 | 4 |
 | 4 | Popcorn | 🍿 | 22g | 3g | 2g | 325 | 1 | 45m | 11 | 3 |
-| 5 | Cookie | 🍪 | 17g | 2g | 7g | 420 | 2 | 30m | 9 | 2 |
-| 6 | Caesar Salad | 🥗 | 10g | 9g | 12g | 546 | 3 | 75m | 5 | 5 |
+| 5 | Cookie | 🍪 | 17g | 2g | 7g | 420 | 2 | 60m | 9 | 4 |
+| 6 | Caesar Salad | 🥗 | 10g | 9g | 12g | 546 | 3 | 120m | 5 | 8 |
 | 7 | Choco Muffin | 🧁 | 52g | 6g | 18g | 1142 | 0 | 60m | 26 | 4 |
-| 8 | Sandwich | 🥪 | 40g | 22g | 28g | 1438 | 2 | 75m | 20 | 5 |
+| 8 | Sandwich | 🥪 | 40g | 22g | 28g | 1438 | 2 | 150m | 20 | 10 |
 | 9 | Chicken Meal | 🍗 | 5g | 35g | 12g | 805 | 3 | 120m | 3 | 8 |
-| 10 | Bowl of Rice | 🍚 | 45g | 4g | 0g | 590 | 4 | 45m | 23 | 3 |
-| 11 | Hamburger | 🍔 | 24g | 17g | 14g | 849 | 3 | 75m | 12 | 5 |
-| 12 | Oatmeal | 🥣 | 28g | 6g | 4g | 477 | 4 | 60m | 14 | 4 |
-| 13 | Pizza | 🍕 | 34g | 12g | 12g | 863 | 3 | 60m | 17 | 4 |
+| 10 | Bowl of Rice | 🍚 | 45g | 4g | 0g | 590 | 4 | 150m | 23 | 10 |
+| 11 | Hamburger | 🍔 | 24g | 17g | 14g | 849 | 3 | 180m | 12 | 12 |
+| 12 | Oatmeal | 🥣 | 28g | 6g | 4g | 477 | 4 | 120m | 14 | 8 |
+| 13 | Pizza | 🍕 | 34g | 12g | 12g | 863 | 3 | 90m | 17 | 6 |
 | 14 | Boiled Eggs | 🥚 | 1g | 13g | 10g | 446 | 4 | 150m | 1 | 10 |
 | 15 | Mixed Berries | 🫐 | 21g | 2g | 1g | 245 | 2 | 45m | 11 | 3 |
-| 16 | Greek Yogurt | 🥛 | 8g | 11g | 11g | 561 | 3 | 75m | 4 | 5 |
+| 16 | Greek Yogurt | 🥛 | 8g | 11g | 11g | 561 | 3 | 90m | 4 | 6 |
 | 17 | Milk 2% | 🥛 | 12g | 8g | 5g | 351 | 3 | 45m | 6 | 3 |
-| 18 | Vegetable Stew | 🥘 | 20g | 5g | 5g | 483 | 4 | 75m | 10 | 5 |
+| 18 | Vegetable Stew | 🥘 | 20g | 5g | 5g | 483 | 4 | 150m | 10 | 10 |
 | 19 | Boiled Carrots | 🥕 | 8g | 1g | 0g | 153 | 4 | 45m | 4 | 3 |
-| 20 | Chickpeas | 🫘 | 27g | 9g | 3g | 472 | 3 | 75m | 14 | 5 |
+| 20 | Chickpeas | 🫘 | 27g | 9g | 3g | 472 | 3 | 90m | 14 | 6 |
 | 21 | Cottage Cheese | 🧀 | 5g | 25g | 9g | 592 | 4 | 120m | 3 | 8 |
 | 22 | Hard Cheese | 🧀 | 1g | 7g | 9g | 345 | 3 | 150m | 1 | 10 |
-| 23 | Avocado | 🥑 | 9g | 2g | 15g | 460 | 3 | 105m | 5 | 7 |
-| 24 | Mixed Nuts | 🥜 | 4g | 5g | 16g | 523 | 2 | 105m | 2 | 7 |
+| 23 | Avocado | 🥑 | 9g | 2g | 15g | 460 | 3 | 150m | 5 | 10 |
+| 24 | Mixed Nuts | 🥜 | 4g | 5g | 16g | 523 | 2 | 150m | 2 | 10 |
 
 **Derived:** Cubes = glucose / 20 (glucose = carbs × 10), Cols = duration / 15. Sources: USDA FoodData Central, glycemic-index.net
 
