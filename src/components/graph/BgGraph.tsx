@@ -66,7 +66,6 @@ interface FoodColumnSummary {
   baseRow: number;
   totalCount: number;
   topNormalRow: number;
-  hasOverlap: boolean;
 }
 
 interface FoodMarkerInfo {
@@ -238,21 +237,8 @@ export function BgGraph({
       const cubes: FoodRenderCube[] = [];
       const colSummary: FoodColumnSummary[] = [];
 
-      // Find food's own peak height (max cube count)
-      let maxCount = 0;
       for (const c of food.columns) {
-        if (c.count > maxCount) maxCount = c.count;
-      }
-      const peakCols: number[] = [];
-
-      for (const c of food.columns) {
-        if (c.count === maxCount) {
-          peakCols.push(c.col);
-        }
-
         let topNormalRow = c.baseRow; // default: no normal cubes visible
-        const hasOverlap = hasMultipleFoods &&
-          (c.baseRow > 0 || (c.baseRow + c.count < plateauHeights[c.col]));
 
         for (let cubeIdx = 0; cubeIdx < c.count; cubeIdx++) {
           const row = c.baseRow + cubeIdx;
@@ -275,29 +261,33 @@ export function BgGraph({
           baseRow: c.baseRow,
           totalCount: c.count,
           topNormalRow,
-          hasOverlap,
         });
       }
 
-      // Marker: centered over peak columns, tail at topNormalRow of center peak
+      // Marker: centered over VISIBLE peak (max topNormalRow), not plateau peak
+      let maxVisibleH = 0;
+      for (const cs of colSummary) {
+        if (cs.topNormalRow > maxVisibleH) maxVisibleH = cs.topNormalRow;
+      }
+      const peakCols = colSummary
+        .filter(cs => cs.topNormalRow === maxVisibleH && maxVisibleH > cs.baseRow)
+        .map(cs => cs.col);
+
       let marker: FoodMarkerInfo | null = null;
       if (peakCols.length > 0) {
         const peakCenterX = PAD_LEFT +
           ((peakCols[0] + peakCols[peakCols.length - 1]) / 2 + 0.5) * CELL_SIZE;
-        const midPeakCol = peakCols[Math.floor(peakCols.length / 2)];
-        const midSummary = colSummary.find(s => s.col === midPeakCol);
-        const tailRow = midSummary ? midSummary.topNormalRow : 0;
-        marker = { peakCenterX, tailRow };
+        marker = { peakCenterX, tailRow: maxVisibleH };
       }
 
-      // Skyline path: only at overlap columns when multiple foods
+      // Skyline path: trace topNormalRow across all columns with visible cubes
       let skylinePath: string | null = null;
       if (hasMultipleFoods) {
         const parts: string[] = [];
         let prevCol = -2;
         for (const cs of colSummary) {
-          if (!cs.hasOverlap) continue;
-          const topRow = cs.baseRow + cs.totalCount;
+          if (cs.topNormalRow <= cs.baseRow) continue; // no visible cubes
+          const topRow = cs.topNormalRow;
           const y = PAD_TOP + GRAPH_H - topRow * CELL_SIZE;
           const x = colToX(cs.col);
           if (cs.col !== prevCol + 1) {
