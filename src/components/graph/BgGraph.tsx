@@ -52,6 +52,48 @@ const ZONE_CLIP_BANDS = [
   { id: 'zone-clip-red', color: '#fc8181', yTop: PAD_TOP - 3, yBot: PAD_TOP + GRAPH_H - 12 * CELL_SIZE + 3 },
 ];
 
+// Unified render data types
+type CubeStatus = 'normal' | 'burned' | 'pancreas';
+
+interface FoodRenderCube {
+  col: number;
+  row: number;
+  status: CubeStatus;
+}
+
+interface FoodColumnSummary {
+  col: number;
+  baseRow: number;
+  totalCount: number;
+  topNormalRow: number;
+  hasOverlap: boolean;
+}
+
+interface FoodMarkerInfo {
+  peakCenterX: number;
+  tailRow: number;
+}
+
+interface FoodRenderLayer {
+  placementId: string;
+  shipId: string;
+  dropColumn: number;
+  color: string;
+  emoji: string;
+  cubes: FoodRenderCube[];
+  colSummary: FoodColumnSummary[];
+  marker: FoodMarkerInfo | null;
+  skylinePath: string | null;
+}
+
+interface GraphRenderData {
+  layers: FoodRenderLayer[];
+  mainSkylinePath: string;
+  columnCaps: number[];
+  plateauHeights: number[];
+  pancreasCaps: number[];
+}
+
 interface BgGraphProps {
   placedFoods: PlacedFood[];
   allShips: Ship[];
@@ -115,9 +157,23 @@ export function BgGraph({
     [placedInterventions, allInterventions]
   );
 
-  // Build per-food cube data for coloring
-  const foodCubeData = useMemo(() => {
-    const data: Array<{
+  // Unified graph render data: single source of truth for all visual elements.
+  // Replaces 7 separate useMemo hooks (foodCubeData, pancreasCaps, plateauHeights,
+  // columnCaps, foodSkylinePaths, markerData, skylinePath) with one coherent pass.
+  // Every cube is pre-stamped with status (normal/burned/pancreas), markers and
+  // skylines are derived from the SAME data that stamps cubes — no desync possible.
+  const graphRenderData = useMemo((): GraphRenderData => {
+    // Precompute GI rate range for color normalization
+    const placedShipIds = new Set(placedFoods.map(p => p.shipId));
+    const placedRates = allShips
+      .filter(s => placedShipIds.has(s.id))
+      .map(s => s.load / s.duration);
+    const minRate = placedRates.length > 0 ? Math.min(...placedRates) : 0;
+    const maxRate = placedRates.length > 0 ? Math.max(...placedRates) : 1;
+
+    // Phase 1: Plateau stacking (decayRate=0) — all cubes including pancreas-eaten
+    const plateauHeights = new Array(TOTAL_COLUMNS).fill(0);
+    const rawFoods: Array<{
       placementId: string;
       shipId: string;
       dropColumn: number;
@@ -126,36 +182,23 @@ export function BgGraph({
       columns: Array<{ col: number; baseRow: number; count: number }>;
     }> = [];
 
-    // Track cumulative height at each column for stacking
-    const columnHeights = new Array(TOTAL_COLUMNS).fill(0);
-
-    // Precompute GI rate range from placed foods only for color normalization
-    const placedShipIds = new Set(placedFoods.map(p => p.shipId));
-    const placedRates = allShips
-      .filter(s => placedShipIds.has(s.id))
-      .map(s => s.load / s.duration);
-    const minRate = placedRates.length > 0 ? Math.min(...placedRates) : 0;
-    const maxRate = placedRates.length > 0 ? Math.max(...placedRates) : 1;
-
     for (const placed of placedFoods) {
       const ship = allShips.find(s => s.id === placed.shipId);
       if (!ship) continue;
-
       const { glucose, duration } = applyMedicationToFood(ship.load, ship.duration, medicationModifiers);
-      // Always use plateau (decayRate=0) to render all cubes including pancreas-eaten
       const curve = calculateCurve(glucose, duration, placed.dropColumn, 0);
       const cols: Array<{ col: number; baseRow: number; count: number }> = [];
 
       for (const pc of curve) {
         const graphCol = placed.dropColumn + pc.columnOffset;
         if (graphCol >= 0 && graphCol < TOTAL_COLUMNS) {
-          const baseRow = columnHeights[graphCol];
+          const baseRow = plateauHeights[graphCol];
           cols.push({ col: graphCol, baseRow, count: pc.cubeCount });
-          columnHeights[graphCol] += pc.cubeCount;
+          plateauHeights[graphCol] += pc.cubeCount;
         }
       }
 
-      data.push({
+      rawFoods.push({
         placementId: placed.id,
         shipId: placed.shipId,
         dropColumn: placed.dropColumn,
@@ -165,12 +208,8 @@ export function BgGraph({
       });
     }
 
-    return data;
-  }, [placedFoods, allShips, medicationModifiers]);
-
-  // Pancreas caps: food height after pancreas decay (before interventions/SGLT2)
-  const pancreasCaps = useMemo(() => {
-    const heights = new Array(TOTAL_COLUMNS).fill(0);
+    // Phase 2: PancreasCaps (with actual decayRate)
+    const pancreasCaps = new Array(TOTAL_COLUMNS).fill(0);
     for (const placed of placedFoods) {
       const ship = allShips.find(s => s.id === placed.shipId);
       if (!ship) continue;
@@ -179,99 +218,142 @@ export function BgGraph({
       for (const col of curve) {
         const graphCol = placed.dropColumn + col.columnOffset;
         if (graphCol >= 0 && graphCol < TOTAL_COLUMNS) {
-          heights[graphCol] += col.cubeCount;
+          pancreasCaps[graphCol] += col.cubeCount;
         }
       }
     }
-    return heights;
-  }, [placedFoods, allShips, medicationModifiers, decayRate]);
 
-  // Plateau heights: total food height with no decay (for preview stacking base)
-  const plateauHeights = useMemo(() => {
-    const heights = new Array(TOTAL_COLUMNS).fill(0);
-    for (const food of foodCubeData) {
-      for (const col of food.columns) {
-        heights[col.col] += col.count;
-      }
-    }
-    return heights;
-  }, [foodCubeData]);
-
-  // Column caps: visible height after pancreas + interventions + SGLT2
-  const columnCaps = useMemo(() => {
+    // Phase 3: ColumnCaps (pancreas − interventions − SGLT2)
     const sglt2 = medicationModifiers.sglt2;
     const sglt2Reduction = sglt2
       ? calculateSglt2Reduction(pancreasCaps, sglt2.depth, sglt2.floorRow)
       : new Array(TOTAL_COLUMNS).fill(0);
-
-    return pancreasCaps.map((h, i) =>
+    const columnCaps = pancreasCaps.map((h, i) =>
       Math.max(0, h - interventionReduction[i] - sglt2Reduction[i])
     );
-  }, [pancreasCaps, interventionReduction, medicationModifiers.sglt2]);
 
-  // Per-food skyline paths: white outline at stacking boundary between foods
-  // Uses plateau boundary (baseRow + count), NOT pancreas-capped effective height,
-  // so the line traces where one food's cubes end and the next food's begin.
-  // Only drawn at columns where other food exists (above or below).
-  const foodSkylinePaths = useMemo(() => {
-    if (foodCubeData.length < 2) return [];
-    return foodCubeData.map(food => {
-      const parts: string[] = [];
-      let prevCol = -2;
+    // Phase 4: Per-food layers — stamp cubes, compute markers and skylines
+    const hasMultipleFoods = rawFoods.length >= 2;
+    const layers: FoodRenderLayer[] = rawFoods.map(food => {
+      const cubes: FoodRenderCube[] = [];
+      const colSummary: FoodColumnSummary[] = [];
+
+      // Find food's own peak height (max cube count)
+      let maxCount = 0;
       for (const c of food.columns) {
-        // Only draw where other food exists above or below this food
-        const hasOverlap = c.baseRow > 0 || (c.baseRow + c.count < plateauHeights[c.col]);
-        if (!hasOverlap) continue;
-
-        const topRow = c.baseRow + c.count; // stacking boundary (plateau)
-        const y = PAD_TOP + GRAPH_H - topRow * CELL_SIZE;
-        const x = colToX(c.col);
-        if (c.col !== prevCol + 1) {
-          // Start new horizontal segment (no vertical closing — only trace the top boundary)
-          parts.push(`M ${x} ${y}`);
-        } else {
-          parts.push(`V ${y}`);
-        }
-        parts.push(`H ${x + CELL_SIZE}`);
-        prevCol = c.col;
+        if (c.count > maxCount) maxCount = c.count;
       }
-      return { id: food.placementId, d: parts.join(' ') };
-    }).filter(fp => fp.d.length > 0);
-  }, [foodCubeData, plateauHeights]);
+      const peakCols: number[] = [];
 
-  // Skyline path: single SVG path tracing the step-wise top surface of columnCaps
-  const skylinePath = useMemo(() => {
-    const parts: string[] = [];
+      for (const c of food.columns) {
+        if (c.count === maxCount) {
+          peakCols.push(c.col);
+        }
+
+        let topNormalRow = c.baseRow; // default: no normal cubes visible
+        const hasOverlap = hasMultipleFoods &&
+          (c.baseRow > 0 || (c.baseRow + c.count < plateauHeights[c.col]));
+
+        for (let cubeIdx = 0; cubeIdx < c.count; cubeIdx++) {
+          const row = c.baseRow + cubeIdx;
+          if (row >= TOTAL_ROWS) break;
+
+          let status: CubeStatus;
+          if (row >= pancreasCaps[c.col]) {
+            status = 'pancreas';
+          } else if (row >= columnCaps[c.col]) {
+            status = 'burned';
+          } else {
+            status = 'normal';
+            topNormalRow = row + 1;
+          }
+          cubes.push({ col: c.col, row, status });
+        }
+
+        colSummary.push({
+          col: c.col,
+          baseRow: c.baseRow,
+          totalCount: c.count,
+          topNormalRow,
+          hasOverlap,
+        });
+      }
+
+      // Marker: centered over peak columns, tail at topNormalRow of center peak
+      let marker: FoodMarkerInfo | null = null;
+      if (peakCols.length > 0) {
+        const peakCenterX = PAD_LEFT +
+          ((peakCols[0] + peakCols[peakCols.length - 1]) / 2 + 0.5) * CELL_SIZE;
+        const midPeakCol = peakCols[Math.floor(peakCols.length / 2)];
+        const midSummary = colSummary.find(s => s.col === midPeakCol);
+        const tailRow = midSummary ? midSummary.topNormalRow : 0;
+        marker = { peakCenterX, tailRow };
+      }
+
+      // Skyline path: only at overlap columns when multiple foods
+      let skylinePath: string | null = null;
+      if (hasMultipleFoods) {
+        const parts: string[] = [];
+        let prevCol = -2;
+        for (const cs of colSummary) {
+          if (!cs.hasOverlap) continue;
+          const topRow = cs.baseRow + cs.totalCount;
+          const y = PAD_TOP + GRAPH_H - topRow * CELL_SIZE;
+          const x = colToX(cs.col);
+          if (cs.col !== prevCol + 1) {
+            parts.push(`M ${x} ${y}`);
+          } else {
+            parts.push(`V ${y}`);
+          }
+          parts.push(`H ${x + CELL_SIZE}`);
+          prevCol = cs.col;
+        }
+        if (parts.length > 0) {
+          skylinePath = parts.join(' ');
+        }
+      }
+
+      return {
+        placementId: food.placementId,
+        shipId: food.shipId,
+        dropColumn: food.dropColumn,
+        color: food.color,
+        emoji: food.emoji,
+        cubes,
+        colSummary,
+        marker,
+        skylinePath,
+      };
+    });
+
+    // Phase 5: Main skyline path from columnCaps
+    const mainParts: string[] = [];
     let inSegment = false;
     const bottomY = PAD_TOP + GRAPH_H;
-
     for (let col = 0; col < TOTAL_COLUMNS; col++) {
       const h = columnCaps[col];
-
       if (h <= 0) {
-        if (inSegment) { parts.push(`V ${bottomY}`); inSegment = false; }
+        if (inSegment) { mainParts.push(`V ${bottomY}`); inSegment = false; }
         continue;
       }
-
       const y = PAD_TOP + GRAPH_H - h * CELL_SIZE;
-
       if (!inSegment) {
-        parts.push(`M ${colToX(col)} ${bottomY}`);
-        parts.push(`V ${y}`);
+        mainParts.push(`M ${colToX(col)} ${bottomY}`);
+        mainParts.push(`V ${y}`);
         inSegment = true;
       } else {
         const prevH = columnCaps[col - 1];
         if (prevH !== h) {
-          parts.push(`V ${y}`);
+          mainParts.push(`V ${y}`);
         }
       }
-
-      parts.push(`H ${colToX(col) + CELL_SIZE}`);
+      mainParts.push(`H ${colToX(col) + CELL_SIZE}`);
     }
+    if (inSegment) mainParts.push(`V ${bottomY}`);
+    const mainSkylinePath = mainParts.length > 0 ? mainParts.join(' ') : '';
 
-    if (inSegment) parts.push(`V ${bottomY}`);
-    return parts.length > 0 ? parts.join(' ') : '';
-  }, [columnCaps]);
+    return { layers, mainSkylinePath, columnCaps, plateauHeights, pancreasCaps };
+  }, [placedFoods, allShips, medicationModifiers, decayRate, interventionReduction]);
 
   // Preview curve (shown during drag hover)
   // Shows full honest picture: plateau cubes + pancreas effect + correction of existing orange cubes
@@ -293,6 +375,7 @@ export function BgGraph({
       }
     }
 
+    const { pancreasCaps, plateauHeights } = graphRenderData;
     const cubes: Array<{ col: number; row: number; isPancreasEaten: boolean }> = [];
 
     for (const pc of plateauCurve) {
@@ -320,7 +403,7 @@ export function BgGraph({
     }
 
     return cubes;
-  }, [previewShip, previewColumn, pancreasCaps, plateauHeights, medicationModifiers, decayRate]);
+  }, [previewShip, previewColumn, graphRenderData, medicationModifiers, decayRate]);
 
   // Intervention preview: per-column reduction array
   const interventionPreviewData = useMemo(() => {
@@ -348,41 +431,6 @@ export function BgGraph({
     },
     [onFoodClick, onInterventionClick, interactive]
   );
-
-  // Food markers: one marker per placed food at its OWN peak (centered)
-  const markerData = useMemo(() => {
-    return placedFoods.map(placed => {
-      const ship = allShips.find(s => s.id === placed.shipId);
-      if (!ship) return null;
-      const foodEntry = foodCubeData.find(f => f.placementId === placed.id);
-      if (!foodEntry || foodEntry.columns.length === 0) return null;
-
-      // Find food's own peak height (max cube count — independent of stacking/pancreas)
-      let maxCount = 0;
-      for (const c of foodEntry.columns) {
-        if (c.count > maxCount) maxCount = c.count;
-      }
-
-      // Find all columns at own peak → center position (can be fractional)
-      const peakCols = foodEntry.columns
-        .filter(c => c.count === maxCount)
-        .map(c => c.col);
-      const peakCenterX = PAD_LEFT + ((peakCols[0] + peakCols[peakCols.length - 1]) / 2 + 0.5) * CELL_SIZE;
-
-      // skylineH = effective height at the center peak column (for marker tail position)
-      const midPeakCol = peakCols[Math.floor(peakCols.length / 2)];
-      const midEntry = foodEntry.columns.find(c => c.col === midPeakCol)!;
-      const skylineH = Math.min(midEntry.baseRow + midEntry.count, pancreasCaps[midEntry.col]);
-
-      return {
-        placementId: placed.id,
-        shipId: placed.shipId,
-        emoji: ship.emoji,
-        peakCenterX,
-        skylineH,
-      };
-    }).filter((d): d is NonNullable<typeof d> => d !== null);
-  }, [placedFoods, allShips, foodCubeData, pancreasCaps]);
 
   // Food marker pointer drag handlers
   const handleMarkerPointerDown = useCallback((e: React.PointerEvent<SVGGElement>, placementId: string) => {
@@ -567,86 +615,74 @@ export function BgGraph({
         )}
 
         {/* Per-food layers: last placed rendered first (bottom), first placed last (top) */}
-        {[...foodCubeData].reverse().map(food => {
-          const fp = foodCubeData.length >= 2
-            ? foodSkylinePaths.find(s => s.id === food.placementId)
-            : null;
-          return (
-            <g key={`food-layer-${food.placementId}`} className="bg-graph__food-group">
-              {/* Cubes */}
-              {food.columns.map(col =>
-                Array.from({ length: col.count }, (_, cubeIdx) => {
-                  const row = col.baseRow + cubeIdx;
-                  if (row >= TOTAL_ROWS) return null;
-                  const isPancreasEaten = row >= pancreasCaps[col.col];
-                  const isBurned = !isPancreasEaten && row >= columnCaps[col.col];
-                  const colOffset = col.col - food.dropColumn;
-                  const waveDelay = colOffset * 20;
-                  const cubeClass = isPancreasEaten
-                    ? 'bg-graph__cube--pancreas'
-                    : isBurned
-                      ? 'bg-graph__cube--burned'
-                      : 'bg-graph__cube';
-                  const cubeFill = isPancreasEaten
-                    ? 'rgba(246, 153, 63, 0.5)'
-                    : food.color;
-                  return (
-                    <rect
-                      key={`${food.placementId}-${col.col}-${cubeIdx}`}
-                      x={colToX(col.col) + 0.5}
-                      y={rowToY(row) + 0.5}
-                      width={CELL_SIZE - 1}
-                      height={CELL_SIZE - 1}
-                      fill={cubeFill}
-                      rx={2}
-                      className={cubeClass}
-                      style={{ animationDelay: `${waveDelay}ms` }}
-                      onClick={() => {
-                        if (isPancreasEaten) return;
-                        if (isBurned) {
-                          if (placedInterventions.length > 0) {
-                            handleCubeClick(placedInterventions[0]?.id ?? food.placementId, true);
-                          }
-                        } else {
-                          handleCubeClick(food.placementId, false);
-                        }
-                      }}
-                    />
-                  );
-                })
-              )}
-              {/* Individual skyline (inside same layer, on top of this food's cubes) */}
-              {fp && (
-                <g pointerEvents="none">
-                  <path
-                    d={fp.d}
-                    fill="none"
-                    stroke="rgba(0,0,0,0.18)"
-                    strokeWidth={5}
-                    strokeLinejoin="round"
-                    strokeLinecap="round"
-                    transform="translate(0, 1.5)"
-                  />
-                  <path
-                    d={fp.d}
-                    fill="none"
-                    stroke="white"
-                    strokeWidth={3}
-                    strokeLinejoin="round"
-                    strokeLinecap="round"
-                  />
-                </g>
-              )}
-            </g>
-          );
-        })}
+        {[...graphRenderData.layers].reverse().map(layer => (
+          <g key={`food-layer-${layer.placementId}`} className="bg-graph__food-group">
+            {/* Cubes — pre-stamped with status */}
+            {layer.cubes.map(cube => {
+              const waveDelay = (cube.col - layer.dropColumn) * 20;
+              const cubeClass = cube.status === 'pancreas'
+                ? 'bg-graph__cube--pancreas'
+                : cube.status === 'burned'
+                  ? 'bg-graph__cube--burned'
+                  : 'bg-graph__cube';
+              const cubeFill = cube.status === 'pancreas'
+                ? 'rgba(246, 153, 63, 0.5)'
+                : layer.color;
+              return (
+                <rect
+                  key={`${layer.placementId}-${cube.col}-${cube.row}`}
+                  x={colToX(cube.col) + 0.5}
+                  y={rowToY(cube.row) + 0.5}
+                  width={CELL_SIZE - 1}
+                  height={CELL_SIZE - 1}
+                  fill={cubeFill}
+                  rx={2}
+                  className={cubeClass}
+                  style={{ animationDelay: `${waveDelay}ms` }}
+                  onClick={() => {
+                    if (cube.status === 'pancreas') return;
+                    if (cube.status === 'burned') {
+                      if (placedInterventions.length > 0) {
+                        handleCubeClick(placedInterventions[0]?.id ?? layer.placementId, true);
+                      }
+                    } else {
+                      handleCubeClick(layer.placementId, false);
+                    }
+                  }}
+                />
+              );
+            })}
+            {/* Individual skyline (inside same layer, on top of this food's cubes) */}
+            {layer.skylinePath && (
+              <g pointerEvents="none">
+                <path
+                  d={layer.skylinePath}
+                  fill="none"
+                  stroke="rgba(0,0,0,0.18)"
+                  strokeWidth={5}
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  transform="translate(0, 1.5)"
+                />
+                <path
+                  d={layer.skylinePath}
+                  fill="none"
+                  stroke="white"
+                  strokeWidth={3}
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                />
+              </g>
+            )}
+          </g>
+        ))}
 
         {/* BG skyline — single path with rounded corners + shadow line below */}
-        {skylinePath && (
+        {graphRenderData.mainSkylinePath && (
           <g className="bg-graph__skyline" pointerEvents="none">
             {/* Shadow line — offset 2px below, wider, semi-transparent */}
             <path
-              d={skylinePath}
+              d={graphRenderData.mainSkylinePath}
               fill="none"
               stroke="rgba(0,0,0,0.18)"
               strokeWidth={5}
@@ -658,7 +694,7 @@ export function BgGraph({
             {ZONE_CLIP_BANDS.map(z => (
               <path
                 key={z.id}
-                d={skylinePath}
+                d={graphRenderData.mainSkylinePath}
                 fill="none"
                 stroke={z.color}
                 strokeWidth={3}
@@ -671,9 +707,10 @@ export function BgGraph({
         )}
 
         {/* Food markers — emoji labels above each food's own peak */}
-        {interactive && markerData.map(b => {
-          const cx = b.peakCenterX;
-          const tailBottomY = PAD_TOP + GRAPH_H - b.skylineH * CELL_SIZE;
+        {interactive && graphRenderData.layers.map(layer => {
+          if (!layer.marker) return null;
+          const cx = layer.marker.peakCenterX;
+          const tailBottomY = PAD_TOP + GRAPH_H - layer.marker.tailRow * CELL_SIZE;
           const tailH = 11;
           const tailTopY = tailBottomY - tailH;
           const mW = 50;
@@ -681,9 +718,9 @@ export function BgGraph({
           const mY = tailTopY - mH;
           return (
             <g
-              key={`marker-${b.placementId}`}
+              key={`marker-${layer.placementId}`}
               style={{ cursor: 'grab' }}
-              onPointerDown={(e) => handleMarkerPointerDown(e, b.placementId)}
+              onPointerDown={(e) => handleMarkerPointerDown(e, layer.placementId)}
               onPointerMove={handleMarkerPointerMove}
               onPointerUp={handleMarkerPointerUp}
             >
@@ -711,29 +748,26 @@ export function BgGraph({
                 textAnchor="middle" dominantBaseline="central"
                 fontSize={30} style={{ pointerEvents: 'none' }}
               >
-                {b.emoji}
+                {layer.emoji}
               </text>
             </g>
           );
         })}
 
         {/* Penalty highlight overlays (after submit) */}
-        {showPenaltyHighlight && foodCubeData.map(food =>
-          food.columns.map(col =>
-            Array.from({ length: col.count }, (_, cubeIdx) => {
-              const row = col.baseRow + cubeIdx;
-              if (row >= TOTAL_ROWS) return null;
-              // Only highlight non-burned cubes in penalty zones
-              if (row >= columnCaps[col.col]) return null;
-              const isOrange = row >= PENALTY_ORANGE_ROW && row < PENALTY_RED_ROW;
-              const isRed = row >= PENALTY_RED_ROW;
+        {showPenaltyHighlight && graphRenderData.layers.map(layer =>
+          layer.cubes
+            .filter(cube => cube.status === 'normal')
+            .map(cube => {
+              const isOrange = cube.row >= PENALTY_ORANGE_ROW && cube.row < PENALTY_RED_ROW;
+              const isRed = cube.row >= PENALTY_RED_ROW;
               if (!isOrange && !isRed) return null;
-              const waveDelay = col.col * 15;
+              const waveDelay = cube.col * 15;
               return (
                 <rect
-                  key={`penalty-${food.placementId}-${col.col}-${cubeIdx}`}
-                  x={colToX(col.col) + 0.5}
-                  y={rowToY(row) + 0.5}
+                  key={`penalty-${layer.placementId}-${cube.col}-${cube.row}`}
+                  x={colToX(cube.col) + 0.5}
+                  y={rowToY(cube.row) + 0.5}
                   width={CELL_SIZE - 1}
                   height={CELL_SIZE - 1}
                   fill={isRed ? 'rgba(245, 101, 101, 0.7)' : 'rgba(237, 137, 54, 0.6)'}
@@ -744,24 +778,23 @@ export function BgGraph({
                 />
               );
             })
-          )
         )}
 
-        {/* Intervention preview: green overlay on food cubes that would be burned */}
-        {interventionPreviewData && foodCubeData.map(food =>
-          food.columns.map(col => {
-            const red = interventionPreviewData[col.col];
-            if (red <= 0) return null;
-            const cap = columnCaps[col.col];
-            const burnFloor = Math.max(0, cap - red);
-            return Array.from({ length: col.count }, (_, cubeIdx) => {
-              const row = col.baseRow + cubeIdx;
-              if (row >= TOTAL_ROWS || row >= cap || row < burnFloor) return null;
+        {/* Intervention preview: green overlay on normal cubes that would be burned */}
+        {interventionPreviewData && graphRenderData.layers.map(layer =>
+          layer.cubes
+            .filter(cube => cube.status === 'normal')
+            .map(cube => {
+              const red = interventionPreviewData[cube.col];
+              if (red <= 0) return null;
+              const cap = graphRenderData.columnCaps[cube.col];
+              const burnFloor = Math.max(0, cap - red);
+              if (cube.row < burnFloor) return null;
               return (
                 <rect
-                  key={`burn-pv-${food.placementId}-${col.col}-${cubeIdx}`}
-                  x={colToX(col.col) + 0.5}
-                  y={rowToY(row) + 0.5}
+                  key={`burn-pv-${layer.placementId}-${cube.col}-${cube.row}`}
+                  x={colToX(cube.col) + 0.5}
+                  y={rowToY(cube.row) + 0.5}
                   width={CELL_SIZE - 1}
                   height={CELL_SIZE - 1}
                   fill="rgba(34, 197, 94, 0.6)"
@@ -769,8 +802,7 @@ export function BgGraph({
                   className="bg-graph__cube--preview-burn"
                 />
               );
-            });
-          })
+            })
         )}
 
         {/* Preview cubes (during drag) — blue for normal, orange for pancreas-eaten */}
