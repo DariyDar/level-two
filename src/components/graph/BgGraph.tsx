@@ -66,6 +66,7 @@ interface FoodColumnSummary {
   baseRow: number;
   totalCount: number;
   topNormalRow: number;
+  skylineRow: number; // per-food decay boundary (independent of other foods)
 }
 
 interface FoodMarkerInfo {
@@ -207,19 +208,23 @@ export function BgGraph({
       });
     }
 
-    // Phase 2: PancreasCaps (with actual decayRate)
+    // Phase 2: PancreasCaps (with actual decayRate) + per-food decayed heights
     const pancreasCaps = new Array(TOTAL_COLUMNS).fill(0);
+    const perFoodDecayed: number[][] = []; // per-food decayed cubeCount at each column
     for (const placed of placedFoods) {
       const ship = allShips.find(s => s.id === placed.shipId);
       if (!ship) continue;
       const { glucose, duration } = applyMedicationToFood(ship.load, ship.duration, medicationModifiers);
       const curve = calculateCurve(glucose, duration, placed.dropColumn, decayRate);
+      const foodDecayed = new Array(TOTAL_COLUMNS).fill(0);
       for (const col of curve) {
         const graphCol = placed.dropColumn + col.columnOffset;
         if (graphCol >= 0 && graphCol < TOTAL_COLUMNS) {
           pancreasCaps[graphCol] += col.cubeCount;
+          foodDecayed[graphCol] = col.cubeCount;
         }
       }
+      perFoodDecayed.push(foodDecayed);
     }
 
     // Phase 3: ColumnCaps (pancreas − interventions − SGLT2)
@@ -233,12 +238,16 @@ export function BgGraph({
 
     // Phase 4: Per-food layers — stamp cubes, compute markers and skylines
     const hasMultipleFoods = rawFoods.length >= 2;
-    const layers: FoodRenderLayer[] = rawFoods.map(food => {
+    const layers: FoodRenderLayer[] = rawFoods.map((food, foodIndex) => {
+      const foodDecayed = perFoodDecayed[foodIndex];
       const cubes: FoodRenderCube[] = [];
       const colSummary: FoodColumnSummary[] = [];
 
       for (const c of food.columns) {
         let topNormalRow = c.baseRow; // default: no normal cubes visible
+        // Per-food alive count: this food's own decayed height (independent of others)
+        const aliveCount = Math.min(c.count, foodDecayed[c.col]);
+        const skylineRow = Math.min(c.baseRow + aliveCount, TOTAL_ROWS);
 
         for (let cubeIdx = 0; cubeIdx < c.count; cubeIdx++) {
           const row = c.baseRow + cubeIdx;
@@ -261,34 +270,34 @@ export function BgGraph({
           baseRow: c.baseRow,
           totalCount: c.count,
           topNormalRow,
+          skylineRow,
         });
       }
 
-      // Marker: centered over VISIBLE peak (max topNormalRow), not plateau peak
-      let maxVisibleH = 0;
+      // Marker: centered over food's OWN decay peak (per-food, independent of others)
+      let maxSkylineH = 0;
       for (const cs of colSummary) {
-        if (cs.topNormalRow > maxVisibleH) maxVisibleH = cs.topNormalRow;
+        if (cs.skylineRow > maxSkylineH) maxSkylineH = cs.skylineRow;
       }
       const peakCols = colSummary
-        .filter(cs => cs.topNormalRow === maxVisibleH && maxVisibleH > cs.baseRow)
+        .filter(cs => cs.skylineRow === maxSkylineH && maxSkylineH > cs.baseRow)
         .map(cs => cs.col);
 
       let marker: FoodMarkerInfo | null = null;
       if (peakCols.length > 0) {
         const peakCenterX = PAD_LEFT +
           ((peakCols[0] + peakCols[peakCols.length - 1]) / 2 + 0.5) * CELL_SIZE;
-        marker = { peakCenterX, tailRow: maxVisibleH };
+        marker = { peakCenterX, tailRow: maxSkylineH };
       }
 
-      // Skyline path: trace topNormalRow across all columns with visible cubes
+      // Skyline path: trace food's OWN decay contour (per-food, independent of others)
       let skylinePath: string | null = null;
       if (hasMultipleFoods) {
         const parts: string[] = [];
         let prevCol = -2;
         for (const cs of colSummary) {
-          if (cs.topNormalRow <= cs.baseRow) continue; // no visible cubes
-          const topRow = cs.topNormalRow;
-          const y = PAD_TOP + GRAPH_H - topRow * CELL_SIZE;
+          if (cs.skylineRow <= cs.baseRow) continue; // no alive cubes for this food
+          const y = PAD_TOP + GRAPH_H - cs.skylineRow * CELL_SIZE;
           const x = colToX(cs.col);
           if (cs.col !== prevCol + 1) {
             parts.push(`M ${x} ${y}`);
