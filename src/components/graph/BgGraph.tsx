@@ -209,37 +209,35 @@ export function BgGraph({
     );
   }, [pancreasCaps, interventionReduction, medicationModifiers.sglt2]);
 
-  // Per-food skyline paths: white outline for each food's effective boundary
+  // Per-food skyline paths: white outline at stacking boundary between foods
+  // Uses plateau boundary (baseRow + count), NOT pancreas-capped effective height,
+  // so the line traces where one food's cubes end and the next food's begin.
+  // Only drawn at columns where other food exists (above or below).
   const foodSkylinePaths = useMemo(() => {
     if (foodCubeData.length < 2) return [];
     return foodCubeData.map(food => {
       const parts: string[] = [];
       let prevCol = -2;
-      let prevBaseY = 0;
       for (const c of food.columns) {
-        const effTop = Math.min(c.baseRow + c.count, pancreasCaps[c.col]);
-        if (effTop <= c.baseRow) continue; // fully eaten — skip
-        const y = PAD_TOP + GRAPH_H - effTop * CELL_SIZE;
-        const baseY = PAD_TOP + GRAPH_H - c.baseRow * CELL_SIZE;
+        // Only draw where other food exists above or below this food
+        const hasOverlap = c.baseRow > 0 || (c.baseRow + c.count < plateauHeights[c.col]);
+        if (!hasOverlap) continue;
+
+        const topRow = c.baseRow + c.count; // stacking boundary (plateau)
+        const y = PAD_TOP + GRAPH_H - topRow * CELL_SIZE;
         const x = colToX(c.col);
         if (c.col !== prevCol + 1) {
-          // Close previous segment
-          if (prevCol >= 0) parts.push(`V ${prevBaseY}`);
-          // Start new segment from base
-          parts.push(`M ${x} ${baseY}`);
-          parts.push(`V ${y}`);
+          // Start new horizontal segment (no vertical closing — only trace the top boundary)
+          parts.push(`M ${x} ${y}`);
         } else {
           parts.push(`V ${y}`);
         }
         parts.push(`H ${x + CELL_SIZE}`);
         prevCol = c.col;
-        prevBaseY = baseY;
       }
-      // Close last segment
-      if (prevCol >= 0) parts.push(`V ${prevBaseY}`);
       return { id: food.placementId, d: parts.join(' ') };
     }).filter(fp => fp.d.length > 0);
-  }, [foodCubeData, pancreasCaps]);
+  }, [foodCubeData, plateauHeights]);
 
   // Skyline path: single SVG path tracing the step-wise top surface of columnCaps
   const skylinePath = useMemo(() => {
@@ -351,7 +349,7 @@ export function BgGraph({
     [onFoodClick, onInterventionClick, interactive]
   );
 
-  // Food markers: one marker per placed food at its effective peak (centered)
+  // Food markers: one marker per placed food at its OWN peak (centered)
   const markerData = useMemo(() => {
     return placedFoods.map(placed => {
       const ship = allShips.find(s => s.id === placed.shipId);
@@ -359,25 +357,29 @@ export function BgGraph({
       const foodEntry = foodCubeData.find(f => f.placementId === placed.id);
       if (!foodEntry || foodEntry.columns.length === 0) return null;
 
-      // Find max effective height
-      let maxEffH = 0;
+      // Find food's own peak height (max cube count — independent of stacking/pancreas)
+      let maxCount = 0;
       for (const c of foodEntry.columns) {
-        const effH = Math.min(c.baseRow + c.count, pancreasCaps[c.col]);
-        if (effH > maxEffH) maxEffH = effH;
+        if (c.count > maxCount) maxCount = c.count;
       }
 
-      // Find all columns at peak height → center position (can be fractional)
+      // Find all columns at own peak → center position (can be fractional)
       const peakCols = foodEntry.columns
-        .filter(c => Math.min(c.baseRow + c.count, pancreasCaps[c.col]) === maxEffH)
+        .filter(c => c.count === maxCount)
         .map(c => c.col);
       const peakCenterX = PAD_LEFT + ((peakCols[0] + peakCols[peakCols.length - 1]) / 2 + 0.5) * CELL_SIZE;
+
+      // skylineH = effective height at the center peak column (for marker tail position)
+      const midPeakCol = peakCols[Math.floor(peakCols.length / 2)];
+      const midEntry = foodEntry.columns.find(c => c.col === midPeakCol)!;
+      const skylineH = Math.min(midEntry.baseRow + midEntry.count, pancreasCaps[midEntry.col]);
 
       return {
         placementId: placed.id,
         shipId: placed.shipId,
         emoji: ship.emoji,
         peakCenterX,
-        skylineH: maxEffH,
+        skylineH,
       };
     }).filter((d): d is NonNullable<typeof d> => d !== null);
   }, [placedFoods, allShips, foodCubeData, pancreasCaps]);
@@ -619,8 +621,8 @@ export function BgGraph({
                   <path
                     d={fp.d}
                     fill="none"
-                    stroke="rgba(0,0,0,0.15)"
-                    strokeWidth={4}
+                    stroke="rgba(0,0,0,0.18)"
+                    strokeWidth={5}
                     strokeLinejoin="round"
                     strokeLinecap="round"
                     transform="translate(0, 1.5)"
@@ -629,7 +631,7 @@ export function BgGraph({
                     d={fp.d}
                     fill="none"
                     stroke="white"
-                    strokeWidth={2}
+                    strokeWidth={3}
                     strokeLinejoin="round"
                     strokeLinecap="round"
                   />
