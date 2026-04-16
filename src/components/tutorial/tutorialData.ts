@@ -53,6 +53,8 @@ export interface TutorialStep {
   slowBurnAnim?: boolean;      // tutorial: force slow-motion burn animation (3x) while this step is active
   pauseOnDrop?: boolean;       // tutorial: intercept food drop — show hover preview without committing placement; advances tutorial on drop
   releasePendingDrop?: boolean; // tutorial: when step activates, commit the pending drop from pauseOnDrop step
+  highlightPendingDrop?: boolean; // tutorial: blink the pending-drop preview cubes on the graph
+  highlightGILabel?: string;   // tutorial: food id whose GI label on ShipCard should blink
 }
 
 // ======= PANCREAS FATIGUE (T4) =======
@@ -266,7 +268,7 @@ const L1D1: TutorialStep[] = [
     id: 'L1D1-4',
     bubble: { type: 'dialogue', text: "Time to plan our first meal! Drag the \ud83c\udf4c Banana to the 9:00\u00a0AM slot \u2014 let\u2019s see how it affects our blood glucose.", expression: 'neutral' },
     highlight: ['food:banana', 'slot:1'],
-    highlightType: 'glow',
+    highlightType: 'pulse',
     cta: { type: 'drag-arrow', source: 'food:banana', dest: 'slot:1' },
     advanceOn: 'action',
     expectedAction: { type: 'place-food', foodId: 'banana', slotIndex: 1 },
@@ -276,6 +278,7 @@ const L1D1: TutorialStep[] = [
     id: 'L1D1-5',
     bubble: { type: 'dialogue', text: 'When we eat, carbs raise our blood glucose \u2014 the more carbs, the higher the blood glucose will rise.', expression: 'neutral', position: 'center' },
     blockInteraction: true,
+    highlightPendingDrop: true,
     advanceOn: 'tap',
   },
   {
@@ -285,7 +288,7 @@ const L1D1: TutorialStep[] = [
     highlightType: 'spotlight',
     noBackdrop: true,
     blockInteraction: true,
-    advanceOn: 'burn-anim-complete',
+    advanceOn: 'tap',
     releasePendingDrop: true,
     slowBurnAnim: true,
   },
@@ -297,20 +300,21 @@ const L1D1: TutorialStep[] = [
   },
   {
     id: 'L1D1-8',
-    bubble: { type: 'dialogue', text: 'In Level Two, food cards show glucose release speed. Mixed Nuts has a low GI \u2014 tagged as Very Slow.', expression: 'neutral' },
-    highlight: 'food:nutsmixed',
+    bubble: { type: 'dialogue', text: 'In Level Two, food cards show glucose release speed. Hamburger has a low GI \u2014 tagged as Low GI.', expression: 'neutral' },
+    highlight: 'food:burger',
     highlightType: 'glow',
+    highlightGILabel: 'burger',
     blockInteraction: true,
     advanceOn: 'tap',
   },
   {
     id: 'L1D1-9',
-    bubble: { type: 'dialogue', text: "Drag the \ud83e\udd5c Mixed Nuts to the 2:00\u00a0PM slot \u2014 let\u2019s see how a slow-release food behaves.", expression: 'neutral' },
-    highlight: ['food:nutsmixed', 'slot:6'],
-    highlightType: 'glow',
-    cta: { type: 'drag-arrow', source: 'food:nutsmixed', dest: 'slot:6' },
+    bubble: { type: 'dialogue', text: "Drag the \ud83c\udf54 Burger to the 2:00\u00a0PM slot \u2014 let\u2019s see how a slow-release food behaves.", expression: 'neutral' },
+    highlight: ['food:burger', 'slot:6'],
+    highlightType: 'pulse',
+    cta: { type: 'drag-arrow', source: 'food:burger', dest: 'slot:6' },
     advanceOn: 'action',
-    expectedAction: { type: 'place-food', foodId: 'nutsmixed', slotIndex: 6 },
+    expectedAction: { type: 'place-food', foodId: 'burger', slotIndex: 6 },
   },
   {
     id: 'L1D1-10',

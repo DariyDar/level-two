@@ -303,6 +303,15 @@
   animation: baselineCubePulse 1.2s ease-in-out infinite;
 }
 
+/* Tutorial: pending-drop preview cube blink */
+@keyframes previewCubeBlink {
+  0%, 100% { opacity: 0.35; }
+  50%       { opacity: 0.85; }
+}
+.bg-graph__cube--pending-blink {
+  animation: previewCubeBlink 1.2s ease-in-out infinite !important;
+}
+
 /* Tutorial: 200 mg/dL line continuous pulse */
 @keyframes dangerLinePulse {
   0%, 100% { opacity: 0.4; }

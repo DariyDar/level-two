@@ -145,6 +145,7 @@ interface BgGraphProps {
   pancreasEffectiveness?: number;        // 1-5 — changes actual burn pattern depth in engine
   replayBurnsTrigger?: number;           // increment to replay bomb animation for all food columns
   highlightBurns?: boolean;              // tutorial: pulse-blink pancreas-burned (orange) cubes
+  highlightPendingDrop?: boolean;        // tutorial: blink pending-drop preview cubes
 }
 
 // Convert column to SVG x
@@ -189,6 +190,7 @@ export function BgGraph({
   pancreasEffectiveness = 5,
   replayBurnsTrigger = 0,
   highlightBurns = false,
+  highlightPendingDrop = false,
 }: BgGraphProps) {
   // Phased reveal removed — revealPhase is always undefined (all layers shown immediately)
   const revealPhase = undefined;
@@ -1257,7 +1259,7 @@ export function BgGraph({
                 fill="#38bdf8"
                 opacity={0.35}
                 rx={2}
-                className="bg-graph__cube--preview"
+                className={`bg-graph__cube--preview${highlightPendingDrop ? ' bg-graph__cube--pending-blink' : ''}`}
               />
             ))}
             {/* Exercise-burned preview cubes:

@@ -25,6 +25,7 @@ interface ShipCardProps {
   hideKcal?: boolean;
   kcalJustRevealed?: boolean;
   clearedIn?: boolean;
+  highlightGI?: boolean;
 }
 
 export function ShipCard({
@@ -37,6 +38,7 @@ export function ShipCard({
   hideKcal = false,
   kcalJustRevealed = false,
   clearedIn = false,
+  highlightGI = false,
 }: ShipCardProps) {
   const draggableId = instanceId ?? `inventory-${ship.id}`;
   const disabled = wpDisabled || isLocked;
@@ -91,7 +93,7 @@ export function ShipCard({
           <span className={`ship-card__info${kcalJustRevealed ? ' ship-card__info--kcal-reveal' : ''}`}>{ship.kcal} kcal</span>
         )}
         <span className="ship-card__info">{ship.carbs ?? 0}g carbs</span>
-        <span className="ship-card__info" style={{ color: getSpeedLabel(ship.duration).color }}>{getSpeedLabel(ship.duration).label}</span>
+        <span className={`ship-card__info${highlightGI ? ' ship-card__gi--blink' : ''}`} style={{ color: getSpeedLabel(ship.duration).color }}>{getSpeedLabel(ship.duration).label}</span>
       </div>
 
       {remainingCount !== undefined && remainingCount < 99 && (

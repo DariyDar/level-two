@@ -12,22 +12,22 @@ Calories Bar			Hidden (planned — not yet implemented)
 
 Day 1
 Parameter			Value
-Inventory			🍌 Banana, 🥜 Mixed Nuts
+Inventory			🍌 Banana, 🍔 Burger
 Open slots			Slot 1 (9:00), Slot 6 (2:00 PM)
 WP budget			5
-Kcal budget			200
+Kcal budget			1100
 Starting BG			100 mg/dL
 
 State ID	State Name	Flags / Overrides	Alice	Dialogue	Advance	Notes
 L1D1-1	WelcomeIntro	blockInteraction	happy	Welcome to Level Two — a Type 2 Diabetes management game. Let me be your guide!	[Tap]
 L1D1-2	GraphIntro	blockInteraction | highlight: baseline-cubes (no backdrop)	neutral	This is our Blood Glucose graph. Our current level is 100 mg/dL.	[Tap]
 L1D1-3	DangerLineWarning	blockInteraction | highlight: danger-line (no backdrop)	concerned	Blood glucose above 200 mg/dL puts real strain on the body. Our goal is to stay below that red line — every single day.	[Tap]
-L1D1-4	PlaceBananaCTA	highlight: food:banana + slot:1 (9:00) (glow) | CTA: drag-arrow food:banana → slot:1 | pauseOnDrop	neutral	Time to plan our first meal! Drag the 🍌 Banana to the 9:00 AM slot — let's see how it affects our blood glucose.	[Drag 🍌 Banana → Slot 1 (9:00)]	pauseOnDrop: game pauses on hover state — placement does NOT commit until step L1D1-6 activates (releasePendingDrop).
-L1D1-5	BGPlatoPause	blockInteraction	neutral	When we eat, carbs raise our blood glucose — the more carbs, the higher the blood glucose will rise.	[Tap]	Food remains in hover/preview state during this step.
-L1D1-6	WaitBurnAnimation	releasePendingDrop | slowBurnAnim | highlight: graph (spotlight) | no backdrop	happy	What a show! The pancreas reacts to rising BG by secreting insulin — pulling our blood sugar right back down.	[Auto — after burn animation completes]	releasePendingDrop: commits food from L1D1-4. slowBurnAnim: burn animation plays at 3× slow motion. Bubble shown during animation.
+L1D1-4	PlaceBananaCTA	highlight: food:banana + slot:1 (9:00) (pulse) | CTA: drag-arrow food:banana → slot:1 | pauseOnDrop	neutral	Time to plan our first meal! Drag the 🍌 Banana to the 9:00 AM slot — let's see how it affects our blood glucose.	[Drag 🍌 Banana → Slot 1 (9:00)]	pauseOnDrop: game pauses on hover state — placement does NOT commit until step L1D1-6 activates (releasePendingDrop).
+L1D1-5	BGPlatoPause	blockInteraction | highlightPendingDrop	neutral	When we eat, carbs raise our blood glucose — the more carbs, the higher the blood glucose will rise.	[Tap]	Food remains in hover/preview state during this step. highlightPendingDrop: banana preview cubes blink on graph.
+L1D1-6	WaitBurnAnimation	releasePendingDrop | slowBurnAnim | highlight: graph (spotlight) | no backdrop	happy	What a show! The pancreas reacts to rising BG by secreting insulin — pulling our blood sugar right back down.	[Tap]	releasePendingDrop: commits food from L1D1-4. slowBurnAnim: burn animation plays at 3× slow motion. Bubble shown during animation.
 L1D1-7	GlycemicIndex	blockInteraction	neutral	Different foods raise glucose at different speeds. It depends on the Glycemic Index — GI for short.	[Tap]
-L1D1-8	FoodGI_Display	blockInteraction | highlight: food:nutsmixed (glow)	neutral	In Level Two, food cards show glucose release speed. Mixed Nuts has a low GI — tagged as Very Slow.	[Tap]
-L1D1-9	MixedNutsDragCTA	highlight: food:nutsmixed + slot:6 (2:00 PM) (glow) | CTA: drag-arrow food:nutsmixed → slot:6	neutral	Drag the 🥜 Mixed Nuts to the 2:00 PM slot — let's see how a slow-release food behaves.	[Drag 🥜 Mixed Nuts → Slot 6 (2:00 PM)]
+L1D1-8	FoodGI_Display	blockInteraction | highlight: food:burger (glow) | highlightGILabel: burger	neutral	In Level Two, food cards show glucose release speed. Hamburger has a low GI — tagged as Low GI.	[Tap]	highlightGILabel: "Low GI" text on the Burger card blinks cyclically.
+L1D1-9	BurgerDragCTA	highlight: food:burger + slot:6 (2:00 PM) (pulse) | CTA: drag-arrow food:burger → slot:6	neutral	Drag the 🍔 Burger to the 2:00 PM slot — let's see how a slow-release food behaves.	[Drag 🍔 Burger → Slot 6 (2:00 PM)]
 L1D1-10	SlowGIExplanation	blockInteraction	neutral	Low GI foods release glucose slowly, giving the pancreas more time to respond. They're a safer choice for most situations.	[Tap]
 L1D1-11	SubmitCTA	highlight: submit-btn (pulse) | CTA: tap-pulse submit-btn	neutral	Now hit Submit to see our results!	[Submit]
 L1D1-12	ResultsExplanation	blockInteraction | blocksResultsReveal | highlight: danger-line (no backdrop)	happy	Look at that! Our pancreas kept the glucose from crossing the 200 mg/dL line — working with our body to stay in the safe zone!	[Tap] → reveal animation resumes	⚠️ blocksResultsReveal — reveal animation paused until player taps.

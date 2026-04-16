@@ -224,6 +224,15 @@
   animation: kcalReveal 1.6s ease-in-out 2;
 }
 
+/* Tutorial: GI label blink highlight */
+@keyframes giLabelBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.2; }
+}
+.ship-card__gi--blink {
+  animation: giLabelBlink 1.2s ease-in-out infinite;
+}
+
 /* Cleared pre-placed food bounce-in animation */
 @keyframes clearedIn {
   0%   { transform: scale(0.7); opacity: 0; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.7); }

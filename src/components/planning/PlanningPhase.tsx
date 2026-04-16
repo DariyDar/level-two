@@ -890,6 +890,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
               pancreasEffectiveness={pancreasEffectiveness ?? 5}
               replayBurnsTrigger={reburnTrigger}
               highlightBurns={tutorialStep?.highlightBurns ?? false}
+              highlightPendingDrop={tutorialStep?.highlightPendingDrop ?? false}
             />
             {isPlanning && showPancreasButton && (
               <div className="planning-phase__pancreas-overlay">
@@ -951,6 +952,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
                 kcalJustRevealed={kcalJustRevealed || (tutorialStep?.kcalBlink ?? false)}
                 clearedFoodsHighlight={clearedHighlight}
                 clearedShipIds={clearedShipIds}
+                highlightGILabel={tutorialStep?.highlightGILabel}
               />
             </InventoryDropZone>
           )}
