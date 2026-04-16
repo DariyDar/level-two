@@ -4,9 +4,11 @@ import type { Ship } from '../../core/types';
 import './ShipCard.css';
 
 function getSpeedLabel(duration: number): { label: string; color: string } {
-  if (duration <= 45) return { label: 'High GI', color: '#fc8181' };
-  if (duration <= 120) return { label: 'Medium GI', color: '#f6c90e' };
-  return { label: 'Low GI', color: '#68d391' };
+  if (duration <= 45)  return { label: 'Very Fast', color: '#fc8181' };
+  if (duration <= 60)  return { label: 'Fast',      color: '#f6ad55' };
+  if (duration <= 90)  return { label: 'Medium',    color: '#f6e05e' };
+  if (duration <= 120) return { label: 'Slow',      color: '#68d391' };
+  return                      { label: 'Very Slow', color: '#38a169' };
 }
 
 function getCardTooltip(ship: Ship): string {

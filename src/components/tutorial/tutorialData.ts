@@ -300,7 +300,7 @@ const L1D1: TutorialStep[] = [
   },
   {
     id: 'L1D1-8',
-    bubble: { type: 'dialogue', text: 'In Level Two, food cards show glucose release speed. Oatmeal has a medium GI \u2014 tagged as Medium GI.', expression: 'neutral' },
+    bubble: { type: 'dialogue', text: 'In Level Two, food cards show glucose release speed. Oatmeal releases glucose slowly \u2014 tagged as Slow.', expression: 'neutral' },
     highlight: 'food:oatmeal',
     highlightType: 'glow',
     highlightGILabel: 'oatmeal',
@@ -309,7 +309,7 @@ const L1D1: TutorialStep[] = [
   },
   {
     id: 'L1D1-9',
-    bubble: { type: 'dialogue', text: "Drag the \ud83e\udd63 Oatmeal to the 2:00\u00a0PM slot \u2014 let\u2019s see how a medium-GI food behaves.", expression: 'neutral' },
+    bubble: { type: 'dialogue', text: "Drag the \ud83e\udd63 Oatmeal to the 2:00\u00a0PM slot \u2014 let\u2019s see how a slow-release food behaves.", expression: 'neutral' },
     highlight: ['food:oatmeal', 'slot:6'],
     highlightType: 'pulse',
     cta: { type: 'drag-arrow', source: 'food:oatmeal', dest: 'slot:6' },
