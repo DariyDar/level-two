@@ -1126,7 +1126,7 @@ const L_STRESS_D2: TutorialStep[] = [
 const L_KCAL_D1: TutorialStep[] = [
   {
     id: 'LK-D1-1',
-    bubble: { type: 'dialogue', text: 'Did you know your body needs energy to work? We measure that energy in Calories or kilocalories!', expression: 'happy', position: 'center' },
+    bubble: { type: 'dialogue', text: 'Did you know your body needs energy to work? We measure that energy in calories \u2014 kcal!', expression: 'happy', position: 'center' },
     advanceOn: 'tap',
     blockInteraction: true,
     revealKcal: true,
@@ -1177,7 +1177,7 @@ const L_KCAL_D1: TutorialStep[] = [
 const L_KCAL_D2: TutorialStep[] = [
   {
     id: 'LK-D2-1',
-    bubble: { type: 'warning', text: 'Overeating raises BG high and puts excessive strain on the pancreas, accelerating disease progression. Notice the calorie bar.', expression: 'concerned', position: 'inventory' },
+    bubble: { type: 'warning', text: 'Overeating puts excessive strain on the pancreas, accelerating disease progression. Notice the calorie bar.', expression: 'concerned', position: 'inventory' },
     highlight: 'kcal-bar',
     highlightType: 'pulse',
     noBackdrop: true,
@@ -1186,7 +1186,7 @@ const L_KCAL_D2: TutorialStep[] = [
   },
   {
     id: 'LK-D2-2',
-    bubble: { type: 'dialogue', text: 'We should avoid this in game and in real life, to contain diabetes development.', expression: 'concerned', position: 'inventory' },
+    bubble: { type: 'dialogue', text: 'In this game, overeating means your pancreas starts the next day with reduced effectiveness.', expression: 'concerned', position: 'inventory' },
     noBackdrop: true,
     advanceOn: 'tap',
     blockInteraction: true,
