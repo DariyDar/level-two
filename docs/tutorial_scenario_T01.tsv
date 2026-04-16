@@ -1,0 +1,60 @@
+T01 — First Steps
+"Introduction to the graph, food, WP, and the core game loop."
+
+Level-wide Conditions
+Parameter			Value
+Defeat			Disabled
+Stress slots			Inactive
+Medications			Unavailable
+Exercises			Unavailable
+BOOST button			Hidden
+
+Day 1
+Parameter			Value
+Inventory			🍌 Banana
+Open slots			Slot 1 only (9:00)
+WP budget			5
+Kcal budget			200
+Starting BG			100 mg/dL
+
+State ID	State Name	Flags / Overrides	Alice	Dialogue	Advance	Notes
+L1D1-1	WelcomeIntro	blockInteraction	happy	Welcome to Level Two — a Type 2 Diabetes management game. Let me be your guide!	[Tap]
+L1D1-2	GraphIntro	blockInteraction | highlight: baseline-cubes (no backdrop)	neutral	This is our Blood Glucose graph. Our current level is 100 mg/dL.	[Tap]
+L1D1-2b	DangerLineWarning	blockInteraction | highlight: danger-line (no backdrop)	concerned	Blood glucose above 200 mg/dL puts real strain on the body. Our goal is to stay below that red line — every single day.	[Tap]
+L1D1-3	FoodCardsIntro	highlight: food:banana + slot:1 (glow) | CTA: drag-arrow food:banana → slot:1	happy	Time to plan our first meal! Drag the 🍌 Banana to the 9:00 AM slot — let's see how it affects our blood glucose.	[Drag 🍌 Banana → Slot 1 (9:00)]	pauseOnDrop: game pauses on hover state after drop — placement does not commit until step L1D1-4b activates.
+L1D1-4	CarbsExplanation	blockInteraction	happy	When we eat, carbs raise our blood glucose — the more carbs, the higher the spike. Each food card shows its absorption speed: Fast foods peak quickly, Slow foods rise gradually.	[Tap]	Food remains in hover/preview state during this step.
+L1D1-4b	WaitBurnAnimation	blockInteraction | highlight: graph (spotlight) | no backdrop	— (silent)	—	[Auto — after burn animation completes]	releasePendingDrop: commits the food from L1D1-3. slowBurnAnim: pancreas burn animation plays at 3× slow motion.
+L1D1-5	PancreasExplanation	blockInteraction	happy	What a show! The pancreas detected the glucose spike and fired insulin — pulling our blood sugar right back down. That's your body at work!	[Tap]
+L1D1-7	SubmitCTA	highlight: submit-btn (pulse) | CTA: tap-pulse submit-btn	neutral	Now hit Submit to see our results!	[Submit]
+L1D1-8	ResultsExplanation	blockInteraction | blocksResultsReveal | no backdrop	happy	Look at that! Our pancreas kept the glucose from crossing the 200 mg/dL line — working with our body to stay in the safe zone!	[Tap] → reveal animation resumes	⚠️ blocksResultsReveal — reveal animation paused until player taps.
+L1D1-9	NextDayCTA	pendingUntilResults | highlight: result-next-btn (pulse) | no backdrop	— (silent)	—	[Tap Next]	Alice does not appear.
+
+Day 2
+Parameter			Value
+Inventory			🍌 Banana, 🥪 Sandwich, 🍪 Cookie
+Open slots			1 (9:00), 2 (10:00), 5 (1:00 PM), 8 (4:00 PM)
+WP budget			10
+Kcal budget			1000
+Starting BG			100 mg/dL
+
+State ID	State Name	Flags / Overrides	Alice	Dialogue	Advance	Notes
+L1D2-1	WillpowerIntro	blockInteraction | highlight: wp-counter (glow)	neutral	That ☀️ icon is your Willpower (WP) — the mental energy it takes to make a healthy choice. In real life, it's what pushes you to do the right thing even when you don't feel like it.	[Tap]
+L1D2-2	WillpowerInGame	blockInteraction	neutral	In the game, WP is spent on food and exercise. Healthier options often cost more — let's take a closer look at what's on the menu today.	[Tap]
+L1D2-3	FoodComparison	highlight: ship-inventory (spotlight)	thinking	🍌 Banana has 23g carbs and costs just 1 WP. 🍪 Cookie has 14g carbs but costs 2 WP — sometimes the sweeter option demands more willpower.	[Tap]
+L1D2-4	FreePlanAndSubmit	highlight: ship-inventory (glow)	happy	You have enough WP to place everything today — but just two items are enough to get through. Try different combinations and see how your glucose curve shifts.	[Submit]
+
+Day 3
+Parameter			Value
+Inventory			🍌 Banana, 🍎 Apple, 🍪 Cookie, 🥛 Milk
+Pre-placed			🍕 Pizza @ Slot 7 (3:00 PM — locked)
+Open slots			All except Slot 7
+WP budget			10
+Kcal budget			1500
+Starting BG			100 mg/dL
+
+State ID	State Name	Flags / Overrides	Alice	Dialogue	Advance	Notes
+L1D3-1	PizzaContext	blockInteraction | highlight: slot:7 (spotlight, no backdrop)	neutral	A friend shared a slice of 🍕 pizza at lunch — you ate it without thinking twice.	[Tap]	Alt: "A friend shared a slice of 🍕 pizza during your lunch break — you ate it without thinking twice."
+L1D3-2	GIExplanation	blockInteraction | highlight: slot:7 (spotlight, no backdrop)	neutral	Pizza has a moderately high Glycemic Index (GI) — a measure of how quickly food raises blood glucose. High-GI foods cause a faster, sharper spike.	[Tap]	Alt: "That pizza has a moderately high Glycemic Index — or GI for short. It means the glucose peak rises quickly."
+L1D3-3	DangerZoneWarning	blockInteraction | highlight: danger-zone (no backdrop)	concerned	That pizza pushed your glucose above 200 mg/dL — into the danger zone. It happens. Not every day goes to plan.	[Tap]	Alt: "That pizza pushed our glucose above 200 mg/dL — the danger zone. It happens. Some days aren't perfect."
+L1D3-4	RecoveryMessage	blockInteraction	happy	The good news: you still control the rest of the day. Try to keep everything else below 200 and limit the damage.	[Tap]
+L1D3-5	FreePlanAndSubmit	highlight: ship-inventory (glow)	neutral	Place your meals and submit when ready!	[Submit]
