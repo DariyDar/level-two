@@ -978,7 +978,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
       </div>
 
       {/* Day navigation + burns toggle — fixed to bottom, outside scrollable content */}
-      {(isPlanning || showResults) && !isTutorial && (
+      {(isPlanning || showResults) && (
         <div className="planning-phase__day-nav">
           {isPlanning && Array.from({ length: currentLevel.days }, (_, i) => i + 1).map(day => (
             <button
