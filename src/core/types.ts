@@ -334,14 +334,14 @@ export interface MealSegmentConfig {
 }
 
 export const MEAL_SEGMENTS: MealSegmentConfig[] = [
-  { id: 'breakfast', label: 'Breakfast', emoji: '🌅', startSlot: 0, slotCount: 4 },
-  { id: 'lunch',     label: 'Lunch',     emoji: '☀️', startSlot: 4, slotCount: 4 },
-  { id: 'dinner',    label: 'Dinner',    emoji: '🌙', startSlot: 8, slotCount: 4 },
+  { id: 'breakfast', label: 'Breakfast', emoji: '🌅', startSlot: 8,  slotCount: 4 },
+  { id: 'lunch',     label: 'Lunch',     emoji: '☀️', startSlot: 12, slotCount: 4 },
+  { id: 'dinner',    label: 'Dinner',    emoji: '🌙', startSlot: 16, slotCount: 4 },
 ];
 
-/** Convert slot index (0-11) to graph column (0,2,4,...,22) */
+/** Convert slot index (8-19, hour in 24h format) to graph column (0,2,4,...,22) */
 export function slotToColumn(slotIndex: number): number {
-  return slotIndex * COLS_PER_SLOT;
+  return (slotIndex - GRAPH_CONFIG.startHour) * COLS_PER_SLOT;
 }
 
 /** Get time label for a slot */

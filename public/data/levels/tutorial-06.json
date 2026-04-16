@@ -14,13 +14,13 @@
       ],
       "availableInterventions": [
         { "id": "takeabreak", "count": 1 },
-        { "id": "lightwalk", "count": 1 }
+        { "id": "lightwalk",  "count": 1 }
       ],
       "availableMedications": [],
       "preplacedFoods": [
-        { "shipId": "chocolatemuffin", "slotIndex": 1 }
+        { "shipId": "chocolatemuffin", "slotIndex": 9 }
       ],
-      "lockedSlots": [5, 6, 7, 8, 9],
+      "lockedSlots": [13, 14, 15, 16, 17],
       "insulinProfile": {
         "mode": "cumulative",
         "segments": [{ "from": 0, "to": 47, "rate": 1 }]
@@ -43,9 +43,9 @@
       ],
       "availableMedications": [],
       "preplacedFoods": [
-        { "shipId": "chocolatemuffin", "slotIndex": 1 }
+        { "shipId": "chocolatemuffin", "slotIndex": 9 }
       ],
-      "lockedSlots": [0, 1, 5, 6, 9, 10, 11],
+      "lockedSlots": [8, 9, 13, 14, 17, 18, 19],
       "insulinProfile": {
         "mode": "cumulative",
         "segments": [{ "from": 0, "to": 47, "rate": 1 }]
@@ -61,16 +61,16 @@
         { "id": "chicken", "count": 1 }
       ],
       "availableInterventions": [
-        { "id": "lightwalk",  "count": 1 },
-        { "id": "heavyrun",   "count": 1 },
-        { "id": "takearest",  "count": 1 }
+        { "id": "lightwalk", "count": 1 },
+        { "id": "heavyrun",  "count": 1 },
+        { "id": "takearest", "count": 1 }
       ],
       "availableMedications": [],
       "preplacedFoods": [
-        { "shipId": "chocolatemuffin", "slotIndex": 0 },
-        { "shipId": "pizza",           "slotIndex": 4 }
+        { "shipId": "chocolatemuffin", "slotIndex": 8 },
+        { "shipId": "pizza",           "slotIndex": 12 }
       ],
-      "lockedSlots": [0, 1, 4, 5],
+      "lockedSlots": [8, 9, 12, 13],
       "insulinProfile": {
         "mode": "cumulative",
         "segments": [{ "from": 0, "to": 47, "rate": 1 }]

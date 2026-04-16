@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useDroppable, useDraggable, useDndContext } from '@dnd-kit/core';
 import type { Ship, Intervention, PlacedFood, PlacedIntervention, GameSettings } from '../../core/types';
-import { TOTAL_SLOTS, slotTimeLabel } from '../../core/types';
+import { TOTAL_SLOTS, GRAPH_CONFIG, slotTimeLabel } from '../../core/types';
 import './SlotGrid.css';
 
 interface SlotGridProps {
@@ -190,7 +190,7 @@ export function SlotGrid({
     const isIntervention = active.data.current?.isIntervention === true;
     const slotSize = (isIntervention && intervention?.slotSize) ? intervention.slotSize : 1;
 
-    for (let s = targetSlot; s < targetSlot + slotSize && s < TOTAL_SLOTS; s++) {
+    for (let s = targetSlot; s < targetSlot + slotSize && s < GRAPH_CONFIG.startHour + TOTAL_SLOTS; s++) {
       slots.add(s);
     }
     return slots;
@@ -256,7 +256,9 @@ export function SlotGrid({
 
   return (
     <div className="slot-grid">
-      {Array.from({ length: TOTAL_SLOTS }, (_, slotIndex) => (
+      {Array.from({ length: TOTAL_SLOTS }, (_, i) => {
+        const slotIndex = GRAPH_CONFIG.startHour + i;
+        return (
         <SlotContainer
           key={slotIndex}
           index={slotIndex}
@@ -278,7 +280,8 @@ export function SlotGrid({
           onHoverEnter={handleSlotHover}
           onHoverLeave={handleSlotLeave}
         />
-      ))}
+        );
+      })}
     </div>
   );
 }

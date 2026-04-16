@@ -9,39 +9,16 @@
       "kcalBudget": 500,
       "wpBudget": 5,
       "availableFoods": [
-        {
-          "id": "banana",
-          "count": 1
-        },
-        {
-          "id": "oatmeal",
-          "count": 1
-        }
+        { "id": "banana", "count": 1 },
+        { "id": "oatmeal", "count": 1 }
       ],
       "availableInterventions": [],
       "availableMedications": [],
       "preplacedFoods": [],
-      "lockedSlots": [
-        0,
-        2,
-        3,
-        4,
-        5,
-        7,
-        8,
-        9,
-        10,
-        11
-      ],
+      "lockedSlots": [8, 10, 11, 12, 13, 15, 16, 17, 18, 19],
       "insulinProfile": {
         "mode": "cumulative",
-        "segments": [
-          {
-            "from": 0,
-            "to": 47,
-            "rate": 1
-          }
-        ]
+        "segments": [{ "from": 0, "to": 47, "rate": 1 }]
       },
       "startingBg": 100
     },
@@ -50,41 +27,17 @@
       "kcalBudget": 1000,
       "wpBudget": 5,
       "availableFoods": [
-        {
-          "id": "banana",
-          "count": 1
-        },
-        {
-          "id": "cookie",
-          "count": 1
-        },
-        {
-          "id": "burger",
-          "count": 1
-        }
+        { "id": "banana", "count": 1 },
+        { "id": "cookie", "count": 1 },
+        { "id": "burger", "count": 1 }
       ],
       "availableInterventions": [],
       "availableMedications": [],
       "preplacedFoods": [],
-      "lockedSlots": [
-        0,
-        1,
-        4,
-        5,
-        7,
-        8,
-        10,
-        11
-      ],
+      "lockedSlots": [8, 9, 12, 13, 15, 16, 18, 19],
       "insulinProfile": {
         "mode": "cumulative",
-        "segments": [
-          {
-            "from": 0,
-            "to": 47,
-            "rate": 1
-          }
-        ]
+        "segments": [{ "from": 0, "to": 47, "rate": 1 }]
       },
       "startingBg": 100
     },
@@ -93,30 +46,16 @@
       "kcalBudget": 1500,
       "wpBudget": 5,
       "availableFoods": [
-        {
-          "id": "banana",
-          "count": 1
-        },
-        {
-          "id": "apple",
-          "count": 1
-        },
-        {
-          "id": "cookie",
-          "count": 1
-        }
+        { "id": "banana", "count": 1 },
+        { "id": "apple",  "count": 1 },
+        { "id": "cookie", "count": 1 }
       ],
       "availableInterventions": [],
       "availableMedications": [],
       "preplacedFoods": [
-        {
-          "shipId": "pizza",
-          "slotIndex": 7
-        }
+        { "shipId": "pizza", "slotIndex": 15 }
       ],
-      "lockedSlots": [
-        7
-      ],
+      "lockedSlots": [15],
       "startingBg": 100
     }
   ]

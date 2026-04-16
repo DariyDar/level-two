@@ -11,7 +11,7 @@ import {
   closestCenter,
 } from '@dnd-kit/core';
 import type { Ship, Intervention, Medication, GamePhase, PenaltyResult, BurnAnimMode } from '../../core/types';
-import { TOTAL_SLOTS, slotToColumn, getBaselineRow, getKcalAssessment } from '../../core/types';
+import { TOTAL_SLOTS, GRAPH_CONFIG, slotToColumn, getBaselineRow, getKcalAssessment } from '../../core/types';
 import { useGameStore, getDayConfig, selectKcalUsed, selectWpUsed, selectWpPenalty } from '../../store/gameStore';
 import { loadFoods, loadLevel, loadInterventions, loadMedications } from '../../config/loader';
 import { computeMedicationModifiers, calculatePenaltyFromState } from '../../core/cubeEngine';
@@ -388,7 +388,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
     const overId = event.over ? String(event.over.id) : null;
     if (overId && overId.startsWith('slot-')) {
       const slot = parseInt(overId.replace('slot-', ''), 10);
-      if (!isNaN(slot) && slot >= 0 && slot < TOTAL_SLOTS) {
+      if (!isNaN(slot) && slot >= GRAPH_CONFIG.startHour && slot < GRAPH_CONFIG.startHour + TOTAL_SLOTS) {
         setPreviewSlot(slot);
         return;
       }
@@ -423,7 +423,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
       // Only slot targets from here
       if (!overId.startsWith('slot-')) return;
       const targetSlot = parseInt(overId.replace('slot-', ''), 10);
-      if (isNaN(targetSlot) || targetSlot < 0 || targetSlot >= TOTAL_SLOTS) return;
+      if (isNaN(targetSlot) || targetSlot < GRAPH_CONFIG.startHour || targetSlot >= GRAPH_CONFIG.startHour + TOTAL_SLOTS) return;
 
       if (isFromSlot && fromSlotIndex !== undefined) {
         // Block drag from locked slot
@@ -465,7 +465,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
           const slotSize = intervention.slotSize ?? 1;
 
           if (slotSize > 1) {
-            if (targetSlot + slotSize > TOTAL_SLOTS) { rejectDrop(targetSlot); return; }
+            if (targetSlot + slotSize > GRAPH_CONFIG.startHour + TOTAL_SLOTS) { rejectDrop(targetSlot); return; }
             for (let s = targetSlot; s < targetSlot + slotSize; s++) {
               if (effectiveLockedSlots.has(s)) { rejectDrop(targetSlot); return; }
               if (isSlotCovered(s)) { rejectDrop(targetSlot); return; }

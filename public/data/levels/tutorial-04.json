@@ -12,14 +12,14 @@
       "startingBg": 100,
       "availableFoods": [
         { "id": "nutsmixed", "count": 1 },
-        { "id": "cookie", "count": 1 }
+        { "id": "cookie",    "count": 1 }
       ],
       "availableInterventions": [],
       "availableMedications": [],
       "preplacedFoods": [
-        { "shipId": "burger", "slotIndex": 1 }
+        { "shipId": "burger", "slotIndex": 9 }
       ],
-      "lockedSlots": [0, 1, 5, 8, 9]
+      "lockedSlots": [8, 9, 13, 16, 17]
     },
     {
       "day": 2,
@@ -36,9 +36,9 @@
       ],
       "availableMedications": ["metformin"],
       "preplacedFoods": [
-        { "shipId": "chocolatemuffin", "slotIndex": 3 }
+        { "shipId": "chocolatemuffin", "slotIndex": 11 }
       ],
-      "lockedSlots": [0, 3, 6, 8, 11]
+      "lockedSlots": [8, 11, 14, 16, 19]
     },
     {
       "day": 3,
@@ -47,21 +47,21 @@
       "pancreasEffectiveness": 4,
       "startingBg": 100,
       "availableFoods": [
-        { "id": "banana", "count": 1 },
-        { "id": "cookie", "count": 1 },
+        { "id": "banana",   "count": 1 },
+        { "id": "cookie",   "count": 1 },
         { "id": "sandwich", "count": 1 },
-        { "id": "oatmeal", "count": 1 }
+        { "id": "oatmeal",  "count": 1 }
       ],
       "availableInterventions": [
         { "id": "lightwalk", "count": 1 },
-        { "id": "heavyrun", "count": 1 }
+        { "id": "heavyrun",  "count": 1 }
       ],
       "availableMedications": ["metformin"],
       "preplacedFoods": [
-        { "shipId": "pizza", "slotIndex": 3 },
-        { "shipId": "burger", "slotIndex": 5 }
+        { "shipId": "pizza",  "slotIndex": 11 },
+        { "shipId": "burger", "slotIndex": 13 }
       ],
-      "lockedSlots": [0, 3, 5, 11]
+      "lockedSlots": [8, 11, 13, 19]
     }
   ]
 }

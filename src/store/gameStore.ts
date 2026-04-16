@@ -11,7 +11,7 @@ import type {
   Intervention,
   GameSettings,
 } from '../core/types';
-import { DEFAULT_SETTINGS, slotToColumn, TOTAL_SLOTS } from '../core/types';
+import { DEFAULT_SETTINGS, slotToColumn, TOTAL_SLOTS, GRAPH_CONFIG } from '../core/types';
 
 // Build pre-placed items from day config
 function getPreplacedItems(dayConfig: DayConfig | null): { foods: PlacedFood[]; interventions: PlacedIntervention[] } {
@@ -128,7 +128,7 @@ export const useGameStore = create<GameState>()(
 
       placeFoodInSlot: (shipId, slotIndex) =>
         set((state) => {
-          if (slotIndex < 0 || slotIndex >= TOTAL_SLOTS) return state;
+          if (slotIndex < GRAPH_CONFIG.startHour || slotIndex >= GRAPH_CONFIG.startHour + TOTAL_SLOTS) return state;
           // Check slot not covered by food or multi-slot intervention
           const occupied = state.placedFoods.some(f => f.slotIndex === slotIndex)
             || state.placedInterventions.some(i => {
@@ -147,7 +147,7 @@ export const useGameStore = create<GameState>()(
 
       placeInterventionInSlot: (interventionId, slotIndex, slotSize = 1) =>
         set((state) => {
-          if (slotIndex < 0 || slotIndex + slotSize > TOTAL_SLOTS) return state;
+          if (slotIndex < GRAPH_CONFIG.startHour || slotIndex + slotSize > GRAPH_CONFIG.startHour + TOTAL_SLOTS) return state;
           // Check ALL required slots are unoccupied
           for (let s = slotIndex; s < slotIndex + slotSize; s++) {
             const occupied = state.placedFoods.some(f => f.slotIndex === s)
@@ -205,7 +205,7 @@ export const useGameStore = create<GameState>()(
 
           // Multi-slot move: only move to free range (no swap)
           if (fromSize > 1) {
-            if (toSlot + fromSize > TOTAL_SLOTS) return state;
+            if (toSlot + fromSize > GRAPH_CONFIG.startHour + TOTAL_SLOTS) return state;
             for (let s = toSlot; s < toSlot + fromSize; s++) {
               // Skip self slots
               if (intFrom && s >= fromSlot && s < fromSlot + fromSize) continue;

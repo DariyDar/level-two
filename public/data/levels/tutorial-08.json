@@ -9,54 +9,22 @@
       "kcalBudget": 1400,
       "wpBudget": 8,
       "availableFoods": [
-        {
-          "id": "banana",
-          "count": 1
-        },
-        {
-          "id": "cookie",
-          "count": 1
-        }
+        { "id": "banana", "count": 1 },
+        { "id": "cookie", "count": 1 }
       ],
       "availableInterventions": [
-        {
-          "id": "lightwalk",
-          "count": 1
-        }
+        { "id": "lightwalk", "count": 1 }
       ],
-      "availableMedications": [
-        "sglt2"
-      ],
+      "availableMedications": ["sglt2"],
       "preplacedFoods": [
-        {
-          "shipId": "pizza",
-          "slotIndex": 3
-        }
+        { "shipId": "pizza", "slotIndex": 11 }
       ],
-      "lockedSlots": [
-        0,
-        1,
-        3,
-        5,
-        6,
-        8,
-        9,
-        10,
-        11
-      ],
+      "lockedSlots": [8, 9, 11, 13, 14, 16, 17, 18, 19],
       "insulinProfile": {
         "mode": "cumulative",
         "segments": [
-          {
-            "from": 0,
-            "to": 31,
-            "rate": 1
-          },
-          {
-            "from": 32,
-            "to": 47,
-            "rate": 1
-          }
+          { "from": 0,  "to": 31, "rate": 1 },
+          { "from": 32, "to": 47, "rate": 1 }
         ]
       },
       "startingBg": 100
@@ -66,57 +34,23 @@
       "kcalBudget": 1300,
       "wpBudget": 10,
       "availableFoods": [
-        {
-          "id": "chickpeas",
-          "count": 1
-        },
-        {
-          "id": "banana",
-          "count": 1
-        }
+        { "id": "chickpeas", "count": 1 },
+        { "id": "banana",    "count": 1 }
       ],
       "availableInterventions": [
-        {
-          "id": "lightwalk",
-          "count": 1
-        }
+        { "id": "lightwalk", "count": 1 }
       ],
-      "availableMedications": [
-        "metformin",
-        "sglt2"
-      ],
+      "availableMedications": ["metformin", "sglt2"],
       "preplacedFoods": [
-        {
-          "shipId": "oatmeal",
-          "slotIndex": 2
-        }
+        { "shipId": "oatmeal", "slotIndex": 10 }
       ],
-      "lockedSlots": [
-        0,
-        1,
-        2,
-        5,
-        8,
-        10,
-        11
-      ],
-      "stressSlots": [
-        6,
-        7
-      ],
+      "lockedSlots": [8, 9, 10, 13, 16, 18, 19],
+      "stressSlots": [14, 15],
       "insulinProfile": {
         "mode": "cumulative",
         "segments": [
-          {
-            "from": 0,
-            "to": 23,
-            "rate": 1
-          },
-          {
-            "from": 24,
-            "to": 47,
-            "rate": 1
-          }
+          { "from": 0,  "to": 23, "rate": 1 },
+          { "from": 24, "to": 47, "rate": 1 }
         ]
       },
       "startingBg": 100
