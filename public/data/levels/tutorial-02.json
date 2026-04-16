@@ -10,15 +10,15 @@
       "startingBg": 100,
       "availableFoods": [
         { "id": "oatmeal",   "count": 1 },
-        { "id": "chickpeas", "count": 1 },
+        { "id": "apple",     "count": 1 },
         { "id": "sandwich",  "count": 1 }
       ],
       "availableInterventions": [],
       "preplacedFoods": [
         { "shipId": "banana", "slotIndex": 9 },
-        { "shipId": "rice",   "slotIndex": 14 }
+        { "shipId": "rice",   "slotIndex": 20 }
       ],
-      "lockedSlots": [8, 9, 11, 12, 14, 15, 17, 18]
+      "lockedSlots": [8, 9, 11, 12, 15, 17, 18, 20]
     },
     {
       "day": 2,
