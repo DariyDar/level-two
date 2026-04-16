@@ -1126,14 +1126,23 @@ const L_STRESS_D2: TutorialStep[] = [
 const L_KCAL_D1: TutorialStep[] = [
   {
     id: 'LK-D1-1',
-    bubble: { type: 'dialogue', text: 'Did you know your body needs energy to work? We measure that energy in calories \u2014 kcal!', expression: 'happy', position: 'center' },
+    bubble: { type: 'dialogue', text: 'Did you know your body needs energy to work? We measure food energy in kilocalories \u2014 1\u00a0Cal equals 1,000 calories.', expression: 'happy', position: 'center' },
     advanceOn: 'tap',
     blockInteraction: true,
     revealKcal: true,
   },
   {
     id: 'LK-D1-2',
-    bubble: { type: 'dialogue', text: 'See the kcal on each card? Now look at the bar below the graph \u2014 it tracks how much you\u2019ve eaten today.', expression: 'neutral', position: 'center' },
+    bubble: { type: 'dialogue', text: 'We can see Cal values on every food card.', expression: 'neutral', position: 'center' },
+    highlight: 'ship-inventory',
+    highlightType: 'glow',
+    kcalBlink: true,
+    advanceOn: 'tap',
+    blockInteraction: true,
+  },
+  {
+    id: 'LK-D1-2b',
+    bubble: { type: 'dialogue', text: 'Now let\u2019s have a look at the Calorie bar below the graph \u2014 it tracks how much we\u2019ve eaten today.', expression: 'neutral', position: 'center' },
     highlight: 'kcal-bar',
     highlightType: 'glow',
     advanceOn: 'tap',

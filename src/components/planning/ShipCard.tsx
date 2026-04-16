@@ -14,7 +14,7 @@ function getSpeedLabel(duration: number): { label: string; color: string } {
 function getCardTooltip(ship: Ship): string {
   const cost = ship.wpCost ?? 0;
   const costText = cost > 0 ? `${cost} ☀️` : 'Free';
-  return `${ship.name} · ${ship.kcal} kcal · ${ship.carbs ?? 0}g carbs · ${getSpeedLabel(ship.duration).label} · ${costText}`;
+  return `${ship.name} · ${ship.kcal} Cal · ${ship.carbs ?? 0}g carbs · ${getSpeedLabel(ship.duration).label} · ${costText}`;
 }
 
 interface ShipCardProps {
@@ -92,7 +92,7 @@ export function ShipCard({
       <div className="ship-card__details">
         <span className="ship-card__name">{ship.name}</span>
         {!hideKcal && (
-          <span className={`ship-card__info${kcalJustRevealed ? ' ship-card__info--kcal-reveal' : ''}`}>{ship.kcal} kcal</span>
+          <span className={`ship-card__info${kcalJustRevealed ? ' ship-card__info--kcal-reveal' : ''}`}>{ship.kcal} Cal</span>
         )}
         <span className="ship-card__info">{ship.carbs ?? 0}g carbs</span>
         <span className={`ship-card__info${highlightGI ? ' ship-card__gi--blink' : ''}`} style={{ color: getSpeedLabel(ship.duration).color }}>{getSpeedLabel(ship.duration).label}</span>
@@ -119,7 +119,7 @@ export function ShipCardOverlay({ ship }: { ship: Ship }) {
 
       <div className="ship-card__details">
         <span className="ship-card__name">{ship.name}</span>
-        <span className="ship-card__info">{ship.kcal} kcal</span>
+        <span className="ship-card__info">{ship.kcal} Cal</span>
         <span className="ship-card__info">{ship.carbs ?? 0}g carbs</span>
         <span className="ship-card__info" style={{ color: getSpeedLabel(ship.duration).color }}>{getSpeedLabel(ship.duration).label}</span>
       </div>
