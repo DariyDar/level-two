@@ -77,10 +77,19 @@
   margin-top: 4px;
 }
 
-.result-panel--perfect .result-panel__label { color: #48bb78; }
-.result-panel--good .result-panel__label { color: #4299e1; }
-.result-panel--pass .result-panel__label { color: #ecc94b; }
-.result-panel--defeat .result-panel__label { color: #fc8181; }
+.result-panel--perfect .result-panel__label    { color: #48bb78; }
+.result-panel--very-good .result-panel__label  { color: #9ae6b4; }
+.result-panel--good .result-panel__label       { color: #4299e1; }
+.result-panel--pass .result-panel__label       { color: #ecc94b; }
+.result-panel--defeat .result-panel__label     { color: #fc8181; }
+
+/* "0!" perfect-score exclamation mark in the penalty counter */
+.result-panel__perfect-mark {
+  color: #48bb78;
+  font-size: 0.85em;
+  font-weight: 800;
+  margin-left: 1px;
+}
 
 /* Penalty score */
 .result-panel__penalty {

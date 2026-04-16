@@ -253,7 +253,7 @@ export interface PenaltyResult {
   orangeCount: number;  // cubes in 200-300 zone
   redCount: number;     // cubes in 300+ zone
   stars: number;        // 0-3
-  label: string;        // "Perfect", "Good", "Pass", "Defeat"
+  label: string;        // "Perfect", "Very Good", "Good", "Pass", "Defeat"
 }
 
 /** Penalty zone thresholds (in row units from bgMin) */
@@ -262,9 +262,13 @@ export const PENALTY_RED_ROW = 10;    // 300 mg/dL = (300-50)/25
 export const PENALTY_ORANGE_WEIGHT = 1;   // halved (twice as many cubes with 25 mg/dL cells)
 export const PENALTY_RED_WEIGHT = 3;       // halved
 
-/** Star rating thresholds (softened 25% from original 10/40/80) */
-export function calculateStars(penalty: number): { stars: number; label: string } {
-  if (penalty <= 12.5) return { stars: 3, label: 'Perfect' };
+/** Star rating thresholds (softened 25% from original 10/40/80)
+ *  excessCubeCount: orangeCount + redCount — cubes above 200 mg/dL
+ *  Perfect  = 3★ with zero excess glucose cubes (shows "0!" in counter)
+ *  Very Good = 3★ with some excess glucose (penalty still ≤12.5)
+ */
+export function calculateStars(penalty: number, excessCubeCount: number = 0): { stars: number; label: string } {
+  if (penalty <= 12.5) return { stars: 3, label: excessCubeCount === 0 ? 'Perfect' : 'Very Good' };
   if (penalty <= 50) return { stars: 2, label: 'Good' };
   if (penalty <= 100) return { stars: 1, label: 'Pass' };
   return { stars: 0, label: 'Defeat' };

@@ -397,7 +397,9 @@ Level Select (root screen) — 9 tutorial levels + Test Level tile
   - Submit button triggers penalty calculation on current graph state
   - Orange zone (200-300 mg/dL, rows 3-4): 0.5 penalty weight per cube
   - Red zone (300+ mg/dL, rows 5+): 1.5 penalty weight per cube
-  - Star rating: 3★ Perfect (≤12.5), 2★ Good (≤50), 1★ Pass (≤100), 0★ Defeat (>100)
+  - Star rating: 3★ Perfect (≤12.5 penalty AND 0 excess cubes) / Very Good (≤12.5 penalty, excess > 0), 2★ Good (≤50), 1★ Pass (≤100), 0★ Defeat (>100)
+  - Perfect shows "0!" next to the Excess Glucose counter; "Retry Day" button hidden only for Perfect
+  - Very Good = 3 stars but player had some cubes above 200 mg/dL (within ≤12.5 penalty); shows "Retry Day"
   - Penalty highlight overlays (pulsing orange/red) on cubes above threshold
 
 - **Row-Pattern Burn System** ✅ (v0.50.0, replaces insulin profile)

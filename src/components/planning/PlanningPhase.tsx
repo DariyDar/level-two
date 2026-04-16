@@ -582,7 +582,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
         if (unspent > 0) {
           const wpPenaltyPoints = unspent * WP_PENALTY_WEIGHT;
           penalty.totalPenalty = Math.round((penalty.totalPenalty + wpPenaltyPoints) * 10) / 10;
-          const { stars, label } = calculateStars(penalty.totalPenalty);
+          const { stars, label } = calculateStars(penalty.totalPenalty, penalty.orangeCount + penalty.redCount);
           penalty.stars = stars;
           penalty.label = label;
         }

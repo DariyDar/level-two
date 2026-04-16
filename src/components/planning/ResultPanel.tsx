@@ -42,7 +42,7 @@ export function ResultPanel({
   visibleStars, showLabel, displayedPenalty,
 }: ResultPanelProps) {
   const isDefeat = result.stars === 0;
-  const isPerfect = result.stars === 3;
+  const isPerfect = result.label === 'Perfect';
   const isLastDay = currentDay >= totalDays;
   const isSuccess = result.stars >= 1;
 
@@ -53,10 +53,11 @@ export function ResultPanel({
   const isAnimating = visibleStars !== undefined || showLabel === false;
 
   return (
-    <div className={`result-panel result-panel--${result.label.toLowerCase()}`}>
+    <div className={`result-panel result-panel--${result.label.toLowerCase().replace(/\s+/g, '-')}`}>
       <div className="result-panel__penalty">
         <span className="result-panel__penalty-value">
           {Math.round(penaltyValue * 10) / 10}
+          {result.totalPenalty === 0 && <span className="result-panel__perfect-mark">!</span>}
         </span>
         <span className="result-panel__penalty-text"> Excess Glucose</span>
       </div>

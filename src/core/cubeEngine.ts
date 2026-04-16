@@ -357,7 +357,7 @@ export function calculatePenalty(columnCaps: number[]): PenaltyResult {
     totalPenalty += orange * PENALTY_ORANGE_WEIGHT + red * PENALTY_RED_WEIGHT;
   }
 
-  const { stars, label } = calculateStars(totalPenalty);
+  const { stars, label } = calculateStars(totalPenalty, orangeCount + redCount);
   return {
     totalPenalty: Math.round(totalPenalty * 10) / 10,
     orangeCount,
