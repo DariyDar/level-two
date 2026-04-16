@@ -198,8 +198,8 @@ export function TutorialOverlay({ step, onAdvance }: TutorialOverlayProps) {
         />
       )}
 
-      {/* Spotlight highlight borders — hidden in passthrough/action mode to avoid iOS touch-event interference with draggables */}
-      {!isPassthrough && spotlightRects.map((rect, i) => (
+      {/* Spotlight highlight borders — always rendered (pointerEvents:none), passthrough just skips the backdrop */}
+      {spotlightRects.map((rect, i) => (
         <div
           key={i}
           className={`tutorial-overlay__spotlight tutorial-overlay__spotlight--${step.highlightType ?? 'spotlight'}`}

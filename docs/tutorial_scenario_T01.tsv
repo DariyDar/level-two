@@ -12,10 +12,10 @@ Calories Bar			Hidden (planned — not yet implemented)
 
 Day 1
 Parameter			Value
-Inventory			🍌 Banana, 🍔 Burger
+Inventory			🍌 Banana, 🥣 Oatmeal
 Open slots			Slot 1 (9:00), Slot 6 (2:00 PM)
 WP budget			5
-Kcal budget			1100
+Kcal budget			550
 Starting BG			100 mg/dL
 
 State ID	State Name	Flags / Overrides	Alice	Dialogue	Advance	Notes
@@ -26,9 +26,9 @@ L1D1-4	PlaceBananaCTA	highlight: food:banana + slot:1 (9:00) (pulse) | CTA: drag
 L1D1-5	BGPlatoPause	blockInteraction | highlightPendingDrop	neutral	When we eat, carbs raise our blood glucose — the more carbs, the higher the blood glucose will rise.	[Tap]	Food remains in hover/preview state during this step. highlightPendingDrop: banana preview cubes blink on graph.
 L1D1-6	WaitBurnAnimation	releasePendingDrop | slowBurnAnim | highlight: graph (spotlight) | no backdrop	happy	What a show! The pancreas reacts to rising BG by secreting insulin — pulling our blood sugar right back down.	[Tap]	releasePendingDrop: commits food from L1D1-4. slowBurnAnim: burn animation plays at 3× slow motion. Bubble shown during animation.
 L1D1-7	GlycemicIndex	blockInteraction	neutral	Different foods raise glucose at different speeds. It depends on the Glycemic Index — GI for short.	[Tap]
-L1D1-8	FoodGI_Display	blockInteraction | highlight: food:burger (glow) | highlightGILabel: burger	neutral	In Level Two, food cards show glucose release speed. Hamburger has a low GI — tagged as Low GI.	[Tap]	highlightGILabel: "Low GI" text on the Burger card blinks cyclically.
-L1D1-9	BurgerDragCTA	highlight: food:burger + slot:6 (2:00 PM) (pulse) | CTA: drag-arrow food:burger → slot:6	neutral	Drag the 🍔 Burger to the 2:00 PM slot — let's see how a slow-release food behaves.	[Drag 🍔 Burger → Slot 6 (2:00 PM)]
-L1D1-10	SlowGIExplanation	blockInteraction	neutral	Low GI foods release glucose slowly, giving the pancreas more time to respond. They're a safer choice for most situations.	[Tap]
+L1D1-8	FoodGI_Display	blockInteraction | highlight: food:oatmeal (glow) | highlightGILabel: oatmeal	neutral	In Level Two, food cards show glucose release speed. Oatmeal has a medium GI — tagged as Medium GI.	[Tap]	highlightGILabel: "Medium GI" text on the Oatmeal card blinks cyclically.
+L1D1-9	OatmealDragCTA	highlight: food:oatmeal + slot:6 (2:00 PM) (pulse) | CTA: drag-arrow food:oatmeal → slot:6	neutral	Drag the 🥣 Oatmeal to the 2:00 PM slot — let's see how a medium-GI food behaves.	[Drag 🥣 Oatmeal → Slot 6 (2:00 PM)]
+L1D1-10	GIExplanation	blockInteraction	neutral	Low-GI foods release glucose slowly — a gentler rise, and more time for your pancreas to respond. They're a safer choice in most situations.	[Tap]
 L1D1-11	SubmitCTA	highlight: submit-btn (pulse) | CTA: tap-pulse submit-btn	neutral	Now hit Submit to see our results!	[Submit]
 L1D1-12	ResultsExplanation	blockInteraction | blocksResultsReveal | highlight: danger-line (no backdrop)	happy	Look at that! Our pancreas kept the glucose from crossing the 200 mg/dL line — working with our body to stay in the safe zone!	[Tap] → reveal animation resumes	⚠️ blocksResultsReveal — reveal animation paused until player taps.
 L1D1-13	NextDayCTA	pendingUntilResults | highlight: result-next-btn (pulse) | no backdrop	— (silent)	—	[Tap Next]	Alice does not appear.
