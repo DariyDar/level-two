@@ -18,7 +18,7 @@
         { "shipId": "banana", "slotIndex": 9 },
         { "shipId": "rice",   "slotIndex": 20 }
       ],
-      "lockedSlots": [8, 9, 11, 12, 15, 17, 18, 20]
+      "lockedSlots": [8, 9, 11, 12, 15, 17, 20]
     },
     {
       "day": 2,
