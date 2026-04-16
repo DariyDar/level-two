@@ -286,12 +286,15 @@ export const useGameStore = create<GameState>()(
         set((state) => {
           const dc = state.currentLevel ? getDayConfig(state.currentLevel, day) : null;
           const pre = getPreplacedItems(dc);
-          // Clear locked/active boost for target day and beyond (stale persisted data corrupts barsAvailable)
+          // Clear locked/active boost and submitted WP for target day and beyond (stale persisted data corrupts barsAvailable and WP carry-over)
           const cleanedLockedBars = Object.fromEntries(
             Object.entries(state.lockedBarsPerDay).filter(([d]) => Number(d) < day)
           );
           const cleanedBoostActive = Object.fromEntries(
             Object.entries(state.boostActivePerDay).filter(([d]) => Number(d) < day)
+          );
+          const cleanedSubmittedWp = Object.fromEntries(
+            Object.entries(state.submittedWpPerDay).filter(([d]) => Number(d) < day)
           );
           return {
             currentDay: day,
@@ -300,6 +303,7 @@ export const useGameStore = create<GameState>()(
             placedMedications: [],
             lockedBarsPerDay: cleanedLockedBars,
             boostActivePerDay: cleanedBoostActive,
+            submittedWpPerDay: cleanedSubmittedWp,
           };
         }),
 
@@ -388,7 +392,6 @@ export const useGameStore = create<GameState>()(
         settings: state.settings,
         boostActivePerDay: state.boostActivePerDay,
         lockedBarsPerDay: state.lockedBarsPerDay,
-        submittedWpPerDay: state.submittedWpPerDay,
       }),
     }
   )
