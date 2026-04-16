@@ -157,7 +157,7 @@
     {
       "day": 3,
       "kcalBudget": 2000,
-      "wpBudget": 10,
+      "wpBudget": 13,
       "availableFoods": [
         {
           "id": "sandwich",
