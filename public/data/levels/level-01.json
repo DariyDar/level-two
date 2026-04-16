@@ -80,7 +80,7 @@
     {
       "day": 2,
       "kcalBudget": 2000,
-      "wpBudget": 10,
+      "wpBudget": 5,
       "availableFoods": [
         {
           "id": "chickpeas",
@@ -157,7 +157,7 @@
     {
       "day": 3,
       "kcalBudget": 2000,
-      "wpBudget": 13,
+      "wpBudget": 5,
       "availableFoods": [
         {
           "id": "sandwich",
