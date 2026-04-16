@@ -258,7 +258,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
 
   const kcalBudget = dayConfig?.kcalBudget ?? 2000;
   const wpBudget = dayConfig?.wpBudget ?? 16;
-  const wpPenalty = selectWpPenalty(currentDay, submittedWpPerDay);
+  const wpPenalty = isTutorial ? 0 : selectWpPenalty(currentDay, submittedWpPerDay);
   const rawWpBudget = wpBudget + medicationModifiers.wpBonus;
   const wpFloor = Math.ceil(wpBudget * 0.5);
   const effectiveWpBudget = Math.max(rawWpBudget - wpPenalty, wpFloor);
