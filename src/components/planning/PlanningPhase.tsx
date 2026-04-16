@@ -990,13 +990,15 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
               Day {day}
             </button>
           ))}
-          <button
-            className={`planning-phase__show-burns-btn${showBurns ? ' planning-phase__show-burns-btn--active' : ''}`}
-            onClick={() => setShowBurns(v => !v)}
-            title={showBurns ? 'Burns: visible — click to hide' : 'Burns: hidden — click to show'}
-          >
-            👁️
-          </button>
+          {!isTutorial && (
+            <button
+              className={`planning-phase__show-burns-btn${showBurns ? ' planning-phase__show-burns-btn--active' : ''}`}
+              onClick={() => setShowBurns(v => !v)}
+              title={showBurns ? 'Burns: visible — click to hide' : 'Burns: hidden — click to show'}
+            >
+              👁️
+            </button>
+          )}
         </div>
       )}
 
