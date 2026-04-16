@@ -419,6 +419,7 @@ export function selectWpUsed(
 ): number {
   let total = 0;
   for (const placed of placedFoods) {
+    if (placed.id.startsWith('preplaced-')) continue; // pre-placed foods are free
     const ship = allShips.find(s => s.id === placed.shipId);
     if (ship) total += (ship.wpCost ?? 0);
   }
