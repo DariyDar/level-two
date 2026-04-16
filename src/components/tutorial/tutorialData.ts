@@ -61,19 +61,19 @@ export interface TutorialStep {
 
 const L_PF_D1: TutorialStep[] = [
   {
-    id: 'LPF-D1-1',
+    id: 'T4D1-1',
     bubble: { type: 'warning', text: "Unfortunately, type 2 diabetes is a progressive disease — especially without careful diet and lifestyle management.", expression: 'concerned', position: 'center' },
     advanceOn: 'tap',
     blockInteraction: true,
   },
   {
-    id: 'LPF-D1-2',
+    id: 'T4D1-2',
     bubble: { type: 'dialogue', text: "Over time this leads to increased insulin resistance and greater burden on the pancreas, causing it to fatigue.", expression: 'neutral', position: 'inventory' },
     advanceOn: 'tap',
     blockInteraction: true,
   },
   {
-    id: 'LPF-D1-3',
+    id: 'T4D1-3',
     bubble: { type: 'hint', text: "You can monitor pancreas performance right here. Right now it's working at full strength — 5 out of 5.", expression: 'neutral', position: 'inventory' },
     highlight: 'pancreas-btn',
     highlightType: 'pulse',
@@ -83,7 +83,7 @@ const L_PF_D1: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'LPF-D1-4',
+    id: 'T4D1-4',
     bubble: { type: 'dialogue', text: "Place any food card and watch how the pancreas handles the glucose spike at full strength.", expression: 'neutral', position: 'inventory' },
     pancreasEffectivenessOverride: 5,
     advanceOn: 'action',
@@ -91,7 +91,7 @@ const L_PF_D1: TutorialStep[] = [
   },
   {
     // Silent step: wait for tier-5 bomb animation to complete
-    id: 'LPF-D1-4b',
+    id: 'T4D1-5',
     pancreasEffectivenessOverride: 5,
     highlight: 'graph',
     highlightType: 'spotlight',
@@ -101,7 +101,7 @@ const L_PF_D1: TutorialStep[] = [
   },
   {
     // Show burned layer (tier-5 pattern) and explain it
-    id: 'LPF-D1-4c',
+    id: 'T4D1-6',
     bubble: { type: 'hint', text: "At full strength the pancreas burns 2 rows of glucose every interval — that's tier-5 depth.", expression: 'neutral', position: 'inventory' },
     pancreasEffectivenessOverride: 5,
     showBurnsLayer: true,
@@ -112,7 +112,7 @@ const L_PF_D1: TutorialStep[] = [
   },
   {
     // Explain what's coming — effectiveness override NOT applied yet (bar still shows 5)
-    id: 'LPF-D1-5',
+    id: 'T4D1-7',
     bubble: { type: 'hint', text: "Now let's see what happens when the pancreas is slightly fatigued...", expression: 'thinking', position: 'inventory' },
     highlight: 'pancreas-btn',
     highlightType: 'pulse',
@@ -122,7 +122,7 @@ const L_PF_D1: TutorialStep[] = [
   },
   {
     // Silent step: apply tier-4 override + replay bombs with tier-4 pattern
-    id: 'LPF-D1-5b',
+    id: 'T4D1-8',
     pancreasEffectivenessOverride: 4,
     triggerReburn: true,
     noBackdrop: true,
@@ -131,7 +131,7 @@ const L_PF_D1: TutorialStep[] = [
   },
   {
     // Show tier-4 burned layer and explain the difference
-    id: 'LPF-D1-6',
+    id: 'T4D1-9',
     bubble: { type: 'dialogue', text: "Not as sharp as before. The second burn row now skips every other interval — so some glucose slips through. That's what tier 4 looks like.", expression: 'concerned', position: 'inventory' },
     pancreasEffectivenessOverride: 4,
     showBurnsLayer: true,
@@ -141,7 +141,7 @@ const L_PF_D1: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'LPF-D1-7',
+    id: 'T4D1-10',
     bubble: { type: 'dialogue', text: "Finish planning for today — I'll explain how we can support the pancreas.", expression: 'neutral', position: 'inventory' },
     pancreasEffectivenessOverride: 4,
     highlight: 'ship-inventory',
@@ -150,7 +150,7 @@ const L_PF_D1: TutorialStep[] = [
     expectedAction: { type: 'click-submit' },
   },
   {
-    id: 'LPF-D1-9',
+    id: 'T4D1-11',
     bubble: { type: 'dialogue', text: "That's a lot of excess sugar. Tomorrow I'll show you what helps reduce the load on the pancreas.", expression: 'concerned', position: 'inventory' },
     pendingUntilResults: true,
     highlight: 'result-next-btn',
@@ -164,7 +164,7 @@ const L_PF_D1: TutorialStep[] = [
 
 const L_PF_D2: TutorialStep[] = [
   {
-    id: 'LPF-D2-1',
+    id: 'T4D2-1',
     bubble: { type: 'dialogue', text: "The muffin is causing a dangerous spike. And today the pancreas is already at 4/5 — it's working harder to compensate.", expression: 'concerned' },
     highlight: 'graph',
     highlightType: 'spotlight',
@@ -173,7 +173,7 @@ const L_PF_D2: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'LPF-D2-2',
+    id: 'T4D2-2',
     bubble: { type: 'hint', text: "Even intense physical activity won't flatten this peak alone — but let's try it. Place Heavy Run right after the muffin.", expression: 'thinking', position: 'inventory' },
     highlight: ['intervention:heavyrun', 'slot:12'],
     highlightType: 'spotlight',
@@ -182,13 +182,13 @@ const L_PF_D2: TutorialStep[] = [
     expectedAction: { type: 'place-intervention', interventionId: 'heavyrun' },
   },
   {
-    id: 'LPF-D2-3',
+    id: 'T4D2-3',
     bubble: { type: 'dialogue', text: "Heavy Run reduces the peak — but it's still in the danger zone. We need another approach.", expression: 'thinking' },
     advanceOn: 'tap',
     blockInteraction: true,
   },
   {
-    id: 'LPF-D2-4',
+    id: 'T4D2-4',
     bubble: { type: 'dialogue', text: "\ud83d\udc8a Metformin! It reduces ALL food glucose by 20% — for the entire day.", expression: 'neutral' },
     highlight: 'medication:metformin',
     highlightType: 'spotlight',
@@ -196,12 +196,12 @@ const L_PF_D2: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'LPF-D2-5',
+    id: 'T4D2-5',
     bubble: { type: 'hint', text: "No WP cost. Just tap once — it stays active all day.", expression: 'thinking' },
     advanceOn: 'tap',
   },
   {
-    id: 'LPF-D2-6',
+    id: 'T4D2-6',
     bubble: { type: 'dialogue', text: "Tap Metformin ON and watch the peak change!", expression: 'neutral' },
     highlight: 'medication:metformin',
     highlightType: 'pulse',
@@ -210,7 +210,7 @@ const L_PF_D2: TutorialStep[] = [
     expectedAction: { type: 'toggle-medication', medicationId: 'metformin' },
   },
   {
-    id: 'LPF-D2-7',
+    id: 'T4D2-7',
     bubble: { type: 'success', text: "Wow! That was substantial! The purple layer shows the glucose Metformin prevented — the more carbs, the bigger the effect!", expression: 'happy', position: 'bottom' },
     highlight: 'graph',
     highlightType: 'glow',
@@ -220,7 +220,7 @@ const L_PF_D2: TutorialStep[] = [
     advanceOn: 'tap',
   },
   {
-    id: 'LPF-D2-8',
+    id: 'T4D2-8',
     bubble: { type: 'dialogue', text: "Place your remaining food and submit!", expression: 'neutral', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -228,7 +228,7 @@ const L_PF_D2: TutorialStep[] = [
     expectedAction: { type: 'click-submit' },
   },
   {
-    id: 'LPF-D2-10',
+    id: 'T4D2-9',
     pendingUntilResults: true,
     highlight: 'result-next-btn',
     highlightType: 'pulse',
@@ -243,13 +243,13 @@ const L_PF_D2: TutorialStep[] = [
 
 const L1D1: TutorialStep[] = [
   {
-    id: 'L1D1-1',
+    id: 'T1D1-1',
     bubble: { type: 'dialogue', text: "Welcome to Level Two — a Type 2 Diabetes management game. Let me be your guide!", expression: 'happy', position: 'center' },
     advanceOn: 'tap',
     blockInteraction: true,
   },
   {
-    id: 'L1D1-2',
+    id: 'T1D1-2',
     bubble: { type: 'dialogue', text: 'This is our Blood Glucose graph. Our current level is 100\u00a0mg/dL.', expression: 'neutral', position: 'center' },
     highlight: 'baseline-cubes',
     noBackdrop: true,
@@ -257,7 +257,7 @@ const L1D1: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L1D1-3',
+    id: 'T1D1-3',
     bubble: { type: 'warning', text: 'Blood glucose above 200\u00a0mg/dL puts real strain on the body. Our goal is to stay below that red line — every single day.', expression: 'concerned', position: 'center' },
     highlight: 'danger-line',
     noBackdrop: true,
@@ -265,7 +265,7 @@ const L1D1: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L1D1-4',
+    id: 'T1D1-4',
     bubble: { type: 'dialogue', text: "Time to plan our first meal! Drag the \ud83c\udf4c Banana to the 9:00\u00a0AM slot \u2014 let\u2019s see how it affects our blood glucose.", expression: 'neutral' },
     highlight: ['food:banana', 'slot:9'],
     highlightType: 'pulse',
@@ -275,14 +275,14 @@ const L1D1: TutorialStep[] = [
     pauseOnDrop: true,
   },
   {
-    id: 'L1D1-5',
+    id: 'T1D1-5',
     bubble: { type: 'dialogue', text: 'When we eat, carbs raise our blood glucose \u2014 the more carbs, the higher the blood glucose will rise.', expression: 'neutral', position: 'center' },
     blockInteraction: true,
     highlightPendingDrop: true,
     advanceOn: 'tap',
   },
   {
-    id: 'L1D1-6',
+    id: 'T1D1-6',
     bubble: { type: 'dialogue', text: 'What a show! The pancreas reacts to rising BG by secreting insulin \u2014 pulling our blood sugar right back down.', expression: 'happy', position: 'center' },
     highlight: 'graph',
     highlightType: 'spotlight',
@@ -293,13 +293,13 @@ const L1D1: TutorialStep[] = [
     slowBurnAnim: true,
   },
   {
-    id: 'L1D1-7',
+    id: 'T1D1-7',
     bubble: { type: 'dialogue', text: 'Different foods raise glucose at different speeds. It depends on the Glycemic Index \u2014 GI for short.', expression: 'neutral', position: 'center' },
     blockInteraction: true,
     advanceOn: 'tap',
   },
   {
-    id: 'L1D1-8',
+    id: 'T1D1-8',
     bubble: { type: 'dialogue', text: 'In Level Two, food cards show glucose release speed. Oatmeal releases glucose slowly \u2014 tagged as Slow.', expression: 'neutral' },
     highlight: 'food:oatmeal',
     highlightType: 'glow',
@@ -308,7 +308,7 @@ const L1D1: TutorialStep[] = [
     advanceOn: 'tap',
   },
   {
-    id: 'L1D1-9',
+    id: 'T1D1-9',
     bubble: { type: 'dialogue', text: "Drag the \ud83e\udd63 Oatmeal to the 2:00\u00a0PM slot \u2014 let\u2019s see how a slow-release food behaves.", expression: 'neutral' },
     highlight: ['food:oatmeal', 'slot:14'],
     highlightType: 'pulse',
@@ -317,13 +317,13 @@ const L1D1: TutorialStep[] = [
     expectedAction: { type: 'place-food', foodId: 'oatmeal', slotIndex: 6 },
   },
   {
-    id: 'L1D1-10',
+    id: 'T1D1-10',
     bubble: { type: 'dialogue', text: 'Low-GI foods release glucose slowly \u2014 a gentler rise, and more time for your pancreas to respond. They\u2019re a safer choice in most situations.', expression: 'neutral', position: 'center' },
     blockInteraction: true,
     advanceOn: 'tap',
   },
   {
-    id: 'L1D1-11',
+    id: 'T1D1-11',
     bubble: { type: 'dialogue', text: 'Now hit Submit to see our results!', expression: 'neutral' },
     highlight: 'submit-btn',
     highlightType: 'pulse',
@@ -332,7 +332,7 @@ const L1D1: TutorialStep[] = [
     expectedAction: { type: 'click-submit' },
   },
   {
-    id: 'L1D1-12',
+    id: 'T1D1-12',
     bubble: { type: 'dialogue', text: 'Look at that! Our pancreas kept the glucose from crossing the 200\u00a0mg/dL line \u2014 working with our body to stay in the safe zone!', expression: 'happy', position: 'center' },
     highlight: 'danger-line',
     noBackdrop: true,
@@ -341,7 +341,7 @@ const L1D1: TutorialStep[] = [
     blocksResultsReveal: true,
   },
   {
-    id: 'L1D1-13',
+    id: 'T1D1-13',
     pendingUntilResults: true,
     highlight: 'result-next-btn',
     highlightType: 'pulse',
@@ -354,7 +354,7 @@ const L1D1: TutorialStep[] = [
 
 const L1D2: TutorialStep[] = [
   {
-    id: 'L1D2-1',
+    id: 'T1D2-1',
     bubble: { type: 'dialogue', text: 'That ☀️ icon is your Willpower (WP) — the mental energy it takes to make a healthy choice. In real life, it\'s what pushes you to do the right thing even when you don\'t feel like it.', expression: 'neutral', position: 'center' },
     highlight: 'wp-counter',
     highlightType: 'glow',
@@ -362,13 +362,13 @@ const L1D2: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L1D2-2',
+    id: 'T1D2-2',
     bubble: { type: 'dialogue', text: 'In the game, WP is spent on food and exercise. Healthier options often cost more — let\'s take a closer look at what\'s on the menu today.', expression: 'neutral', position: 'center' },
     advanceOn: 'tap',
     blockInteraction: true,
   },
   {
-    id: 'L1D2-3',
+    id: 'T1D2-3',
     bubble: { type: 'dialogue', text: '\ud83c\udf4c Banana has 23g carbs, fast glucose release, and costs just 1 WP.', expression: 'thinking' },
     highlight: 'food:banana',
     highlightType: 'glow',
@@ -376,7 +376,7 @@ const L1D2: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L1D2-4',
+    id: 'T1D2-4',
     bubble: { type: 'dialogue', text: '\ud83c\udf54 Hamburger has 27g carbs, slow glucose release, but costs 2 WP.', expression: 'neutral' },
     highlight: 'food:burger',
     highlightType: 'glow',
@@ -384,7 +384,7 @@ const L1D2: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L1D2-5',
+    id: 'T1D2-5',
     bubble: { type: 'dialogue', text: 'And we also have \ud83c\udf6a Cookie! Try them all out \u2014 you can remove a food from a slot by tapping it.', expression: 'happy' },
     highlight: 'food:cookie',
     highlightType: 'glow',
@@ -392,7 +392,7 @@ const L1D2: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L1D2-6',
+    id: 'T1D2-6',
     bubble: { type: 'dialogue', text: 'You have enough WP to place everything today. Try different combinations and submit when ready!', expression: 'happy', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -403,7 +403,7 @@ const L1D2: TutorialStep[] = [
 
 const L1D3: TutorialStep[] = [
   {
-    id: 'L1D3-1',
+    id: 'T1D3-1',
     bubble: { type: 'dialogue', text: 'A friend shared a slice of \ud83c\udf55 pizza at lunch \u2014 you ate it without thinking twice.', expression: 'neutral' },
     highlight: 'slot:15',
     highlightType: 'spotlight',
@@ -412,7 +412,7 @@ const L1D3: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L1D3-2',
+    id: 'T1D3-2',
     bubble: { type: 'dialogue', text: "It happens \u2014 sometimes we slip without even noticing. A brief glucose spike above 200\u00a0mg/dL won't cause lasting harm.", expression: 'neutral' },
     highlight: 'danger-zone',
     noBackdrop: true,
@@ -420,13 +420,13 @@ const L1D3: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L1D3-3',
+    id: 'T1D3-3',
     bubble: { type: 'dialogue', text: "The key is what comes next. Plan the rest of your day wisely \u2014 you've got this!", expression: 'concerned' },
     advanceOn: 'tap',
     blockInteraction: true,
   },
   {
-    id: 'L1D3-5',
+    id: 'T1D3-4',
     bubble: { type: 'dialogue', text: 'Place your meals and submit when ready!', expression: 'neutral', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -439,13 +439,13 @@ const L1D3: TutorialStep[] = [
 
 const L2D1: TutorialStep[] = [
   {
-    id: 'L2D1-1',
+    id: 'T3D1-1',
     bubble: { type: 'dialogue', text: 'Physical activity is a great tool to burn excess calories!', expression: 'happy' },
     advanceOn: 'tap',
     blockInteraction: true,
   },
   {
-    id: 'L2D1-2',
+    id: 'T3D1-2',
     bubble: { type: 'warning', text: 'The \ud83c\udf55 Pizza is already on the graph, reaching 250\u00a0mg/dL \u2014 above the 200 danger level!', expression: 'concerned', position: 'inventory' },
     highlight: 'danger-zone',
     noBackdrop: true,
@@ -453,7 +453,7 @@ const L2D1: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L2D1-3',
+    id: 'T3D1-3',
     bubble: { type: 'dialogue', text: 'Let\u2019s fix that peak! Drag the \ud83d\udeb6 Light Walk into the schedule right after the pizza.', expression: 'thinking', position: 'inventory' },
     highlight: ['intervention:lightwalk', 'slot:11'],
     highlightType: 'pulse',
@@ -462,13 +462,13 @@ const L2D1: TutorialStep[] = [
     expectedAction: { type: 'place-intervention', interventionId: 'lightwalk' },
   },
   {
-    id: 'L2D1-5',
+    id: 'T3D1-4',
     bubble: { type: 'success', text: '\u2728 Nicely done! The walk burned off the excess calories and brought blood glucose down to safe levels!', expression: 'happy', position: 'inventory' },
     noBackdrop: true,
     advanceOn: 'tap',
   },
   {
-    id: 'L2D1-6',
+    id: 'T3D1-5',
     bubble: { type: 'dialogue', text: 'Now finish planning the day.', expression: 'neutral' },
     advanceOn: 'tap',
     blockInteraction: true,
@@ -479,7 +479,7 @@ const L2D2: TutorialStep[] = [];
 
 const L2D3: TutorialStep[] = [
   {
-    id: 'L2D3-3',
+    id: 'T3D2-1',
     bubble: { type: 'dialogue', text: '\ud83e\uddc1 The Muffin is at the 8:30 AM slot. Drag the Heavy Run right after it to crush the peak!', expression: 'thinking', position: 'inventory' },
     highlight: ['intervention:heavyrun', 'slot:10'],
     highlightType: 'pulse',
@@ -488,7 +488,7 @@ const L2D3: TutorialStep[] = [
     expectedAction: { type: 'place-intervention', interventionId: 'heavyrun' },
   },
   {
-    id: 'L2D3-4',
+    id: 'T3D2-2',
     bubble: { type: 'dialogue', text: 'Place everything and submit!', expression: 'happy', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -501,7 +501,7 @@ const L2D3: TutorialStep[] = [
 
 const L3D1: TutorialStep[] = [
   {
-    id: 'L3D1-1',
+    id: 'T5D1-1',
     bubble: { type: 'dialogue', text: 'Only 5 \u2600\ufe0f today. Three foods to place \u2014 but you might not have enough WP for all of them!', expression: 'concerned' },
     highlight: 'wp-counter',
     highlightType: 'glow',
@@ -509,7 +509,7 @@ const L3D1: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L3D1-2',
+    id: 'T5D1-2',
     bubble: { type: 'dialogue', text: 'Place your first food on the graph.', expression: 'neutral', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -517,7 +517,7 @@ const L3D1: TutorialStep[] = [
     expectedAction: { type: 'place-food' },
   },
   {
-    id: 'L3D1-3',
+    id: 'T5D1-3',
     bubble: { type: 'dialogue', text: 'Place one more food.', expression: 'neutral', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -525,7 +525,7 @@ const L3D1: TutorialStep[] = [
     expectedAction: { type: 'place-food' },
   },
   {
-    id: 'L3D1-4',
+    id: 'T5D1-4',
     bubble: { type: 'warning', text: '1 WP left, but the last food costs 2! \u2615 Take a Break refunds 1 WP.', expression: 'concerned' },
     highlight: 'intervention:takeabreak',
     highlightType: 'pulse',
@@ -533,7 +533,7 @@ const L3D1: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L3D1-5',
+    id: 'T5D1-5',
     bubble: { type: 'dialogue', text: 'Drag \u2615 Take a Break to a slot \u2014 you\u2019ll get 1 WP back!', expression: 'happy', position: 'inventory' },
     highlight: 'intervention:takeabreak',
     highlightType: 'pulse',
@@ -542,7 +542,7 @@ const L3D1: TutorialStep[] = [
     expectedAction: { type: 'place-intervention', interventionId: 'takeabreak' },
   },
   {
-    id: 'L3D1-7',
+    id: 'T5D1-6',
     bubble: { type: 'dialogue', text: 'Place the last food!', expression: 'neutral', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -550,7 +550,7 @@ const L3D1: TutorialStep[] = [
     expectedAction: { type: 'place-food' },
   },
   {
-    id: 'L3D1-8',
+    id: 'T5D1-7',
     bubble: { type: 'success', text: 'All foods placed! Now submit.', expression: 'happy', position: 'inventory' },
     highlight: 'submit-btn',
     highlightType: 'pulse',
@@ -562,7 +562,7 @@ const L3D1: TutorialStep[] = [
 
 const L3D3: TutorialStep[] = [
   {
-    id: 'L3D3-1',
+    id: 'T5D2-1',
     bubble: { type: 'dialogue', text: 'Day 3! When you overeat, you lose Willpower Points the next day.', expression: 'neutral' },
     highlight: 'wp-counter',
     highlightType: 'glow',
@@ -570,7 +570,7 @@ const L3D3: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L3D3-2',
+    id: 'T5D2-2',
     bubble: { type: 'dialogue', text: 'New tool: \ud83d\ude34 Take a Rest! It refunds 2 WP but takes 2 slots and 120 minutes. Great for recovering willpower!', expression: 'neutral' },
     highlight: 'intervention-inventory',
     highlightType: 'spotlight',
@@ -578,7 +578,7 @@ const L3D3: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L3D3-3',
+    id: 'T5D2-3',
     bubble: { type: 'dialogue', text: 'The burger is pre-placed. Use your tools to manage the spike and submit!', expression: 'happy', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -591,7 +591,7 @@ const L3D3: TutorialStep[] = [
 
 const L4D1: TutorialStep[] = [
   {
-    id: 'L4D1-1',
+    id: 'T6D1-1',
     bubble: { type: 'warning', text: 'That \ud83e\uddc1 Muffin spiked way above 200 mg/dL! Today you have no exercise \u2014 but there\'s another tool: the Pancreas BOOST!', expression: 'concerned' },
     highlight: 'boost-btn',
     highlightType: 'spotlight',
@@ -599,7 +599,7 @@ const L4D1: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L4D1-2',
+    id: 'T6D1-2',
     bubble: { type: 'hint', text: 'BOOST supercharges insulin ONLY above 200 mg/dL \u2014 it cuts 4 cubes per column in the danger zone!', expression: 'thinking' },
     highlight: 'boost-btn',
     highlightType: 'glow',
@@ -607,7 +607,7 @@ const L4D1: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L4D1-3',
+    id: 'T6D1-3',
     bubble: { type: 'dialogue', text: 'Tap BOOST ON and watch the spike drop!', expression: 'happy' },
     highlight: 'boost-btn',
     highlightType: 'pulse',
@@ -616,14 +616,14 @@ const L4D1: TutorialStep[] = [
     expectedAction: { type: 'toggle-boost' },
   },
   {
-    id: 'L4D1-4',
+    id: 'T6D1-4',
     bubble: { type: 'success', text: 'See that? BOOST crushed the peak above 200! Now place your food and submit.', expression: 'celebrating' },
     highlight: 'graph',
     highlightType: 'glow',
     advanceOn: 'tap',
   },
   {
-    id: 'L4D1-5',
+    id: 'T6D1-5',
     bubble: { type: 'dialogue', text: 'Place your food and submit!', expression: 'neutral', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -634,7 +634,7 @@ const L4D1: TutorialStep[] = [
 
 const L4D2: TutorialStep[] = [
   {
-    id: 'L4D2-1',
+    id: 'T6D2-1',
     bubble: { type: 'dialogue', text: 'Day 2! The doctor replenished your BOOST \u2014 you have 1 charge again. But remember: it\'s limited. Use it wisely!', expression: 'neutral' },
     highlight: 'boost-btn',
     highlightType: 'glow',
@@ -642,7 +642,7 @@ const L4D2: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L4D2-2',
+    id: 'T6D2-2',
     bubble: { type: 'hint', text: 'Today you have a \ud83c\udfc3 Heavy Run! It burns 5 cubes/col for 3 hours \u2014 very powerful. Try using it near the peak BEFORE reaching for BOOST.', expression: 'thinking' },
     highlight: 'intervention-inventory',
     highlightType: 'spotlight',
@@ -650,12 +650,12 @@ const L4D2: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L4D2-3',
+    id: 'T6D2-3',
     bubble: { type: 'hint', text: 'Save BOOST for Day 3 if you can \u2014 the peak there is even bigger!', expression: 'thinking' },
     advanceOn: 'tap',
   },
   {
-    id: 'L4D2-4',
+    id: 'T6D2-4',
     bubble: { type: 'dialogue', text: 'Place your run, food, and submit!', expression: 'happy', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -666,7 +666,7 @@ const L4D2: TutorialStep[] = [
 
 const L4D3: TutorialStep[] = [
   {
-    id: 'L4D3-1',
+    id: 'T6D3-1',
     bubble: { type: 'warning', text: 'Day 3 \u2014 the hardest! Two big pre-placed foods. The combined peak is brutal.', expression: 'concerned' },
     highlight: 'graph',
     highlightType: 'spotlight',
@@ -674,7 +674,7 @@ const L4D3: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L4D3-2',
+    id: 'T6D3-2',
     bubble: { type: 'hint', text: 'If you saved your BOOST from yesterday \u2014 now is the time! BOOST + Light Walk is a powerful combo.', expression: 'thinking' },
     highlight: 'boost-btn',
     highlightType: 'glow',
@@ -682,12 +682,12 @@ const L4D3: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L4D3-3',
+    id: 'T6D3-3',
     bubble: { type: 'hint', text: 'Even without BOOST, smart walk placement + good food timing goes a long way. With BOOST: you can flatten the spike significantly!', expression: 'thinking' },
     advanceOn: 'tap',
   },
   {
-    id: 'L4D3-4',
+    id: 'T6D3-4',
     bubble: { type: 'dialogue', text: 'Plan your best day and submit!', expression: 'happy', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -702,7 +702,7 @@ const L4D3: TutorialStep[] = [
 
 const L6D1: TutorialStep[] = [
   {
-    id: 'L6D1-1',
+    id: 'T8D1-1',
     bubble: { type: 'dialogue', text: 'New medication: \ud83e\uddea SGLT2 Inhibitor! It works differently from Metformin.', expression: 'neutral' },
     highlight: 'medication:sglt2',
     highlightType: 'spotlight',
@@ -711,7 +711,7 @@ const L6D1: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L6D1-2',
+    id: 'T8D1-2',
     bubble: { type: 'dialogue', text: 'SGLT2 removes excess glucose through the kidneys \u2014 but ONLY above 200 mg/dL. See the purple dashed line on the graph? That\'s the threshold.', expression: 'neutral' },
     highlight: 'graph',
     highlightType: 'glow',
@@ -720,12 +720,12 @@ const L6D1: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L6D1-3',
+    id: 'T8D1-3',
     bubble: { type: 'dialogue', text: 'It won\'t lower glucose below 200 mg/dL. Think of it as shaving the top of tall peaks.', expression: 'thinking' },
     advanceOn: 'tap',
   },
   {
-    id: 'L6D1-4',
+    id: 'T8D1-4',
     bubble: { type: 'dialogue', text: 'Toggle \ud83e\uddea SGLT2 ON and watch the pizza peak change!', expression: 'neutral' },
     highlight: 'medication:sglt2',
     highlightType: 'pulse',
@@ -734,14 +734,14 @@ const L6D1: TutorialStep[] = [
     expectedAction: { type: 'toggle-medication', medicationId: 'sglt2' },
   },
   {
-    id: 'L6D1-5',
+    id: 'T8D1-5',
     bubble: { type: 'success', text: 'The peak dropped! SGLT2 flushed out excess glucose above 200 mg/dL.', expression: 'happy', position: 'inventory' },
     highlight: 'graph',
     highlightType: 'glow',
     advanceOn: 'tap',
   },
   {
-    id: 'L6D1-6',
+    id: 'T8D1-6',
     bubble: { type: 'dialogue', text: 'Place your food and walk, then submit.', expression: 'neutral', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -752,7 +752,7 @@ const L6D1: TutorialStep[] = [
 
 const L6D2: TutorialStep[] = [
   {
-    id: 'L6D2-1',
+    id: 'T8D2-1',
     bubble: { type: 'dialogue', text: 'See the red-tinted columns on the graph? Those are stress slots!', expression: 'neutral' },
     highlight: 'slot:14',
     highlightType: 'spotlight',
@@ -761,7 +761,7 @@ const L6D2: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L6D2-2',
+    id: 'T8D2-2',
     bubble: { type: 'warning', text: '\ud83d\ude30 Stress reduces insulin by 2 in those time slots. If the base rate was 2, it drops to 0 \u2014 no insulin at all!', expression: 'concerned' },
     highlight: 'insulin-bars',
     highlightType: 'glow',
@@ -770,12 +770,12 @@ const L6D2: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L6D2-3',
+    id: 'T8D2-3',
     bubble: { type: 'dialogue', text: 'Food placed in stress slots will peak much higher and decay much slower. Avoid putting big food there!', expression: 'thinking' },
     advanceOn: 'tap',
   },
   {
-    id: 'L6D2-4',
+    id: 'T8D2-4',
     bubble: { type: 'dialogue', text: 'You have Metformin AND SGLT2 today. Toggle both ON to reduce glucose across the board.', expression: 'neutral' },
     highlight: 'med-toggles',
     highlightType: 'pulse',
@@ -783,12 +783,12 @@ const L6D2: TutorialStep[] = [
     advanceOn: 'tap',
   },
   {
-    id: 'L6D2-5',
+    id: 'T8D2-5',
     bubble: { type: 'hint', text: '\ud83d\udca1 Place food in the morning where insulin is strong. Use the walk to cover the oatmeal peak.', expression: 'thinking' },
     advanceOn: 'tap',
   },
   {
-    id: 'L6D2-6',
+    id: 'T8D2-6',
     bubble: { type: 'dialogue', text: 'Plan carefully and submit!', expression: 'neutral', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -801,7 +801,7 @@ const L6D2: TutorialStep[] = [
 
 const L7D1: TutorialStep[] = [
   {
-    id: 'L7D1-1',
+    id: 'T9D1-1',
     bubble: { type: 'dialogue', text: 'Welcome to GLP-1 \u2014 the most complex medication! \ud83d\udc89 It has FOUR effects at once.', expression: 'neutral' },
     highlight: 'medication:glp1',
     highlightType: 'spotlight',
@@ -810,7 +810,7 @@ const L7D1: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L7D1-2',
+    id: 'T9D1-2',
     bubble: { type: 'dialogue', text: 'Toggle it ON, and I\'ll explain each effect.', expression: 'neutral' },
     highlight: 'medication:glp1',
     highlightType: 'pulse',
@@ -819,7 +819,7 @@ const L7D1: TutorialStep[] = [
     expectedAction: { type: 'toggle-medication', medicationId: 'glp1' },
   },
   {
-    id: 'L7D1-3',
+    id: 'T9D1-3',
     bubble: { type: 'dialogue', text: 'Effect 1: Duration \u00d71.5 \u2014 food takes 50% longer to absorb. The curve gets WIDER and LOWER.', expression: 'neutral', position: 'inventory' },
     highlight: 'graph',
     highlightType: 'glow',
@@ -827,7 +827,7 @@ const L7D1: TutorialStep[] = [
     advanceOn: 'tap',
   },
   {
-    id: 'L7D1-4',
+    id: 'T9D1-4',
     bubble: { type: 'dialogue', text: 'Effect 2: Glucose \u00d70.90 \u2014 10% less glucose overall. Smaller peaks!', expression: 'neutral', position: 'inventory' },
     highlight: 'graph',
     highlightType: 'glow',
@@ -835,26 +835,26 @@ const L7D1: TutorialStep[] = [
     advanceOn: 'tap',
   },
   {
-    id: 'L7D1-5',
+    id: 'T9D1-5',
     bubble: { type: 'dialogue', text: 'Effect 3: Check the WP counter \u2014 you got +4 \u2600\ufe0f WP bonus! More willpower to work with.', expression: 'neutral' },
     highlight: 'wp-counter',
     highlightType: 'glow',
     advanceOn: 'tap',
   },
   {
-    id: 'L7D1-6',
+    id: 'T9D1-6',
     bubble: { type: 'warning', text: 'Effect 4: Calorie budget reduced by 30%! Check the kcal bar \u2014 the target is smaller now. You need to eat LESS.', expression: 'concerned' },
     highlight: 'kcal-bar',
     highlightType: 'glow',
     advanceOn: 'tap',
   },
   {
-    id: 'L7D1-7',
+    id: 'T9D1-7',
     bubble: { type: 'dialogue', text: 'GLP-1 is a trade-off: better glucose control, but tighter calorie limits. Plan accordingly!', expression: 'thinking' },
     advanceOn: 'tap',
   },
   {
-    id: 'L7D1-8',
+    id: 'T9D1-8',
     bubble: { type: 'dialogue', text: 'Place your food and walk, then submit.', expression: 'neutral', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -865,7 +865,7 @@ const L7D1: TutorialStep[] = [
 
 const L7D2: TutorialStep[] = [
   {
-    id: 'L7D2-1',
+    id: 'T9D2-1',
     bubble: { type: 'dialogue', text: 'The ultimate medication test! \ud83e\uddc1 Muffin and \ud83c\udf5a Rice \u2014 two massive pre-placed foods. You have all 3 medications.', expression: 'neutral' },
     highlight: 'graph',
     highlightType: 'spotlight',
@@ -874,7 +874,7 @@ const L7D2: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L7D2-2',
+    id: 'T9D2-2',
     bubble: { type: 'dialogue', text: 'Toggle all three medications ON. Watch how they stack!', expression: 'neutral' },
     highlight: 'med-toggles',
     highlightType: 'pulse',
@@ -882,7 +882,7 @@ const L7D2: TutorialStep[] = [
     advanceOn: 'tap',
   },
   {
-    id: 'L7D2-3',
+    id: 'T9D2-3',
     bubble: { type: 'dialogue', text: 'Metformin \u00d7 GLP-1: glucose is now 72% of original (\u221228%!). SGLT2 drains the remaining peaks above 200.', expression: 'neutral', position: 'inventory' },
     highlight: 'graph',
     highlightType: 'glow',
@@ -890,7 +890,7 @@ const L7D2: TutorialStep[] = [
     advanceOn: 'tap',
   },
   {
-    id: 'L7D2-4',
+    id: 'T9D2-4',
     bubble: { type: 'dialogue', text: 'Place your food, walk, and break. Submit when ready!', expression: 'neutral', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -903,23 +903,23 @@ const L7D2: TutorialStep[] = [
 
 const L8D1: TutorialStep[] = [
   {
-    id: 'L8D1-1',
+    id: 'T10D1-1',
     bubble: { type: 'dialogue', text: 'The Final Exam! Everything you\'ve learned comes together.', expression: 'neutral', position: 'center' },
     advanceOn: 'tap',
     blockInteraction: true,
   },
   {
-    id: 'L8D1-2',
+    id: 'T10D1-2',
     bubble: { type: 'dialogue', text: 'Day 1: You have Metformin, 2 walks, a break, and 4 foods. Two meals are pre-placed. Plan your best day!', expression: 'neutral' },
     advanceOn: 'tap',
   },
   {
-    id: 'L8D1-3',
+    id: 'T10D1-3',
     bubble: { type: 'hint', text: '\ud83d\udca1 Remember: big food in the morning (high insulin), walks near peaks, keep kcal in the green zone!', expression: 'thinking' },
     advanceOn: 'tap',
   },
   {
-    id: 'L8D1-4',
+    id: 'T10D1-4',
     bubble: { type: 'dialogue', text: 'Good luck! No more hand-holding \u2014 show me what you\'ve learned!', expression: 'happy', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -930,18 +930,18 @@ const L8D1: TutorialStep[] = [
 
 const L8D2: TutorialStep[] = [
   {
-    id: 'L8D2-1',
+    id: 'T10D2-1',
     bubble: { type: 'warning', text: 'Day 2 \u2014 under pressure! Stress slots are active, and two massive foods are pre-placed.', expression: 'concerned' },
     advanceOn: 'tap',
     blockInteraction: true,
   },
   {
-    id: 'L8D2-2',
+    id: 'T10D2-2',
     bubble: { type: 'dialogue', text: 'Use both Metformin and SGLT2. The Heavy Run covers the muffin. Place food away from stress zones!', expression: 'thinking' },
     advanceOn: 'tap',
   },
   {
-    id: 'L8D2-3',
+    id: 'T10D2-3',
     bubble: { type: 'dialogue', text: 'Go!', expression: 'neutral', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -952,7 +952,7 @@ const L8D2: TutorialStep[] = [
 
 const L8D3: TutorialStep[] = [
   {
-    id: 'L8D3-1',
+    id: 'T10D3-1',
     bubble: { type: 'dialogue', text: 'The final day! Three massive pre-placed foods. Even with all medications, the peaks are brutal.', expression: 'concerned' },
     highlight: 'graph',
     highlightType: 'spotlight',
@@ -961,7 +961,7 @@ const L8D3: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L8D3-2',
+    id: 'T10D3-2',
     bubble: { type: 'dialogue', text: 'See the \ud83e\uddd1\u200d\u2695\ufe0f button in the top-left of the graph? That\'s BOOST \u2014 your secret weapon!', expression: 'neutral' },
     highlight: 'boost-btn',
     highlightType: 'spotlight',
@@ -970,21 +970,21 @@ const L8D3: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'L8D3-3',
+    id: 'T10D3-3',
     bubble: { type: 'dialogue', text: 'BOOST supercharges your insulin, but ONLY above 200 mg/dL. It dramatically increases glucose absorption in the danger zone.', expression: 'neutral' },
     highlight: 'boost-btn',
     highlightType: 'glow',
     advanceOn: 'tap',
   },
   {
-    id: 'L8D3-4',
+    id: 'T10D3-4',
     bubble: { type: 'warning', text: 'You only get ONE BOOST use per level. This is Day 3 \u2014 now is the time to use it!', expression: 'concerned' },
     highlight: 'boost-btn',
     highlightType: 'pulse',
     advanceOn: 'tap',
   },
   {
-    id: 'L8D3-5',
+    id: 'T10D3-5',
     bubble: { type: 'dialogue', text: 'Toggle BOOST ON!', expression: 'neutral' },
     highlight: 'boost-btn',
     highlightType: 'pulse',
@@ -993,7 +993,7 @@ const L8D3: TutorialStep[] = [
     expectedAction: { type: 'toggle-boost' },
   },
   {
-    id: 'L8D3-6',
+    id: 'T10D3-6',
     bubble: { type: 'success', text: 'BOOST is absorbing the dangerous peaks above 200 mg/dL! Combined with medications, the curves are much more manageable.', expression: 'happy', position: 'inventory' },
     highlight: 'graph',
     highlightType: 'glow',
@@ -1001,21 +1001,21 @@ const L8D3: TutorialStep[] = [
     advanceOn: 'tap',
   },
   {
-    id: 'L8D3-7',
+    id: 'T10D3-7',
     bubble: { type: 'dialogue', text: 'Toggle all three medications ON. Place your walk and food. Remember: this is the LAST day \u2014 spend ALL your WP!', expression: 'neutral' },
     highlight: 'med-toggles',
     highlightType: 'pulse',
     advanceOn: 'tap',
   },
   {
-    id: 'L8D3-8',
+    id: 'T10D3-8',
     bubble: { type: 'warning', text: 'Last day penalty: every unspent \u2600\ufe0f WP adds 5 penalty points. Use everything!', expression: 'concerned' },
     highlight: 'wp-counter',
     highlightType: 'glow',
     advanceOn: 'tap',
   },
   {
-    id: 'L8D3-9',
+    id: 'T10D3-9',
     bubble: { type: 'dialogue', text: 'Submit your masterpiece!', expression: 'happy' },
     highlight: 'submit-btn',
     highlightType: 'pulse',
@@ -1024,12 +1024,12 @@ const L8D3: TutorialStep[] = [
     expectedAction: { type: 'click-submit' },
   },
   {
-    id: 'L8D3-10',
+    id: 'T10D3-10',
     bubble: { type: 'success', text: '\ud83c\udf89 CONGRATULATIONS! You\'ve completed the BG Planner Tutorial! You now know every tool for managing blood glucose. Use your knowledge wisely!', expression: 'celebrating', position: 'center' },
     advanceOn: 'tap',
   },
   {
-    id: 'L8D3-11',
+    id: 'T10D3-11',
     bubble: { type: 'dialogue', text: 'Doctor Alice signing off. Remember: plan your meals, stay active, and keep that glucose in the green zone! \ud83d\udc9a', expression: 'happy', position: 'center' },
     advanceOn: 'tap',
   },
@@ -1039,50 +1039,50 @@ const L8D3: TutorialStep[] = [
 
 const L_STRESS_D1: TutorialStep[] = [
   {
-    id: 'LS-D1-1',
+    id: 'T7D1-1',
     bubble: { type: 'dialogue', text: 'Some time slots are under stress, weakening your insulin!', expression: 'concerned' },
     advanceOn: 'tap',
   },
   {
-    id: 'LS-D1-2',
+    id: 'T7D1-2',
     bubble: { type: 'warning', text: 'See the red column? That\'s a stress slot. Insulin rate drops by 1 there — food placed here will spike higher and decay slower!', expression: 'concerned' },
     highlight: 'stress-slots',
     highlightType: 'spotlight',
     advanceOn: 'tap',
   },
   {
-    id: 'LS-D1-3',
+    id: 'T7D1-3',
     bubble: { type: 'dialogue', text: 'Normally insulin absorbs 2 cubes per column. In the stress zone it only absorbs 1 — glucose stays higher for longer.', expression: 'thinking' },
     highlight: 'insulin-bars',
     highlightType: 'glow',
     advanceOn: 'tap',
   },
   {
-    id: 'LS-D1-4',
+    id: 'T7D1-4',
     bubble: { type: 'dialogue', text: 'The pizza is already placed. Your job: put banana and cookie OUTSIDE the red zone.', expression: 'neutral' },
     highlight: 'stress-slots',
     highlightType: 'pulse',
     advanceOn: 'tap',
   },
   {
-    id: 'LS-D1-5',
+    id: 'T7D1-5',
     bubble: { type: 'dialogue', text: 'Drag your foods to safe slots — any slot without a red tint works.', expression: 'happy' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
     advanceOn: 'tap',
   },
   {
-    id: 'LS-D1-6',
+    id: 'T7D1-6',
     advanceOn: 'action',
     expectedAction: { type: 'place-food' },
   },
   {
-    id: 'LS-D1-6b',
+    id: 'T7D1-7',
     advanceOn: 'action',
     expectedAction: { type: 'place-food' },
   },
   {
-    id: 'LS-D1-7',
+    id: 'T7D1-8',
     bubble: { type: 'dialogue', text: 'Nice! Submit when you\'re ready to see how it went.', expression: 'happy' },
     highlight: 'submit-btn',
     highlightType: 'pulse',
@@ -1092,30 +1092,30 @@ const L_STRESS_D1: TutorialStep[] = [
 
 const L_STRESS_D2: TutorialStep[] = [
   {
-    id: 'LS-D2-1',
+    id: 'T7D2-1',
     bubble: { type: 'dialogue', text: 'Now there are THREE stress zones. Plan food placement carefully!', expression: 'concerned' },
     advanceOn: 'tap',
   },
   {
-    id: 'LS-D2-2',
+    id: 'T7D2-2',
     bubble: { type: 'warning', text: 'These red zones weaken your insulin — try to place food outside them!', expression: 'concerned' },
     highlight: 'stress-slots',
     advanceOn: 'tap',
   },
   {
-    id: 'LS-D2-3',
+    id: 'T7D2-3',
     bubble: { type: 'dialogue', text: 'You have a rest and a walk today. Rest recovers WP — walk fights any stray glucose spikes.', expression: 'neutral' },
     highlight: 'intervention-inventory',
     highlightType: 'glow',
     advanceOn: 'tap',
   },
   {
-    id: 'LS-D2-4',
+    id: 'T7D2-4',
     bubble: { type: 'dialogue', text: 'If you must place something in a stress zone, use the walk to compensate!', expression: 'thinking' },
     advanceOn: 'tap',
   },
   {
-    id: 'LS-D2-5',
+    id: 'T7D2-5',
     bubble: { type: 'dialogue', text: 'Good luck — 2\u2605 is achievable if you avoid the red zones.', expression: 'happy' },
     advanceOn: 'tap',
   },
@@ -1125,14 +1125,14 @@ const L_STRESS_D2: TutorialStep[] = [
 
 const L_KCAL_D1: TutorialStep[] = [
   {
-    id: 'LK-D1-1',
+    id: 'T2D1-1',
     bubble: { type: 'dialogue', text: 'Did you know your body needs energy to work? We measure food energy in kilocalories \u2014 1\u00a0Cal equals 1,000 calories.', expression: 'happy', position: 'center' },
     advanceOn: 'tap',
     blockInteraction: true,
     revealKcal: true,
   },
   {
-    id: 'LK-D1-2',
+    id: 'T2D1-2',
     bubble: { type: 'dialogue', text: 'We can see Cal values on every food card.', expression: 'neutral', position: 'center' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -1141,7 +1141,7 @@ const L_KCAL_D1: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'LK-D1-2b',
+    id: 'T2D1-3',
     bubble: { type: 'dialogue', text: 'Now let\u2019s have a look at the Calorie bar below the graph \u2014 it tracks how much we\u2019ve eaten today.', expression: 'neutral', position: 'center' },
     highlight: 'kcal-bar',
     highlightType: 'glow',
@@ -1149,7 +1149,7 @@ const L_KCAL_D1: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'LK-D1-3',
+    id: 'T2D1-4',
     bubble: { type: 'hint', text: 'This is the optimal calories zone \u2014 staying in it means just the right amount of energy for your body. Aim to fill it up!', expression: 'happy', position: 'center' },
     highlight: 'kcal-green-zone',
     highlightType: 'pulse-green',
@@ -1157,7 +1157,7 @@ const L_KCAL_D1: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'LK-D1-4',
+    id: 'T2D1-5',
     bubble: { type: 'dialogue', text: 'Place your meals to reach the green zone, then submit!', expression: 'happy', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -1165,7 +1165,7 @@ const L_KCAL_D1: TutorialStep[] = [
     expectedAction: { type: 'click-submit' },
   },
   {
-    id: 'LK-D1-5',
+    id: 'T2D1-6',
     bubble: { type: 'success', text: 'Perfect! Your body has enough energy to stay healthy today. Balance is key!', expression: 'celebrating', position: 'center' },
     noBackdrop: true,
     blockInteraction: true,
@@ -1173,7 +1173,7 @@ const L_KCAL_D1: TutorialStep[] = [
     blocksResultsReveal: true,
   },
   {
-    id: 'LK-D1-6',
+    id: 'T2D1-7',
     pendingUntilResults: true,
     highlight: 'result-next-btn',
     highlightType: 'pulse',
@@ -1185,7 +1185,7 @@ const L_KCAL_D1: TutorialStep[] = [
 
 const L_KCAL_D2: TutorialStep[] = [
   {
-    id: 'LK-D2-1',
+    id: 'T2D2-1',
     bubble: { type: 'warning', text: 'Overeating puts excessive strain on the pancreas, accelerating disease progression. Notice the calorie bar.', expression: 'concerned', position: 'inventory' },
     highlight: 'kcal-bar',
     highlightType: 'pulse',
@@ -1194,14 +1194,14 @@ const L_KCAL_D2: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'LK-D2-2',
+    id: 'T2D2-2',
     bubble: { type: 'dialogue', text: 'In this game, overeating means your pancreas starts the next day with reduced effectiveness.', expression: 'concerned', position: 'inventory' },
     noBackdrop: true,
     advanceOn: 'tap',
     blockInteraction: true,
   },
   {
-    id: 'LK-D2-3',
+    id: 'T2D2-3',
     bubble: { type: 'hint', text: "Let\u2019s replan this day better!", expression: 'thinking', position: 'inventory' },
     clearPreplaced: true,
     noBackdrop: true,
@@ -1209,7 +1209,7 @@ const L_KCAL_D2: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'LK-D2-4',
+    id: 'T2D2-4',
     bubble: { type: 'hint', text: "Aim for the green zone \u2014 that\u2019s your optimal calorie target!", expression: 'thinking', position: 'inventory' },
     highlight: 'kcal-bar',
     highlightType: 'pulse',
@@ -1218,7 +1218,7 @@ const L_KCAL_D2: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'LK-D2-5',
+    id: 'T2D2-5',
     bubble: { type: 'dialogue', text: 'Each food card shows its calorie content \u2014 use this to plan your intake.', expression: 'happy', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -1228,14 +1228,14 @@ const L_KCAL_D2: TutorialStep[] = [
     blockInteraction: true,
   },
   {
-    id: 'LK-D2-6',
+    id: 'T2D2-6',
     bubble: { type: 'dialogue', text: 'Place your meals to reach the optimal zone, then submit.', expression: 'happy', position: 'inventory' },
     requiresOptimalSubmit: true,
     advanceOn: 'action',
     expectedAction: { type: 'click-submit' },
   },
   {
-    id: 'LK-D2-8',
+    id: 'T2D2-7',
     pendingUntilResults: true,
     highlight: 'result-next-btn',
     highlightType: 'pulse',

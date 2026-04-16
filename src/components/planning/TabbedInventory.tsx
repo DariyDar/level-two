@@ -86,6 +86,7 @@ interface TabbedInventoryProps {
   clearedFoodsHighlight?: boolean;
   clearedShipIds?: string[];
   highlightGILabel?: string;
+  highlightKcal?: boolean;
 }
 
 export function TabbedInventory({
@@ -104,6 +105,7 @@ export function TabbedInventory({
   clearedFoodsHighlight = false,
   clearedShipIds = [],
   highlightGILabel,
+  highlightKcal = false,
 }: TabbedInventoryProps) {
   const foodItems = useMemo(() => {
     const placed = new Map<string, number>();
@@ -158,6 +160,7 @@ export function TabbedInventory({
               kcalJustRevealed={kcalJustRevealed}
               clearedIn={clearedFoodsHighlight && clearedShipIds.includes(ship.id)}
               highlightGI={highlightGILabel === ship.id}
+              highlightKcal={highlightKcal}
             />
           ))
         )}

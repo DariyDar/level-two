@@ -232,6 +232,9 @@
 .ship-card__gi--blink {
   animation: giLabelBlink 1.2s ease-in-out infinite;
 }
+.ship-card__info--kcal-blink {
+  animation: giLabelBlink 1.2s ease-in-out infinite;
+}
 
 /* Cleared pre-placed food bounce-in animation */
 @keyframes clearedIn {
