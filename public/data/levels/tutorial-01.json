@@ -53,7 +53,7 @@
       "availableInterventions": [],
       "availableMedications": [],
       "preplacedFoods": [
-        { "shipId": "pizza", "slotHour": 15 }
+        { "shipId": "burger", "slotHour": 15 }
       ],
       "lockedSlots": [15],
       "startingBg": 100

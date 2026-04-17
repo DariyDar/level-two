@@ -404,7 +404,7 @@ const L1D2: TutorialStep[] = [
 const L1D3: TutorialStep[] = [
   {
     id: 'T1D3-1',
-    bubble: { type: 'dialogue', text: 'A friend shared a slice of \ud83c\udf55 pizza at lunch \u2014 you ate it without thinking twice.', expression: 'neutral' },
+    bubble: { type: 'dialogue', text: 'A friend treated you to a \ud83c\udf54 hamburger at lunch \u2014 you ate it without thinking twice.', expression: 'neutral' },
     highlight: 'slot:15',
     highlightType: 'spotlight',
     noBackdrop: true,

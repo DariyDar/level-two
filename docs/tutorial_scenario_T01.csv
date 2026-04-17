@@ -1,0 +1,71 @@
+T01 — First Steps
+"Introduction to the graph, food, WP, and the core game loop."
+"Source: public/data/levels/tutorial-01.json + src/components/tutorial/tutorialData.ts (v0.60.21)"
+
+Level-wide Conditions
+Parameter,Value
+Days,3
+Defeat,Disabled
+Exercises,Unavailable (all days)
+Medications,Unavailable (all days)
+BOOST button,Hidden
+Stress slots,None
+
+Day 1
+Parameter,Value
+Inventory,🍌 Banana (1 WP) · 🥣 Oatmeal (4 WP)
+Pre-placed,None
+Locked slots (slotIndex),"8 (12:00) · 10 (13:00) · 11 (13:30) · 12 (14:00) · 13 (14:30) · 15 (15:30) · 16 (16:00) · 17 (16:30) · 18 (17:00) · 19 (17:30)"
+Open slots,"0–7 (8:00–11:30) · 9 (12:30) · 14 (15:00) · 20–23 (18:00–19:30)"
+WP budget,5
+Kcal budget,500
+Starting BG,100 mg/dL
+
+State ID,State Name,Flags / Overrides,Alice,Dialogue,Advance,Notes
+L1D1-1,WelcomeIntro,blockInteraction,happy,"Welcome to Level Two — a Type 2 Diabetes management game. Let me be your guide!",[Tap],
+L1D1-2,GraphIntro,"blockInteraction · highlight: baseline-cubes (no backdrop)",neutral,"This is our Blood Glucose graph. Our current level is 100 mg/dL.",[Tap],
+L1D1-3,DangerLineWarning,"blockInteraction · highlight: danger-line (no backdrop)",concerned,"Blood glucose above 200 mg/dL puts real strain on the body. Our goal is to stay below that red line — every single day.",[Tap],
+L1D1-4,PlaceBananaCTA,"highlight: food:banana + slot:9 (pulse) · CTA: drag-arrow food:banana → slot:9 · pauseOnDrop",neutral,"Time to plan our first meal! Drag the 🍌 Banana to the 9:00 AM slot — let's see how it affects our blood glucose.",[Drag 🍌 Banana → slot:9],"⚠️ BUG: highlight/CTA target is slot:9, but expectedAction.slotIndex=1 (8:30 AM). Arrow doesn't match accepted drop location."
+L1D1-5,BGRiseExplanation,"blockInteraction · highlightPendingDrop",neutral,"When we eat, carbs raise our blood glucose — the more carbs, the higher the blood glucose will rise.",[Tap],Food remains in pending-drop preview state.
+L1D1-6,PancreasReactionReveal,"releasePendingDrop · slowBurnAnim · highlight: graph (spotlight, no backdrop)",happy,"What a show! The pancreas reacts to rising BG by secreting insulin — pulling our blood sugar right back down.",[Tap],"releasePendingDrop: commits food from L1D1-4. slowBurnAnim: 3× slow motion."
+L1D1-7,GlycemicIndexIntro,blockInteraction,neutral,"Different foods raise glucose at different speeds. It depends on the Glycemic Index — GI for short.",[Tap],
+L1D1-8,FoodGI_Display,"blockInteraction · highlight: food:oatmeal (glow) · highlightGILabel: oatmeal",neutral,"In Level Two, food cards show glucose release speed. Oatmeal releases glucose slowly — tagged as Slow.",[Tap],
+L1D1-9,OatmealDragCTA,"highlight: food:oatmeal + slot:14 (pulse) · CTA: drag-arrow food:oatmeal → slot:14",neutral,"Drag the 🥣 Oatmeal to the 2:00 PM slot — let's see how a slow-release food behaves.",[Drag 🥣 Oatmeal → slot:14],"⚠️ BUG: expectedAction.slotIndex=6 (11:00 AM) but CTA targets slot:14. slotIndex 12 (14:00) is locked — player cannot drop there."
+L1D1-10,GIExplanation,blockInteraction,neutral,"Low-GI foods release glucose slowly — a gentler rise, and more time for your pancreas to respond. They're a safer choice in most situations.",[Tap],
+L1D1-11,SubmitCTA,"highlight: submit-btn (pulse) · CTA: tap-pulse submit-btn",neutral,"Now hit Submit to see our results!",[Submit],
+L1D1-12,ResultsExplanation,"blockInteraction · blocksResultsReveal · highlight: danger-line (no backdrop)",happy,"Look at that! Our pancreas kept the glucose from crossing the 200 mg/dL line — working with our body to stay in the safe zone!",[Tap] → reveal resumes,Reveal animation paused until tap.
+L1D1-13,NextDayCTA,"pendingUntilResults · highlight: result-next-btn (pulse) · no backdrop",— (silent),—,[Tap Next],Alice does not appear. Activates only after full results reveal.
+
+Day 2
+Parameter,Value
+Inventory,🍌 Banana (1 WP) · 🍪 Cookie (2 WP) · 🍔 Hamburger (2 WP)
+Pre-placed,None
+Locked slots (slotIndex),"8 (12:00) · 9 (12:30) · 12 (14:00) · 13 (14:30) · 15 (15:30) · 16 (16:00) · 18 (17:00) · 19 (17:30)"
+Open slots,"0–7 (8:00–11:30) · 10 (13:00) · 11 (13:30) · 14 (15:00) · 17 (16:30) · 20–23 (18:00–19:30)"
+WP budget,5
+Kcal budget,1000
+Starting BG,100 mg/dL
+
+State ID,State Name,Flags / Overrides,Alice,Dialogue,Advance,Notes
+L1D2-1,WillpowerIntro,"blockInteraction · highlight: wp-counter (glow)",neutral,"That ☀️ icon is your Willpower (WP) — the mental energy it takes to make a healthy choice. In real life, it's what pushes you to do the right thing even when you don't feel like it.",[Tap],
+L1D2-2,WillpowerInGame,blockInteraction,neutral,"In the game, WP is spent on food and exercise. Healthier options often cost more — let's take a closer look at what's on the menu today.",[Tap],
+L1D2-3,FoodComparison_Banana,"blockInteraction · highlight: food:banana (glow)",thinking,"🍌 Banana has 23g carbs, fast glucose release, and costs just 1 WP.",[Tap],
+L1D2-4,FoodComparison_Burger,"blockInteraction · highlight: food:burger (glow)",neutral,"🍔 Hamburger has 27g carbs, slow glucose release, but costs 2 WP.",[Tap],
+L1D2-5,CookieIntro,"blockInteraction · highlight: food:cookie (glow)",happy,"And we also have 🍪 Cookie! Try them all out — you can remove a food from a slot by tapping it.",[Tap],
+L1D2-6,PlanCTA,"highlight: ship-inventory (glow)",happy,"You have enough WP to place everything today. Try different combinations and submit when ready!",[Submit],
+
+Day 3
+Parameter,Value
+Inventory,🍌 Banana (1 WP) · 🍎 Apple (1 WP) · 🍪 Cookie (2 WP)
+Pre-placed,🍔 Hamburger @ slotIndex 15 (15:30 — locked)
+Locked slots (slotIndex),15 (15:30)
+Open slots,All except slotIndex 15
+WP budget,5
+Kcal budget,1500
+Starting BG,100 mg/dL
+
+State ID,State Name,Flags / Overrides,Alice,Dialogue,Advance,Notes
+L1D3-1,BurgerContext,"blockInteraction · highlight: slot:15 (spotlight, no backdrop)",neutral,"A friend treated you to a 🍔 hamburger at lunch — you ate it without thinking twice.",[Tap],
+L1D3-2,DangerZoneWarning,"blockInteraction · highlight: danger-zone (no backdrop)",neutral,"It happens — sometimes we slip without even noticing. A brief glucose spike above 200 mg/dL won't cause lasting harm.",[Tap],
+L1D3-3,RecoveryMessage,blockInteraction,concerned,"The key is what comes next. Plan the rest of your day wisely — you've got this!",[Tap],Step ID skips L1D3-4 (not present in code).
+L1D3-5,FreePlanAndSubmit,"highlight: ship-inventory (glow)",neutral,"Place your meals and submit when ready!",[Submit],
