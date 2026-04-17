@@ -32,11 +32,11 @@
       ],
       "availableInterventions": [],
       "preplacedFoods": [
-        { "shipId": "hardcheese",      "slotIndex": 8 },
-        { "shipId": "burger",          "slotIndex": 10 },
-        { "shipId": "pizza",           "slotIndex": 15 },
-        { "shipId": "chocolatemuffin", "slotIndex": 17 },
-        { "shipId": "rice",            "slotIndex": 9 }
+        { "shipId": "hardcheese",      "slotHour": 8 },
+        { "shipId": "burger",          "slotHour": 10 },
+        { "shipId": "pizza",           "slotHour": 15 },
+        { "shipId": "chocolatemuffin", "slotHour": 17 },
+        { "shipId": "rice",            "slotHour": 9 }
       ],
       "lockedSlots": [9, 11, 13, 14, 16, 18, 19]
     }
