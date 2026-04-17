@@ -144,7 +144,7 @@ export function KcalBar({
           <div className="planning-header__kcal-inner-label">
             <span className="planning-header__kcal-value">{kcalUsed}</span>
             <span className="planning-header__kcal-unit">
-              /{effectiveKcalBudget} kcal
+              /{effectiveKcalBudget} Cal
               {hasKcalMod && <span className="planning-header__kcal-mod"> ({Math.round(medicationModifiers.kcalMultiplier * 100)}%)</span>}
             </span>
           </div>

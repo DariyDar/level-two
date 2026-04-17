@@ -1143,8 +1143,8 @@ const L_KCAL_D1: TutorialStep[] = [
   {
     id: 'T2D1-3',
     bubble: { type: 'dialogue', text: 'Now let\u2019s have a look at the Calorie bar below the graph \u2014 it tracks how much we\u2019ve eaten today.', expression: 'neutral', position: 'center' },
-    highlight: 'kcal-bar',
-    highlightType: 'glow',
+    highlight: 'kcal-green-zone',
+    highlightType: 'pulse-green',
     advanceOn: 'tap',
     blockInteraction: true,
   },
@@ -1195,14 +1195,7 @@ const L_KCAL_D2: TutorialStep[] = [
   },
   {
     id: 'T2D2-2',
-    bubble: { type: 'dialogue', text: 'In this game, overeating means your pancreas starts the next day with reduced effectiveness.', expression: 'concerned', position: 'inventory' },
-    noBackdrop: true,
-    advanceOn: 'tap',
-    blockInteraction: true,
-  },
-  {
-    id: 'T2D2-3',
-    bubble: { type: 'hint', text: "Let\u2019s replan this day better!", expression: 'thinking', position: 'inventory' },
+    bubble: { type: 'dialogue', text: 'We should avoid this in game and in real life, to contain diabetes development.', expression: 'concerned', position: 'inventory' },
     clearPreplaced: true,
     noBackdrop: true,
     advanceOn: 'tap',
@@ -1211,8 +1204,8 @@ const L_KCAL_D2: TutorialStep[] = [
   {
     id: 'T2D2-4',
     bubble: { type: 'hint', text: "Aim for the green zone \u2014 that\u2019s your optimal calorie target!", expression: 'thinking', position: 'inventory' },
-    highlight: 'kcal-bar',
-    highlightType: 'pulse',
+    highlight: 'kcal-green-zone',
+    highlightType: 'pulse-green',
     noBackdrop: true,
     advanceOn: 'tap',
     blockInteraction: true,
