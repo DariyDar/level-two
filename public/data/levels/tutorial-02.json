@@ -10,7 +10,7 @@
       "startingBg": 100,
       "availableFoods": [
         { "id": "oatmeal",    "count": 1 },
-        { "id": "mixednuts",  "count": 1 },
+        { "id": "nutsmixed",  "count": 1 },
         { "id": "sandwich",   "count": 1 }
       ],
       "availableInterventions": [],
