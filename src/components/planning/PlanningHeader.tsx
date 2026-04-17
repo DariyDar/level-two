@@ -103,7 +103,7 @@ export function KcalBar({
 
   const satietyZone = getSatietyZone(kcalUsed, effectiveKcalBudget);
   const satietyLabel = kcalUsed > 0 ? assessment.label : '';
-  const satietyText = satietyLabel + (satietyZone === 'overeating' ? ' +Pancreas Fatigue' : '');
+  const satietyText = satietyLabel + (satietyZone === 'overeating' ? ' +100 Cal tomorrow' : '');
 
   return (
     <div className="planning-header__kcal-bar-wrap">
