@@ -271,7 +271,7 @@ const L1D1: TutorialStep[] = [
     highlightType: 'pulse',
     cta: { type: 'drag-arrow', source: 'food:banana', dest: 'slot:9' },
     advanceOn: 'action',
-    expectedAction: { type: 'place-food', foodId: 'banana', slotIndex: 1 },
+    expectedAction: { type: 'place-food', foodId: 'banana', slotIndex: 9 },
     pauseOnDrop: true,
   },
   {
@@ -314,7 +314,7 @@ const L1D1: TutorialStep[] = [
     highlightType: 'pulse',
     cta: { type: 'drag-arrow', source: 'food:oatmeal', dest: 'slot:14' },
     advanceOn: 'action',
-    expectedAction: { type: 'place-food', foodId: 'oatmeal', slotIndex: 6 },
+    expectedAction: { type: 'place-food', foodId: 'oatmeal', slotIndex: 14 },
   },
   {
     id: 'T1D1-10',
