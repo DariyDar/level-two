@@ -19,7 +19,7 @@
       "availableMedications": [],
       "preplacedFoods": [],
       "preplacedInterventions": [
-        { "interventionId": "lightwalk", "slotIndex": 16 }
+        { "interventionId": "lightwalk", "slotHour": 16 }
       ],
       "lockedSlots": [8, 9, 12, 13, 16, 18, 19],
       "insulinProfile": {
@@ -42,7 +42,7 @@
       ],
       "availableMedications": [],
       "preplacedFoods": [
-        { "shipId": "burger", "slotIndex": 8 }
+        { "shipId": "burger", "slotHour": 8 }
       ],
       "lockedSlots": [8, 12, 13, 16, 17, 18, 19],
       "insulinProfile": {

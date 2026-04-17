@@ -17,16 +17,16 @@ import { DEFAULT_SETTINGS, slotToColumn, TOTAL_SLOTS, GRAPH_CONFIG } from '../co
 function getPreplacedItems(dayConfig: DayConfig | null): { foods: PlacedFood[]; interventions: PlacedIntervention[] } {
   if (!dayConfig) return { foods: [], interventions: [] };
   const foods: PlacedFood[] = (dayConfig.preplacedFoods ?? []).map(pf => ({
-    id: `preplaced-food-${pf.shipId}-${pf.slotIndex}`,
+    id: `preplaced-food-${pf.shipId}-${pf.slotHour}`,
     shipId: pf.shipId,
-    dropColumn: slotToColumn(pf.slotIndex),
-    slotIndex: pf.slotIndex,
+    dropColumn: slotToColumn(pf.slotHour),
+    slotHour: pf.slotHour,
   }));
   const interventions: PlacedIntervention[] = (dayConfig.preplacedInterventions ?? []).map(pi => ({
-    id: `preplaced-int-${pi.interventionId}-${pi.slotIndex}`,
+    id: `preplaced-int-${pi.interventionId}-${pi.slotHour}`,
     interventionId: pi.interventionId,
-    dropColumn: slotToColumn(pi.slotIndex),
-    slotIndex: pi.slotIndex,
+    dropColumn: slotToColumn(pi.slotHour),
+    slotHour: pi.slotHour,
     slotSize: pi.slotSize,
   }));
   return { foods, interventions };
@@ -130,9 +130,9 @@ export const useGameStore = create<GameState>()(
         set((state) => {
           if (slotIndex < GRAPH_CONFIG.startHour || slotIndex >= GRAPH_CONFIG.startHour + TOTAL_SLOTS) return state;
           // Check slot not covered by food or multi-slot intervention
-          const occupied = state.placedFoods.some(f => f.slotIndex === slotIndex)
+          const occupied = state.placedFoods.some(f => f.slotHour === slotIndex)
             || state.placedInterventions.some(i => {
-              const start = i.slotIndex ?? -1;
+              const start = i.slotHour ?? -1;
               const size = i.slotSize ?? 1;
               return slotIndex >= start && slotIndex < start + size;
             });
@@ -140,7 +140,7 @@ export const useGameStore = create<GameState>()(
           return {
             placedFoods: [
               ...state.placedFoods,
-              { id: uuidv4(), shipId, dropColumn: slotToColumn(slotIndex), slotIndex },
+              { id: uuidv4(), shipId, dropColumn: slotToColumn(slotIndex), slotHour: slotIndex },
             ],
           };
         }),
@@ -150,9 +150,9 @@ export const useGameStore = create<GameState>()(
           if (slotIndex < GRAPH_CONFIG.startHour || slotIndex + slotSize > GRAPH_CONFIG.startHour + TOTAL_SLOTS) return state;
           // Check ALL required slots are unoccupied
           for (let s = slotIndex; s < slotIndex + slotSize; s++) {
-            const occupied = state.placedFoods.some(f => f.slotIndex === s)
+            const occupied = state.placedFoods.some(f => f.slotHour === s)
               || state.placedInterventions.some(i => {
-                const start = i.slotIndex ?? -1;
+                const start = i.slotHour ?? -1;
                 const sz = i.slotSize ?? 1;
                 return s >= start && s < start + sz;
               });
@@ -161,7 +161,7 @@ export const useGameStore = create<GameState>()(
           return {
             placedInterventions: [
               ...state.placedInterventions,
-              { id: uuidv4(), interventionId, dropColumn: slotToColumn(slotIndex), slotIndex, slotSize },
+              { id: uuidv4(), interventionId, dropColumn: slotToColumn(slotIndex), slotHour: slotIndex, slotSize },
             ],
           };
         }),
@@ -169,17 +169,17 @@ export const useGameStore = create<GameState>()(
       removeFromSlot: (slotIndex) =>
         set((state) => {
           // Block removal of pre-placed items
-          const preplacedFood = state.placedFoods.find(f => f.slotIndex === slotIndex && f.id.startsWith('preplaced-'));
+          const preplacedFood = state.placedFoods.find(f => f.slotHour === slotIndex && f.id.startsWith('preplaced-'));
           if (preplacedFood) return state;
           // Find multi-slot intervention covering this slot
           const coveringInt = state.placedInterventions.find(i => {
-            const start = i.slotIndex ?? -1;
+            const start = i.slotHour ?? -1;
             const size = i.slotSize ?? 1;
             return slotIndex >= start && slotIndex < start + size;
           });
           if (coveringInt?.id.startsWith('preplaced-')) return state;
           return {
-            placedFoods: state.placedFoods.filter(f => f.slotIndex !== slotIndex),
+            placedFoods: state.placedFoods.filter(f => f.slotHour !== slotIndex),
             placedInterventions: coveringInt
               ? state.placedInterventions.filter(i => i.id !== coveringInt.id)
               : state.placedInterventions,
@@ -194,8 +194,8 @@ export const useGameStore = create<GameState>()(
       moveSlotToSlot: (fromSlot, toSlot) =>
         set((state) => {
           if (fromSlot === toSlot) return state;
-          const foodFrom = state.placedFoods.find(f => f.slotIndex === fromSlot);
-          const intFrom = state.placedInterventions.find(i => i.slotIndex === fromSlot);
+          const foodFrom = state.placedFoods.find(f => f.slotHour === fromSlot);
+          const intFrom = state.placedInterventions.find(i => i.slotHour === fromSlot);
           // Block moving pre-placed items
           if (foodFrom?.id.startsWith('preplaced-')) return state;
           if (intFrom?.id.startsWith('preplaced-')) return state;
@@ -209,11 +209,11 @@ export const useGameStore = create<GameState>()(
             for (let s = toSlot; s < toSlot + fromSize; s++) {
               // Skip self slots
               if (intFrom && s >= fromSlot && s < fromSlot + fromSize) continue;
-              const occFood = state.placedFoods.some(f => f.slotIndex === s);
+              const occFood = state.placedFoods.some(f => f.slotHour === s);
               const occInt = state.placedInterventions.some(i => {
                 if (intFrom && i.id === intFrom.id) return false;
                 const size = i.slotSize ?? 1;
-                const start = i.slotIndex ?? -1;
+                const start = i.slotHour ?? -1;
                 return s >= start && s < start + size;
               });
               if (occFood || occInt) return state;
@@ -222,7 +222,7 @@ export const useGameStore = create<GameState>()(
               placedFoods: state.placedFoods,
               placedInterventions: state.placedInterventions.map(i =>
                 intFrom && i.id === intFrom.id
-                  ? { ...i, slotIndex: toSlot, dropColumn: slotToColumn(toSlot) }
+                  ? { ...i, slotHour: toSlot, dropColumn: slotToColumn(toSlot) }
                   : i
               ),
             };
@@ -231,27 +231,27 @@ export const useGameStore = create<GameState>()(
           // Single-slot: check if target is inside a multi-slot (reject swap)
           const covInt = state.placedInterventions.find(i => {
             const size = i.slotSize ?? 1;
-            const start = i.slotIndex ?? -1;
+            const start = i.slotHour ?? -1;
             return toSlot >= start && toSlot < start + size;
           });
           if (covInt && (covInt.slotSize ?? 1) > 1) return state;
 
-          const foodTo = state.placedFoods.find(f => f.slotIndex === toSlot);
+          const foodTo = state.placedFoods.find(f => f.slotHour === toSlot);
           const intTo = covInt;
 
           const newFoods = state.placedFoods.map(f => {
             if (foodFrom && f.id === foodFrom.id)
-              return { ...f, slotIndex: toSlot, dropColumn: slotToColumn(toSlot) };
+              return { ...f, slotHour: toSlot, dropColumn: slotToColumn(toSlot) };
             if (foodTo && f.id === foodTo.id)
-              return { ...f, slotIndex: fromSlot, dropColumn: slotToColumn(fromSlot) };
+              return { ...f, slotHour: fromSlot, dropColumn: slotToColumn(fromSlot) };
             return f;
           });
 
           const newInts = state.placedInterventions.map(i => {
             if (intFrom && i.id === intFrom.id)
-              return { ...i, slotIndex: toSlot, dropColumn: slotToColumn(toSlot) };
+              return { ...i, slotHour: toSlot, dropColumn: slotToColumn(toSlot) };
             if (intTo && i.id === intTo.id)
-              return { ...i, slotIndex: fromSlot, dropColumn: slotToColumn(fromSlot) };
+              return { ...i, slotHour: fromSlot, dropColumn: slotToColumn(fromSlot) };
             return i;
           });
 
@@ -261,18 +261,18 @@ export const useGameStore = create<GameState>()(
       placeMedicationInSlot: (medicationId, slotIndex) =>
         set((state) => {
           // Remove any existing medication at this slot
-          const filtered = state.placedMedications.filter(m => m.slotIndex !== slotIndex);
+          const filtered = state.placedMedications.filter(m => m.slotHour !== slotIndex);
           return {
             placedMedications: [
               ...filtered,
-              { id: uuidv4(), medicationId, dropColumn: slotToColumn(slotIndex), slotIndex },
+              { id: uuidv4(), medicationId, dropColumn: slotToColumn(slotIndex), slotHour: slotIndex },
             ],
           };
         }),
 
       removeMedicationFromSlot: (slotIndex) =>
         set((state) => ({
-          placedMedications: state.placedMedications.filter(m => m.slotIndex !== slotIndex),
+          placedMedications: state.placedMedications.filter(m => m.slotHour !== slotIndex),
         })),
 
       clearFoods: () =>

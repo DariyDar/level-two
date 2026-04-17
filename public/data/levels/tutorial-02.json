@@ -15,10 +15,10 @@
       ],
       "availableInterventions": [],
       "preplacedFoods": [
-        { "shipId": "banana", "slotIndex": 9 },
-        { "shipId": "rice",   "slotIndex": 20 }
+        { "shipId": "banana", "slotHour": 9 },
+        { "shipId": "rice",   "slotHour": 18 }
       ],
-      "lockedSlots": [8, 9, 11, 12, 15, 17, 20]
+      "lockedSlots": [8, 9, 11, 12, 15, 17, 18]
     },
     {
       "day": 2,

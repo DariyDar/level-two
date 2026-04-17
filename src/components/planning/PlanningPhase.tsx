@@ -99,7 +99,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
   const [activeIntervention, setActiveIntervention] = useState<Intervention | null>(null);
   const [activeMedication, setActiveMedication] = useState<Medication | null>(null);
   const [previewSlot, setPreviewSlot] = useState<number | null>(null);
-  const [pendingTutorialDrop, setPendingTutorialDrop] = useState<{ ship: Ship; slotIndex: number } | null>(null);
+  const [pendingTutorialDrop, setPendingTutorialDrop] = useState<{ ship: Ship; slotHour: number } | null>(null);
   const [rejectedSlot, setRejectedSlot] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -231,11 +231,11 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
   const effectiveLockedSlots = useMemo(() => {
     const slots = new Set<number>(dayConfig?.lockedSlots ?? []);
     if (!preplacedCleared) {
-      for (const pf of dayConfig?.preplacedFoods ?? []) slots.add(pf.slotIndex);
+      for (const pf of dayConfig?.preplacedFoods ?? []) slots.add(pf.slotHour);
     }
     for (const pi of dayConfig?.preplacedInterventions ?? []) {
       const size = pi.slotSize ?? 1;
-      for (let s = pi.slotIndex; s < pi.slotIndex + size; s++) slots.add(s);
+      for (let s = pi.slotHour; s < pi.slotHour + size; s++) slots.add(s);
     }
     return slots;
   }, [dayConfig, preplacedCleared]);
@@ -273,7 +273,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
   const suggestedMedSlot = useMemo(() => {
     if (activeMedication?.id !== 'metformin') return null;
     if (placedFoods.length === 0) return null;
-    const minSlot = Math.min(...placedFoods.map(f => f.slotIndex ?? Infinity));
+    const minSlot = Math.min(...placedFoods.map(f => f.slotHour ?? Infinity));
     return minSlot > 0 ? minSlot - 1 : null;
   }, [activeMedication, placedFoods]);
 
@@ -318,7 +318,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
   // releasePendingDrop: commit intercepted food placement when next tutorial step activates
   useEffect(() => {
     if (tutorialStep?.releasePendingDrop && pendingTutorialDrop) {
-      placeFoodInSlot(pendingTutorialDrop.ship.id, pendingTutorialDrop.slotIndex);
+      placeFoodInSlot(pendingTutorialDrop.ship.id, pendingTutorialDrop.slotHour);
       setPendingTutorialDrop(null);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -450,9 +450,9 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
 
         // Helper: check if a slot is covered (including multi-slot interventions)
         const isSlotCovered = (slot: number): boolean => {
-          if (placedFoods.some(f => f.slotIndex === slot)) return true;
+          if (placedFoods.some(f => f.slotHour === slot)) return true;
           return placedInterventions.some(i => {
-            const start = i.slotIndex ?? -1;
+            const start = i.slotHour ?? -1;
             const size = i.slotSize ?? 1;
             return slot >= start && slot < start + size;
           });
@@ -486,13 +486,13 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
         // Compute WP freed if replacing an existing card
         let freedWp = 0;
         if (targetOccupied) {
-          const existingFood = placedFoods.find(f => f.slotIndex === targetSlot);
+          const existingFood = placedFoods.find(f => f.slotHour === targetSlot);
           if (existingFood) {
             const s = allShips.find(sh => sh.id === existingFood.shipId);
             freedWp = s?.wpCost ?? 0;
           }
           const coveringInt = placedInterventions.find(i => {
-            const start = i.slotIndex ?? -1;
+            const start = i.slotHour ?? -1;
             const size = i.slotSize ?? 1;
             return targetSlot >= start && targetSlot < start + size;
           });
@@ -517,7 +517,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
           if ((ship.wpCost ?? 0) > effectiveWp) { rejectDrop(targetSlot); return; }
           if (tutorialStep?.pauseOnDrop) {
             // Intercept drop: freeze in hover/preview state, advance tutorial without placing
-            setPendingTutorialDrop({ ship, slotIndex: targetSlot });
+            setPendingTutorialDrop({ ship, slotHour: targetSlot });
             notifyTutorialAction({ type: 'place-food', foodId: ship.id, slotIndex: targetSlot });
             return;
           }
@@ -869,7 +869,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
               showPenaltyOverlay={showPenaltyOverlay}
               showHatchFlash={showHatchFlash}
               previewShip={activeShip && previewSlot !== null ? activeShip : pendingTutorialDrop?.ship}
-              previewColumn={previewSlot !== null ? slotToColumn(previewSlot) : pendingTutorialDrop ? slotToColumn(pendingTutorialDrop.slotIndex) : undefined}
+              previewColumn={previewSlot !== null ? slotToColumn(previewSlot) : pendingTutorialDrop ? slotToColumn(pendingTutorialDrop.slotHour) : undefined}
               previewIntervention={activeIntervention && previewSlot !== null ? activeIntervention : undefined}
               previewInterventionColumn={activeIntervention && previewSlot !== null ? slotToColumn(previewSlot) : undefined}
               stressSlots={stressSlotSet}

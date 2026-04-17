@@ -19,8 +19,8 @@
         { "id": "takeabreak", "count": 1 }
       ],
       "preplacedFoods": [
-        { "shipId": "burger", "slotIndex": 8 },
-        { "shipId": "banana", "slotIndex": 12 }
+        { "shipId": "burger", "slotHour": 8 },
+        { "shipId": "banana", "slotHour": 12 }
       ],
       "lockedSlots": [8, 11, 12, 14, 15, 17, 18],
       "insulinProfile": {
@@ -48,8 +48,8 @@
         { "id": "takeabreak", "count": 1 }
       ],
       "preplacedFoods": [
-        { "shipId": "banana",          "slotIndex": 8 },
-        { "shipId": "chocolatemuffin", "slotIndex": 13 }
+        { "shipId": "banana",          "slotHour": 8 },
+        { "shipId": "chocolatemuffin", "slotHour": 13 }
       ],
       "lockedSlots": [9, 11, 14, 16, 19],
       "availableMedications": ["metformin"],
@@ -79,7 +79,7 @@
         { "id": "takeabreak", "count": 1 }
       ],
       "preplacedFoods": [
-        { "shipId": "chocolatemuffin", "slotIndex": 8 }
+        { "shipId": "chocolatemuffin", "slotHour": 8 }
       ],
       "lockedSlots": [8],
       "startingBg": 100

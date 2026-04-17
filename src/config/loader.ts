@@ -33,8 +33,8 @@ interface RawLevelConfig {
     availableFoods: AvailableFood[] | string[];
     availableInterventions?: AvailableFood[] | string[];
     availableMedications?: string[];
-    preplacedFoods?: Array<{ shipId: string; slotIndex: number }>;
-    preplacedInterventions?: Array<{ interventionId: string; slotIndex: number; slotSize?: number }>;
+    preplacedFoods?: Array<{ shipId: string; slotHour: number }>;
+    preplacedInterventions?: Array<{ interventionId: string; slotHour: number; slotSize?: number }>;
     lockedSlots?: number[];
     stressSlots?: number[];
     startingBg?: number;

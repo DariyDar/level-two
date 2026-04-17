@@ -17,7 +17,7 @@
       "availableInterventions": [],
       "availableMedications": [],
       "preplacedFoods": [
-        { "shipId": "burger", "slotIndex": 9 }
+        { "shipId": "burger", "slotHour": 9 }
       ],
       "lockedSlots": [8, 9, 13, 16, 17]
     },
@@ -36,7 +36,7 @@
       ],
       "availableMedications": ["metformin"],
       "preplacedFoods": [
-        { "shipId": "chocolatemuffin", "slotIndex": 11 }
+        { "shipId": "chocolatemuffin", "slotHour": 11 }
       ],
       "lockedSlots": [8, 11, 14, 16, 19]
     },
@@ -58,8 +58,8 @@
       ],
       "availableMedications": ["metformin"],
       "preplacedFoods": [
-        { "shipId": "pizza",  "slotIndex": 11 },
-        { "shipId": "burger", "slotIndex": 13 }
+        { "shipId": "pizza",  "slotHour": 11 },
+        { "shipId": "burger", "slotHour": 13 }
       ],
       "lockedSlots": [8, 11, 13, 19]
     }

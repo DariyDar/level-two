@@ -428,15 +428,15 @@ function runSolve(args: Record<string, string>) {
   let preWp = 0, preKcal = 0;
 
   for (const pf of dayConfig.preplacedFoods ?? []) {
-    locked.add(pf.slotIndex);
-    preFoods.push({ id: pf.shipId, slot: pf.slotIndex });
+    locked.add(pf.slotHour);
+    preFoods.push({ id: pf.shipId, slot: pf.slotHour });
     const ship = allShips.find(s => s.id === pf.shipId);
     if (ship) { preWp += ship.wpCost; preKcal += ship.kcal; }
   }
   for (const pi of dayConfig.preplacedInterventions ?? []) {
     const sz = pi.slotSize ?? 1;
-    for (let s = pi.slotIndex; s < pi.slotIndex + sz; s++) locked.add(s);
-    preInts.push({ id: pi.interventionId, slot: pi.slotIndex, size: sz });
+    for (let s = pi.slotHour; s < pi.slotHour + sz; s++) locked.add(s);
+    preInts.push({ id: pi.interventionId, slot: pi.slotHour, size: sz });
     const intv = allInts.find(x => x.id === pi.interventionId);
     if (intv) preWp += intv.wpCost;
   }

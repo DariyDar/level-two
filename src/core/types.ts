@@ -87,7 +87,7 @@ export interface PlacedFood {
   id: string;             // Unique placement ID
   shipId: string;         // Reference to Ship.id
   dropColumn: number;     // Column index where dropped (0 = start of graph)
-  slotIndex?: number;     // Meal slot index (0-11)
+  slotHour?: number;      // Meal slot hour in 24h format (8-19)
 }
 
 // === Interventions (exercise) ===
@@ -110,7 +110,7 @@ export interface PlacedIntervention {
   id: string;             // Unique placement ID
   interventionId: string; // Reference to Intervention.id
   dropColumn: number;
-  slotIndex?: number;     // Meal slot index (0-11)
+  slotHour?: number;      // Meal slot hour in 24h format (8-19)
   slotSize?: number;      // Number of meal slots occupied (default 1)
 }
 
@@ -142,8 +142,8 @@ export interface Medication {
 export interface PlacedMedication {
   id: string;              // unique placement UUID
   medicationId: string;    // ref to Medication.id
-  dropColumn: number;      // slotToColumn(slotIndex)
-  slotIndex: number;
+  dropColumn: number;      // slotToColumn(slotHour)
+  slotHour: number;
 }
 
 /** Global food-affecting modifiers — only GLP-1 produces these */
@@ -176,12 +176,12 @@ export interface AvailableFood {
 
 export interface PreplacedFood {
   shipId: string;
-  slotIndex: number;
+  slotHour: number;
 }
 
 export interface PreplacedIntervention {
   interventionId: string;
-  slotIndex: number;
+  slotHour: number;
   slotSize?: number;
 }
 

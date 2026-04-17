@@ -166,7 +166,7 @@ export function SlotGrid({
     const slots = new Set<number>();
     if (active?.data.current?.isFromSlot) {
       const fromSlot = active.data.current.fromSlotIndex as number;
-      const pi = placedInterventions.find(i => i.slotIndex === fromSlot);
+      const pi = placedInterventions.find(i => i.slotHour === fromSlot);
       if (pi) {
         const size = pi.slotSize ?? 1;
         for (let s = fromSlot; s < fromSlot + size; s++) slots.add(s);
@@ -210,13 +210,13 @@ export function SlotGrid({
 
   const handleSlotHover = useCallback((slotIndex: number) => {
     const pi = placedInterventions.find(i => {
-      const start = i.slotIndex ?? -1;
+      const start = i.slotHour ?? -1;
       const size = i.slotSize ?? 1;
       return slotIndex >= start && slotIndex < start + size;
     });
     if (pi && (pi.slotSize ?? 1) > 1) {
       const slots = new Set<number>();
-      const start = pi.slotIndex ?? 0;
+      const start = pi.slotHour ?? 0;
       const size = pi.slotSize ?? 1;
       for (let s = start; s < start + size; s++) slots.add(s);
       setHoveredGroup(slots);
@@ -230,13 +230,13 @@ export function SlotGrid({
   }, []);
 
   const getSlotContent = (slotIndex: number): SlotContent => {
-    const food = placedFoods.find(f => f.slotIndex === slotIndex);
+    const food = placedFoods.find(f => f.slotHour === slotIndex);
     if (food) {
       const ship = allShips.find(s => s.id === food.shipId);
       if (ship) return { type: 'food', ship };
     }
     // Check exact match (start slot)
-    const intervention = placedInterventions.find(i => i.slotIndex === slotIndex);
+    const intervention = placedInterventions.find(i => i.slotHour === slotIndex);
     if (intervention) {
       const int = allInterventions.find(a => a.id === intervention.interventionId);
       if (int) return { type: 'intervention', intervention: int };
@@ -244,12 +244,12 @@ export function SlotGrid({
     // Check continuation (multi-slot)
     const continuation = placedInterventions.find(i => {
       const size = i.slotSize ?? 1;
-      const start = i.slotIndex ?? -1;
+      const start = i.slotHour ?? -1;
       return size > 1 && slotIndex > start && slotIndex < start + size;
     });
     if (continuation) {
       const int = allInterventions.find(a => a.id === continuation.interventionId);
-      if (int) return { type: 'continuation', intervention: int, parentSlotIndex: continuation.slotIndex! };
+      if (int) return { type: 'continuation', intervention: int, parentSlotIndex: continuation.slotHour! };
     }
     return null;
   };

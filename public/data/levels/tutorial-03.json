@@ -18,8 +18,8 @@
       ],
       "availableMedications": [],
       "preplacedFoods": [
-        { "shipId": "pizza", "slotIndex": 10 },
-        { "shipId": "milk",  "slotIndex": 8 }
+        { "shipId": "pizza", "slotHour": 10 },
+        { "shipId": "milk",  "slotHour": 8 }
       ],
       "lockedSlots": [8, 9, 10, 15, 18, 19],
       "insulinProfile": {
@@ -44,8 +44,8 @@
       ],
       "availableMedications": [],
       "preplacedFoods": [
-        { "shipId": "chocolatemuffin", "slotIndex": 9 },
-        { "shipId": "chickpeas",       "slotIndex": 16 }
+        { "shipId": "chocolatemuffin", "slotHour": 9 },
+        { "shipId": "chickpeas",       "slotHour": 16 }
       ],
       "lockedSlots": [8, 9, 12, 16, 18, 19],
       "insulinProfile": {
@@ -73,7 +73,7 @@
       ],
       "availableMedications": [],
       "preplacedFoods": [
-        { "shipId": "burger", "slotIndex": 15 }
+        { "shipId": "burger", "slotHour": 15 }
       ],
       "lockedSlots": [9, 14, 18],
       "startingBg": 100

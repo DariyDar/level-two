@@ -17,7 +17,7 @@
       ],
       "availableMedications": ["sglt2"],
       "preplacedFoods": [
-        { "shipId": "pizza", "slotIndex": 11 }
+        { "shipId": "pizza", "slotHour": 11 }
       ],
       "lockedSlots": [8, 9, 11, 13, 14, 16, 17, 18, 19],
       "insulinProfile": {
@@ -42,7 +42,7 @@
       ],
       "availableMedications": ["metformin", "sglt2"],
       "preplacedFoods": [
-        { "shipId": "oatmeal", "slotIndex": 10 }
+        { "shipId": "oatmeal", "slotHour": 10 }
       ],
       "lockedSlots": [8, 9, 10, 13, 16, 18, 19],
       "stressSlots": [14, 15],
