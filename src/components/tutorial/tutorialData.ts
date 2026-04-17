@@ -1166,7 +1166,7 @@ const L_KCAL_D1: TutorialStep[] = [
   },
   {
     id: 'T2D1-6',
-    bubble: { type: 'success', text: 'Perfect! Your body has enough energy to stay healthy today. Balance is key!', expression: 'celebrating', position: 'center' },
+    bubble: { type: 'success', text: 'Well Done! Your body has enough energy to stay healthy today. Balance is key!', expression: 'celebrating', position: 'center' },
     noBackdrop: true,
     blockInteraction: true,
     advanceOn: 'tap',
@@ -1225,32 +1225,6 @@ const L_KCAL_D2: TutorialStep[] = [
     noBackdrop: true,
     advanceOn: 'tap',
     blockInteraction: true,
-  },
-  {
-    id: 'T2D2-6',
-    bubble: { type: 'dialogue', text: 'Each food card shows its calorie content — use this to plan your intake.', expression: 'happy', position: 'inventory' },
-    highlight: 'ship-inventory',
-    highlightType: 'glow',
-    kcalBlink: true,
-    noBackdrop: true,
-    advanceOn: 'tap',
-    blockInteraction: true,
-  },
-  {
-    id: 'T2D2-7',
-    bubble: { type: 'dialogue', text: 'Place your meals to reach the optimal zone, then submit.', expression: 'happy', position: 'inventory' },
-    requiresOptimalSubmit: true,
-    advanceOn: 'action',
-    expectedAction: { type: 'click-submit' },
-  },
-  {
-    id: 'T2D2-8',
-    pendingUntilResults: true,
-    highlight: 'result-next-btn',
-    highlightType: 'pulse',
-    cta: { type: 'tap-pulse', target: 'result-next-btn' },
-    noBackdrop: true,
-    advanceOn: 'tap',
   },
 ];
 

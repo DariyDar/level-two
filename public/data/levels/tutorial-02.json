@@ -6,12 +6,12 @@
     {
       "day": 1,
       "kcalBudget": 2000,
-      "wpBudget": 11,
+      "wpBudget": 5,
       "startingBg": 100,
       "availableFoods": [
-        { "id": "oatmeal",   "count": 1 },
-        { "id": "apple",     "count": 1 },
-        { "id": "sandwich",  "count": 1 }
+        { "id": "oatmeal",    "count": 1 },
+        { "id": "mixednuts",  "count": 1 },
+        { "id": "sandwich",   "count": 1 }
       ],
       "availableInterventions": [],
       "preplacedFoods": [
