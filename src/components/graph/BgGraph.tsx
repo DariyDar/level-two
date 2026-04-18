@@ -9,7 +9,7 @@ import {
   GRAPH_CONFIG,
   COLS_PER_SLOT,
 } from '../../core/types';
-import { calculateCurve, calculateInterventionCurve, calculateMedicationReductions, applyMedicationToFood, patternDepth, BOOST_PATTERN, getEffectivenessPattern } from '../../core/cubeEngine';
+import { calculateCurve, calculateInterventionCurve, calculateMedicationCurve, calculateMedicationReductions, applyMedicationToFood, patternDepth, BOOST_PATTERN, getEffectivenessPattern } from '../../core/cubeEngine';
 import './BgGraph.css';
 
 // SVG layout constants
@@ -127,6 +127,8 @@ interface BgGraphProps {
   previewColumn?: number;    // target column for preview
   previewIntervention?: Intervention;   // intervention being dragged
   previewInterventionColumn?: number;   // target column for intervention preview
+  previewMedication?: Medication;       // medication being dragged
+  previewMedicationColumn?: number;     // target column for medication preview
   stressSlots?: Set<number>;            // slot indices with stress (reduced insulin)
   highlightStressSlots?: boolean;        // tutorial: pulse animation on stress columns
   highlightDangerZone?: boolean;         // tutorial: pulse animation on the glucose zone above 200 mg/dL
@@ -172,6 +174,8 @@ export function BgGraph({
   previewColumn,
   previewIntervention,
   previewInterventionColumn,
+  previewMedication,
+  previewMedicationColumn,
   stressSlots,
   highlightStressSlots = false,
   highlightDangerZone = false,
@@ -629,6 +633,39 @@ export function BgGraph({
 
     return { wrapCubes, dropColumn: dropCol };
   }, [previewIntervention, previewInterventionColumn, graphRenderData, effectiveRows]);
+
+  // Medication drag preview: fuchsia/purple cubes showing what would be burned
+  const medicationPreviewData = useMemo(() => {
+    if (!previewMedication || previewMedicationColumn === undefined) return null;
+
+    const dropCol = previewMedicationColumn;
+    const curve = calculateMedicationCurve(previewMedication, dropCol);
+
+    // Pick burn color by medication id
+    const burnColor =
+      previewMedication.id === 'metformin' ? '#f0abfc' :
+      previewMedication.id === 'sglt2'     ? '#c084fc' :
+      previewMedication.id === 'glp1'      ? '#a78bfa' : '#c084fc';
+
+    const { columnCaps } = graphRenderData;
+    const wrapCubes: Array<{ col: number; row: number }> = [];
+
+    for (let col = 0; col < TOTAL_COLUMNS; col++) {
+      const depth = curve[col];
+      if (depth <= 0) continue;
+      const currentTop = columnCaps[col];
+      if (currentTop <= baselineRow) continue;
+      const wrapCount = Math.min(depth, currentTop - baselineRow);
+      const burnStart = currentTop - wrapCount;
+      for (let i = 0; i < wrapCount; i++) {
+        const row = burnStart + i;
+        if (row < baselineRow) continue;
+        wrapCubes.push({ col, row });
+      }
+    }
+
+    return { wrapCubes, dropColumn: dropCol, burnColor };
+  }, [previewMedication, previewMedicationColumn, graphRenderData, baselineRow]);
 
   // Detect removed food layers for exit animation
   useLayoutEffect(() => {
@@ -1442,6 +1479,31 @@ export function BgGraph({
                   rx={2}
                   className="bg-graph__cube--preview"
                   stroke={cube.color === '#86efac' ? '#4ade80' : '#16a34a'}
+                  strokeWidth={0.5}
+                  style={{ animationDelay: `${waveDelay}ms` }}
+                />
+              );
+            })}
+          </g>
+        )}
+
+        {/* Drag preview: medication burn overlay — fuchsia/purple cubes showing what would burn */}
+        {medicationPreviewData && (
+          <g pointerEvents="none">
+            {medicationPreviewData.wrapCubes.map(cube => {
+              const waveDelay = Math.abs(cube.col - medicationPreviewData.dropColumn) * 15;
+              return (
+                <rect
+                  key={`preview-wrap-med-${cube.col}-${cube.row}`}
+                  x={colToX(cube.col) + 0.5}
+                  y={rowToY(cube.row) + 0.5}
+                  width={CELL_SIZE - 1}
+                  height={cellHeight - 1}
+                  fill={medicationPreviewData.burnColor}
+                  opacity={0.55}
+                  rx={2}
+                  className="bg-graph__cube--preview"
+                  stroke={medicationPreviewData.burnColor}
                   strokeWidth={0.5}
                   style={{ animationDelay: `${waveDelay}ms` }}
                 />

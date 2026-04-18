@@ -900,6 +900,8 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
               previewColumn={previewSlot !== null ? slotToColumn(previewSlot) : pendingTutorialDrop ? slotToColumn(pendingTutorialDrop.slotHour) : undefined}
               previewIntervention={activeIntervention && previewSlot !== null ? activeIntervention : undefined}
               previewInterventionColumn={activeIntervention && previewSlot !== null ? slotToColumn(previewSlot) : undefined}
+              previewMedication={activeMedication && previewSlot !== null ? activeMedication : undefined}
+              previewMedicationColumn={activeMedication && previewSlot !== null ? slotToColumn(previewSlot) : undefined}
               stressSlots={stressSlotSet}
               highlightStressSlots={tutorialStep?.highlight === 'stress-slots'}
               highlightDangerZone={tutorialStep?.highlight === 'danger-zone'}
