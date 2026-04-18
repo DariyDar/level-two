@@ -48,10 +48,10 @@ function getHighlightSelector(target: string): string | null {
     return `.intervention-card[data-intervention="${id}"]`;
   }
 
-  // medication:id → .medication-toggle[data-medication="id"]
+  // medication:id → .intervention-card--medication[data-medication="id"]
   if (target.startsWith('medication:')) {
     const id = target.split(':')[1];
-    return `.medication-toggle[data-medication="${id}"]`;
+    return `.intervention-card--medication[data-medication="${id}"]`;
   }
 
   return null;
