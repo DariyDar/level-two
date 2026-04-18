@@ -81,6 +81,7 @@ interface TabbedInventoryProps {
   allMedications?: Medication[];
   availableMedicationIds?: string[];
   placedMedications?: PlacedMedication[];
+  onMedicationTap?: (medId: string) => void;
   hideKcal?: boolean;
   kcalJustRevealed?: boolean;
   clearedFoodsHighlight?: boolean;
@@ -99,7 +100,8 @@ export function TabbedInventory({
   wpRemaining,
   allMedications = [],
   availableMedicationIds = [],
-  placedMedications: _placedMedications = [],
+  placedMedications = [],
+  onMedicationTap,
   hideKcal = false,
   kcalJustRevealed = false,
   clearedFoodsHighlight = false,
@@ -183,13 +185,18 @@ export function TabbedInventory({
       {/* Row 3: Medications — draggable cards */}
       {hasMedications && (
         <InventoryRow trackClassName="medication-section">
-          {medicationItems.map((med) => (
-            <MedicationCard
-              key={med.id}
-              medication={med}
-              instanceId={`medication-inventory-${med.id}`}
-            />
-          ))}
+          {medicationItems.map((med) => {
+            const isPlaced = placedMedications.some(pm => pm.medicationId === med.id);
+            return (
+              <MedicationCard
+                key={med.id}
+                medication={med}
+                instanceId={`medication-inventory-${med.id}`}
+                isPlaced={isPlaced}
+                onTap={onMedicationTap ? () => onMedicationTap(med.id) : undefined}
+              />
+            );
+          })}
         </InventoryRow>
       )}
     </div>

@@ -530,6 +530,19 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
     [placeFoodInSlot, placeInterventionInSlot, placeMedicationInSlot, removeFromSlot, moveSlotToSlot, wpRemaining, gamePhase, placedFoods, placedInterventions, allShips, allInterventions, effectiveLockedSlots, notifyTutorialAction, rejectDrop]
   );
 
+  const handleMedicationTap = useCallback((medId: string) => {
+    if (gamePhase !== 'planning') return;
+    // Compute optimal slot: 1 before earliest placed food, or startHour
+    const minFoodSlot = placedFoods.length > 0
+      ? Math.min(...placedFoods.map(f => f.slotHour ?? Infinity))
+      : Infinity;
+    const targetSlot = isFinite(minFoodSlot) && minFoodSlot > GRAPH_CONFIG.startHour
+      ? minFoodSlot - 1
+      : GRAPH_CONFIG.startHour;
+    placeMedicationInSlot(medId, targetSlot);
+    notifyTutorialAction({ type: 'toggle-medication', medicationId: medId });
+  }, [gamePhase, placedFoods, placeMedicationInSlot, notifyTutorialAction]);
+
   const handleToggleBoost = useCallback(() => {
     if (!isBoostActive && barsAvailable <= 0) return;
     toggleBoost(currentDay);
@@ -949,6 +962,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
                 allMedications={allMedications}
                 availableMedicationIds={dayConfig?.availableMedications ?? []}
                 placedMedications={placedMedications}
+                onMedicationTap={handleMedicationTap}
                 hideKcal={!kcalCardsVisible}
                 kcalJustRevealed={kcalJustRevealed}
                 highlightKcal={tutorialStep?.kcalBlink ?? false}
