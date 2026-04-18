@@ -197,7 +197,7 @@ const L_PF_D2: TutorialStep[] = [
   },
   {
     id: 'T4D2-6',
-    bubble: { type: 'success', text: "Wow! That was substantial! The purple layer shows the glucose Metformin prevented — the more carbs, the bigger the effect!", expression: 'happy', position: 'bottom' },
+    bubble: { type: 'success', text: "Nicely done! As we can see, Metformin starts strong — but its effect tapers off over time. It's great for handling big glucose spikes!", expression: 'happy', position: 'bottom' },
     highlight: 'graph',
     highlightType: 'glow',
     noBackdrop: true,
@@ -207,7 +207,7 @@ const L_PF_D2: TutorialStep[] = [
   },
   {
     id: 'T4D2-7',
-    bubble: { type: 'dialogue', text: "Place your remaining food and submit!", expression: 'neutral', position: 'inventory' },
+    bubble: { type: 'dialogue', text: "Now, let's complete our schedule and submit!", expression: 'neutral', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
     advanceOn: 'action',
