@@ -156,7 +156,7 @@ const L_PF_D1: TutorialStep[] = [
 const L_PF_D2: TutorialStep[] = [
   {
     id: 'T4D2-1',
-    bubble: { type: 'dialogue', text: "The muffin is causing a dangerous spike. And today the pancreas is already at 4/5 — it's working harder to compensate.", expression: 'concerned' },
+    bubble: { type: 'dialogue', text: "That muffin causes a dangerous spike. Worse — the pancreas is at 4/5 now, so it can't compensate as effectively.", expression: 'concerned' },
     highlight: 'graph',
     highlightType: 'spotlight',
     noBackdrop: true,
