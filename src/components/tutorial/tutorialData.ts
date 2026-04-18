@@ -165,7 +165,7 @@ const L_PF_D2: TutorialStep[] = [
   },
   {
     id: 'T4D2-2',
-    bubble: { type: 'hint', text: "Even intense physical activity won't flatten this peak alone — but let's try it. Place Heavy Run right after the muffin.", expression: 'thinking', position: 'inventory' },
+    bubble: { type: 'hint', text: "Let's schedule a Run to reduce the BG levels", expression: 'thinking', position: 'inventory' },
     highlight: ['intervention:heavyrun', 'slot:12'],
     highlightType: 'spotlight',
     cta: { type: 'drag-arrow', source: 'intervention:heavyrun', dest: 'slot:12' },
@@ -174,13 +174,13 @@ const L_PF_D2: TutorialStep[] = [
   },
   {
     id: 'T4D2-3',
-    bubble: { type: 'dialogue', text: "Heavy Run reduces the peak — but it's still in the danger zone. We need another approach.", expression: 'thinking' },
+    bubble: { type: 'dialogue', text: "Nicely done. Sadly we still have lots of excess glucose. We need another approach.", expression: 'thinking' },
     advanceOn: 'tap',
     blockInteraction: true,
   },
   {
     id: 'T4D2-4',
-    bubble: { type: 'dialogue', text: "\ud83d\udc8a Metformin! It reduces ALL food glucose by 20% — for the entire day.", expression: 'neutral' },
+    bubble: { type: 'dialogue', text: "Time to bring in our first medication — 💊 Metformin! It works best when scheduled before a meal, so let's set that up!", expression: 'neutral' },
     highlight: 'medication:metformin',
     highlightType: 'spotlight',
     advanceOn: 'tap',
