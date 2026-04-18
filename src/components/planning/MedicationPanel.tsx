@@ -29,6 +29,7 @@ export function MedicationPanel({
               key={medId}
               className={`medication-toggle ${isActive ? 'medication-toggle--active' : ''}`}
               onClick={() => onToggle(medId)}
+              data-medication={medId}
               data-tooltip={med.description}
             >
               <span className="medication-toggle__emoji">{med.emoji}</span>

@@ -188,8 +188,8 @@ const L_PF_D2: TutorialStep[] = [
   },
   {
     id: 'T4D2-5',
-    bubble: { type: 'hint', text: "It works best when scheduled before a meal, and cost no WP, so let's set that up!", expression: 'thinking' },
-    highlight: ['medication:metformin', 'slot:12'],
+    bubble: { type: 'hint', text: "It works best when scheduled before a meal, and cost no WP, so let's set that up!", expression: 'thinking', position: 'bottom' },
+    highlight: ['medication:metformin', 'slot:10'],
     highlightType: 'pulse',
     cta: { type: 'tap-pulse', target: 'medication:metformin' },
     advanceOn: 'action',
