@@ -180,7 +180,7 @@ const L_PF_D2: TutorialStep[] = [
   },
   {
     id: 'T4D2-4',
-    bubble: { type: 'dialogue', text: "Time to bring in our first medication — 💊 Metformin! It works best when scheduled before a meal, so let's set that up!", expression: 'neutral' },
+    bubble: { type: 'dialogue', text: "Time to bring in our first medication — 💊 Metformin!", expression: 'neutral' },
     highlight: 'medication:metformin',
     highlightType: 'spotlight',
     advanceOn: 'tap',
@@ -188,20 +188,15 @@ const L_PF_D2: TutorialStep[] = [
   },
   {
     id: 'T4D2-5',
-    bubble: { type: 'hint', text: "No WP cost. Just tap once — it stays active all day.", expression: 'thinking' },
-    advanceOn: 'tap',
-  },
-  {
-    id: 'T4D2-6',
-    bubble: { type: 'dialogue', text: "Tap Metformin ON and watch the peak change!", expression: 'neutral' },
-    highlight: 'medication:metformin',
+    bubble: { type: 'hint', text: "It works best when scheduled before a meal, and cost no WP, so let's set that up!", expression: 'thinking' },
+    highlight: ['medication:metformin', 'slot:12'],
     highlightType: 'pulse',
     cta: { type: 'tap-pulse', target: 'medication:metformin' },
     advanceOn: 'action',
     expectedAction: { type: 'toggle-medication', medicationId: 'metformin' },
   },
   {
-    id: 'T4D2-7',
+    id: 'T4D2-6',
     bubble: { type: 'success', text: "Wow! That was substantial! The purple layer shows the glucose Metformin prevented — the more carbs, the bigger the effect!", expression: 'happy', position: 'bottom' },
     highlight: 'graph',
     highlightType: 'glow',
@@ -211,7 +206,7 @@ const L_PF_D2: TutorialStep[] = [
     advanceOn: 'tap',
   },
   {
-    id: 'T4D2-8',
+    id: 'T4D2-7',
     bubble: { type: 'dialogue', text: "Place your remaining food and submit!", expression: 'neutral', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
@@ -219,7 +214,7 @@ const L_PF_D2: TutorialStep[] = [
     expectedAction: { type: 'click-submit' },
   },
   {
-    id: 'T4D2-9',
+    id: 'T4D2-8',
     pendingUntilResults: true,
     highlight: 'result-next-btn',
     highlightType: 'pulse',
