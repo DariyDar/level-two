@@ -19,10 +19,11 @@ export function MedicationCard({
   onTap,
 }: MedicationCardProps) {
   const draggableId = instanceId ?? `medication-${medication.id}`;
+  const disabled = isLocked || isPlaced;
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: draggableId,
-    disabled: isLocked || isPlaced,
+    disabled,
     data: {
       medication,
       isMedication: true,
@@ -31,12 +32,6 @@ export function MedicationCard({
 
   const style = {
     transform: CSS.Transform.toString(transform),
-  };
-
-  const handleClick = () => {
-    if (!isLocked && !isPlaced && onTap) {
-      onTap();
-    }
   };
 
   return (
@@ -49,24 +44,26 @@ export function MedicationCard({
         isDragging && 'intervention-card--dragging',
         isLocked && 'intervention-card--locked',
         isPlaced && 'intervention-card--placed',
+        disabled && !isPlaced && 'intervention-card--disabled',
       ]
         .filter(Boolean)
         .join(' ')}
       data-medication={medication.id}
       data-tooltip={medication.description}
-      onClick={handleClick}
-      {...(isLocked || isPlaced ? {} : listeners)}
+      onClick={!disabled && onTap ? onTap : undefined}
+      {...(disabled ? {} : listeners)}
       {...attributes}
     >
       {isLocked && <span className="intervention-card__lock">🔒</span>}
       {isPlaced && <span className="intervention-card__placed-mark">✓</span>}
-      <span className="intervention-card__emoji">{medication.emoji}</span>
 
-      <span className="intervention-card__badge">0☀️</span>
+      <span className="intervention-card__emoji">{medication.emoji}</span>
 
       <div className="intervention-card__details">
         <span className="intervention-card__name">{medication.name}</span>
-        <span className="intervention-card__info">{isPlaced ? 'Active' : 'Tap to use'}</span>
+        <span className="intervention-card__info">
+          {isPlaced ? 'Active' : 'Drag to slot'}
+        </span>
       </div>
     </div>
   );
@@ -77,10 +74,9 @@ export function MedicationCardOverlay({ medication }: { medication: Medication }
   return (
     <div className="intervention-card intervention-card--medication intervention-card--overlay">
       <span className="intervention-card__emoji">{medication.emoji}</span>
-      <span className="intervention-card__badge">0☀️</span>
       <div className="intervention-card__details">
         <span className="intervention-card__name">{medication.name}</span>
-        <span className="intervention-card__info">Tap to use</span>
+        <span className="intervention-card__info">Drag to slot</span>
       </div>
     </div>
   );

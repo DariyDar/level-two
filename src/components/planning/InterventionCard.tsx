@@ -56,9 +56,9 @@ export function InterventionCard({
       {isLocked && <span className="intervention-card__lock">🔒</span>}
       <span className="intervention-card__emoji">{intervention.emoji}</span>
 
-      {!isLocked && (
+      {!isLocked && intervention.wpCost !== 0 && (
         <span className="intervention-card__badge">
-          {intervention.isBreak
+          {intervention.wpCost < 0
             ? `+${Math.abs(intervention.wpCost)}`
             : intervention.wpCost}☀️
         </span>
@@ -81,11 +81,13 @@ export function InterventionCardOverlay({ intervention }: { intervention: Interv
   return (
     <div className="intervention-card intervention-card--overlay">
       <span className="intervention-card__emoji">{intervention.emoji}</span>
-      <span className="intervention-card__badge">
-        {intervention.isBreak
-          ? `+${Math.abs(intervention.wpCost)}`
-          : intervention.wpCost}☀️
-      </span>
+      {intervention.wpCost !== 0 && (
+        <span className="intervention-card__badge">
+          {intervention.wpCost < 0
+            ? `+${Math.abs(intervention.wpCost)}`
+            : intervention.wpCost}☀️
+        </span>
+      )}
       <div className="intervention-card__details">
         <span className="intervention-card__name">{intervention.name}</span>
         <span className="intervention-card__info">{intervention.duration}m</span>
