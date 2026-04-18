@@ -67,7 +67,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
     moveSlotToSlot,
     placedMedications,
     placeMedicationInSlot,
-    removeMedicationFromSlot: _removeMedicationFromSlot,
+    removeMedicationFromSlot,
     clearFoods,
     currentLevel,
     currentDay,
@@ -430,27 +430,42 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
         if (effectiveLockedSlots.has(fromSlotIndex)) return;
         // Block drag to locked slot
         if (effectiveLockedSlots.has(targetSlot)) { rejectDrop(targetSlot); return; }
-        // Slot → Slot: move or swap
         if (fromSlotIndex === targetSlot) return;
+
+        // Medication from slot → another slot
+        const isMedFromSlot = activeData?.isMedication === true;
+        if (isMedFromSlot) {
+          const medication = activeData?.medication as Medication | undefined;
+          if (!medication) return;
+          removeMedicationFromSlot(fromSlotIndex);
+          placeMedicationInSlot(medication.id, targetSlot);
+          notifyTutorialAction({ type: 'toggle-medication', medicationId: medication.id });
+          return;
+        }
+
+        // Slot → Slot: move or swap (food / intervention)
         moveSlotToSlot(fromSlotIndex, targetSlot);
       } else {
         // Inventory → Slot: place (or replace if occupied)
         const isIntervention = activeData?.isIntervention === true;
         const isMedication = activeData?.isMedication === true;
 
-        // Medication placement: can coexist with food/interventions in same slot
+        // Medication placement: occupies slot, removes anything already there
         if (isMedication) {
           const medication = activeData?.medication as Medication | undefined;
           if (!medication) return;
-          // Remove from locked check: medications bypass slot locking
+          if (effectiveLockedSlots.has(targetSlot)) { rejectDrop(targetSlot); return; }
+          // Remove food/intervention/medication already in that slot
+          removeFromSlot(targetSlot);
           placeMedicationInSlot(medication.id, targetSlot);
           notifyTutorialAction({ type: 'toggle-medication', medicationId: medication.id });
           return;
         }
 
-        // Helper: check if a slot is covered (including multi-slot interventions)
+        // Helper: check if a slot is covered (food, intervention, or medication)
         const isSlotCovered = (slot: number): boolean => {
           if (placedFoods.some(f => f.slotHour === slot)) return true;
+          if (placedMedications.some(m => m.slotHour === slot)) return true;
           return placedInterventions.some(i => {
             const start = i.slotHour ?? -1;
             const size = i.slotSize ?? 1;
@@ -527,7 +542,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
         }
       }
     },
-    [placeFoodInSlot, placeInterventionInSlot, placeMedicationInSlot, removeFromSlot, moveSlotToSlot, wpRemaining, gamePhase, placedFoods, placedInterventions, allShips, allInterventions, effectiveLockedSlots, notifyTutorialAction, rejectDrop]
+    [placeFoodInSlot, placeInterventionInSlot, placeMedicationInSlot, removeMedicationFromSlot, removeFromSlot, moveSlotToSlot, wpRemaining, gamePhase, placedFoods, placedInterventions, placedMedications, allShips, allInterventions, effectiveLockedSlots, notifyTutorialAction, rejectDrop]
   );
 
   const handleMedicationTap = useCallback((medId: string) => {
@@ -938,8 +953,10 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
           <SlotGrid
             allShips={allShips}
             allInterventions={allInterventions}
+            allMedications={allMedications}
             placedFoods={placedFoods}
             placedInterventions={placedInterventions}
+            placedMedications={placedMedications}
             settings={settings}
             onRemoveFromSlot={removeFromSlot}
             disabled={!isPlanning}

@@ -1,14 +1,16 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useDroppable, useDraggable, useDndContext } from '@dnd-kit/core';
-import type { Ship, Intervention, PlacedFood, PlacedIntervention, GameSettings } from '../../core/types';
+import type { Ship, Intervention, PlacedFood, PlacedIntervention, GameSettings, Medication, PlacedMedication } from '../../core/types';
 import { TOTAL_SLOTS, GRAPH_CONFIG, slotTimeLabel } from '../../core/types';
 import './SlotGrid.css';
 
 interface SlotGridProps {
   allShips: Ship[];
   allInterventions: Intervention[];
+  allMedications?: Medication[];
   placedFoods: PlacedFood[];
   placedInterventions: PlacedIntervention[];
+  placedMedications?: PlacedMedication[];
   settings: GameSettings;
   onRemoveFromSlot: (slotIndex: number) => void;
   disabled?: boolean;
@@ -22,6 +24,7 @@ type SlotContent =
   | { type: 'food'; ship: Ship }
   | { type: 'intervention'; intervention: Intervention }
   | { type: 'continuation'; intervention: Intervention; parentSlotIndex: number }
+  | { type: 'medication'; medication: Medication }
   | null;
 
 function SlotContainer({
@@ -69,7 +72,9 @@ function SlotContainer({
     ? { ship: content.ship, isFromSlot: true, fromSlotIndex: index }
     : content?.type === 'intervention'
       ? { intervention: content.intervention, isIntervention: true, isFromSlot: true, fromSlotIndex: index }
-      : {};
+      : content?.type === 'medication'
+        ? { medication: content.medication, isMedication: true, isFromSlot: true, fromSlotIndex: index }
+        : {};
 
   const { setNodeRef: setDragRef, attributes, listeners, isDragging } = useDraggable({
     id: `placed-slot-${index}`,
@@ -89,9 +94,10 @@ function SlotContainer({
   const tooltip = (() => {
     const stressTag = isStressed ? 'Stress: insulin −2' : '';
     if (showContent) {
-      const itemName = content.type === 'food'
-        ? `${content.ship.name} · ${content.ship.kcal} kcal · ${content.ship.carbs ?? 0}g`
-        : isContinuation ? '' : `${content.intervention.name} · ${content.intervention.duration}m`;
+      let itemName = '';
+      if (content.type === 'food') itemName = `${content.ship.name} · ${content.ship.kcal} kcal · ${content.ship.carbs ?? 0}g`;
+      else if (content.type === 'medication') itemName = content.medication.name;
+      else if (!isContinuation) itemName = `${content.intervention.name} · ${content.intervention.duration}m`;
       if (isLocked) return `🔒 ${itemName}`;
       if (stressTag && itemName) return `${stressTag} · ${itemName}`;
       return itemName;
@@ -110,6 +116,7 @@ function SlotContainer({
           'slot-container' +
           (showContent ? ' slot-container--filled' : '') +
           (showContent && (content.type === 'intervention' || content.type === 'continuation') ? ' slot-container--intervention' : '') +
+          (showContent && content.type === 'medication' ? ' slot-container--medication' : '') +
           (showContent && isContinuation ? ' slot-container--continuation' : '') +
           (showContent && isMultiStart ? ' slot-container--multi-start' : '') +
           (showContent && isGroupHovered ? ' slot-container--hover' : '') +
@@ -133,7 +140,11 @@ function SlotContainer({
           <div className="slot-container__card">
             {isLocked && <span className="slot-container__lock">🔒</span>}
             <span className="slot-container__emoji">
-              {content.type === 'food' ? content.ship.emoji : content.intervention.emoji}
+              {content.type === 'food'
+                ? content.ship.emoji
+                : content.type === 'medication'
+                  ? content.medication.emoji
+                  : content.intervention.emoji}
             </span>
           </div>
         ) : (
@@ -150,8 +161,10 @@ function SlotContainer({
 export function SlotGrid({
   allShips,
   allInterventions,
+  allMedications = [],
   placedFoods,
   placedInterventions,
+  placedMedications = [],
   settings,
   onRemoveFromSlot,
   disabled,
@@ -250,6 +263,12 @@ export function SlotGrid({
     if (continuation) {
       const int = allInterventions.find(a => a.id === continuation.interventionId);
       if (int) return { type: 'continuation', intervention: int, parentSlotIndex: continuation.slotHour! };
+    }
+    // Check medication
+    const placed = placedMedications.find(m => m.slotHour === slotIndex);
+    if (placed) {
+      const med = allMedications.find(m => m.id === placed.medicationId);
+      if (med) return { type: 'medication', medication: med };
     }
     return null;
   };

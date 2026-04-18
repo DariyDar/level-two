@@ -183,6 +183,7 @@ export const useGameStore = create<GameState>()(
             placedInterventions: coveringInt
               ? state.placedInterventions.filter(i => i.id !== coveringInt.id)
               : state.placedInterventions,
+            placedMedications: state.placedMedications.filter(m => m.slotHour !== slotIndex),
           };
         }),
 

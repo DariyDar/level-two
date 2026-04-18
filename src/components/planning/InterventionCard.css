@@ -156,21 +156,6 @@
   background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
 }
 
-/* Placed medication — dimmed with checkmark */
-.intervention-card--placed {
-  opacity: 0.55;
-  cursor: default;
-}
-
-.intervention-card__placed-mark {
-  position: absolute;
-  top: 4px;
-  right: 6px;
-  font-size: 11px;
-  color: #86efac;
-  font-weight: 700;
-}
-
 /* Mobile portrait — fixed size, matches medication cards */
 @media (max-width: 480px) {
   .intervention-card {

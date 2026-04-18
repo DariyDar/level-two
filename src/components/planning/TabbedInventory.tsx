@@ -138,9 +138,14 @@ export function TabbedInventory({
 
   const medicationItems = useMemo(() => {
     return availableMedicationIds
-      .map(medId => allMedications.find(m => m.id === medId))
+      .map(medId => {
+        const med = allMedications.find(m => m.id === medId);
+        if (!med) return null;
+        const isPlaced = placedMedications.some(pm => pm.medicationId === medId);
+        return isPlaced ? null : med;
+      })
       .filter(Boolean) as Medication[];
-  }, [availableMedicationIds, allMedications]);
+  }, [availableMedicationIds, allMedications, placedMedications]);
 
   const hasMedications = medicationItems.length > 0;
   const hasInterventions = interventionItems.length > 0;
@@ -185,18 +190,14 @@ export function TabbedInventory({
       {/* Row 3: Medications — draggable cards */}
       {hasMedications && (
         <InventoryRow trackClassName="medication-section">
-          {medicationItems.map((med) => {
-            const isPlaced = placedMedications.some(pm => pm.medicationId === med.id);
-            return (
-              <MedicationCard
-                key={med.id}
-                medication={med}
-                instanceId={`medication-inventory-${med.id}`}
-                isPlaced={isPlaced}
-                onTap={onMedicationTap ? () => onMedicationTap(med.id) : undefined}
-              />
-            );
-          })}
+          {medicationItems.map((med) => (
+            <MedicationCard
+              key={med.id}
+              medication={med}
+              instanceId={`medication-inventory-${med.id}`}
+              onTap={onMedicationTap ? () => onMedicationTap(med.id) : undefined}
+            />
+          ))}
         </InventoryRow>
       )}
     </div>

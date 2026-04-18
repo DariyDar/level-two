@@ -49,6 +49,11 @@
   background: transparent;
 }
 
+.slot-container--medication {
+  border-color: #7c3aed;
+  background: transparent;
+}
+
 /* Hover state (controlled by React for multi-slot group hover) */
 .slot-container--hover.slot-container--filled {
   border-color: #e53e3e;
