@@ -224,8 +224,19 @@ export function BgGraph({
   const burningIntTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const prevInterventionIdsRef = useRef<Set<string>>(new Set());
 
+  // Medication sweep animation state (analogous to burningInterventions)
+  interface BurningMedication {
+    id: string;
+    medicationId: string;
+    dropColumn: number;
+    reduction: number[];
+    color: string;
+  }
+  const [burningMedications, setBurningMedications] = useState<Map<string, BurningMedication>>(new Map());
+  const burningMedTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const prevMedicationIdsRef = useRef<Set<string>>(new Set());
+
   // Bomb animation state (ПЖ/BOOST burns on food placement)
-  const [animatingBurnIds, setAnimatingBurnIds] = useState<Set<string>>(new Set());
   const [bombDrops, setBombDrops] = useState<DropBomb[]>([]);
   // Per-column bomb hit delays (ms) — non-null during pre-burn phase (food colored → flash → disappear)
   const [bombHitDelays, setBombHitDelays] = useState<Map<number, number> | null>(null);
@@ -999,48 +1010,49 @@ export function BgGraph({
     prevInterventionIdsRef.current = currIds;
   }, [placedInterventions, allInterventions]);
 
-  // Medication placement bomb: when placedMedications changes and food is on graph, animate newly burned med cells
-  const prevPlacedMedCountRef = useRef(0);
+  // Detect added medications → sweep animation (analogous to burningInterventions)
   useLayoutEffect(() => {
-    const prevCount = prevPlacedMedCountRef.current;
-    const currCount = placedMedications.length;
-    prevPlacedMedCountRef.current = currCount;
+    const currIds = new Set(placedMedications.map(p => p.id));
+    const prevIds = prevMedicationIdsRef.current;
 
-    if (!hideBurnedInPlanning) return;
-    if (currCount <= prevCount) return; // only animate when a med is added (not removed)
-    if (graphRenderData.layers.length === 0) return;
-
-    // Find newly burned med cubes
-    const newBurnIds = new Set<string>();
-    for (const layer of graphRenderData.layers) {
-      for (const cube of layer.cubes) {
-        if (cube.status !== 'burned') continue;
-        const c = cube.burnColor;
-        if (c === '#f0abfc' || c === '#c084fc' || c === '#a78bfa') {
-          newBurnIds.add(`${layer.placementId}-${cube.col}-${cube.row}`);
-        }
+    const added = placedMedications.filter(p => !prevIds.has(p.id));
+    if (added.length > 0) {
+      const newBurning = new Map(burningMedications);
+      for (const placed of added) {
+        const med = allMedications.find(m => m.id === placed.medicationId);
+        if (!med) continue;
+        const reduction = calculateMedicationCurve(med, placed.dropColumn);
+        const color = med.id === 'metformin' ? '#f0abfc' :
+                      med.id === 'sglt2'     ? '#c084fc' : '#a78bfa';
+        newBurning.set(placed.id, {
+          id: placed.id,
+          medicationId: med.id,
+          dropColumn: placed.dropColumn,
+          reduction,
+          color,
+        });
+        const timer = setTimeout(() => {
+          setBurningMedications(prev => {
+            const next = new Map(prev);
+            next.delete(placed.id);
+            return next;
+          });
+          burningMedTimersRef.current.delete(placed.id);
+        }, 2000);
+        burningMedTimersRef.current.set(placed.id, timer);
       }
+      setBurningMedications(newBurning);
     }
 
-    if (newBurnIds.size > 0) {
-      setAnimatingBurnIds(prev => {
-        const next = new Set(prev);
-        newBurnIds.forEach(id => next.add(id));
-        return next;
-      });
-      if (animateBurnTimerRef.current) clearTimeout(animateBurnTimerRef.current);
-      animateBurnTimerRef.current = setTimeout(() => {
-        setAnimatingBurnIds(new Set());
-        setBombDrops([]);
-      }, 2200);
-    }
+    prevMedicationIdsRef.current = currIds;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [placedMedications]);
+  }, [placedMedications, allMedications]);
 
   // Cleanup timers on unmount
   useEffect(() => () => {
     if (exitTimerRef.current) clearTimeout(exitTimerRef.current);
     for (const timer of burningIntTimersRef.current.values()) clearTimeout(timer);
+    for (const timer of burningMedTimersRef.current.values()) clearTimeout(timer);
     if (animateBurnTimerRef.current) {
       clearTimeout(animateBurnTimerRef.current);
       animateBurnTimerRef.current = null;
@@ -1329,12 +1341,11 @@ export function BgGraph({
                   if (cube.status === 'normal') return true;
                   if (cube.status === 'burned') {
                     if (!hideBurnedInPlanning) return true; // old behavior
-                    const cubeKey = `${layer.placementId}-${cube.col}-${cube.row}`;
                     // Pancreas/BOOST burns: visible as food-color during plateau phase or pre-bomb phase
                     const isPancreasBurn = cube.burnColor === '#f97316' || cube.burnColor === '#f59e0b';
                     if (isPancreasBurn) return plateauPhase || (bombHitDelays !== null && bombHitDelays.has(cube.col));
-                    // Med burns: visible only during med toggle animation
-                    return animatingBurnIds.has(cubeKey);
+                    // Med burns: always hidden during planning (sweep animation provides visual feedback)
+                    return false;
                   }
                   return true;
                 }
@@ -1352,7 +1363,6 @@ export function BgGraph({
                 return false;
               })
               .map(cube => {
-              const cubeKey = `${layer.placementId}-${cube.col}-${cube.row}`;
               const isPancreasBurnCube = cube.burnColor === '#f97316' || cube.burnColor === '#f59e0b';
               const cascadeVisible = cascadeLevels === null || cube.row < cascadeLevels[cube.col];
               // Plateau phase: static food-colored burn cube (no animation, full plateau visible)
@@ -1360,7 +1370,7 @@ export function BgGraph({
               const isPreBurnCube = !isPlateauBurnCube && hideBurnedInPlanning && cube.status === 'burned' && isPancreasBurnCube && bombHitDelays !== null && bombHitDelays.has(cube.col) && cascadeVisible;
               // Phase 1 of reveal: pancreas-burned cubes appear food-colored (no bombs yet)
               const isRevealPreBurn = revealPhase === 1 && cube.status === 'burned' && isPancreasBurnCube;
-              const isAnimatingBurn = !isPreBurnCube && !isRevealPreBurn && hideBurnedInPlanning && cube.status === 'burned' && animatingBurnIds.has(cubeKey);
+              const isAnimatingBurn = false; // med burns now use sweep animation; animatingBurnIds unused
               const waveDelay = (cube.col - layer.dropColumn) * 20;
               // Per-row stagger: bomb-0 hits row cap, bomb-1 hits row cap+1 (60ms later), etc.
               const burnK = isPreBurnCube ? Math.max(0, cube.row - graphRenderData.columnCaps[cube.col]) : 0;
@@ -1570,6 +1580,38 @@ export function BgGraph({
         )}
 
 
+
+        {/* Medication sweep animation — purple/fuchsia flash when medication placed */}
+        {burningMedications.size > 0 && (
+          <g pointerEvents="none">
+            {Array.from(burningMedications.values()).flatMap(bm => {
+              const { columnCaps } = graphRenderData;
+              return bm.reduction.flatMap((red, col) => {
+                if (red <= 0) return [];
+                const currentTop = columnCaps[col];
+                if (currentTop <= baselineRow) return [];
+                const effectiveRed = Math.min(red, currentTop - baselineRow);
+                if (effectiveRed <= 0) return [];
+                const waveDelay = Math.abs(col - bm.dropColumn) * 20;
+                const sweepY = rowToY(currentTop - effectiveRed) + 0.5;
+                const sweepH = effectiveRed * cellHeight - 1;
+                return [(
+                  <rect
+                    key={`med-sweep-${bm.id}-${col}`}
+                    x={colToX(col) + 0.5}
+                    y={sweepY}
+                    width={CELL_SIZE - 1}
+                    height={Math.max(3, sweepH)}
+                    fill={bm.color}
+                    rx={2}
+                    className="bg-graph__sweep-col"
+                    style={{ animationDelay: `${waveDelay}ms` }}
+                  />
+                )];
+              });
+            })}
+          </g>
+        )}
 
         {/* Meteor drop animation — insulin rain falling at 70° angle */}
         {bombDrops.length > 0 && (
