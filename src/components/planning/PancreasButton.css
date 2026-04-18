@@ -121,6 +121,16 @@
   animation: boostSegPulse 1.2s ease-in-out infinite;
 }
 
+/* ── Effectiveness bar blink (tutorial highlight) ── */
+@keyframes segBarBlink {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  40%       { opacity: 0.25; filter: brightness(0.6); }
+}
+
+.pancreas-btn__seg--bar-blink {
+  animation: segBarBlink 0.8s ease-in-out infinite;
+}
+
 /* ── Locked / disabled ── */
 .pancreas-btn--locked {
   opacity: 0.5;

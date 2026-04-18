@@ -6,6 +6,7 @@ interface PancreasButtonProps {
   onToggle: () => void;
   disabled?: boolean;
   isBlinking?: boolean;
+  isBarBlinking?: boolean; // pulse-blink orange effectiveness segments
   pancreasEffectiveness?: number; // 1-5, default 5 (fully healthy)
   hideCharges?: boolean; // hide BOOST charges row (indicator-only mode for T1)
 }
@@ -40,6 +41,7 @@ export function PancreasButton({
   onToggle,
   disabled = false,
   isBlinking = false,
+  isBarBlinking = false,
   pancreasEffectiveness = 5,
   hideCharges = false,
 }: PancreasButtonProps) {
@@ -78,7 +80,14 @@ export function PancreasButton({
       </div>
       <div className="pancreas-btn__bar">
         {segs.map((type, i) => (
-          <span key={i} className={`pancreas-btn__seg pancreas-btn__seg--${type}`} />
+          <span
+            key={i}
+            className={[
+              'pancreas-btn__seg',
+              `pancreas-btn__seg--${type}`,
+              isBarBlinking && type === 'orange' ? 'pancreas-btn__seg--bar-blink' : '',
+            ].filter(Boolean).join(' ')}
+          />
         ))}
       </div>
     </button>

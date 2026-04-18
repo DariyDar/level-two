@@ -900,6 +900,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
                   onToggle={handleToggleBoost}
                   disabled={gamePhase !== 'planning' || !showBoostCharges}
                   isBlinking={isPJBlinking || isPancreasBlinkingFromStep}
+                  isBarBlinking={tutorialStep?.highlightEffectivenessBar ?? false}
                   pancreasEffectiveness={pancreasEffectiveness}
                   hideCharges={!showBoostCharges}
                 />

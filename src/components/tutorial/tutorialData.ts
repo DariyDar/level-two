@@ -54,6 +54,7 @@ export interface TutorialStep {
   pauseOnDrop?: boolean;       // tutorial: intercept food drop — show hover preview without committing placement; advances tutorial on drop
   releasePendingDrop?: boolean; // tutorial: when step activates, commit the pending drop from pauseOnDrop step
   highlightPendingDrop?: boolean; // tutorial: blink the pending-drop preview cubes on the graph
+  highlightEffectivenessBar?: boolean; // tutorial: pulse-blink the orange effectiveness segments on PancreasButton
   highlightGILabel?: string;   // tutorial: food id whose GI label on ShipCard should blink
 }
 
@@ -74,10 +75,11 @@ const L_PF_D1: TutorialStep[] = [
   },
   {
     id: 'T4D1-3',
-    bubble: { type: 'hint', text: "You can monitor pancreas performance right here. Right now it's working at full strength — 5 out of 5.", expression: 'neutral', position: 'inventory' },
+    bubble: { type: 'hint', text: "We can see the pancreas performance right here. Right now it's working at full strength — 5 out of 5.", expression: 'neutral', position: 'inventory' },
     highlight: 'pancreas-btn',
     highlightType: 'pulse',
     pancreasEffectivenessOverride: 5,
+    highlightEffectivenessBar: true,
     noBackdrop: true,
     advanceOn: 'tap',
     blockInteraction: true,
