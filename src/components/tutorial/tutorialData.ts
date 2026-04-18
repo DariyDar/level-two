@@ -151,17 +151,6 @@ const L_PF_D1: TutorialStep[] = [
     advanceOn: 'action',
     expectedAction: { type: 'click-submit' },
   },
-  {
-    id: 'T4D1-11',
-    bubble: { type: 'dialogue', text: "That's a lot of excess sugar. Tomorrow I'll show you what helps reduce the load on the pancreas.", expression: 'concerned', position: 'inventory' },
-    pendingUntilResults: true,
-    highlight: 'result-next-btn',
-    highlightType: 'pulse',
-    cta: { type: 'tap-pulse', target: 'result-next-btn' },
-    noBackdrop: true,
-    blockInteraction: false,
-    advanceOn: 'tap',
-  },
 ];
 
 const L_PF_D2: TutorialStep[] = [
