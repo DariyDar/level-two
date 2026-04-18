@@ -153,6 +153,11 @@ interface RawMedicationConfig {
   durationMultiplier?: number;
   kcalMultiplier?: number;
   wpBonus?: number;
+  curveStart?: number;
+  curvePeak?: number;
+  curveRampCols?: number;
+  curveDecayRate?: number;
+  curveMinDepth?: number;
 }
 
 function transformMedication(raw: RawMedicationConfig): Medication {
@@ -167,6 +172,11 @@ function transformMedication(raw: RawMedicationConfig): Medication {
     durationMultiplier: raw.durationMultiplier,
     kcalMultiplier: raw.kcalMultiplier,
     wpBonus: raw.wpBonus,
+    curveStart: raw.curveStart,
+    curvePeak: raw.curvePeak,
+    curveRampCols: raw.curveRampCols,
+    curveDecayRate: raw.curveDecayRate,
+    curveMinDepth: raw.curveMinDepth,
   };
 }
 
