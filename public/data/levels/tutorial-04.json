@@ -25,13 +25,17 @@
     },
     {
       "day": 2,
-      "kcalBudget": 1500,
-      "wpBudget": 10,
+      "kcalBudget": 2000,
+      "wpBudget": 14,
       "pancreasEffectiveness": 4,
       "startingBg": 100,
       "availableFoods": [
-        { "id": "banana", "count": 1 },
-        { "id": "cookie", "count": 1 }
+        { "id": "banana",    "count": 1 },
+        { "id": "cookie",    "count": 1 },
+        { "id": "chickpeas", "count": 1 },
+        { "id": "sandwich",  "count": 1 },
+        { "id": "pizza",     "count": 1 },
+        { "id": "avocado",   "count": 1 }
       ],
       "availableInterventions": [
         { "id": "heavyrun", "count": 1 }
