@@ -488,7 +488,7 @@ const L2D3: TutorialStep[] = [
 const L3D1: TutorialStep[] = [
   {
     id: 'T5D1-1',
-    bubble: { type: 'dialogue', text: 'Only 5 \u2600\ufe0f today. Three foods to place \u2014 but you might not have enough WP for all of them!', expression: 'concerned' },
+    bubble: { type: 'dialogue', text: 'Some days we feel low and have less willpower \u2600\ufe0f at our disposal.', expression: 'concerned' },
     highlight: 'wp-counter',
     highlightType: 'glow',
     advanceOn: 'tap',
@@ -496,7 +496,7 @@ const L3D1: TutorialStep[] = [
   },
   {
     id: 'T5D1-2',
-    bubble: { type: 'dialogue', text: 'Place your first food on the graph.', expression: 'neutral', position: 'inventory' },
+    bubble: { type: 'dialogue', text: 'Let\u2019s use the willpower we have right now to schedule some meals!', expression: 'neutral', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
     advanceOn: 'action',
@@ -512,7 +512,7 @@ const L3D1: TutorialStep[] = [
   },
   {
     id: 'T5D1-4',
-    bubble: { type: 'warning', text: '1 WP left, but the last food costs 2! \u2615 Take a Break refunds 1 WP.', expression: 'concerned' },
+    bubble: { type: 'warning', text: 'Look \u2014 we only have 1 WP left, but we need 2 to schedule the next food!', expression: 'concerned' },
     highlight: 'intervention:takeabreak',
     highlightType: 'pulse',
     advanceOn: 'tap',
@@ -520,7 +520,7 @@ const L3D1: TutorialStep[] = [
   },
   {
     id: 'T5D1-5',
-    bubble: { type: 'dialogue', text: 'Drag \u2615 Take a Break to a slot \u2014 you\u2019ll get 1 WP back!', expression: 'happy', position: 'inventory' },
+    bubble: { type: 'dialogue', text: 'To gain some WP, we can plan a \u2615 Break. Let\u2019s place one!', expression: 'happy', position: 'inventory' },
     highlight: 'intervention:takeabreak',
     highlightType: 'pulse',
     cta: { type: 'drag-arrow', source: 'intervention:takeabreak' },
@@ -529,20 +529,11 @@ const L3D1: TutorialStep[] = [
   },
   {
     id: 'T5D1-6',
-    bubble: { type: 'dialogue', text: 'Place the last food!', expression: 'neutral', position: 'inventory' },
+    bubble: { type: 'dialogue', text: 'Well done! Now we have enough WP to finish the daily schedule \u2014 let\u2019s do it!', expression: 'neutral', position: 'inventory' },
     highlight: 'ship-inventory',
     highlightType: 'glow',
     advanceOn: 'action',
     expectedAction: { type: 'place-food' },
-  },
-  {
-    id: 'T5D1-7',
-    bubble: { type: 'success', text: 'All foods placed! Now submit.', expression: 'happy', position: 'inventory' },
-    highlight: 'submit-btn',
-    highlightType: 'pulse',
-    cta: { type: 'tap-pulse', target: 'submit-btn' },
-    advanceOn: 'action',
-    expectedAction: { type: 'click-submit' },
   },
 ];
 
