@@ -6,7 +6,7 @@
   "dayConfigs": [
     {
       "day": 1,
-      "kcalBudget": 1900,
+      "kcalBudget": 2000,
       "wpBudget": 6,
       "pancreasEffectiveness": 4,
       "startingBg": 100,
