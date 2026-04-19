@@ -64,10 +64,9 @@
       ],
       "availableMedications": ["metformin"],
       "preplacedFoods": [
-        { "shipId": "pizza",  "slotHour": 11 },
-        { "shipId": "burger", "slotHour": 13 }
+        { "shipId": "rice", "slotHour": 13 }
       ],
-      "lockedSlots": [8, 11, 13, 19]
+      "lockedSlots": [8, 13, 19]
     }
   ]
 }
