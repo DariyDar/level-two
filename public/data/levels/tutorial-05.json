@@ -6,7 +6,7 @@
   "dayConfigs": [
     {
       "day": 1,
-      "kcalBudget": 1900,
+      "kcalBudget": 2100,
       "wpBudget": 7,
       "pancreasEffectiveness": 4,
       "availableFoods": [
@@ -18,11 +18,13 @@
         { "id": "takeabreak", "count": 1 }
       ],
       "availableMedications": [],
-      "preplacedFoods": [],
+      "preplacedFoods": [
+        { "shipId": "oatmeal", "slotHour": 10 }
+      ],
       "preplacedInterventions": [
         { "interventionId": "lightwalk", "slotHour": 16 }
       ],
-      "lockedSlots": [8, 9, 12, 13, 16, 18, 19],
+      "lockedSlots": [8, 9, 10, 12, 13, 16, 18, 19],
       "insulinProfile": {
         "mode": "cumulative",
         "segments": [{ "from": 0, "to": 47, "rate": 1 }]
