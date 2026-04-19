@@ -8,6 +8,7 @@
       "day": 1,
       "kcalBudget": 1600,
       "wpBudget": 6,
+      "pancreasEffectiveness": 4,
       "availableFoods": [
         { "id": "oatmeal", "count": 1 },
         { "id": "banana",  "count": 1 }
@@ -33,6 +34,7 @@
       "day": 2,
       "kcalBudget": 2000,
       "wpBudget": 8,
+      "pancreasEffectiveness": 4,
       "availableFoods": [
         { "id": "banana",  "count": 1 },
         { "id": "cookie",  "count": 1 },
