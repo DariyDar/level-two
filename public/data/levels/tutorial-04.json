@@ -7,12 +7,13 @@
     {
       "day": 1,
       "kcalBudget": 2000,
-      "wpBudget": 6,
+      "wpBudget": 10,
       "pancreasEffectiveness": 4,
       "startingBg": 100,
       "availableFoods": [
         { "id": "nutsmixed",     "count": 1 },
-        { "id": "vegetablestew", "count": 1 }
+        { "id": "vegetablestew", "count": 1 },
+        { "id": "berriesmixed",   "count": 1 }
       ],
       "availableInterventions": [],
       "availableMedications": [],
