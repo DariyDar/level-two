@@ -13,7 +13,8 @@
       "availableFoods": [
         { "id": "nutsmixed",     "count": 1 },
         { "id": "vegetablestew", "count": 1 },
-        { "id": "berriesmixed",   "count": 1 }
+        { "id": "berriesmixed",   "count": 1 },
+        { "id": "rice",           "count": 1 }
       ],
       "availableInterventions": [],
       "availableMedications": [],
