@@ -11,8 +11,8 @@
       "pancreasEffectiveness": 4,
       "startingBg": 100,
       "availableFoods": [
-        { "id": "nutsmixed", "count": 1 },
-        { "id": "cookie",    "count": 1 }
+        { "id": "nutsmixed",     "count": 1 },
+        { "id": "vegetablestew", "count": 1 }
       ],
       "availableInterventions": [],
       "availableMedications": [],
