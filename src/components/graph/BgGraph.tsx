@@ -1114,7 +1114,7 @@ export function BgGraph({
 
         {/* Stress zone column bands */}
         {stressSlots && stressSlots.size > 0 && Array.from(stressSlots).map(slotIndex => {
-          const startCol = slotIndex * COLS_PER_SLOT;
+          const startCol = (slotIndex - GRAPH_CONFIG.startHour) * COLS_PER_SLOT;
           return (
             <rect
               key={`stress-zone-${slotIndex}`}
@@ -1229,7 +1229,7 @@ export function BgGraph({
 
         {/* Stress zone boundary lines and markers */}
         {stressSlots && stressSlots.size > 0 && Array.from(stressSlots).flatMap(slotIndex => {
-          const startCol = slotIndex * COLS_PER_SLOT;
+          const startCol = (slotIndex - GRAPH_CONFIG.startHour) * COLS_PER_SLOT;
           const endCol = startCol + COLS_PER_SLOT;
           const centerX = colToX(startCol) + (CELL_SIZE * COLS_PER_SLOT) / 2;
           return [
