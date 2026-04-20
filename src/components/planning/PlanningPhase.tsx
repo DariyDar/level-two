@@ -927,6 +927,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
               pancreasEffectiveness={pancreasEffectiveness ?? 5}
               replayBurnsTrigger={reburnTrigger}
               highlightBurns={tutorialStep?.highlightBurns ?? false}
+              highlightStressBurns={tutorialStep?.highlightStressBurns ?? false}
               highlightPendingDrop={tutorialStep?.highlightPendingDrop ?? false}
             />
             {isPlanning && showPancreasButton && (

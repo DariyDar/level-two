@@ -56,6 +56,7 @@ export interface TutorialStep {
   highlightPendingDrop?: boolean; // tutorial: blink the pending-drop preview cubes on the graph
   highlightEffectivenessBar?: boolean; // tutorial: pulse-blink the orange effectiveness segments on PancreasButton
   highlightGILabel?: string;   // tutorial: food id whose GI label on ShipCard should blink
+  highlightStressBurns?: boolean; // tutorial: pulse-blink pancreas-burned cubes only in stress slot columns
 }
 
 // ======= PANCREAS FATIGUE (T4) =======
@@ -1012,6 +1013,14 @@ const L_STRESS_D1: TutorialStep[] = [
   },
   {
     id: 'T7D1-4',
+    bubble: { type: 'dialogue', text: 'With pancreas fatigue and a stress slot in play, insulin really struggles \u2014 it can only burn through one cube of glucose now.', expression: 'concerned', position: 'inventory' },
+    showBurnsLayer: true,
+    highlightStressBurns: true,
+    noBackdrop: true,
+    advanceOn: 'tap',
+  },
+  {
+    id: 'T7D1-5',
     bubble: { type: 'hint', text: 'When possible, try to schedule meals outside stress slots \u2014 it helps insulin manage glucose spikes more effectively.', expression: 'neutral', position: 'inventory' },
     showBurnsLayer: true,
     highlightBurns: true,
@@ -1019,7 +1028,7 @@ const L_STRESS_D1: TutorialStep[] = [
     advanceOn: 'tap',
   },
   {
-    id: 'T7D1-5',
+    id: 'T7D1-6',
     bubble: { type: 'dialogue', text: 'Let\'s remove the food we placed and plan around this stressful time slot instead.', expression: 'happy', position: 'inventory' },
     highlight: 'stress-slots',
     highlightType: 'pulse',

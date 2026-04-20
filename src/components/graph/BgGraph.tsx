@@ -147,6 +147,7 @@ interface BgGraphProps {
   pancreasEffectiveness?: number;        // 1-5 — changes actual burn pattern depth in engine
   replayBurnsTrigger?: number;           // increment to replay bomb animation for all food columns
   highlightBurns?: boolean;              // tutorial: pulse-blink pancreas-burned (orange) cubes
+  highlightStressBurns?: boolean;        // tutorial: pulse-blink pancreas burns only in stress columns
   highlightPendingDrop?: boolean;        // tutorial: blink pending-drop preview cubes
 }
 
@@ -194,6 +195,7 @@ export function BgGraph({
   pancreasEffectiveness = 5,
   replayBurnsTrigger = 0,
   highlightBurns = false,
+  highlightStressBurns = false,
   highlightPendingDrop = false,
 }: BgGraphProps) {
   // Phased reveal removed — revealPhase is always undefined (all layers shown immediately)
@@ -1383,6 +1385,7 @@ export function BgGraph({
                 : waveDelay;
               const isPancreasBurnedCube = cube.status === 'burned' && cube.burnColor === '#f97316';
               const isMetforminBurnedCube = cube.status === 'burned' && cube.burnColor === '#f0abfc';
+              const isInStressCol = !!stressSlots?.has(Math.floor(cube.col / COLS_PER_SLOT) + GRAPH_CONFIG.startHour);
               const cubeClass = isPlateauBurnCube
                 ? 'bg-graph__cube'
                 : isPreBurnCube
@@ -1397,6 +1400,7 @@ export function BgGraph({
                         ? [
                             'bg-graph__cube--burned',
                             highlightBurns && isPancreasBurnedCube ? 'bg-graph__cube--pancreas-blink' : '',
+                            highlightStressBurns && isPancreasBurnedCube && isInStressCol ? 'bg-graph__cube--pancreas-blink' : '',
                             highlightMedEffect && isMetforminBurnedCube ? 'bg-graph__cube--pancreas-blink' : '',
                           ].filter(Boolean).join(' ')
                         : 'bg-graph__cube';
