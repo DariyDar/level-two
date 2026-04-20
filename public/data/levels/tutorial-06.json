@@ -17,7 +17,7 @@
         { "id": "takeabreak", "count": 1 },
         { "id": "lightwalk",  "count": 1 }
       ],
-      "availableMedications": [],
+      "availableMedications": ["metformin"],
       "preplacedFoods": [
         { "shipId": "chocolatemuffin", "slotHour": 9 }
       ],
@@ -43,7 +43,7 @@
         { "id": "heavyrun",   "count": 1 },
         { "id": "takeabreak", "count": 1 }
       ],
-      "availableMedications": [],
+      "availableMedications": ["metformin"],
       "preplacedFoods": [
         { "shipId": "chocolatemuffin", "slotHour": 9 }
       ],
@@ -68,7 +68,7 @@
         { "id": "heavyrun",  "count": 1 },
         { "id": "takearest", "count": 1 }
       ],
-      "availableMedications": [],
+      "availableMedications": ["metformin"],
       "preplacedFoods": [
         { "shipId": "chocolatemuffin", "slotHour": 8 },
         { "shipId": "pizza",           "slotHour": 12 }

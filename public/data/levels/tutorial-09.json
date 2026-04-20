@@ -16,7 +16,7 @@
       "availableInterventions": [
         { "id": "lightwalk", "count": 1 }
       ],
-      "availableMedications": ["glp1"],
+      "availableMedications": ["metformin", "glp1"],
       "preplacedFoods": [
         { "shipId": "burger", "slotHour": 8 }
       ],

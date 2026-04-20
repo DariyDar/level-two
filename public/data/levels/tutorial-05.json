@@ -17,7 +17,7 @@
       "availableInterventions": [
         { "id": "takeabreak", "count": 1 }
       ],
-      "availableMedications": [],
+      "availableMedications": ["metformin"],
       "preplacedFoods": [
         { "shipId": "oatmeal", "slotHour": 10 }
       ],
