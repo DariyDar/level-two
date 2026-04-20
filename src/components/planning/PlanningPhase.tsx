@@ -53,7 +53,7 @@ interface PlanningPhaseProps {
 // Tutorial level order for "Next Level" navigation
 const TUTORIAL_LEVEL_ORDER = [
   'tutorial-01', 'tutorial-02', 'tutorial-03', 'tutorial-04',
-  'tutorial-07', 'tutorial-08', 'tutorial-05', 'tutorial-09', 'tutorial-06', 'tutorial-10',
+  'tutorial-07', 'tutorial-08', 'tutorial-09', 'tutorial-06', 'tutorial-10',
 ];
 
 export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: PlanningPhaseProps = {}) {
