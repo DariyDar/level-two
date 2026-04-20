@@ -7,12 +7,15 @@
     {
       "day": 1,
       "kcalBudget": 1400,
-      "wpBudget": 6,
+      "wpBudget": 11,
       "pancreasEffectiveness": 4,
       "availableFoods": [
-        { "id": "pizza",  "count": 1 },
-        { "id": "banana", "count": 1 },
-        { "id": "cookie", "count": 1 }
+        { "id": "pizza",        "count": 1 },
+        { "id": "banana",       "count": 1 },
+        { "id": "cookie",       "count": 1 },
+        { "id": "berriesmixed", "count": 1 },
+        { "id": "chickpeas",    "count": 1 },
+        { "id": "rice",         "count": 1 }
       ],
       "availableInterventions": [
         { "id": "heavyrun",   "count": 1 },

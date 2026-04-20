@@ -7,15 +7,12 @@
     {
       "day": 1,
       "kcalBudget": 2000,
-      "wpBudget": 10,
+      "wpBudget": 5,
       "pancreasEffectiveness": 4,
       "availableFoods": [
-        { "id": "burger",       "count": 1 },
-        { "id": "nutsmixed",    "count": 1 },
-        { "id": "cookie",       "count": 1 },
-        { "id": "berriesmixed", "count": 1 },
-        { "id": "chickpeas",    "count": 1 },
-        { "id": "rice",         "count": 1 }
+        { "id": "burger",    "count": 1 },
+        { "id": "nutsmixed", "count": 1 },
+        { "id": "cookie",    "count": 1 }
       ],
       "availableInterventions": [
         { "id": "takeabreak", "count": 1 }
