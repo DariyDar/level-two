@@ -1041,7 +1041,10 @@ const L_STRESS_D1: TutorialStep[] = [
 const L_STRESS_D2: TutorialStep[] = [
   {
     id: 'T7D2-1',
-    bubble: { type: 'dialogue', text: 'Now there are THREE stress zones. Plan food placement carefully!', expression: 'concerned' },
+    bubble: { type: 'dialogue', text: 'Now there are THREE stress zones. Plan food placement carefully!', expression: 'concerned', position: 'inventory' },
+    highlight: 'stress-slots',
+    highlightType: 'pulse',
+    noBackdrop: true,
     advanceOn: 'tap',
   },
 ];
