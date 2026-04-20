@@ -416,6 +416,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
       if (overId === 'inventory-zone') {
         if (isFromSlot && fromSlotIndex !== undefined) {
           removeFromSlot(fromSlotIndex);
+          notifyTutorialAction({ type: 'remove-food', slotIndex: fromSlotIndex });
         }
         return;
       }
@@ -557,6 +558,11 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
     placeMedicationInSlot(medId, targetSlot);
     notifyTutorialAction({ type: 'toggle-medication', medicationId: medId });
   }, [gamePhase, placedFoods, placeMedicationInSlot, notifyTutorialAction]);
+
+  const handleRemoveFromSlot = useCallback((slotIndex: number) => {
+    removeFromSlot(slotIndex);
+    notifyTutorialAction({ type: 'remove-food', slotIndex });
+  }, [removeFromSlot, notifyTutorialAction]);
 
   const handleToggleBoost = useCallback(() => {
     if (!isBoostActive && barsAvailable <= 0) return;
@@ -960,7 +966,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
             placedInterventions={placedInterventions}
             placedMedications={placedMedications}
             settings={settings}
-            onRemoveFromSlot={removeFromSlot}
+            onRemoveFromSlot={handleRemoveFromSlot}
             disabled={!isPlanning}
             lockedSlots={effectiveLockedSlots}
             stressSlots={stressSlotSet}

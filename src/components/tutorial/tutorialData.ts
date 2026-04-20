@@ -22,7 +22,7 @@ export interface TutorialCTA {
 }
 
 export interface ExpectedAction {
-  type: 'place-food' | 'place-intervention' | 'toggle-medication' | 'toggle-boost' | 'click-submit';
+  type: 'place-food' | 'place-intervention' | 'toggle-medication' | 'toggle-boost' | 'click-submit' | 'remove-food';
   foodId?: string;
   slotIndex?: number;
   interventionId?: string;
@@ -1021,7 +1021,8 @@ const L_STRESS_D1: TutorialStep[] = [
     highlight: 'stress-slots',
     highlightType: 'pulse',
     noBackdrop: true,
-    advanceOn: 'tap',
+    advanceOn: 'action',
+    expectedAction: { type: 'remove-food', slotIndex: 12 },
   },
 ];
 
