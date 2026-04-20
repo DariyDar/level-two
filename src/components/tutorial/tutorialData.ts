@@ -1044,29 +1044,6 @@ const L_STRESS_D2: TutorialStep[] = [
     bubble: { type: 'dialogue', text: 'Now there are THREE stress zones. Plan food placement carefully!', expression: 'concerned' },
     advanceOn: 'tap',
   },
-  {
-    id: 'T7D2-2',
-    bubble: { type: 'warning', text: 'These red zones weaken your insulin — try to place food outside them!', expression: 'concerned' },
-    highlight: 'stress-slots',
-    advanceOn: 'tap',
-  },
-  {
-    id: 'T7D2-3',
-    bubble: { type: 'dialogue', text: 'You have a rest and a walk today. Rest recovers WP — walk fights any stray glucose spikes.', expression: 'neutral' },
-    highlight: 'intervention-inventory',
-    highlightType: 'glow',
-    advanceOn: 'tap',
-  },
-  {
-    id: 'T7D2-4',
-    bubble: { type: 'dialogue', text: 'If you must place something in a stress zone, use the walk to compensate!', expression: 'thinking' },
-    advanceOn: 'tap',
-  },
-  {
-    id: 'T7D2-5',
-    bubble: { type: 'dialogue', text: 'Good luck — 2\u2605 is achievable if you avoid the red zones.', expression: 'happy' },
-    advanceOn: 'tap',
-  },
 ];
 
 // ======= LEVEL 2 — Energy Balance (kcal tutorial) =======
