@@ -1012,7 +1012,10 @@ const L_STRESS_D1: TutorialStep[] = [
   },
   {
     id: 'T7D1-4',
-    bubble: { type: 'hint', text: 'When possible, try to schedule meals outside stress slots \u2014 it helps insulin manage glucose spikes more effectively.', expression: 'neutral' },
+    bubble: { type: 'hint', text: 'When possible, try to schedule meals outside stress slots \u2014 it helps insulin manage glucose spikes more effectively.', expression: 'neutral', position: 'inventory' },
+    showBurnsLayer: true,
+    highlightBurns: true,
+    noBackdrop: true,
     advanceOn: 'tap',
   },
   {
