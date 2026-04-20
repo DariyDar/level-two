@@ -537,32 +537,6 @@ const L3D1: TutorialStep[] = [
   },
 ];
 
-const L3D3: TutorialStep[] = [
-  {
-    id: 'T5D2-1',
-    bubble: { type: 'dialogue', text: 'Day 3! When you overeat, you lose Willpower Points the next day.', expression: 'neutral' },
-    highlight: 'wp-counter',
-    highlightType: 'glow',
-    advanceOn: 'tap',
-    blockInteraction: true,
-  },
-  {
-    id: 'T5D2-2',
-    bubble: { type: 'dialogue', text: 'New tool: \ud83d\ude34 Take a Rest! It refunds 2 WP but takes 2 slots and 120 minutes. Great for recovering willpower!', expression: 'neutral' },
-    highlight: 'intervention-inventory',
-    highlightType: 'spotlight',
-    advanceOn: 'tap',
-    blockInteraction: true,
-  },
-  {
-    id: 'T5D2-3',
-    bubble: { type: 'dialogue', text: 'The burger is pre-placed. Use your tools to manage the spike and submit!', expression: 'happy', position: 'inventory' },
-    highlight: 'ship-inventory',
-    highlightType: 'glow',
-    advanceOn: 'action',
-    expectedAction: { type: 'click-submit' },
-  },
-];
 
 // ======= LEVEL 4 — Pancreas Boost =======
 
@@ -1212,7 +1186,7 @@ const TUTORIAL_STEPS: Record<string, Record<number, TutorialStep[]>> = {
   'tutorial-02': { 1: L_KCAL_D1, 2: L_KCAL_D2 },
   'tutorial-03': { 1: L2D1, 2: L2D3, 3: L2D2 },
   'tutorial-04': { 1: L_PF_D1, 2: L_PF_D2 },            // Pancreas Fatigue (NEW)
-  'tutorial-05': { 1: L3D1, 2: L3D3 },                   // Willpower Management (← old T4)
+  'tutorial-05': { 1: L3D1, 2: [], 3: [] },               // Willpower Management (← old T4)
   'tutorial-06': { 1: L4D1, 2: L4D2, 3: L4D3 },         // Pancreas Boost (← old T5)
   'tutorial-07': { 1: L_STRESS_D1, 2: L_STRESS_D2, 3: [] }, // Under Stress (← old T6)
   'tutorial-08': { 1: L6D1, 2: L6D2 },
