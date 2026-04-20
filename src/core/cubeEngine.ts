@@ -1,5 +1,5 @@
 import type { PlacedFood, Ship, PlacedIntervention, Intervention, Medication, MedicationModifiers, MedicationReductions, PlacedMedication, PenaltyResult } from './types';
-import { GRAPH_CONFIG, TOTAL_COLUMNS, DEFAULT_MEDICATION_MODIFIERS, PENALTY_ORANGE_ROW, PENALTY_RED_ROW, PENALTY_ORANGE_WEIGHT, PENALTY_RED_WEIGHT, calculateStars } from './types';
+import { GRAPH_CONFIG, TOTAL_COLUMNS, COLS_PER_SLOT, DEFAULT_MEDICATION_MODIFIERS, PENALTY_ORANGE_ROW, PENALTY_RED_ROW, PENALTY_ORANGE_WEIGHT, PENALTY_RED_WEIGHT, calculateStars } from './types';
 
 export interface CubeColumn {
   columnOffset: number; // offset from drop column (0, 1, 2, ...)
@@ -381,6 +381,7 @@ export function calculatePenaltyFromState(
   boostActive: boolean = false,
   baselineRow: number = 0,
   pancreasEffectiveness?: number,
+  stressSlots?: Set<number>,
 ): PenaltyResult {
   const medicationModifiers = computeMedicationModifiers(placedMedications, allMedications);
   const medReductions = calculateMedicationReductions(placedMedications, allMedications);
@@ -406,7 +407,9 @@ export function calculatePenaltyFromState(
   // Column caps using positional medication reductions
   const pancreasPattern = getEffectivenessPattern(pancreasEffectiveness ?? 5);
   const columnCaps = totalHeights.map((h, col) => {
-    const pancreasD = patternDepth(pancreasPattern, col);
+    const rawPancreasD = patternDepth(pancreasPattern, col);
+    const stressSlotHour = Math.floor(col / COLS_PER_SLOT) + GRAPH_CONFIG.startHour;
+    const pancreasD = stressSlots?.has(stressSlotHour) ? Math.max(0, rawPancreasD - 1) : rawPancreasD;
     const boostD = boostActive ? patternDepth(BOOST_PATTERN, col) : 0;
     const metforminD = medReductions.metformin[col];
     const glp1D = medReductions.glp1[col];

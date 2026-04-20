@@ -10,6 +10,7 @@
       "wpBudget": 6,
       "pancreasEffectiveness": 4,
       "availableFoods": [
+        { "id": "pizza",  "count": 1 },
         { "id": "banana", "count": 1 },
         { "id": "cookie", "count": 1 }
       ],
@@ -18,10 +19,7 @@
         { "id": "takeabreak", "count": 1 }
       ],
       "availableMedications": ["metformin"],
-      "preplacedFoods": [
-        { "shipId": "pizza", "slotHour": 10 }
-      ],
-      "lockedSlots": [8, 10],
+      "lockedSlots": [8],
       "stressSlots": [12],
       "insulinProfile": {
         "mode": "cumulative",

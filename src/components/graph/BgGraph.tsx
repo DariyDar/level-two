@@ -377,7 +377,9 @@ export function BgGraph({
 
     for (let col = 0; col < TOTAL_COLUMNS; col++) {
       const h = pancreasCaps[col];
-      const pancreasD = patternDepth(getEffectivenessPattern(pancreasEffectiveness), col);
+      const rawPancreasD = patternDepth(getEffectivenessPattern(pancreasEffectiveness), col);
+      const stressSlotHour = Math.floor(col / COLS_PER_SLOT) + GRAPH_CONFIG.startHour;
+      const pancreasD = stressSlots?.has(stressSlotHour) ? Math.max(0, rawPancreasD - 1) : rawPancreasD;
       const boostD = boostActive ? patternDepth(BOOST_PATTERN, col) : 0;
       const metforminD = medReductions.metformin[col];
       const glp1D = medReductions.glp1[col];
@@ -557,7 +559,7 @@ export function BgGraph({
     const mainSkylinePath = mainParts.length > 0 ? mainParts.join(' ') : '';
 
     return { layers, mainSkylinePath, columnCaps, pancreasCaps, effectiveRows, pancreasDepths, boostDepths, metforminDepths, sglt2Depths, sglt2FloorRow: medReductions.sglt2FloorRow, glp1Depths, plateauExtraRows };
-  }, [placedFoods, allShips, medicationModifiers, placedMedications, allMedications, decayRate, boostActive, interventionReduction, interventionReductions, baselineRow, graphH, pancreasEffectiveness]);
+  }, [placedFoods, allShips, medicationModifiers, placedMedications, allMedications, decayRate, boostActive, interventionReduction, interventionReductions, baselineRow, graphH, pancreasEffectiveness, stressSlots]);
 
   // Dynamic Y-axis: cellHeight adapts when cubes exceed default 400 mg/dL
   const { effectiveRows } = graphRenderData;

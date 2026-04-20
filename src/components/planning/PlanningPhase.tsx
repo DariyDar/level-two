@@ -604,6 +604,7 @@ export function PlanningPhase({ isTutorial, onBackToTutorials, onNextLevel }: Pl
       isBoostActive,
       baselineRow,
       configEffectiveness,
+      stressSlotSet,
     );
 
     // Last day: add WP penalty for unspent WP
