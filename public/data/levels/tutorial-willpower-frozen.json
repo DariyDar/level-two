@@ -1,0 +1,78 @@
+{
+  "id": "tutorial-05",
+  "name": "Willpower Management",
+  "description": "Master WP budgeting, breaks, and the consequences of overeating.",
+  "days": 3,
+  "dayConfigs": [
+    {
+      "day": 1,
+      "kcalBudget": 2000,
+      "wpBudget": 5,
+      "pancreasEffectiveness": 4,
+      "availableFoods": [
+        { "id": "burger",    "count": 1 },
+        { "id": "nutsmixed", "count": 1 },
+        { "id": "cookie",    "count": 1 }
+      ],
+      "availableInterventions": [
+        { "id": "takeabreak", "count": 1 }
+      ],
+      "availableMedications": ["metformin"],
+      "preplacedFoods": [
+        { "shipId": "oatmeal", "slotHour": 10 }
+      ],
+      "preplacedInterventions": [
+        { "interventionId": "lightwalk", "slotHour": 16 }
+      ],
+      "lockedSlots": [8, 9, 10, 12, 13, 16, 18, 19],
+      "startingBg": 100
+    },
+    {
+      "day": 2,
+      "kcalBudget": 2100,
+      "wpBudget": 8,
+      "pancreasEffectiveness": 4,
+      "availableFoods": [
+        { "id": "burger",    "count": 1 },
+        { "id": "banana",    "count": 1 },
+        { "id": "cookie",    "count": 1 },
+        { "id": "chickpeas", "count": 1 }
+      ],
+      "availableInterventions": [
+        { "id": "lightwalk", "count": 1 },
+        { "id": "takearest", "count": 1 }
+      ],
+      "availableMedications": ["metformin"],
+      "preplacedFoods": [
+        { "shipId": "sandwich", "slotHour": 8 }
+      ],
+      "lockedSlots": [8, 16, 17, 20, 21, 22, 23],
+      "startingBg": 100
+    },
+    {
+      "day": 3,
+      "kcalBudget": 2200,
+      "wpBudget": 12,
+      "pancreasEffectiveness": 4,
+      "availableFoods": [
+        { "id": "pizza",    "count": 1 },
+        { "id": "banana",   "count": 1 },
+        { "id": "cookie",   "count": 1 },
+        { "id": "sandwich", "count": 1 }
+      ],
+      "availableInterventions": [
+        { "id": "lightwalk",  "count": 1 },
+        { "id": "heavyrun",   "count": 1 },
+        { "id": "takeabreak", "count": 1 },
+        { "id": "takearest",  "count": 1 }
+      ],
+      "availableMedications": ["metformin"],
+      "preplacedFoods": [
+        { "shipId": "oatmeal", "slotHour": 6 },
+        { "shipId": "burger",  "slotHour": 14 }
+      ],
+      "lockedSlots": [6, 14, 20, 21, 22, 23],
+      "startingBg": 100
+    }
+  ]
+}

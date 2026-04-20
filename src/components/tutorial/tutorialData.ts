@@ -486,7 +486,7 @@ const L2D3: TutorialStep[] = [
 
 // ======= LEVEL 3 — Willpower Management =======
 
-const L3D1: TutorialStep[] = [
+export const _L3D1_willpower_frozen: TutorialStep[] = [
   {
     id: 'T5D1-1',
     bubble: { type: 'dialogue', text: 'Some days we feel low and have less willpower \u2600\ufe0f at our disposal.', expression: 'concerned' },
@@ -1183,9 +1183,8 @@ const TUTORIAL_STEPS: Record<string, Record<number, TutorialStep[]>> = {
   'tutorial-02': { 1: L_KCAL_D1, 2: L_KCAL_D2 },
   'tutorial-03': { 1: L2D1, 2: L2D3, 3: L2D2 },
   'tutorial-04': { 1: L_PF_D1, 2: L_PF_D2 },            // Pancreas Fatigue (NEW)
-  'tutorial-05': { 1: L3D1, 2: [], 3: [] },               // Willpower Management (← old T4)
-  'tutorial-06': { 1: L4D1, 2: L4D2, 3: L4D3 },         // Pancreas Boost (← old T5)
-  'tutorial-07': { 1: L_STRESS_D1, 2: L_STRESS_D2, 3: [] }, // Under Stress (← old T6)
+  'tutorial-05': { 1: L_STRESS_D1, 2: L_STRESS_D2, 3: [] }, // Under Stress
+  'tutorial-06': { 1: L4D1, 2: L4D2, 3: L4D3 },            // Pancreas Boost
   'tutorial-08': { 1: L6D1, 2: L6D2 },
   'tutorial-09': { 1: L7D1, 2: L7D2 },
   'tutorial-10': { 1: L8D1, 2: L8D2, 3: L8D3 },

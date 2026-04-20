@@ -14,7 +14,7 @@ const TUTORIAL_LEVELS: TutorialLevel[] = [
   { id: 'tutorial-02', name: 'Eat in Balance',   days: 3, emoji: '\ud83e\udd57', gradient: 'linear-gradient(135deg, #34d399, #059669)' },
   { id: 'tutorial-03', name: 'Exercises',         days: 3, emoji: '\ud83d\udeb6', gradient: 'linear-gradient(135deg, #4ade80, #16a34a)' },
   { id: 'tutorial-04', name: 'Pancreas Fatigue',  days: 3, emoji: '\ud83e\udec0', gradient: 'linear-gradient(135deg, #f97316, #c2410c)' },
-  { id: 'tutorial-07', name: 'Under Stress',      days: 3, emoji: '\ud83e\uddd8', gradient: 'linear-gradient(135deg, #2dd4bf, #0f766e)' },
+  { id: 'tutorial-05', name: 'Under Stress',      days: 3, emoji: '\ud83e\uddd8', gradient: 'linear-gradient(135deg, #2dd4bf, #0f766e)' },
   { id: 'tutorial-08', name: 'SGLT2',             days: 2, emoji: '\ud83e\uddea', gradient: 'linear-gradient(135deg, #f472b6, #db2777)' },
   // tutorial-05 (Willpower Mgmt) hidden — frozen until further notice
   { id: 'tutorial-09', name: 'GLP-1',             days: 2, emoji: '\ud83d\udc89', gradient: 'linear-gradient(135deg, #8b5cf6, #6d28d9)' },
